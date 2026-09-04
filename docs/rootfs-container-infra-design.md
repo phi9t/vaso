@@ -2,6 +2,7 @@
 
 **Status:** Draft design record
 **Date:** 2026-08-19
+**Last updated:** 2026-09-04
 
 ## Purpose
 
@@ -14,6 +15,41 @@ The innermost insulation layer is always a `bwrap` rootfs. Docker is not a
 runtime dependency for Vaso execution. Rootfs materialization may be automated
 by scripts, but the runtime contract is a `bwrap` process over a materialized
 root filesystem, with all host state projected explicitly.
+
+## Reference and Downstream Implementations
+
+Vaso owns the versioned rootfs contract, schemas, conformance behavior, and an
+executable reference implementation. The Vaso CLI is the reference operator
+surface for materialization, planning, execution, and evidence. A downstream
+ML repository may expose its own repository-specific launcher while preserving
+the observable Vaso contract.
+
+Downstream implementations are self-contained. They pin a released Vaso
+specification version and digest, implement and test the required behavior in
+their own repository, and pass the public conformance suite. They do not import
+the Vaso Python package, call a Vaso service, require a Vaso checkout, or depend
+on another repository at build or runtime. Compatibility is behavioral rather
+than a shared-code dependency.
+
+The specification, digest, and conformance suite described here become public
+interfaces only when v1 is frozen. Until then, this document and the current
+implementation are a draft reference and must not be represented as a released
+compatibility standard.
+
+## Initial GPU Qualification
+
+NVIDIA B200 is the first production GPU qualification target. Qualification
+must cover the PyTorch/CUDA userspace stack, projected host driver, device
+access, and applicable distributed communication behavior from inside the
+selected rootfs. A sanitized qualification receipt binds the result to the
+exact Vaso commit, rootfs identity, profile, and qualification inputs. Signing
+and trust-root requirements belong to the release trust model and must be
+defined before production qualification.
+
+The validation tiers below remain a functional progression; B200 qualification
+is a release gate over the applicable tiers, not a replacement name for any
+tier. Other accelerators and GPU generations remain unqualified until their own
+profiles and evidence are approved.
 
 ## Source-Grounded References
 
