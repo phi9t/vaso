@@ -1,0 +1,7 @@
+# Marks native/gzip as a Bazel package so gzip.bzl is loadable from
+# MODULE.bazel. The @gzip_native repo is materialized by the gzip_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["gzip.bzl"])

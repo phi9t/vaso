@@ -1,0 +1,78 @@
+{
+  "packages": {
+    "spack_bison": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_m4"
+      ],
+      "link_libs": [
+        "y"
+      ],
+      "native_prefix": "@bison_native//:lib",
+      "package": "bison",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/bison-3.8.2-4qaumm37uog2t7mfl4zmq6x2cwtk3cwx",
+      "spack_hash": "4qaumm37uog2t7mfl4zmq6x2cwtk3cwx",
+      "version": "3.8.2"
+    },
+    "spack_diffutils": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libiconv"
+      ],
+      "link_libs": [],
+      "native_prefix": "@diffutils_native//:lib",
+      "package": "diffutils",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/diffutils-3.12-2gbb2j56nzjeq2ejlhopq2twu4van7ii",
+      "spack_hash": "2gbb2j56nzjeq2ejlhopq2twu4van7ii",
+      "version": "3.12"
+    },
+    "spack_libiconv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "charset",
+        "iconv"
+      ],
+      "native_prefix": "@libiconv_native//:lib",
+      "package": "libiconv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libiconv-1.18-l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "spack_hash": "l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "version": "1.18"
+    },
+    "spack_libsigsegv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "sigsegv"
+      ],
+      "native_prefix": "@libsigsegv_native//:lib",
+      "package": "libsigsegv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libsigsegv-2.15-r4a3kvxxanxl6ca2iyz3hlrhjjklzvaz",
+      "spack_hash": "r4a3kvxxanxl6ca2iyz3hlrhjjklzvaz",
+      "version": "2.15"
+    },
+    "spack_m4": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libsigsegv"
+      ],
+      "link_libs": [],
+      "native_prefix": "@m4_native//:lib",
+      "package": "m4",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/m4-1.4.21-rodh3g6jpvojzq4lyrc7xeeo7pcey2ig",
+      "spack_hash": "rodh3g6jpvojzq4lyrc7xeeo7pcey2ig",
+      "version": "1.4.21"
+    }
+  },
+  "root": "spack_bison",
+  "schema_version": 1
+}

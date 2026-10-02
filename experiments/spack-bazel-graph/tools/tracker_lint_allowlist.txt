@@ -1,0 +1,3 @@
+# Existing tracker violations are grandfathered here as:
+# .scratch/<effort>/issues/<ticket>.md<TAB><rule-code>
+# Entries must only shrink: a stale entry fails //tools:tracker_lint_live_test.

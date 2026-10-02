@@ -1,0 +1,7 @@
+# Marks native/utf8proc as a Bazel package so utf8proc.bzl is loadable from
+# MODULE.bazel. The @utf8proc_native repo is materialized by the
+# utf8proc_native repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["utf8proc.bzl"])

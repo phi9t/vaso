@@ -1,0 +1,24 @@
+{
+  "packages": {
+    "spack_pcre2": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pcre2-16",
+        "pcre2-32",
+        "pcre2-8",
+        "pcre2-posix"
+      ],
+      "native_prefix": "@pcre2_native//:lib",
+      "package": "pcre2",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pcre2-10.44-iplcr7o6iu7nyaurkfmeokpby6dozfaq",
+      "spack_hash": "iplcr7o6iu7nyaurkfmeokpby6dozfaq",
+      "version": "10.44"
+    }
+  },
+  "root": "spack_pcre2",
+  "schema_version": 1
+}

@@ -1,0 +1,167 @@
+# Existing identity/codegen toolchain settings outside Bazel C++ toolchain
+# configuration. Entries are keyed as:
+#   file:variable:normalised-value
+#
+# Remove entries only after a single-native insula parity proof for the owning
+# native. Stale entries fail the ratchet guard.
+native/binutils/binutils.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/binutils/binutils.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/boost/boost.bzl:CXX:${CXX:-g++}
+native/cairo/cairo.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/cairo/cairo.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/cairo/cairo.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/cpuinfo/cpuinfo.bzl:CC:${CC:-gcc}
+native/cpuinfo/cpuinfo.bzl:CMAKE_CXX_COMPILER:/usr/bin/g++
+native/cpuinfo/cpuinfo.bzl:CMAKE_CXX_FLAGS:${spack_target_flags}
+native/cpuinfo/cpuinfo.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/cpuinfo/cpuinfo.bzl:CMAKE_C_FLAGS:${spack_target_flags}
+native/cpuinfo/cpuinfo.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/cpuinfo/cpuinfo.bzl:CXX:${CXX:-g++}
+native/cpuinfo/cpuinfo.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/curl/curl.bzl:CC:${CC:-gcc}
+native/eigen/eigen.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/elfutils/elfutils.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/elfutils/elfutils.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/file/file.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/file/file.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/fp16/fp16.bzl:CC:${CC:-gcc}
+native/fp16/fp16.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/fp16/fp16.bzl:CXX:${CXX:-g++}
+native/freetype/freetype.bzl:CC:${CC:-gcc}
+native/fxdiv/fxdiv.bzl:CC:${CC:-gcc}
+native/fxdiv/fxdiv.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/fxdiv/fxdiv.bzl:CXX:${CXX:-g++}
+native/gdbm/gdbm.bzl:CPPFLAGS:-D_GNU_SOURCE ${dep_cppflags}
+native/git/git.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/git/git.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/glib/glib.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/glib/glib.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/glib/glib.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/glib_bootstrap/glib_bootstrap.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/glib_bootstrap/glib_bootstrap.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/glib_bootstrap/glib_bootstrap.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/gobject_introspection/gobject_introspection.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/gobject_introspection/gobject_introspection.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/gobject_introspection/gobject_introspection.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/harfbuzz/harfbuzz.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/harfbuzz/harfbuzz.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/harfbuzz/harfbuzz.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/icu4c/icu4c.bzl:CC:gcc
+native/icu4c/icu4c.bzl:CFLAGS:${spack_cflags} ${spack_target_flags}
+native/icu4c/icu4c.bzl:CFLAGS:<unset>
+native/icu4c/icu4c.bzl:CXX:g++
+native/icu4c/icu4c.bzl:CXXFLAGS:${spack_target_flags}
+native/icu4c/icu4c.bzl:CXXFLAGS:-std=c++17
+native/icu4c/icu4c.bzl:spack_cflags:-O2 -std=c11 -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings
+native/icu4c/icu4c.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/krb5/krb5.bzl:CFLAGS:-fcommon
+native/libevent/libevent.bzl:CC:${CC:-gcc}
+native/libjpeg_turbo/libjpeg_turbo.bzl:CC:${CC:-gcc}
+native/libjpeg_turbo/libjpeg_turbo.bzl:CMAKE_ASM_NASM_COMPILER:$NASM
+native/libjpeg_turbo/libjpeg_turbo.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/libjpeg_turbo/libjpeg_turbo.bzl:CXX:${CXX:-g++}
+native/libpng/libpng.bzl:CC:${CC:-gcc}
+native/libpng/libpng.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/libpng/libpng.bzl:CXX:${CXX:-g++}
+native/libraqm/libraqm.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/libraqm/libraqm.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/libraqm/libraqm.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/libxml2/libxml2.bzl:CFLAGS:-fPIC -DPIC ${CFLAGS:-}
+native/llvm/llvm.bzl:CMAKE_CXX_COMPILER:/usr/bin/g++
+native/llvm/llvm.bzl:CMAKE_CXX_FLAGS:${spack_target_flags}
+native/llvm/llvm.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/llvm/llvm.bzl:CMAKE_C_FLAGS:${spack_target_flags}
+native/llvm/llvm.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/llvm/llvm.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/lua/lua.bzl:CC:${CC:-gcc} -std=gnu99 -fPIC
+native/ncurses/ncurses.bzl:CFLAGS:-O2 -fPIC ${CFLAGS:-}
+native/ncurses/ncurses.bzl:CXXFLAGS:-O2 -fPIC ${CXXFLAGS:-}
+native/ninja/ninja.bzl:CFLAGS:${spack_target_flags} ${CFLAGS:-}
+native/ninja/ninja.bzl:CXXFLAGS:${spack_target_flags} ${CXXFLAGS:-}
+native/ninja/ninja.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/nlohmann_json/nlohmann_json.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/nvtx/nvtx.bzl:CC:/usr/bin/gcc
+native/nvtx/nvtx.bzl:CXX:/usr/bin/g++
+native/openblas/openblas.bzl:CC:${CC:-gcc}
+native/openblas/openblas.bzl:RANLIB:ranlib
+native/openmpi/openmpi.bzl:CC:${CC:-/usr/bin/gcc}
+native/openmpi/openmpi.bzl:CFLAGS:-O3 -DNDEBUG -DYY_BUF_SIZE=1048576 -finline-functions ${CFLAGS:-}
+native/openmpi/openmpi.bzl:CXX:${CXX:-/usr/bin/g++}
+native/openmpi/openmpi.bzl:CXXFLAGS:-O3 -DNDEBUG -finline-functions ${CXXFLAGS:-}
+native/openmpi/openmpi.bzl:FC:${FC:-/usr/bin/gfortran}
+native/pcre2/pcre2.bzl:CFLAGS:${CFLAGS:-} -O2 -fvisibility=hidden
+native/pigz/pigz.bzl:CC:${CC:-cc}
+native/pigz/pigz.bzl:CFLAGS:-O3 -Wall -I${ZLIB_PREFIX}/include
+native/pixman/pixman.bzl:CFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CFLAGS:-}
+native/pixman/pixman.bzl:CXXFLAGS:-O3 -g0 ${spack_target_flags} ${CPPFLAGS} ${CXXFLAGS:-}
+native/pixman/pixman.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/pmix/pmix.bzl:CC:${CC:-gcc}
+native/pmix/pmix.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/pmix/pmix.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/protobuf/protobuf.bzl:CMAKE_CXX_COMPILER:/usr/bin/g++
+native/protobuf/protobuf.bzl:CMAKE_CXX_FLAGS:${spack_target_flags}
+native/protobuf/protobuf.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/protobuf/protobuf.bzl:CMAKE_C_FLAGS:${spack_target_flags}
+native/protobuf/protobuf.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/prrte/prrte.bzl:CC:${CC:-gcc}
+native/prrte/prrte.bzl:CFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CFLAGS:-}
+native/prrte/prrte.bzl:CXXFLAGS:-O3 -g0 -march=icelake-client -mtune=icelake-client ${CXXFLAGS:-}
+native/psimd/psimd.bzl:CC:${CC:-gcc}
+native/psimd/psimd.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/psimd/psimd.bzl:CXX:${CXX:-g++}
+native/pthreadpool/pthreadpool.bzl:CC:${CC:-gcc}
+native/pthreadpool/pthreadpool.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/pthreadpool/pthreadpool.bzl:CXX:${CXX:-g++}
+native/py_cython/py_cython.bzl:CC:/usr/bin/gcc
+native/py_cython/py_cython.bzl:CXX:/usr/bin/g++
+native/py_kiwisolver/py_kiwisolver.bzl:CC:/usr/bin/gcc
+native/py_kiwisolver/py_kiwisolver.bzl:CXX:$PWD/spack-target-g++
+native/py_llvmlite/py_llvmlite.bzl:CMAKE_CXX_COMPILER:/usr/bin/g++
+native/py_llvmlite/py_llvmlite.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/py_llvmlite/py_llvmlite.bzl:CXXFLAGS:-fPIC -I${PYTHON_PREFIX}/include/python${PYTHON_ABI} ${CXXFLAGS:-}
+native/py_llvmlite/py_llvmlite.bzl:CXX_FLTO_FLAGS:-flto -fPIC
+native/py_markupsafe/py_markupsafe.bzl:CC:/usr/bin/gcc
+native/py_markupsafe/py_markupsafe.bzl:CXX:/usr/bin/g++
+native/py_ml_dtypes/py_ml_dtypes.bzl:CC:$wrapper_dir/gcc
+native/py_ml_dtypes/py_ml_dtypes.bzl:CXX:$wrapper_dir/g++
+native/py_ml_dtypes/py_ml_dtypes.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/py_pybind11/py_pybind11.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/py_numpy/py_numpy.bzl:CC:$wrapper_dir/gcc
+native/py_numpy/py_numpy.bzl:CXX:$wrapper_dir/g++
+native/py_numpy/py_numpy.bzl:F77:
+native/py_numpy/py_numpy.bzl:F90:
+native/py_numpy/py_numpy.bzl:FC:
+native/py_numpy/py_numpy.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/py_scipy/py_scipy.bzl:CC:$wrapper_dir/gcc
+native/py_scipy/py_scipy.bzl:CXX:$wrapper_dir/g++
+native/py_scipy/py_scipy.bzl:FC:$wrapper_dir/gfortran
+native/py_scipy/py_scipy.bzl:F77:$wrapper_dir/gfortran
+native/py_scipy/py_scipy.bzl:F90:$wrapper_dir/gfortran
+native/py_scipy/py_scipy.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/py_protobuf/py_protobuf.bzl:CC:/usr/bin/gcc
+native/py_protobuf/py_protobuf.bzl:CXX:/usr/bin/g++
+native/py_pyyaml/py_pyyaml.bzl:CC:/usr/bin/gcc
+native/py_pyyaml/py_pyyaml.bzl:CXX:/usr/bin/g++
+native/python/python.bzl:CFLAGS:-fPIC ${CFLAGS:-}
+native/qhull/qhull.bzl:CMAKE_CXX_COMPILER:/usr/bin/g++
+native/qhull/qhull.bzl:CMAKE_CXX_FLAGS:${spack_target_flags}
+native/qhull/qhull.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/qhull/qhull.bzl:CMAKE_C_FLAGS:${spack_target_flags}
+native/qhull/qhull.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/qhull/qhull.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/re2c/re2c.bzl:CFLAGS:${spack_target_flags} ${CFLAGS:-}
+native/re2c/re2c.bzl:CXXFLAGS:${spack_target_flags} ${CXXFLAGS:-}
+native/re2c/re2c.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/sqlite/sqlite.bzl:CPPFLAGS:-DSQLITE_ENABLE_COLUMN_METADATA=1 ${dep_cppflags}
+native/sleef/sleef.bzl:CC:${CC:-gcc}
+native/sleef/sleef.bzl:CMAKE_C_COMPILER:/usr/bin/gcc
+native/sleef/sleef.bzl:CMAKE_INTERPROCEDURAL_OPTIMIZATION:OFF
+native/swig/swig.bzl:CFLAGS:${spack_target_flags} ${CFLAGS:-}
+native/swig/swig.bzl:CXXFLAGS:${spack_target_flags} ${CXXFLAGS:-}
+native/swig/swig.bzl:spack_target_flags:-march=icelake-client -mtune=icelake-client
+native/unzip/unzip.bzl:LOC:-Wno-error=implicit-function-declaration -Wno-error=implicit-int -DLARGE_FILE_SUPPORT
+synthetic/abi_parity_gate.sh:CC:${CC:-${CXX:-c++}}
+tools/spack_lock.sh:CC:${CC:-/usr/bin/gcc}
+tools/spack_lock.sh:CXX:${CXX:-/usr/bin/g++}
+tools/spack_lock.sh:F77:${F77:-/usr/bin/gfortran}
+tools/spack_lock.sh:FC:${FC:-/usr/bin/gfortran}

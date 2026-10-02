@@ -1,0 +1,4 @@
+# Marks native/py_kiwisolver as a Bazel package so the repository rule can be
+# loaded from MODULE.bazel and included in hermetic-dependency guard tests.
+
+exports_files(["py_kiwisolver.bzl"])

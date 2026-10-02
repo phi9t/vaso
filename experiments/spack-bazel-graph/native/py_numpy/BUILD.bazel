@@ -1,0 +1,9 @@
+# Marks native/py_numpy as a Bazel package so the repository rule can be
+# loaded from MODULE.bazel.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "check_executables.patch",
+    "py_numpy.bzl",
+])

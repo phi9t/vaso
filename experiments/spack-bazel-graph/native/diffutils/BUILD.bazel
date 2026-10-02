@@ -1,0 +1,6 @@
+# Marks native/diffutils as a Bazel package so diffutils.bzl is loadable from MODULE.bazel.
+# The actual @diffutils_native repo is materialized by the diffutils_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["diffutils.bzl"])

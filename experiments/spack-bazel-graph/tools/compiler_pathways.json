@@ -1,0 +1,442 @@
+{
+  "schema_version": 1,
+  "source": ".scratch/execution-plan/spec.md#human-decision-2026-10-02-enforce-the-compiler-pathway",
+  "rootfs": {
+    "cuda_prefix": "/usr/local/cuda",
+    "cuda_nvcc": "/usr/local/cuda/bin/nvcc",
+    "gcc": {
+      "cc": "/usr/bin/gcc",
+      "cxx": "/usr/bin/g++"
+    },
+    "binutils_ld": "/usr/bin/ld"
+  },
+  "llvm": {
+    "prefix": "/usr/lib/llvm-23",
+    "bin": "/usr/lib/llvm-23/bin",
+    "clang": "/usr/lib/llvm-23/bin/clang",
+    "clangxx": "/usr/lib/llvm-23/bin/clang++",
+    "lld": "/usr/lib/llvm-23/bin/ld.lld",
+    "source_commit": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+    "source_commit_prefix": "35901313"
+  },
+  "vendored_prebuilt_allowlist": {
+    "basename_prefixes": [
+      "libcuda.so",
+      "libcublas.so",
+      "libcublasLt.so",
+      "libcudart.so",
+      "libcudnn.so",
+      "libcudnn_adv.so",
+      "libcudnn_cnn.so",
+      "libcudnn_engines_precompiled.so",
+      "libcudnn_engines_runtime_compiled.so",
+      "libcudnn_graph.so",
+      "libcudnn_heuristic.so",
+      "libcudnn_ops.so",
+      "libcufft.so",
+      "libcufftw.so",
+      "libcufile.so",
+      "libcupti.so",
+      "libcurand.so",
+      "libcusolver.so",
+      "libcusolverMg.so",
+      "libcusparse.so",
+      "libcusparseLt.so",
+      "libcudss.so",
+      "libnccl.so",
+      "libnpp",
+      "libnvJitLink.so",
+      "libnvToolsExt.so",
+      "libnvidia-",
+      "libnvjpeg.so",
+      "libnvrtc.so",
+      "libnvrtc-builtins.so",
+      "libnvshmem",
+      "libnvvm.so",
+      "libnvptxcompiler.so",
+      "libnvinfer.so",
+      "libnvinfer_builder_resource.so",
+      "libnvinfer_dispatch.so",
+      "libnvinfer_lean.so",
+      "libnvinfer_plugin.so",
+      "libnvinfer_vc_plugin.so"
+    ]
+  },
+  "default_profile": "torch",
+  "profiles": {
+    "torch": {
+      "description": "Stage 1 torch profile: torch, torchvision, torchaudio and Triton are built with rootfs gcc 13.3.",
+      "consumers": {
+        "torch": {
+          "aliases": [
+            "pytorch"
+          ],
+          "allowed_host_cc_paths": [
+            "/usr/bin/gcc"
+          ],
+          "allowed_host_cxx_paths": [
+            "/usr/bin/g++"
+          ],
+          "cuda_compiler": {
+            "kind": "nvcc",
+            "path": "/usr/local/cuda/bin/nvcc",
+            "host": "/usr/bin/gcc"
+          },
+          "linker": {
+            "kind": "binutils-ld",
+            "path": "/usr/bin/ld"
+          },
+          "required": {
+            "env": {
+              "USE_CUDA": "1",
+              "CUDA_HOME": "/usr/local/cuda",
+              "CUDA_PATH": "/usr/local/cuda"
+            },
+            "path_entries": [
+              "/usr/local/cuda/bin",
+              "/usr/bin"
+            ]
+          },
+          "forbidden": {
+            "env": {
+              "CC": [
+                "clang",
+                "/usr/lib/llvm-23/bin/clang"
+              ],
+              "CXX": [
+                "clang++",
+                "/usr/lib/llvm-23/bin/clang++"
+              ],
+              "CUDAHOSTCXX": [
+                "clang",
+                "clang++"
+              ],
+              "CMAKE_C_COMPILER": [
+                "clang"
+              ],
+              "CMAKE_CXX_COMPILER": [
+                "clang++"
+              ]
+            },
+            "substrings": [
+              "-allow-unsupported-compiler",
+              "TF_NVCC_CLANG",
+              "USE_HERMETIC_CC_TOOLCHAIN=1"
+            ],
+            "regexes": [
+              "/usr/lib/llvm-(?!23\\b)[^\\s:]*"
+            ]
+          },
+          "artifact_comment": {
+            "required_substrings": [
+              "GCC: (Ubuntu 13.3.0"
+            ],
+            "ignored_comments": [
+              {
+                "path_regex": "(^|/)libtorch_nvshmem\\.so$",
+                "comment_regex": "GCC: \\(GNU\\) 8\\.5\\.0 .* \\(Red Hat 8\\.5\\.0-[0-9]+\\)"
+              }
+            ],
+            "allowed_regexes": [
+              "GCC: \\(Ubuntu 13\\.3\\.0"
+            ],
+            "forbidden_regexes": [
+              "clang version",
+              "GCC: \\((?!Ubuntu 13\\.3\\.0)"
+            ]
+          }
+        },
+        "torchvision": {
+          "aliases": [
+            "vision"
+          ],
+          "allowed_host_cc_paths": [
+            "/usr/bin/gcc"
+          ],
+          "allowed_host_cxx_paths": [
+            "/usr/bin/g++"
+          ],
+          "cuda_compiler": {
+            "kind": "nvcc",
+            "path": "/usr/local/cuda/bin/nvcc",
+            "host": "/usr/bin/gcc"
+          },
+          "linker": {
+            "kind": "binutils-ld",
+            "path": "/usr/bin/ld"
+          },
+          "required": {
+            "env": {
+              "FORCE_CUDA": "1",
+              "CUDA_HOME": "/usr/local/cuda",
+              "CUDA_PATH": "/usr/local/cuda"
+            },
+            "path_entries": [
+              "/usr/local/cuda/bin",
+              "/usr/bin"
+            ]
+          },
+          "forbidden": {
+            "env": {
+              "CC": [
+                "clang",
+                "/usr/lib/llvm-23/bin/clang"
+              ],
+              "CXX": [
+                "clang++",
+                "/usr/lib/llvm-23/bin/clang++"
+              ],
+              "CUDAHOSTCXX": [
+                "clang",
+                "clang++"
+              ],
+              "CMAKE_C_COMPILER": [
+                "clang"
+              ],
+              "CMAKE_CXX_COMPILER": [
+                "clang++"
+              ]
+            },
+            "substrings": [
+              "-allow-unsupported-compiler",
+              "TF_NVCC_CLANG",
+              "USE_HERMETIC_CC_TOOLCHAIN=1"
+            ],
+            "regexes": [
+              "/usr/lib/llvm-(?!23\\b)[^\\s:]*"
+            ]
+          },
+          "artifact_comment": {
+            "required_substrings": [
+              "GCC: (Ubuntu 13.3.0"
+            ],
+            "allowed_regexes": [
+              "GCC: \\(Ubuntu 13\\.3\\.0"
+            ],
+            "forbidden_regexes": [
+              "clang version",
+              "GCC: \\((?!Ubuntu 13\\.3\\.0)"
+            ]
+          }
+        },
+        "torchaudio": {
+          "aliases": [
+            "audio"
+          ],
+          "allowed_host_cc_paths": [
+            "/usr/bin/gcc"
+          ],
+          "allowed_host_cxx_paths": [
+            "/usr/bin/g++"
+          ],
+          "cuda_compiler": {
+            "kind": "nvcc",
+            "path": "/usr/local/cuda/bin/nvcc",
+            "host": "/usr/bin/gcc"
+          },
+          "linker": {
+            "kind": "binutils-ld",
+            "path": "/usr/bin/ld"
+          },
+          "required": {
+            "env": {
+              "USE_CUDA": "1",
+              "CUDA_HOME": "/usr/local/cuda",
+              "CUDA_PATH": "/usr/local/cuda"
+            },
+            "path_entries": [
+              "/usr/local/cuda/bin",
+              "/usr/bin"
+            ]
+          },
+          "forbidden": {
+            "env": {
+              "CC": [
+                "clang",
+                "/usr/lib/llvm-23/bin/clang"
+              ],
+              "CXX": [
+                "clang++",
+                "/usr/lib/llvm-23/bin/clang++"
+              ],
+              "CUDAHOSTCXX": [
+                "clang",
+                "clang++"
+              ],
+              "CMAKE_C_COMPILER": [
+                "clang"
+              ],
+              "CMAKE_CXX_COMPILER": [
+                "clang++"
+              ]
+            },
+            "substrings": [
+              "-allow-unsupported-compiler",
+              "TF_NVCC_CLANG",
+              "USE_HERMETIC_CC_TOOLCHAIN=1"
+            ],
+            "regexes": [
+              "/usr/lib/llvm-(?!23\\b)[^\\s:]*"
+            ]
+          },
+          "artifact_comment": {
+            "required_substrings": [
+              "GCC: (Ubuntu 13.3.0"
+            ],
+            "allowed_regexes": [
+              "GCC: \\(Ubuntu 13\\.3\\.0"
+            ],
+            "forbidden_regexes": [
+              "clang version",
+              "GCC: \\((?!Ubuntu 13\\.3\\.0)"
+            ]
+          }
+        },
+        "triton": {
+          "aliases": [
+            "Triton"
+          ],
+          "allowed_host_cc_paths": [
+            "/usr/bin/gcc"
+          ],
+          "allowed_host_cxx_paths": [
+            "/usr/bin/g++"
+          ],
+          "cuda_compiler": {
+            "kind": "none",
+            "runtime_assembler": "/usr/local/cuda/bin/ptxas"
+          },
+          "linker": {
+            "kind": "binutils-ld",
+            "path": "/usr/bin/ld"
+          },
+          "required_module_constants": {
+            "ONE_LLVM_COMMIT": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e"
+          },
+          "required": {
+            "env": {
+              "LLVM_SYSPATH": "/usr/lib/llvm-23",
+              "TRITON_PTXAS_PATH": "/usr/local/cuda/bin/ptxas",
+              "TRITON_PTXAS_BLACKWELL_PATH": "/usr/local/cuda/bin/ptxas"
+            },
+            "path_entries": [
+              "/usr/local/cuda/bin",
+              "/usr/bin"
+            ]
+          },
+          "forbidden": {
+            "env": {
+              "CC": [
+                "clang",
+                "/usr/lib/llvm-23/bin/clang"
+              ],
+              "CXX": [
+                "clang++",
+                "/usr/lib/llvm-23/bin/clang++"
+              ],
+              "TRITON_BUILD_WITH_CLANG_LLD": [
+                "1"
+              ]
+            },
+            "substrings": [
+              "-allow-unsupported-compiler",
+              "TF_NVCC_CLANG",
+              "USE_HERMETIC_CC_TOOLCHAIN=1"
+            ],
+            "regexes": [
+              "/usr/lib/llvm-(?!23\\b)[^\\s:]*"
+            ]
+          },
+          "artifact_comment": {
+            "required_substrings": [
+              "GCC: (Ubuntu 13.3.0"
+            ],
+            "allowed_regexes": [
+              "GCC: \\(Ubuntu 13\\.3\\.0"
+            ],
+            "forbidden_regexes": [
+              "clang version",
+              "GCC: \\((?!Ubuntu 13\\.3\\.0)"
+            ]
+          }
+        }
+      }
+    },
+    "jax": {
+      "description": "Stage 2 JAX profile: jaxlib/XLA is built with rootfs clang 23.",
+      "consumers": {
+        "jaxlib": {
+          "aliases": [
+            "jax",
+            "xla"
+          ],
+          "allowed_host_cc_paths": [
+            "/usr/lib/llvm-23/bin/clang"
+          ],
+          "allowed_host_cxx_paths": [
+            "/usr/lib/llvm-23/bin/clang++"
+          ],
+          "cuda_compiler": {
+            "kind": "clang",
+            "path": "/usr/lib/llvm-23/bin/clang"
+          },
+          "linker": {
+            "kind": "lld",
+            "path": "/usr/lib/llvm-23/bin/ld.lld"
+          },
+          "required_module_constants": {
+            "ONE_LLVM_COMMIT": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e"
+          },
+          "required": {
+            "env": {
+              "CC": "/usr/lib/llvm-23/bin/clang",
+              "CXX": "/usr/lib/llvm-23/bin/clang++",
+              "LOCAL_CUDA_PATH": "/usr/local/cuda",
+              "LOCAL_CUDNN_PATH": "/usr/local/cuda",
+              "LOCAL_NCCL_PATH": "/usr/local/cuda",
+              "LOCAL_NVSHMEM_PATH": "/usr/local/cuda"
+            },
+            "args": [
+              "--bazel_options=--config=build_cuda_with_clang",
+              "--clang_path=/usr/lib/llvm-23/bin/clang",
+              "--bazel_options=--repo_env=USE_HERMETIC_CC_TOOLCHAIN=0",
+              "--bazel_options=--@rules_ml_toolchain//common:enable_hermetic_cc=False"
+            ],
+            "path_entries": [
+              "/usr/lib/llvm-23/bin",
+              "/usr/local/cuda/bin",
+              "/usr/bin"
+            ]
+          },
+          "forbidden": {
+            "substrings": [
+              "build_cuda_with_nvcc",
+              "TF_NVCC_CLANG",
+              "-allow-unsupported-compiler",
+              "USE_HERMETIC_CC_TOOLCHAIN=1"
+            ],
+            "regexes": [
+              "/usr/lib/llvm-(?!23\\b)[^\\s:]*"
+            ]
+          },
+          "artifact_comment": {
+            "required_substrings": [
+              "clang version 23.0.0git",
+              "35901313"
+            ],
+            "ignored_regexes": [
+              "GCC: \\(Ubuntu 13\\.3\\.0-6ubuntu2~24\\.04\\.1\\) 13\\.3\\.0"
+            ],
+            "allowed_regexes": [
+              "clang version 23\\.0\\.0git.*35901313",
+              "Linker: LLD 23\\.0\\.0.*35901313"
+            ],
+            "forbidden_regexes": [
+              "clang version (?!23\\.0\\.0git.*35901313)"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

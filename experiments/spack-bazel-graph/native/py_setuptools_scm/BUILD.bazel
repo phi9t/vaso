@@ -1,0 +1,6 @@
+# Marks native/py_setuptools_scm as a Bazel package so the repository rule can
+# be loaded from MODULE.bazel.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["py_setuptools_scm.bzl"])

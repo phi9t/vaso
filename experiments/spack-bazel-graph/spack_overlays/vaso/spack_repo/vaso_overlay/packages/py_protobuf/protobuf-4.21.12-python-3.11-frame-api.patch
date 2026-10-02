@@ -1,0 +1,80 @@
+--- a/google/protobuf/pyext/descriptor.cc
++++ b/google/protobuf/pyext/descriptor.cc
+@@ -99,6 +99,70 @@
+   if (frame == nullptr) {
+     return false;
+   }
++#if PY_VERSION_HEX >= 0x030B0000
++  ScopedPyObjectPtr owned_frame;
++  while (stacklevel-- > 0) {
++    PyFrameObject* back = PyFrame_GetBack(frame);
++    owned_frame.reset(reinterpret_cast<PyObject*>(back));
++    frame = back;
++    if (frame == nullptr) {
++      return false;
++    }
++  }
++
++  ScopedPyObjectPtr code(reinterpret_cast<PyObject*>(PyFrame_GetCode(frame)));
++  if (code.get() == nullptr) {
++    PyErr_Clear();
++    return false;
++  }
++
++  ScopedPyObjectPtr filename_object(
++      PyObject_GetAttrString(code.get(), "co_filename"));
++  if (filename_object.get() == nullptr) {
++    PyErr_Clear();
++    return false;
++  }
++
++  char* filename;
++  Py_ssize_t filename_size;
++  if (PyString_AsStringAndSize(filename_object.get(),
++                               &filename, &filename_size) < 0) {
++    // filename is not a string.
++    PyErr_Clear();
++    return false;
++  }
++  if ((filename_size < 3) ||
++      (strcmp(&filename[filename_size - 3], ".py") != 0)) {
++    // Cython's stack does not have .py file name and is not at global module
++    // scope.
++    return true;
++  }
++  if (filename_size < 7) {
++    // filename is too short.
++    return false;
++  }
++  if (strcmp(&filename[filename_size - 7], "_pb2.py") != 0) {
++    // Filename is not ending with _pb2.
++    return false;
++  }
++
++  ScopedPyObjectPtr globals(PyFrame_GetGlobals(frame));
++  if (globals.get() == nullptr) {
++    PyErr_Clear();
++    return false;
++  }
++
++  ScopedPyObjectPtr locals(PyFrame_GetLocals(frame));
++  if (locals.get() == nullptr) {
++    PyErr_Clear();
++    return false;
++  }
++
++  if (globals.get() != locals.get()) {
++    // Not at global module scope
++    return false;
++  }
++#else
+   while (stacklevel-- > 0) {
+     frame = frame->f_back;
+     if (frame == nullptr) {
+@@ -137,6 +201,7 @@
+     return false;
+   }
+ #endif
++#endif
+   return true;
+ }

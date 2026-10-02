@@ -1,0 +1,10 @@
+# Marks native/ncurses as a Bazel package so ncurses.bzl is loadable from
+# MODULE.bazel. The Spack patch is a repository-owned input copied from the
+# Bazel-vendored Spack v1.2.2 package recipe evidence.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "ncurses.bzl",
+    "rxvt_unicode_6_4.patch",
+])

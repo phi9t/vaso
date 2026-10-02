@@ -1,0 +1,48 @@
+{
+  "packages": {
+    "spack_libpciaccess": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pciaccess"
+      ],
+      "native_prefix": "@libpciaccess_native//:lib",
+      "package": "libpciaccess",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libpciaccess-0.17-e6mggyjmjm4irx6j2djubhoj5j2pshuj",
+      "spack_hash": "e6mggyjmjm4irx6j2djubhoj5j2pshuj",
+      "version": "0.17"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    },
+    "spack_util_macros": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@util_macros_native//:lib",
+      "package": "util-macros",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-macros-1.20.2-xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "spack_hash": "xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "version": "1.20.2"
+    }
+  },
+  "root": "spack_libpciaccess",
+  "schema_version": 1
+}

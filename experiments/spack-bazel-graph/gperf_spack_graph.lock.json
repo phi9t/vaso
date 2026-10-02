@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_gperf": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@gperf_native//:lib",
+      "package": "gperf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/gperf-3.3-l26jrf5imbae3hynvykmqzitwamrhaxg",
+      "spack_hash": "l26jrf5imbae3hynvykmqzitwamrhaxg",
+      "version": "3.3"
+    }
+  },
+  "root": "spack_gperf",
+  "schema_version": 1
+}

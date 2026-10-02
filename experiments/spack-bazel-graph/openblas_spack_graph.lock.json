@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "spack_openblas": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "openblas",
+        "openblas-r0.3.33"
+      ],
+      "native_prefix": "@openblas_native//:lib",
+      "package": "openblas",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/openblas-0.3.33-6phoxmaa62vdfy3jzbnejrlwodjforpz",
+      "spack_hash": "6phoxmaa62vdfy3jzbnejrlwodjforpz",
+      "version": "0.3.33"
+    }
+  },
+  "root": "spack_openblas",
+  "schema_version": 1
+}

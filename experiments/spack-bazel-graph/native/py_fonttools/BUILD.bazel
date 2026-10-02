@@ -1,0 +1,4 @@
+# Marks native/py_fonttools as a Bazel package so the repository rule can be
+# loaded from MODULE.bazel.
+
+exports_files(["py_fonttools.bzl"])

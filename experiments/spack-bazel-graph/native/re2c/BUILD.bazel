@@ -1,0 +1,7 @@
+# Marks native/re2c as a Bazel package so re2c.bzl is loadable from
+# MODULE.bazel. The @re2c_native repo is materialized by the re2c_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["re2c.bzl"])

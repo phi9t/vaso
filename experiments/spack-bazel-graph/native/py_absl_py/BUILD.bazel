@@ -1,0 +1,4 @@
+# Marks native/py_absl_py as a Bazel package so the repository rule can be
+# loaded from MODULE.bazel.
+
+exports_files(["py_absl_py.bzl"])

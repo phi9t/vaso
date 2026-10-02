@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_util_macros": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@util_macros_native//:lib",
+      "package": "util-macros",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-macros-1.20.2-xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "spack_hash": "xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "version": "1.20.2"
+    }
+  },
+  "root": "spack_util_macros",
+  "schema_version": 1
+}

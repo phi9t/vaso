@@ -1,0 +1,6 @@
+# Marks native/libffi as a Bazel package so libffi.bzl is loadable from MODULE.bazel.
+# The actual @libffi_native repo is materialized by the libffi_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libffi.bzl"])

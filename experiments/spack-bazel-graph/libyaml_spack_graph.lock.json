@@ -1,0 +1,21 @@
+{
+  "packages": {
+    "spack_libyaml": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "yaml"
+      ],
+      "native_prefix": "@libyaml_native//:lib",
+      "package": "libyaml",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libyaml-0.2.5-u5wr3urg73gjnyysrxmcd4t6dmkyifhn",
+      "spack_hash": "u5wr3urg73gjnyysrxmcd4t6dmkyifhn",
+      "version": "0.2.5"
+    }
+  },
+  "root": "spack_libyaml",
+  "schema_version": 1
+}

@@ -1,0 +1,2028 @@
+{
+  "archive": {
+    "directory_count": 14814,
+    "excludes": [
+      "*/.git"
+    ],
+    "file_count": 141195,
+    "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+    "format": "tar.zst",
+    "path": "$VASO_ESTATE_ROOT/sources/pytorch/distdir/pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+    "regular_file_count": 141186,
+    "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+    "size_bytes": 676775505,
+    "strip_prefix": "pytorch-v2.14.0",
+    "symlink_count": 9,
+    "tar_entry_count": 156017,
+    "tar_options": [
+      "--sort=name",
+      "--mtime=@0",
+      "--owner=0",
+      "--group=0",
+      "--numeric-owner",
+      "--exclude=*/.git"
+    ],
+    "total_file_like_count": 141195,
+    "zstd_level": 6
+  },
+  "bazel_input": {
+    "label": "@pytorch_v2_14_0_source//:all",
+    "offline_failure_contract": "The repository rule must fail when the sha256-pinned archive is absent from --distdir/repository_cache; it must not fetch during the build.",
+    "recommended_repository_rule": "http_archive with --distdir seeded from the estate distdir",
+    "repository_name": "pytorch_v2_14_0_source",
+    "required_bazel_flags": [
+      "--repository_disable_download",
+      "--distdir=$VASO_ESTATE_ROOT/sources/pytorch/distdir",
+      "--repository_cache=<bazel-owned cache>"
+    ],
+    "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+    "strip_prefix": "pytorch-v2.14.0",
+    "urls": [
+      "https://example.invalid/vaso/pytorch-v2.14.0-2b3ec348-recursive.tar.zst"
+    ]
+  },
+  "cross_checks": [
+    {
+      "evidence": [
+        "CMakeLists.txt:332-340 declares USE_NCCL/USE_SYSTEM_NCCL.",
+        "cmake/PreBuildSteps.cmake:90-147 would FetchContent NCCL if USE_SYSTEM_NCCL is off and third_party/nccl is absent.",
+        "experiments/spack-bazel-graph/native/pytorch/plan.py:329-333 sets USE_NCCL=1 and USE_SYSTEM_NCCL=1."
+      ],
+      "name": "NCCL",
+      "policy": "system-provider",
+      "result": "requires rootfs/native provider via USE_SYSTEM_NCCL=1",
+      "source_presence": "not a PyTorch submodule"
+    },
+    {
+      "evidence": [
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:18-56",
+        "experiments/spack-bazel-graph/native/pytorch/plan.py:145-158"
+      ],
+      "name": "protobuf/ONNX ODR",
+      "policy": "system protobuf, vendored ONNX",
+      "result": "no conflict"
+    },
+    {
+      "evidence": [
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:24-35"
+      ],
+      "name": "forbidden ODR submodules",
+      "policy": "not admitted",
+      "result": "third_party/abseil-cpp, third_party/boost, and third_party/grpc are absent from the recursive status manifest"
+    }
+  ],
+  "full_feature_dependency_cross_checks": [
+    {
+      "evidence": [
+        "CMakeLists.txt:332-340 declares USE_NCCL/USE_SYSTEM_NCCL.",
+        "cmake/PreBuildSteps.cmake:90-147 would FetchContent NCCL if USE_SYSTEM_NCCL is off and third_party/nccl is absent."
+      ],
+      "name": "NCCL",
+      "paths": [],
+      "policy": "system-provider",
+      "provider": "rootfs NCCL if compatible, otherwise native NCCL provider",
+      "required_env": [
+        "USE_NCCL=1",
+        "USE_SYSTEM_NCCL=1",
+        "USE_STATIC_NCCL=0"
+      ],
+      "source_presence": "not a submodule"
+    },
+    {
+      "evidence": [],
+      "name": "gloo",
+      "paths": [
+        {
+          "gitlink_commit": "74cc005ae13f69c11d8a41e50b42025b6730e796",
+          "path": "third_party/gloo",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_DISTRIBUTED=1",
+        "USE_GLOO=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "tensorpipe",
+      "paths": [
+        {
+          "gitlink_commit": "2b4cd91092d335a697416b2a3cb398283246849d",
+          "path": "third_party/tensorpipe",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "910b55815be16109f04f4180e9adee14fb4ce281",
+          "path": "third_party/tensorpipe/third_party/libnop",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b",
+          "path": "third_party/tensorpipe/third_party/libuv",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_TENSORPIPE=1",
+        "USE_RPC=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "cutlass",
+      "paths": [
+        {
+          "gitlink_commit": "e05f953a5b3d38adc240df2ff928e0421c2abba3",
+          "path": "third_party/cutlass",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "7127592069c2fe01b041e174ba4345ef9b279671",
+          "path": "third_party/flash-attention/csrc/cutlass",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "571edeb2d0ac872a8392fc49285b156b07884b4e",
+          "path": "third_party/mslk/external/cutlass",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_CUDA=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "flash-attention",
+      "paths": [
+        {
+          "gitlink_commit": "14c377950125c70b7a9dabf9c561fca53715ac7d",
+          "path": "third_party/flash-attention",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "7127592069c2fe01b041e174ba4345ef9b279671",
+          "path": "third_party/flash-attention/csrc/cutlass",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_FLASH_ATTENTION=1",
+        "USE_MEM_EFF_ATTENTION=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "fbgemm",
+      "paths": [
+        {
+          "gitlink_commit": "bf6dce360a4fe133bc779e2fd036277678509f95",
+          "path": "third_party/fbgemm",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "a3199e8857792cd10b7589ff5d58343d2c9008ea",
+          "path": "third_party/fbgemm/external/asmjit",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "571edeb2d0ac872a8392fc49285b156b07884b4e",
+          "path": "third_party/fbgemm/external/cutlass",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "55f93686c01528224f448c19128836e7df245f72",
+          "path": "third_party/fbgemm/external/json",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_FBGEMM=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "kineto",
+      "paths": [
+        {
+          "gitlink_commit": "15f4784a3471d4db8b31720d528f2f57cd2b1f40",
+          "path": "third_party/kineto",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "55f93686c01528224f448c19128836e7df245f72",
+          "path": "third_party/kineto/libkineto/third_party/json",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_KINETO=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "onnx",
+      "paths": [
+        {
+          "gitlink_commit": "e709452ef2bbc1d113faf678c24e6d3467696e83",
+          "path": "third_party/onnx",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "BUILD_CUSTOM_PROTOBUF=OFF",
+        "ONNX_BUILD_CUSTOM_PROTOBUF=OFF"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "protobuf",
+      "paths": [
+        {
+          "gitlink_commit": "f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c",
+          "path": "third_party/protobuf",
+          "policy": "system-provider"
+        }
+      ],
+      "policy": "system-provider",
+      "provider": "protobuf@21.12 and py-protobuf@4.21.12",
+      "required_env": [
+        "BUILD_CUSTOM_PROTOBUF=OFF"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "pybind11",
+      "paths": [
+        {
+          "gitlink_commit": "97bf890db679505a14dfe547a5e77bb2bd05dc90",
+          "path": "third_party/pybind11",
+          "policy": "system-provider"
+        }
+      ],
+      "policy": "system-provider",
+      "provider": "py-pybind11 graph/provider",
+      "required_env": [
+        "USE_SYSTEM_PYBIND11=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "sleef",
+      "paths": [
+        {
+          "gitlink_commit": "5a1d179df9cf652951b59010a2d2075372d67f68",
+          "path": "third_party/sleef",
+          "policy": "system-provider"
+        }
+      ],
+      "policy": "system-provider",
+      "provider": "sleef graph/provider",
+      "required_env": [
+        "USE_SYSTEM_SLEEF=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "fmt",
+      "paths": [
+        {
+          "gitlink_commit": "c0330b746600bfd91dbacb88837da5a16f947ba5",
+          "path": "third_party/fmt",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "cpuinfo",
+      "paths": [
+        {
+          "gitlink_commit": "bc3c01e230c6974283e4b89421cfb0e232435589",
+          "path": "third_party/cpuinfo",
+          "policy": "system-provider"
+        },
+        {
+          "gitlink_commit": "161a9ec374884f4b3e85725cb22e05f9458fdc93",
+          "path": "third_party/fbgemm/external/cpuinfo",
+          "policy": "system-provider"
+        }
+      ],
+      "policy": "system-provider",
+      "provider": "@cpuinfo_native//:lib",
+      "required_env": [
+        "USE_SYSTEM_CPUINFO=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "pthreadpool",
+      "paths": [
+        {
+          "gitlink_commit": "a56dcd79c699366e7ac6466792c3025883ff7704",
+          "path": "third_party/pthreadpool",
+          "policy": "system-provider"
+        }
+      ],
+      "policy": "system-provider",
+      "provider": "@pthreadpool_native//:lib",
+      "required_env": [
+        "USE_SYSTEM_PTHREADPOOL=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "XNNPACK",
+      "paths": [
+        {
+          "gitlink_commit": "51a0103656eff6fc9bfd39a4597923c4b542c883",
+          "path": "third_party/XNNPACK",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_XNNPACK=1"
+      ],
+      "source_presence": "submodule"
+    },
+    {
+      "evidence": [],
+      "name": "oneDNN (ideep)",
+      "paths": [
+        {
+          "gitlink_commit": "e087b6e4b32a7ba684db82231d1558123968ac1d",
+          "path": "third_party/ideep",
+          "policy": "vendored"
+        },
+        {
+          "gitlink_commit": "80afa71049cd69a3df32adcccb623b12cd7baa22",
+          "path": "third_party/ideep/mkl-dnn",
+          "policy": "vendored"
+        }
+      ],
+      "policy": "vendored",
+      "provider": null,
+      "required_env": [
+        "USE_MKLDNN=1"
+      ],
+      "source_presence": "submodule"
+    }
+  ],
+  "generated_by": ".scratch/native-pytorch-build/tools/pytorch_source_manifest.py",
+  "odr_conflicts": [],
+  "policy_counts": {
+    "system-provider": 10,
+    "unused-with-reason": 26,
+    "vendored": 29
+  },
+  "schema_version": 1,
+  "source": {
+    "checkout_path": "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0",
+    "commit": "2b3ec34829036a65cd9d1398ea72a0167dc37470",
+    "name": "pytorch",
+    "recursive_submodule_status_lines": 65,
+    "status_file": "$VASO_ESTATE_ROOT/sources/pytorch/submodule-status.txt",
+    "version": "v2.14.0"
+  },
+  "submodules": [
+    {
+      "declared_name_in_parent": "android/libs/fbjni",
+      "declared_path_in_parent": "android/libs/fbjni",
+      "evidence": [
+        "CMakeLists.txt:1444 gates Android fbjni wiring behind BUILD_JNI/Android paths; the Linux CUDA wheel profile does not build it."
+      ],
+      "git_describe": "7e1e1fe",
+      "gitlink_commit": "7e1e1fe3858c63c251c637ae41a20de425dde96f",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "android/libs/fbjni",
+      "policy": "unused-with-reason",
+      "reason": "Android/JNI-only dependency; not part of the Linux CUDA wheel profile.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 7e1e1fe3858c63c251c637ae41a20de425dde96f android/libs/fbjni (7e1e1fe)",
+      "submodule_license_file": "android/libs/fbjni/LICENSE",
+      "url": "https://github.com/facebookincubator/fbjni.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NNPACK_deps/FP16",
+      "declared_path_in_parent": "third_party/FP16",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef."
+      ],
+      "git_describe": "4dfe081",
+      "gitlink_commit": "4dfe081cf6bcd15db339cf2680b9281b8451eeb3",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/FP16",
+      "policy": "system-provider",
+      "provider": "fp16 native/graph provider",
+      "reason": "Use the graph/native FP16 provider through USE_SYSTEM_FP16 instead of PyTorch's checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 4dfe081cf6bcd15db339cf2680b9281b8451eeb3 third_party/FP16 (4dfe081)",
+      "submodule_license_file": "third_party/FP16/LICENSE",
+      "url": "https://github.com/Maratyszcza/FP16.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NNPACK_deps/FXdiv",
+      "declared_path_in_parent": "third_party/FXdiv",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef."
+      ],
+      "git_describe": "b408327",
+      "gitlink_commit": "b408327ac2a15ec3e43352421954f5b1967701d1",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/FXdiv",
+      "policy": "system-provider",
+      "provider": "fxdiv native/graph provider",
+      "reason": "Use the graph/native FXdiv provider through USE_SYSTEM_FXDIV instead of PyTorch's checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " b408327ac2a15ec3e43352421954f5b1967701d1 third_party/FXdiv (b408327)",
+      "submodule_license_file": "third_party/FXdiv/LICENSE",
+      "url": "https://github.com/Maratyszcza/FXdiv.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NNPACK",
+      "declared_path_in_parent": "third_party/NNPACK",
+      "evidence": [
+        "CMakeLists.txt:346 exposes USE_NNPACK.",
+        "cmake/Dependencies.cmake:532-547 builds third_party/NNPACK when USE_NNPACK is on."
+      ],
+      "git_describe": "c07e3a0",
+      "gitlink_commit": "c07e3a0400713d546e0dea2d5466dd22ea389c73",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/NNPACK",
+      "policy": "vendored",
+      "reason": "NNPACK has no v2.14 USE_SYSTEM_NNPACK hook; the enabled NNPACK path consumes this gitlink.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " c07e3a0400713d546e0dea2d5466dd22ea389c73 third_party/NNPACK (c07e3a0)",
+      "submodule_license_file": "third_party/NNPACK/LICENSE",
+      "url": "https://github.com/Maratyszcza/NNPACK.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NVTX",
+      "declared_path_in_parent": "third_party/NVTX",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef."
+      ],
+      "git_describe": "7d113f2",
+      "gitlink_commit": "7d113f290f89eeeae9c957011c497101f3948d9e",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/NVTX",
+      "policy": "system-provider",
+      "provider": "nvtx native/rootfs provider",
+      "reason": "Use the CUDA/rootfs or native NVTX provider via USE_SYSTEM_NVTX.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 7d113f290f89eeeae9c957011c497101f3948d9e third_party/NVTX (7d113f2)",
+      "submodule_license_file": "third_party/NVTX/LICENSE.txt",
+      "url": "https://github.com/NVIDIA/NVTX.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/VulkanMemoryAllocator",
+      "declared_path_in_parent": "third_party/VulkanMemoryAllocator",
+      "evidence": [
+        "CMakeLists.txt:380-386 and the full-feature spec keep the Linux CUDA profile focused on CUDA/cuDNN/NCCL, not Vulkan mobile paths."
+      ],
+      "git_describe": "1d8f600",
+      "gitlink_commit": "1d8f600fd424278486eade7ed3e877c99f0846b1",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/VulkanMemoryAllocator",
+      "policy": "unused-with-reason",
+      "reason": "Vulkan mobile path is outside the selected Linux CUDA wheel profile.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 1d8f600fd424278486eade7ed3e877c99f0846b1 third_party/VulkanMemoryAllocator (1d8f600)",
+      "submodule_license_file": "third_party/VulkanMemoryAllocator/LICENSE.txt",
+      "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/XNNPACK",
+      "declared_path_in_parent": "third_party/XNNPACK",
+      "evidence": [
+        "CMakeLists.txt:377 enables USE_XNNPACK and CMakeLists.txt:545 declares the optional USE_SYSTEM_XNNPACK hook.",
+        "cmake/Dependencies.cmake:549-623 adds third_party/XNNPACK when USE_XNNPACK is on and USE_SYSTEM_XNNPACK is off.",
+        "No XNNPACK graph/native provider is present in this workspace, so ticket 09 treats the gitlink as the build input."
+      ],
+      "git_describe": "51a01036",
+      "gitlink_commit": "51a0103656eff6fc9bfd39a4597923c4b542c883",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/XNNPACK",
+      "policy": "vendored",
+      "reason": "Full-feature XNNPACK is enabled and no graph/native XNNPACK provider is present yet.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 51a0103656eff6fc9bfd39a4597923c4b542c883 third_party/XNNPACK (51a01036)",
+      "submodule_license_file": "third_party/XNNPACK/LICENSE",
+      "url": "https://github.com/google/XNNPACK.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/aiter",
+      "declared_path_in_parent": "third_party/aiter",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires aiter/composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "971d98b",
+      "gitlink_commit": "971d98b8ed4003639486134a435df7e2ef9c0475",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/aiter",
+      "policy": "unused-with-reason",
+      "reason": "ROCm-only AITER path; the selected profile is CUDA with USE_ROCM off.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 971d98b8ed4003639486134a435df7e2ef9c0475 third_party/aiter (971d98b)",
+      "submodule_license_file": "third_party/aiter/LICENSE",
+      "url": "https://github.com/ROCm/aiter.git"
+    },
+    {
+      "declared_name_in_parent": "3rdparty/composable_kernel",
+      "declared_path_in_parent": "3rdparty/composable_kernel",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "af7118e",
+      "gitlink_commit": "af7118e342580ecd3f71edce7b1d0ba465012ecf",
+      "gitmodules_file": "third_party/aiter/.gitmodules",
+      "parent_license_file": "third_party/aiter/LICENSE",
+      "parent_superproject_path": "third_party/aiter",
+      "path": "third_party/aiter/3rdparty/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "Nested ROCm composable_kernel for AITER; CUDA profile does not build it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " af7118e342580ecd3f71edce7b1d0ba465012ecf third_party/aiter/3rdparty/composable_kernel (af7118e)",
+      "submodule_license_file": "third_party/aiter/3rdparty/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/benchmark",
+      "declared_path_in_parent": "third_party/benchmark",
+      "evidence": [
+        "cmake/Dependencies.cmake:663-685 configures googletest/benchmark only for test/benchmark targets; the full build profile keeps BUILD_TEST=0."
+      ],
+      "git_describe": "299e592",
+      "gitlink_commit": "299e5928955cc62af9968370293b916f5130916f",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/benchmark",
+      "policy": "unused-with-reason",
+      "reason": "Google Benchmark is used for benchmarks/tests, not the selected BUILD_TEST=0 wheel build.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 299e5928955cc62af9968370293b916f5130916f third_party/benchmark (299e592)",
+      "submodule_license_file": "third_party/benchmark/LICENSE",
+      "url": "https://github.com/google/benchmark.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/composable_kernel",
+      "declared_path_in_parent": "third_party/composable_kernel",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "5a74dec",
+      "gitlink_commit": "5a74dec07a894484b9489d0c0e00cd3b52652d18",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "ROCm composable_kernel path; the selected profile is CUDA with USE_ROCM off.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 5a74dec07a894484b9489d0c0e00cd3b52652d18 third_party/composable_kernel (5a74dec)",
+      "submodule_license_file": "third_party/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/cpp-httplib",
+      "declared_path_in_parent": "third_party/cpp-httplib",
+      "evidence": [
+        "cmake/Dependencies.cmake:1735-1741 wires checked-out cpp-httplib and nlohmann/json include directories for Kineto/HTTP JSON support."
+      ],
+      "git_describe": "62d899f",
+      "gitlink_commit": "62d899feac3cf9215a55f2b43da250fdd98d2156",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/cpp-httplib",
+      "policy": "vendored",
+      "reason": "Header-only dependency consumed from the PyTorch checkout for Kineto/HTTP support.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 62d899feac3cf9215a55f2b43da250fdd98d2156 third_party/cpp-httplib (62d899f)",
+      "submodule_license_file": "third_party/cpp-httplib/LICENSE",
+      "url": "https://github.com/yhirose/cpp-httplib.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/cpuinfo",
+      "declared_path_in_parent": "third_party/cpuinfo",
+      "evidence": [
+        "CMakeLists.txt:535 declares USE_SYSTEM_CPUINFO.",
+        "cmake/Dependencies.cmake:471-499 consumes a system cpuinfo target when USE_SYSTEM_CPUINFO is on.",
+        "experiments/spack-bazel-graph/native_overrides.json maps cpuinfo to @cpuinfo_native//:lib."
+      ],
+      "git_describe": "bc3c01e",
+      "gitlink_commit": "bc3c01e230c6974283e4b89421cfb0e232435589",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/cpuinfo",
+      "policy": "system-provider",
+      "provider": "@cpuinfo_native//:lib",
+      "reason": "Use the repo-owned native cpuinfo provider through USE_SYSTEM_CPUINFO.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " bc3c01e230c6974283e4b89421cfb0e232435589 third_party/cpuinfo (bc3c01e)",
+      "submodule_license_file": "third_party/cpuinfo/LICENSE",
+      "url": "https://github.com/pytorch/cpuinfo.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/cudnn_frontend",
+      "declared_path_in_parent": "third_party/cudnn_frontend",
+      "evidence": [
+        "CMakeLists.txt:314 enables cuDNN and the checked-out third_party/cudnn_frontend provides CUDA frontend headers."
+      ],
+      "git_describe": "35fd7b0",
+      "gitlink_commit": "35fd7b0d0e1d4952b904c79341c5e84e3af0a328",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/cudnn_frontend",
+      "policy": "vendored",
+      "reason": "cuDNN frontend headers are part of the CUDA/cuDNN source surface and have no v2.14 USE_SYSTEM hook.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 35fd7b0d0e1d4952b904c79341c5e84e3af0a328 third_party/cudnn_frontend (35fd7b0)",
+      "submodule_license_file": "third_party/cudnn_frontend/LICENSE.txt",
+      "url": "https://github.com/NVIDIA/cudnn-frontend.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/cutlass",
+      "declared_path_in_parent": "third_party/cutlass",
+      "evidence": [
+        "cmake/FileMirroring.cmake:39-61 requires the top-level CUTLASS checkout for CUDA header mirroring.",
+        "aten/src/ATen/CMakeLists.txt:337-355 wires CUTLASS-backed CUDA attention sources."
+      ],
+      "git_describe": "e05f953",
+      "gitlink_commit": "e05f953a5b3d38adc240df2ff928e0421c2abba3",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/cutlass",
+      "policy": "vendored",
+      "reason": "CUTLASS is required by CUDA attention/file mirroring paths and is not replaced by a graph provider.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " e05f953a5b3d38adc240df2ff928e0421c2abba3 third_party/cutlass (e05f953)",
+      "submodule_license_file": "third_party/cutlass/LICENSE.txt",
+      "url": "https://github.com/NVIDIA/cutlass.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/fbgemm",
+      "declared_path_in_parent": "third_party/fbgemm",
+      "evidence": [
+        "CMakeLists.txt:321-322 keeps FBGEMM available for Linux x86_64 when USE_FBGEMM is on.",
+        "cmake/Dependencies.cmake:712-745 adds third_party/fbgemm for the CPU/GPU quantized kernels."
+      ],
+      "git_describe": "bf6dce3",
+      "gitlink_commit": "bf6dce360a4fe133bc779e2fd036277678509f95",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/fbgemm",
+      "policy": "vendored",
+      "reason": "FBGEMM is enabled for x86_64 quantized kernels and has no v2.14 USE_SYSTEM_FBGEMM hook.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " bf6dce360a4fe133bc779e2fd036277678509f95 third_party/fbgemm (bf6dce3)",
+      "submodule_license_file": "third_party/fbgemm/LICENSE",
+      "url": "https://github.com/pytorch/fbgemm"
+    },
+    {
+      "declared_name_in_parent": "external/asmjit",
+      "declared_path_in_parent": "external/asmjit",
+      "evidence": [
+        "third_party/fbgemm/CMakeLists.txt:435-470 adds external helper sources such as asmjit/json/cutlass when their targets are not already supplied."
+      ],
+      "git_describe": "a3199e8",
+      "gitlink_commit": "a3199e8857792cd10b7589ff5d58343d2c9008ea",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/asmjit",
+      "policy": "vendored",
+      "reason": "FBGEMM helper dependency built from the nested gitlink when the target is not pre-supplied.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " a3199e8857792cd10b7589ff5d58343d2c9008ea third_party/fbgemm/external/asmjit (a3199e8)",
+      "submodule_license_file": "third_party/fbgemm/external/asmjit/LICENSE.md",
+      "url": "https://github.com/asmjit/asmjit.git"
+    },
+    {
+      "declared_name_in_parent": "external/composable_kernel",
+      "declared_path_in_parent": "external/composable_kernel",
+      "evidence": [
+        "third_party/fbgemm/cmake/modules/RocmSetup.cmake:11-17 wires composable_kernel only for ROCm builds."
+      ],
+      "git_describe": "7fe50dc",
+      "gitlink_commit": "7fe50dc3da2069d6645d9deb8c017a876472a977",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "FBGEMM ROCm helper; CUDA profile does not enable the ROCm setup path.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 7fe50dc3da2069d6645d9deb8c017a876472a977 third_party/fbgemm/external/composable_kernel (7fe50dc)",
+      "submodule_license_file": "third_party/fbgemm/external/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "external/cpuinfo",
+      "declared_path_in_parent": "external/cpuinfo",
+      "evidence": [
+        "CMakeLists.txt:535 declares USE_SYSTEM_CPUINFO.",
+        "cmake/Dependencies.cmake:471-499 consumes a system cpuinfo target when USE_SYSTEM_CPUINFO is on.",
+        "experiments/spack-bazel-graph/native_overrides.json maps cpuinfo to @cpuinfo_native//:lib.",
+        "third_party/fbgemm/CMakeLists.txt:435-470 only adds external/cpuinfo when target cpuinfo is absent."
+      ],
+      "git_describe": "161a9ec",
+      "gitlink_commit": "161a9ec374884f4b3e85725cb22e05f9458fdc93",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/cpuinfo",
+      "policy": "system-provider",
+      "provider": "@cpuinfo_native//:lib",
+      "reason": "Covered by the top-level cpuinfo system/native provider before FBGEMM can fall back to its nested copy.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 161a9ec374884f4b3e85725cb22e05f9458fdc93 third_party/fbgemm/external/cpuinfo (161a9ec)",
+      "submodule_license_file": "third_party/fbgemm/external/cpuinfo/LICENSE",
+      "url": "https://github.com/pytorch/cpuinfo"
+    },
+    {
+      "declared_name_in_parent": "external/cutlass",
+      "declared_path_in_parent": "external/cutlass",
+      "evidence": [
+        "third_party/fbgemm/CMakeLists.txt:435-470 adds external helper sources such as asmjit/json/cutlass when their targets are not already supplied."
+      ],
+      "git_describe": "571edeb",
+      "gitlink_commit": "571edeb2d0ac872a8392fc49285b156b07884b4e",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/cutlass",
+      "policy": "vendored",
+      "reason": "FBGEMM GPU helper CUTLASS checkout; no system-provider hook is present in FBGEMM.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 571edeb2d0ac872a8392fc49285b156b07884b4e third_party/fbgemm/external/cutlass (571edeb)",
+      "submodule_license_file": "third_party/fbgemm/external/cutlass/LICENSE.txt",
+      "url": "https://github.com/jwfromm/cutlass"
+    },
+    {
+      "declared_name_in_parent": "external/googletest",
+      "declared_path_in_parent": "external/googletest",
+      "evidence": [
+        "cmake/Dependencies.cmake:663-685 configures googletest/benchmark only for test/benchmark targets; the full build profile keeps BUILD_TEST=0."
+      ],
+      "git_describe": "52eb810",
+      "gitlink_commit": "52eb8108c5bdec04579160ae17225d66034bd723",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/googletest",
+      "policy": "unused-with-reason",
+      "reason": "FBGEMM test dependency; selected PyTorch profile keeps BUILD_TEST=0.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 52eb8108c5bdec04579160ae17225d66034bd723 third_party/fbgemm/external/googletest (52eb810)",
+      "submodule_license_file": "third_party/fbgemm/external/googletest/LICENSE",
+      "url": "https://github.com/google/googletest"
+    },
+    {
+      "declared_name_in_parent": "external/hipify_torch",
+      "declared_path_in_parent": "external/hipify_torch",
+      "evidence": [
+        "third_party/fbgemm/cmake/modules/RocmSetup.cmake:11-17 wires hipify_torch only for ROCm builds."
+      ],
+      "git_describe": "63b6a7b",
+      "gitlink_commit": "63b6a7b541fa7f08f8475ca7d74054db36ff2691",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/hipify_torch",
+      "policy": "unused-with-reason",
+      "reason": "FBGEMM ROCm HIP conversion helper; CUDA profile does not use it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 63b6a7b541fa7f08f8475ca7d74054db36ff2691 third_party/fbgemm/external/hipify_torch (63b6a7b)",
+      "submodule_license_file": "third_party/fbgemm/external/hipify_torch/LICENSE.txt",
+      "url": "https://github.com/ROCmSoftwarePlatform/hipify_torch.git"
+    },
+    {
+      "declared_name_in_parent": "external/json",
+      "declared_path_in_parent": "external/json",
+      "evidence": [
+        "third_party/fbgemm/CMakeLists.txt:435-470 adds external helper sources such as asmjit/json/cutlass when their targets are not already supplied."
+      ],
+      "git_describe": "55f9368",
+      "gitlink_commit": "55f93686c01528224f448c19128836e7df245f72",
+      "gitmodules_file": "third_party/fbgemm/.gitmodules",
+      "parent_license_file": "third_party/fbgemm/LICENSE",
+      "parent_superproject_path": "third_party/fbgemm",
+      "path": "third_party/fbgemm/external/json",
+      "policy": "vendored",
+      "reason": "FBGEMM helper header source when FBGEMM is built from its vendored checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 55f93686c01528224f448c19128836e7df245f72 third_party/fbgemm/external/json (55f9368)",
+      "submodule_license_file": "third_party/fbgemm/external/json/LICENSE.MIT",
+      "url": "https://github.com/nlohmann/json.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/flash-attention",
+      "declared_path_in_parent": "third_party/flash-attention",
+      "evidence": [
+        "CMakeLists.txt:982-1016 enables FlashAttention and memory-efficient attention for CUDA builds.",
+        "aten/src/ATen/CMakeLists.txt:190-191 and 337-355 compile third_party/flash-attention and its CUTLASS source."
+      ],
+      "git_describe": "14c3779",
+      "gitlink_commit": "14c377950125c70b7a9dabf9c561fca53715ac7d",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/flash-attention",
+      "policy": "vendored",
+      "reason": "CUDA SDPA flash attention is a full-feature target and is built from this checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 14c377950125c70b7a9dabf9c561fca53715ac7d third_party/flash-attention (14c3779)",
+      "submodule_license_file": "third_party/flash-attention/LICENSE",
+      "url": "https://github.com/Dao-AILab/flash-attention.git"
+    },
+    {
+      "declared_name_in_parent": "csrc/composable_kernel",
+      "declared_path_in_parent": "csrc/composable_kernel",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "c56c675",
+      "gitlink_commit": "c56c6750d0fc54ed771d532cc92c316423449614",
+      "gitmodules_file": "third_party/flash-attention/.gitmodules",
+      "parent_license_file": "third_party/flash-attention/LICENSE",
+      "parent_superproject_path": "third_party/flash-attention",
+      "path": "third_party/flash-attention/csrc/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "ROCm composable_kernel path inside flash-attention; CUDA SDPA does not build it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " c56c6750d0fc54ed771d532cc92c316423449614 third_party/flash-attention/csrc/composable_kernel (c56c675)",
+      "submodule_license_file": "third_party/flash-attention/csrc/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "csrc/cutlass",
+      "declared_path_in_parent": "csrc/cutlass",
+      "evidence": [
+        "CMakeLists.txt:982-1016 enables FlashAttention and memory-efficient attention for CUDA builds.",
+        "aten/src/ATen/CMakeLists.txt:190-191 and 337-355 compile third_party/flash-attention and its CUTLASS source."
+      ],
+      "git_describe": "7127592",
+      "gitlink_commit": "7127592069c2fe01b041e174ba4345ef9b279671",
+      "gitmodules_file": "third_party/flash-attention/.gitmodules",
+      "parent_license_file": "third_party/flash-attention/LICENSE",
+      "parent_superproject_path": "third_party/flash-attention",
+      "path": "third_party/flash-attention/csrc/cutlass",
+      "policy": "vendored",
+      "reason": "CUTLASS source used by CUDA flash-attention kernels.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 7127592069c2fe01b041e174ba4345ef9b279671 third_party/flash-attention/csrc/cutlass (7127592)",
+      "submodule_license_file": "third_party/flash-attention/csrc/cutlass/LICENSE.txt",
+      "url": "https://github.com/NVIDIA/cutlass.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/aiter",
+      "declared_path_in_parent": "third_party/aiter",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires aiter/composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "9bab838",
+      "gitlink_commit": "9bab8388c35936814a659b4ebd245c491e1b940a",
+      "gitmodules_file": "third_party/flash-attention/.gitmodules",
+      "parent_license_file": "third_party/flash-attention/LICENSE",
+      "parent_superproject_path": "third_party/flash-attention",
+      "path": "third_party/flash-attention/third_party/aiter",
+      "policy": "unused-with-reason",
+      "reason": "ROCm AITER path nested under flash-attention; CUDA profile does not build it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 9bab8388c35936814a659b4ebd245c491e1b940a third_party/flash-attention/third_party/aiter (9bab838)",
+      "submodule_license_file": "third_party/flash-attention/third_party/aiter/LICENSE",
+      "url": "https://github.com/ROCm/aiter.git"
+    },
+    {
+      "declared_name_in_parent": "3rdparty/composable_kernel",
+      "declared_path_in_parent": "3rdparty/composable_kernel",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "af7118e",
+      "gitlink_commit": "af7118e342580ecd3f71edce7b1d0ba465012ecf",
+      "gitmodules_file": "third_party/flash-attention/third_party/aiter/.gitmodules",
+      "parent_license_file": "third_party/flash-attention/third_party/aiter/LICENSE",
+      "parent_superproject_path": "third_party/flash-attention/third_party/aiter",
+      "path": "third_party/flash-attention/third_party/aiter/3rdparty/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "Nested ROCm composable_kernel under flash-attention/AITER; CUDA profile does not build it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " af7118e342580ecd3f71edce7b1d0ba465012ecf third_party/flash-attention/third_party/aiter/3rdparty/composable_kernel (af7118e)",
+      "submodule_license_file": "third_party/flash-attention/third_party/aiter/3rdparty/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/flatbuffers",
+      "declared_path_in_parent": "third_party/flatbuffers",
+      "evidence": [
+        "cmake/FlatBuffers.cmake:1-10 builds the checked-out flatbuffers source for PyTorch schema generation/runtime support."
+      ],
+      "git_describe": "a2cd1ea",
+      "gitlink_commit": "a2cd1ea3b6d3fee220106b5fed3f7ce8da9eb757",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/flatbuffers",
+      "policy": "vendored",
+      "reason": "Flatbuffers source is used from the checkout by PyTorch's FlatBuffers CMake module.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " a2cd1ea3b6d3fee220106b5fed3f7ce8da9eb757 third_party/flatbuffers (a2cd1ea)",
+      "submodule_license_file": "third_party/flatbuffers/LICENSE",
+      "url": "https://github.com/google/flatbuffers.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/fmt",
+      "declared_path_in_parent": "third_party/fmt",
+      "evidence": [
+        "cmake/Dependencies.cmake:1633-1663 always adds third_party/fmt and exports fmt::fmt-header-only for PyTorch C API users."
+      ],
+      "git_describe": "c0330b7",
+      "gitlink_commit": "c0330b746600bfd91dbacb88837da5a16f947ba5",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/fmt",
+      "policy": "vendored",
+      "reason": "Top-level fmt is always added by PyTorch and exported as fmt::fmt-header-only.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " c0330b746600bfd91dbacb88837da5a16f947ba5 third_party/fmt (c0330b7)",
+      "submodule_license_file": "third_party/fmt/LICENSE",
+      "url": "https://github.com/fmtlib/fmt.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/gemmlowp/gemmlowp",
+      "declared_path_in_parent": "third_party/gemmlowp/gemmlowp",
+      "evidence": [
+        "cmake/Dependencies.cmake:507-529 uses third_party/gemmlowp/gemmlowp for QNNPACK when USE_QNNPACK is on."
+      ],
+      "git_describe": "3fb5c17",
+      "gitlink_commit": "3fb5c176c17c765a3492cd2f0321b0dab712f350",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/gemmlowp/gemmlowp",
+      "policy": "vendored",
+      "reason": "QNNPACK path uses this gitlink; no selected system gemmlowp provider exists.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 3fb5c176c17c765a3492cd2f0321b0dab712f350 third_party/gemmlowp/gemmlowp (3fb5c17)",
+      "submodule_license_file": "third_party/gemmlowp/gemmlowp/LICENSE",
+      "url": "https://github.com/google/gemmlowp.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/gloo",
+      "declared_path_in_parent": "third_party/gloo",
+      "evidence": [
+        "CMakeLists.txt:332-340 enables distributed support and CMakeLists.txt:537 declares the optional USE_SYSTEM_GLOO hook.",
+        "cmake/Dependencies.cmake:1266-1378 builds third_party/gloo when USE_DISTRIBUTED/USE_GLOO are on and USE_SYSTEM_GLOO is off.",
+        "The current graph records gloo=false; full-feature ticket 11 must either keep this vendored gitlink or provide a matching system Gloo."
+      ],
+      "git_describe": "74cc005",
+      "gitlink_commit": "74cc005ae13f69c11d8a41e50b42025b6730e796",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/gloo",
+      "policy": "vendored",
+      "reason": "Full-feature distributed/Gloo build consumes this checkout unless ticket 11/10 adds a matching USE_SYSTEM_GLOO provider.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 74cc005ae13f69c11d8a41e50b42025b6730e796 third_party/gloo (74cc005)",
+      "submodule_license_file": "third_party/gloo/LICENSE",
+      "url": "https://github.com/pytorch/gloo"
+    },
+    {
+      "declared_name_in_parent": "third_party/googletest",
+      "declared_path_in_parent": "third_party/googletest",
+      "evidence": [
+        "cmake/Dependencies.cmake:663-685 configures googletest/benchmark only for test/benchmark targets; the full build profile keeps BUILD_TEST=0."
+      ],
+      "git_describe": "52eb810",
+      "gitlink_commit": "52eb8108c5bdec04579160ae17225d66034bd723",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/googletest",
+      "policy": "unused-with-reason",
+      "reason": "Top-level GoogleTest is test-only; selected wheel build keeps BUILD_TEST=0.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 52eb8108c5bdec04579160ae17225d66034bd723 third_party/googletest (52eb810)",
+      "submodule_license_file": "third_party/googletest/LICENSE",
+      "url": "https://github.com/google/googletest.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/ideep",
+      "declared_path_in_parent": "third_party/ideep",
+      "evidence": [
+        "CMakeLists.txt:380-386 and spec.md set oneDNN/MKLDNN as full-feature parity work.",
+        "cmake/Dependencies.cmake:1549-1568 and cmake/Modules/FindMKLDNN.cmake:19-20,105-112 use third_party/ideep and ideep/mkl-dnn when USE_MKLDNN is on."
+      ],
+      "git_describe": "e087b6e",
+      "gitlink_commit": "e087b6e4b32a7ba684db82231d1558123968ac1d",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/ideep",
+      "policy": "vendored",
+      "reason": "oneDNN/MKLDNN full-feature path uses ideep from the checked-out source.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " e087b6e4b32a7ba684db82231d1558123968ac1d third_party/ideep (e087b6e)",
+      "submodule_license_file": "third_party/ideep/LICENSE",
+      "url": "https://github.com/intel/ideep"
+    },
+    {
+      "declared_name_in_parent": "mkl-dnn",
+      "declared_path_in_parent": "mkl-dnn",
+      "evidence": [
+        "CMakeLists.txt:380-386 and spec.md set oneDNN/MKLDNN as full-feature parity work.",
+        "cmake/Dependencies.cmake:1549-1568 and cmake/Modules/FindMKLDNN.cmake:19-20,105-112 use third_party/ideep and ideep/mkl-dnn when USE_MKLDNN is on."
+      ],
+      "git_describe": "80afa71",
+      "gitlink_commit": "80afa71049cd69a3df32adcccb623b12cd7baa22",
+      "gitmodules_file": "third_party/ideep/.gitmodules",
+      "parent_license_file": "third_party/ideep/LICENSE",
+      "parent_superproject_path": "third_party/ideep",
+      "path": "third_party/ideep/mkl-dnn",
+      "policy": "vendored",
+      "reason": "oneDNN source nested under ideep; FindMKLDNN falls back to this gitlink when MKLDNN is enabled.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 80afa71049cd69a3df32adcccb623b12cd7baa22 third_party/ideep/mkl-dnn (80afa71)",
+      "submodule_license_file": "third_party/ideep/mkl-dnn/LICENSE",
+      "url": "https://github.com/intel/mkl-dnn.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/ittapi",
+      "declared_path_in_parent": "third_party/ittapi",
+      "evidence": [
+        "CMakeLists.txt:380-386 enables ITT tracing integration and third_party/ittapi is the checked-out source input."
+      ],
+      "git_describe": "0c57540",
+      "gitlink_commit": "0c57540822deb5dae43bef6c1cc9b3be4772a033",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/ittapi",
+      "policy": "vendored",
+      "reason": "ITT API source supports tracing/profiling integration.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 0c57540822deb5dae43bef6c1cc9b3be4772a033 third_party/ittapi (0c57540)",
+      "submodule_license_file": null,
+      "url": "https://github.com/intel/ittapi.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/kineto",
+      "declared_path_in_parent": "third_party/kineto",
+      "evidence": [
+        "CMakeLists.txt:321-322 enables Kineto and cmake/Dependencies.cmake:1677-1714 adds third_party/kineto/libkineto with CUDA/CUPTI backend."
+      ],
+      "git_describe": "15f4784",
+      "gitlink_commit": "15f4784a3471d4db8b31720d528f2f57cd2b1f40",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/kineto",
+      "policy": "vendored",
+      "reason": "Kineto/CUPTI profiler is part of the full-feature CUDA surface and is built from this checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 15f4784a3471d4db8b31720d528f2f57cd2b1f40 third_party/kineto (15f4784)",
+      "submodule_license_file": "third_party/kineto/LICENSE",
+      "url": "https://github.com/pytorch/kineto"
+    },
+    {
+      "declared_name_in_parent": "libkineto/third_party/fmt",
+      "declared_path_in_parent": "libkineto/third_party/fmt",
+      "evidence": [
+        "cmake/Dependencies.cmake:1633-1663 creates the top-level fmt target before Kineto.",
+        "third_party/kineto/libkineto/CMakeLists.txt:215-227 uses its nested fmt only if fmt::fmt-header-only is missing."
+      ],
+      "git_describe": "40626af",
+      "gitlink_commit": "40626af88bd7df9a5fb80be7b25ac85b122d6c21",
+      "gitmodules_file": "third_party/kineto/.gitmodules",
+      "parent_license_file": "third_party/kineto/LICENSE",
+      "parent_superproject_path": "third_party/kineto",
+      "path": "third_party/kineto/libkineto/third_party/fmt",
+      "policy": "unused-with-reason",
+      "reason": "Top-level PyTorch fmt target is created before Kineto, so Kineto's nested fallback is not used.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 40626af88bd7df9a5fb80be7b25ac85b122d6c21 third_party/kineto/libkineto/third_party/fmt (40626af)",
+      "submodule_license_file": "third_party/kineto/libkineto/third_party/fmt/LICENSE",
+      "url": "https://github.com/fmtlib/fmt.git"
+    },
+    {
+      "declared_name_in_parent": "libkineto/third_party/googletest",
+      "declared_path_in_parent": "libkineto/third_party/googletest",
+      "evidence": [
+        "CMakeLists.txt:321-322 enables Kineto and cmake/Dependencies.cmake:1677-1714 adds third_party/kineto/libkineto with CUDA/CUPTI backend."
+      ],
+      "git_describe": "52eb810",
+      "gitlink_commit": "52eb8108c5bdec04579160ae17225d66034bd723",
+      "gitmodules_file": "third_party/kineto/.gitmodules",
+      "parent_license_file": "third_party/kineto/LICENSE",
+      "parent_superproject_path": "third_party/kineto",
+      "path": "third_party/kineto/libkineto/third_party/googletest",
+      "policy": "unused-with-reason",
+      "reason": "Kineto tests are disabled by KINETO_BUILD_TESTS=OFF in the PyTorch dependency build.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 52eb8108c5bdec04579160ae17225d66034bd723 third_party/kineto/libkineto/third_party/googletest (52eb810)",
+      "submodule_license_file": "third_party/kineto/libkineto/third_party/googletest/LICENSE",
+      "url": "https://github.com/google/googletest.git"
+    },
+    {
+      "declared_name_in_parent": "libkineto/third_party/json",
+      "declared_path_in_parent": "libkineto/third_party/json",
+      "evidence": [
+        "third_party/kineto/libkineto/CMakeLists.txt:86-95 sets LIBKINETO_THIRDPARTY_DIR and builds libkineto with its checked-out third_party headers."
+      ],
+      "git_describe": "55f9368",
+      "gitlink_commit": "55f93686c01528224f448c19128836e7df245f72",
+      "gitmodules_file": "third_party/kineto/.gitmodules",
+      "parent_license_file": "third_party/kineto/LICENSE",
+      "parent_superproject_path": "third_party/kineto",
+      "path": "third_party/kineto/libkineto/third_party/json",
+      "policy": "vendored",
+      "reason": "Kineto builds with its checked-out third_party JSON headers when profiler support is enabled.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 55f93686c01528224f448c19128836e7df245f72 third_party/kineto/libkineto/third_party/json (55f9368)",
+      "submodule_license_file": "third_party/kineto/libkineto/third_party/json/LICENSE.MIT",
+      "url": "https://github.com/nlohmann/json.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/kleidiai",
+      "declared_path_in_parent": "third_party/kleidiai",
+      "evidence": [
+        "CMakeLists.txt:441-442 and cmake/Dependencies.cmake:1574-1583 gate KleidiAI to AArch64/ARM CPU paths; this insula target is x86_64 CUDA."
+      ],
+      "git_describe": "d7770c8",
+      "gitlink_commit": "d7770c89632329a9914ef1a90289917597639cbe",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/kleidiai",
+      "policy": "unused-with-reason",
+      "reason": "AArch64 KleidiAI CPU path is outside the x86_64 CUDA insula profile.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " d7770c89632329a9914ef1a90289917597639cbe third_party/kleidiai (d7770c8)",
+      "submodule_license_file": null,
+      "url": "https://github.com/ARM-software/kleidiai.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/mimalloc",
+      "declared_path_in_parent": "third_party/mimalloc",
+      "evidence": [
+        "CMakeLists.txt:451-456 defaults USE_MIMALLOC to OFF outside explicit allocator builds; full-feature env does not enable it."
+      ],
+      "git_describe": "30ac9d5",
+      "gitlink_commit": "30ac9d56b8b9ea57ae84bc8ef17ef39000da08fe",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/mimalloc",
+      "policy": "unused-with-reason",
+      "reason": "Allocator override is off by default and not part of the selected full-feature env.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 30ac9d56b8b9ea57ae84bc8ef17ef39000da08fe third_party/mimalloc (30ac9d5)",
+      "submodule_license_file": "third_party/mimalloc/LICENSE",
+      "url": "https://github.com/microsoft/mimalloc.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/mslk",
+      "declared_path_in_parent": "third_party/mslk",
+      "evidence": [
+        "CMakeLists.txt:982-1016 enables memory-efficient attention and related CUDA paths.",
+        "aten/src/ATen/CMakeLists.txt:388-433 wires third_party/mslk and its CUTLASS source for CUDA attention."
+      ],
+      "git_describe": "3d332d1",
+      "gitlink_commit": "3d332d1c0c0ac7765852c97b3979c9ef913e037f",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/mslk",
+      "policy": "vendored",
+      "reason": "MSLK CUDA attention source is used by the memory-efficient attention path.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 3d332d1c0c0ac7765852c97b3979c9ef913e037f third_party/mslk (3d332d1)",
+      "submodule_license_file": "third_party/mslk/LICENSE",
+      "url": "https://github.com/meta-pytorch/MSLK.git"
+    },
+    {
+      "declared_name_in_parent": "external/composable_kernel",
+      "declared_path_in_parent": "external/composable_kernel",
+      "evidence": [
+        "aten/src/ATen/CMakeLists.txt:616-674 wires composable_kernel only under USE_ROCM; the selected profile is CUDA with USE_ROCM off."
+      ],
+      "git_describe": "rocm-6.4.3-459-g7fe50dc3d",
+      "gitlink_commit": "7fe50dc3da2069d6645d9deb8c017a876472a977",
+      "gitmodules_file": "third_party/mslk/.gitmodules",
+      "parent_license_file": "third_party/mslk/LICENSE",
+      "parent_superproject_path": "third_party/mslk",
+      "path": "third_party/mslk/external/composable_kernel",
+      "policy": "unused-with-reason",
+      "reason": "MSLK ROCm composable_kernel helper; CUDA profile does not build it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 7fe50dc3da2069d6645d9deb8c017a876472a977 third_party/mslk/external/composable_kernel (rocm-6.4.3-459-g7fe50dc3d)",
+      "submodule_license_file": "third_party/mslk/external/composable_kernel/LICENSE",
+      "url": "https://github.com/ROCm/composable_kernel.git"
+    },
+    {
+      "declared_name_in_parent": "external/cutlass",
+      "declared_path_in_parent": "external/cutlass",
+      "evidence": [
+        "CMakeLists.txt:982-1016 enables memory-efficient attention and related CUDA paths.",
+        "aten/src/ATen/CMakeLists.txt:388-433 wires third_party/mslk and its CUTLASS source for CUDA attention."
+      ],
+      "git_describe": "571edeb2",
+      "gitlink_commit": "571edeb2d0ac872a8392fc49285b156b07884b4e",
+      "gitmodules_file": "third_party/mslk/.gitmodules",
+      "parent_license_file": "third_party/mslk/LICENSE",
+      "parent_superproject_path": "third_party/mslk",
+      "path": "third_party/mslk/external/cutlass",
+      "policy": "vendored",
+      "reason": "MSLK CUDA CUTLASS helper source.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 571edeb2d0ac872a8392fc49285b156b07884b4e third_party/mslk/external/cutlass (571edeb2)",
+      "submodule_license_file": "third_party/mslk/external/cutlass/LICENSE.txt",
+      "url": "https://github.com/jwfromm/cutlass.git"
+    },
+    {
+      "declared_name_in_parent": "external/googletest",
+      "declared_path_in_parent": "external/googletest",
+      "evidence": [
+        "cmake/Dependencies.cmake:663-685 configures googletest/benchmark only for test/benchmark targets; the full build profile keeps BUILD_TEST=0."
+      ],
+      "git_describe": "release-1.8.0-3544-g52eb8108",
+      "gitlink_commit": "52eb8108c5bdec04579160ae17225d66034bd723",
+      "gitmodules_file": "third_party/mslk/.gitmodules",
+      "parent_license_file": "third_party/mslk/LICENSE",
+      "parent_superproject_path": "third_party/mslk",
+      "path": "third_party/mslk/external/googletest",
+      "policy": "unused-with-reason",
+      "reason": "MSLK test dependency; selected wheel build keeps BUILD_TEST=0.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 52eb8108c5bdec04579160ae17225d66034bd723 third_party/mslk/external/googletest (release-1.8.0-3544-g52eb8108)",
+      "submodule_license_file": "third_party/mslk/external/googletest/LICENSE",
+      "url": "https://github.com/google/googletest.git"
+    },
+    {
+      "declared_name_in_parent": "external/hipify_torch",
+      "declared_path_in_parent": "external/hipify_torch",
+      "evidence": [
+        "third_party/mslk/CMakeLists.txt:143-169 uses hipify/composable_kernel only for ROCm code generation."
+      ],
+      "git_describe": "remotes/origin/mmelesse-11-g63b6a7b",
+      "gitlink_commit": "63b6a7b541fa7f08f8475ca7d74054db36ff2691",
+      "gitmodules_file": "third_party/mslk/.gitmodules",
+      "parent_license_file": "third_party/mslk/LICENSE",
+      "parent_superproject_path": "third_party/mslk",
+      "path": "third_party/mslk/external/hipify_torch",
+      "policy": "unused-with-reason",
+      "reason": "MSLK ROCm HIP conversion helper; CUDA profile does not use it.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 63b6a7b541fa7f08f8475ca7d74054db36ff2691 third_party/mslk/external/hipify_torch (remotes/origin/mmelesse-11-g63b6a7b)",
+      "submodule_license_file": "third_party/mslk/external/hipify_torch/LICENSE.txt",
+      "url": "https://github.com/ROCm/hipify_torch.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/nlohmann",
+      "declared_path_in_parent": "third_party/nlohmann",
+      "evidence": [
+        "cmake/Dependencies.cmake:1735-1741 wires checked-out cpp-httplib and nlohmann/json include directories for Kineto/HTTP JSON support."
+      ],
+      "git_describe": "55f93686",
+      "gitlink_commit": "55f93686c01528224f448c19128836e7df245f72",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/nlohmann",
+      "policy": "vendored",
+      "reason": "Header-only JSON dependency consumed from the top-level checkout.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 55f93686c01528224f448c19128836e7df245f72 third_party/nlohmann (55f93686)",
+      "submodule_license_file": "third_party/nlohmann/LICENSE.MIT",
+      "url": "https://github.com/nlohmann/json.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/onnx",
+      "declared_path_in_parent": "third_party/onnx",
+      "evidence": [
+        "cmake/Dependencies.cmake:1381-1433 builds vendored third_party/onnx when USE_SYSTEM_ONNX is off.",
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:37-56 keeps ONNX vendored but forces external protobuf 3.21.12."
+      ],
+      "git_describe": "e709452e",
+      "gitlink_commit": "e709452ef2bbc1d113faf678c24e6d3467696e83",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/onnx",
+      "policy": "vendored",
+      "reason": "ODR policy keeps ONNX vendored but forces the external protobuf provider.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " e709452ef2bbc1d113faf678c24e6d3467696e83 third_party/onnx (e709452e)",
+      "submodule_license_file": "third_party/onnx/LICENSE",
+      "url": "https://github.com/onnx/onnx.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/pybind11",
+      "declared_path_in_parent": "third_party/pybind11",
+      "evidence": [
+        "cmake/Dependencies.cmake:1381-1433 builds vendored ONNX for PyTorch C++ use; standalone ONNX Python packaging and its nested pybind11 are not admitted."
+      ],
+      "git_describe": "v2.11.0-182-ga2e59f0e",
+      "gitlink_commit": "a2e59f0e7065404b44dfe92a28aca47ba1378dc4",
+      "gitmodules_file": "third_party/onnx/.gitmodules",
+      "parent_license_file": "third_party/onnx/LICENSE",
+      "parent_superproject_path": "third_party/onnx",
+      "path": "third_party/onnx/third_party/pybind11",
+      "policy": "unused-with-reason",
+      "reason": "Nested ONNX Python pybind11 is not used by PyTorch's vendored ONNX C++ build.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " a2e59f0e7065404b44dfe92a28aca47ba1378dc4 third_party/onnx/third_party/pybind11 (v2.11.0-182-ga2e59f0e)",
+      "submodule_license_file": "third_party/onnx/third_party/pybind11/LICENSE",
+      "url": "https://github.com/pybind/pybind11.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/pocketfft",
+      "declared_path_in_parent": "third_party/pocketfft",
+      "evidence": [
+        "setup.py/pyproject and ATen CMake use the checked-out pocketfft headers for FFT code paths; no USE_SYSTEM_POCKETFFT hook exists in v2.14.0."
+      ],
+      "git_describe": "0fa0ef5",
+      "gitlink_commit": "0fa0ef591e38c2758e3184c6c23e497b9f732ffa",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/pocketfft",
+      "policy": "vendored",
+      "reason": "PocketFFT headers are consumed from the checked-out PyTorch tree.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 0fa0ef591e38c2758e3184c6c23e497b9f732ffa third_party/pocketfft (0fa0ef5)",
+      "submodule_license_file": "third_party/pocketfft/LICENSE.md",
+      "url": "https://github.com/mreineck/pocketfft"
+    },
+    {
+      "declared_name_in_parent": "third_party/protobuf",
+      "declared_path_in_parent": "third_party/protobuf",
+      "evidence": [
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:18-56 requires BUILD_CUSTOM_PROTOBUF=OFF with system protobuf 3.21.12.",
+        "experiments/spack-bazel-graph/native/pytorch/plan.py:414-419 wires PROTOBUF_PROTOC_EXECUTABLE and CMAKE_PREFIX_PATH for protobuf@21.12."
+      ],
+      "git_describe": "f0dc78d7e",
+      "gitlink_commit": "f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/protobuf",
+      "policy": "system-provider",
+      "provider": "protobuf@21.12 and py-protobuf@4.21.12",
+      "reason": "ODR policy requires system protobuf@21.12/py-protobuf@4.21.12; PyTorch's gitlink is pin evidence only.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c third_party/protobuf (f0dc78d7e)",
+      "submodule_license_file": "third_party/protobuf/LICENSE",
+      "url": "https://github.com/protocolbuffers/protobuf.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/benchmark",
+      "declared_path_in_parent": "third_party/benchmark",
+      "evidence": [
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:18-56 requires BUILD_CUSTOM_PROTOBUF=OFF with system protobuf 3.21.12.",
+        "experiments/spack-bazel-graph/native/pytorch/plan.py:414-419 wires PROTOBUF_PROTOC_EXECUTABLE and CMAKE_PREFIX_PATH for protobuf@21.12."
+      ],
+      "git_describe": "v1.2.0",
+      "gitlink_commit": "5b7683f49e1e9223cf9927b24f6fd3d6bd82e3f8",
+      "gitmodules_file": "third_party/protobuf/.gitmodules",
+      "parent_license_file": "third_party/protobuf/LICENSE",
+      "parent_superproject_path": "third_party/protobuf",
+      "path": "third_party/protobuf/third_party/benchmark",
+      "policy": "unused-with-reason",
+      "reason": "Nested protobuf benchmark source is not used because BUILD_CUSTOM_PROTOBUF=OFF.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 5b7683f49e1e9223cf9927b24f6fd3d6bd82e3f8 third_party/protobuf/third_party/benchmark (v1.2.0)",
+      "submodule_license_file": "third_party/protobuf/third_party/benchmark/LICENSE",
+      "url": "https://github.com/google/benchmark.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/googletest",
+      "declared_path_in_parent": "third_party/googletest",
+      "evidence": [
+        "experiments/spack-bazel-graph/docs/pytorch-odr-dependencies.md:18-56 requires BUILD_CUSTOM_PROTOBUF=OFF with system protobuf 3.21.12.",
+        "experiments/spack-bazel-graph/native/pytorch/plan.py:414-419 wires PROTOBUF_PROTOC_EXECUTABLE and CMAKE_PREFIX_PATH for protobuf@21.12."
+      ],
+      "git_describe": "release-1.8.0-1696-g5ec7f0c4",
+      "gitlink_commit": "5ec7f0c4a113e2f18ac2c6cc7df51ad6afc24081",
+      "gitmodules_file": "third_party/protobuf/.gitmodules",
+      "parent_license_file": "third_party/protobuf/LICENSE",
+      "parent_superproject_path": "third_party/protobuf",
+      "path": "third_party/protobuf/third_party/googletest",
+      "policy": "unused-with-reason",
+      "reason": "Nested protobuf test source is not used because BUILD_CUSTOM_PROTOBUF=OFF.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 5ec7f0c4a113e2f18ac2c6cc7df51ad6afc24081 third_party/protobuf/third_party/googletest (release-1.8.0-1696-g5ec7f0c4)",
+      "submodule_license_file": "third_party/protobuf/third_party/googletest/LICENSE",
+      "url": "https://github.com/google/googletest.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NNPACK_deps/psimd",
+      "declared_path_in_parent": "third_party/psimd",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef."
+      ],
+      "git_describe": "heads/master",
+      "gitlink_commit": "072586a71b55b7f8c584153d223e95687148a900",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/psimd",
+      "policy": "system-provider",
+      "provider": "@psimd_native//:lib",
+      "reason": "Use the graph/native psimd provider through USE_SYSTEM_PSIMD.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 072586a71b55b7f8c584153d223e95687148a900 third_party/psimd (heads/master)",
+      "submodule_license_file": null,
+      "url": "https://github.com/Maratyszcza/psimd.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/NNPACK_deps/pthreadpool",
+      "declared_path_in_parent": "third_party/pthreadpool",
+      "evidence": [
+        "CMakeLists.txt:540 declares USE_SYSTEM_PTHREADPOOL.",
+        "cmake/Dependencies.cmake:430-462 consumes a system pthreadpool target when USE_SYSTEM_PTHREADPOOL is on.",
+        "experiments/spack-bazel-graph/native_overrides.json maps pthreadpool to @pthreadpool_native//:lib."
+      ],
+      "git_describe": "a56dcd7",
+      "gitlink_commit": "a56dcd79c699366e7ac6466792c3025883ff7704",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/pthreadpool",
+      "policy": "system-provider",
+      "provider": "@pthreadpool_native//:lib",
+      "reason": "Use the repo-owned native pthreadpool provider through USE_SYSTEM_PTHREADPOOL.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " a56dcd79c699366e7ac6466792c3025883ff7704 third_party/pthreadpool (a56dcd7)",
+      "submodule_license_file": "third_party/pthreadpool/LICENSE",
+      "url": "https://github.com/google/pthreadpool.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/pybind11",
+      "declared_path_in_parent": "third_party/pybind11",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef."
+      ],
+      "git_describe": "97bf890d",
+      "gitlink_commit": "97bf890db679505a14dfe547a5e77bb2bd05dc90",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/pybind11",
+      "policy": "system-provider",
+      "provider": "py-pybind11 graph/provider",
+      "reason": "Use the graph py-pybind11 provider through USE_SYSTEM_PYBIND11.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 97bf890db679505a14dfe547a5e77bb2bd05dc90 third_party/pybind11 (97bf890d)",
+      "submodule_license_file": "third_party/pybind11/LICENSE",
+      "url": "https://github.com/pybind/pybind11.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/python-peachpy",
+      "declared_path_in_parent": "third_party/python-peachpy",
+      "evidence": [
+        "CMakeLists.txt:346 exposes USE_NNPACK.",
+        "cmake/Dependencies.cmake:532-547 builds third_party/NNPACK when USE_NNPACK is on."
+      ],
+      "git_describe": "heads/master-368-gf45429b",
+      "gitlink_commit": "f45429b087dd7d5bc78bb40dc7cf06425c252d67",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/python-peachpy",
+      "policy": "vendored",
+      "reason": "NNPACK/PeachPy code generation source is part of the checked-out NNPACK dependency set.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " f45429b087dd7d5bc78bb40dc7cf06425c252d67 third_party/python-peachpy (heads/master-368-gf45429b)",
+      "submodule_license_file": "third_party/python-peachpy/LICENSE.rst",
+      "url": "https://github.com/malfet/PeachPy.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/sleef",
+      "declared_path_in_parent": "third_party/sleef",
+      "evidence": [
+        "CMakeLists.txt:535-546 declares USE_SYSTEM_CPUINFO/FP16/PTHREADPOOL/PSIMD/FXDIV/PYBIND11/SLEEF/NVTX hooks.",
+        "experiments/spack-bazel-graph/docs/recipes/py-torch.md:153-158 records Spack's preference for system cpuinfo/fp16/fxdiv/nvtx/psimd/pthreadpool/pybind11/sleef.",
+        "aten/src/ATen/CMakeLists.txt:799-827 imports a system sleef library when USE_SYSTEM_SLEEF is on."
+      ],
+      "git_describe": "5a1d179",
+      "gitlink_commit": "5a1d179df9cf652951b59010a2d2075372d67f68",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/sleef",
+      "policy": "system-provider",
+      "provider": "sleef graph/provider",
+      "reason": "Use the graph sleef provider through USE_SYSTEM_SLEEF.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 5a1d179df9cf652951b59010a2d2075372d67f68 third_party/sleef (5a1d179)",
+      "submodule_license_file": "third_party/sleef/LICENSE.txt",
+      "url": "https://github.com/shibatch/sleef"
+    },
+    {
+      "declared_name_in_parent": "third_party/tensorpipe",
+      "declared_path_in_parent": "third_party/tensorpipe",
+      "evidence": [
+        "cmake/Dependencies.cmake:1222-1263 builds third_party/tensorpipe when USE_TENSORPIPE and USE_DISTRIBUTED are enabled.",
+        "third_party/tensorpipe/cmake/Finduv.cmake:42-66 consumes vendored libuv unless TP_USE_SYSTEM_LIBUV supplies a provider."
+      ],
+      "git_describe": "2b4cd91",
+      "gitlink_commit": "2b4cd91092d335a697416b2a3cb398283246849d",
+      "gitmodules_file": ".gitmodules",
+      "parent_license_file": "LICENSE",
+      "parent_superproject_path": ".",
+      "path": "third_party/tensorpipe",
+      "policy": "vendored",
+      "reason": "Full-feature RPC/TensorPipe consumes this checkout unless a future provider implements TP system wiring.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 2b4cd91092d335a697416b2a3cb398283246849d third_party/tensorpipe (2b4cd91)",
+      "submodule_license_file": "third_party/tensorpipe/LICENSE.txt",
+      "url": "https://github.com/pytorch/tensorpipe.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/googletest",
+      "declared_path_in_parent": "third_party/googletest",
+      "evidence": [
+        "third_party/tensorpipe/cmake/Options.cmake:32-50 keeps test/python options separate from the PyTorch library build."
+      ],
+      "git_describe": "release-1.8.0-2420-gaee0f9d9",
+      "gitlink_commit": "aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e",
+      "gitmodules_file": "third_party/tensorpipe/.gitmodules",
+      "parent_license_file": "third_party/tensorpipe/LICENSE.txt",
+      "parent_superproject_path": "third_party/tensorpipe",
+      "path": "third_party/tensorpipe/third_party/googletest",
+      "policy": "unused-with-reason",
+      "reason": "TensorPipe tests are not part of the selected PyTorch wheel build.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " aee0f9d9b5b87796ee8a0ab26b7587ec30e8858e third_party/tensorpipe/third_party/googletest (release-1.8.0-2420-gaee0f9d9)",
+      "submodule_license_file": "third_party/tensorpipe/third_party/googletest/LICENSE",
+      "url": "https://github.com/google/googletest.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/libnop",
+      "declared_path_in_parent": "third_party/libnop",
+      "evidence": [
+        "cmake/Dependencies.cmake:1222-1263 builds third_party/tensorpipe when USE_TENSORPIPE and USE_DISTRIBUTED are enabled.",
+        "third_party/tensorpipe/cmake/Finduv.cmake:42-66 consumes vendored libuv unless TP_USE_SYSTEM_LIBUV supplies a provider."
+      ],
+      "git_describe": "910b558",
+      "gitlink_commit": "910b55815be16109f04f4180e9adee14fb4ce281",
+      "gitmodules_file": "third_party/tensorpipe/.gitmodules",
+      "parent_license_file": "third_party/tensorpipe/LICENSE.txt",
+      "parent_superproject_path": "third_party/tensorpipe",
+      "path": "third_party/tensorpipe/third_party/libnop",
+      "policy": "vendored",
+      "reason": "TensorPipe serialization helper source; no selected system provider exists.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 910b55815be16109f04f4180e9adee14fb4ce281 third_party/tensorpipe/third_party/libnop (910b558)",
+      "submodule_license_file": "third_party/tensorpipe/third_party/libnop/LICENSE",
+      "url": "https://github.com/google/libnop.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/libuv",
+      "declared_path_in_parent": "third_party/libuv",
+      "evidence": [
+        "cmake/Dependencies.cmake:1222-1263 builds third_party/tensorpipe when USE_TENSORPIPE and USE_DISTRIBUTED are enabled.",
+        "third_party/tensorpipe/cmake/Finduv.cmake:42-66 consumes vendored libuv unless TP_USE_SYSTEM_LIBUV supplies a provider."
+      ],
+      "git_describe": "v1.51.0",
+      "gitlink_commit": "5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b",
+      "gitmodules_file": "third_party/tensorpipe/.gitmodules",
+      "parent_license_file": "third_party/tensorpipe/LICENSE.txt",
+      "parent_superproject_path": "third_party/tensorpipe",
+      "path": "third_party/tensorpipe/third_party/libuv",
+      "policy": "vendored",
+      "reason": "TensorPipe libuv transport dependency; vendored unless TP_USE_SYSTEM_LIBUV supplies a future provider.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b third_party/tensorpipe/third_party/libuv (v1.51.0)",
+      "submodule_license_file": "third_party/tensorpipe/third_party/libuv/LICENSE",
+      "url": "https://github.com/libuv/libuv.git"
+    },
+    {
+      "declared_name_in_parent": "third_party/pybind11",
+      "declared_path_in_parent": "third_party/pybind11",
+      "evidence": [
+        "third_party/tensorpipe/cmake/Options.cmake:32-50 leaves TP_BUILD_PYTHON off in the PyTorch dependency build; nested pybind11/clang are not needed."
+      ],
+      "git_describe": "v2.2.4-1-ga23996fc",
+      "gitlink_commit": "a23996fce38ff6ccfbcdc09f1e63f2c4be5ea2ef",
+      "gitmodules_file": "third_party/tensorpipe/.gitmodules",
+      "parent_license_file": "third_party/tensorpipe/LICENSE.txt",
+      "parent_superproject_path": "third_party/tensorpipe",
+      "path": "third_party/tensorpipe/third_party/pybind11",
+      "policy": "unused-with-reason",
+      "reason": "TensorPipe Python bindings are off in the PyTorch dependency build.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " a23996fce38ff6ccfbcdc09f1e63f2c4be5ea2ef third_party/tensorpipe/third_party/pybind11 (v2.2.4-1-ga23996fc)",
+      "submodule_license_file": "third_party/tensorpipe/third_party/pybind11/LICENSE",
+      "url": "https://github.com/pybind/pybind11.git"
+    },
+    {
+      "declared_name_in_parent": "tools/clang",
+      "declared_path_in_parent": "tools/clang",
+      "evidence": [
+        "third_party/tensorpipe/cmake/Options.cmake:32-50 leaves TP_BUILD_PYTHON off in the PyTorch dependency build; nested pybind11/clang are not needed."
+      ],
+      "git_describe": "6a00cbc",
+      "gitlink_commit": "6a00cbc4a9b8e68b71caf7f774b3f9c753ae84d5",
+      "gitmodules_file": "third_party/tensorpipe/third_party/pybind11/.gitmodules",
+      "parent_license_file": "third_party/tensorpipe/third_party/pybind11/LICENSE",
+      "parent_superproject_path": "third_party/tensorpipe/third_party/pybind11",
+      "path": "third_party/tensorpipe/third_party/pybind11/tools/clang",
+      "policy": "unused-with-reason",
+      "reason": "Nested pybind11 tooling is only needed for TensorPipe Python binding development.",
+      "source_artifact": {
+        "bazel_input_label": "@pytorch_v2_14_0_source//:all",
+        "file_name": "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+        "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+        "strip_prefix": "pytorch-v2.14.0"
+      },
+      "status_line": " 6a00cbc4a9b8e68b71caf7f774b3f9c753ae84d5 third_party/tensorpipe/third_party/pybind11/tools/clang (6a00cbc)",
+      "submodule_license_file": "third_party/tensorpipe/third_party/pybind11/tools/clang/LICENSE.TXT",
+      "url": "https://github.com/wjakob/clang-cindex-python3"
+    }
+  ]
+}
