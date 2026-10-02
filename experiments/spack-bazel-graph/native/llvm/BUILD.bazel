@@ -1,0 +1,19 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "llvm.bzl",
+    "plan.py",
+    "plan_test.py",
+])
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = ["llvm.bzl"],
+    main = "plan_test.py",
+)

@@ -1,0 +1,278 @@
+{
+  "packages": {
+    "spack_berkeley_db": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "db",
+        "db-18",
+        "db-18.1",
+        "db_cxx",
+        "db_cxx-18",
+        "db_cxx-18.1",
+        "db_stl",
+        "db_stl-18",
+        "db_stl-18.1"
+      ],
+      "native_prefix": "@berkeley_db_native//:lib",
+      "package": "berkeley-db",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/berkeley-db-18.1.40-l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+      "spack_hash": "l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+      "version": "18.1.40"
+    },
+    "spack_bzip2": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "bz2"
+      ],
+      "native_prefix": "@bzip2_native//:lib",
+      "package": "bzip2",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/bzip2-1.0.8-ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+      "spack_hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+      "version": "1.0.8"
+    },
+    "spack_ca_certificates_mozilla": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@ca_certificates_mozilla_native//:lib",
+      "package": "ca-certificates-mozilla",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/ca-certificates-mozilla-2026-03-19-rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "spack_hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "version": "2026-03-19"
+    },
+    "spack_curl": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/curl"
+      ],
+      "link_deps": [
+        "spack_nghttp2",
+        "spack_openssl",
+        "spack_zlib_ng"
+      ],
+      "link_libs": [
+        "curl"
+      ],
+      "native_prefix": "@curl_native//:lib",
+      "package": "curl",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/curl-8.20.0-rhs5xjezzx2zcevml6qu2qtujxm4pnvm",
+      "spack_hash": "rhs5xjezzx2zcevml6qu2qtujxm4pnvm",
+      "version": "8.20.0"
+    },
+    "spack_diffutils": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libiconv"
+      ],
+      "link_libs": [],
+      "native_prefix": "@diffutils_native//:lib",
+      "package": "diffutils",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/diffutils-3.12-5u2vizuxymb72i5qq5qr24s27xeylrz6",
+      "spack_hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+      "version": "3.12"
+    },
+    "spack_gdbm": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [
+        "spack_readline"
+      ],
+      "link_libs": [
+        "gdbm",
+        "gdbm_compat"
+      ],
+      "native_prefix": "@gdbm_native//:lib",
+      "package": "gdbm",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/gdbm-1.26-n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+      "spack_hash": "n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+      "version": "1.26"
+    },
+    "spack_less": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_ncurses"
+      ],
+      "link_libs": [],
+      "native_prefix": "@less_native//:lib",
+      "package": "less",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/less-692-dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+      "spack_hash": "dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+      "version": "692"
+    },
+    "spack_libiconv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "charset",
+        "iconv"
+      ],
+      "native_prefix": "@libiconv_native//:lib",
+      "package": "libiconv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libiconv-1.18-c772leslxvswjh32kbc3x6wf7362uxuy",
+      "spack_hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+      "version": "1.18"
+    },
+    "spack_ncurses": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/ncurses",
+        "include/ncursesw"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "curses",
+        "form",
+        "form_g",
+        "formw",
+        "formw_g",
+        "menu",
+        "menu_g",
+        "menuw",
+        "menuw_g",
+        "ncurses",
+        "ncurses++",
+        "ncurses++_g",
+        "ncurses++w",
+        "ncurses++w_g",
+        "ncurses_g",
+        "ncursesw",
+        "ncursesw_g",
+        "panel",
+        "panel_g",
+        "panelw",
+        "panelw_g",
+        "tinfo",
+        "tinfo_g",
+        "tinfow",
+        "tinfow_g"
+      ],
+      "native_prefix": "@ncurses_native//:lib",
+      "package": "ncurses",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/ncurses-6.6-anxucerxim6q3r4fpijczh5brrrrgguu",
+      "spack_hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+      "version": "6.6"
+    },
+    "spack_nghttp2": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/nghttp2"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "nghttp2"
+      ],
+      "native_prefix": "@nghttp2_native//:lib",
+      "package": "nghttp2",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/nghttp2-1.67.1-cnlvyswhnr2xm4gtj4rkqzhyy5ong2i5",
+      "spack_hash": "cnlvyswhnr2xm4gtj4rkqzhyy5ong2i5",
+      "version": "1.67.1"
+    },
+    "spack_openssl": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/openssl"
+      ],
+      "link_deps": [
+        "spack_zlib_ng"
+      ],
+      "link_libs": [
+        "crypto",
+        "ssl"
+      ],
+      "native_prefix": "@openssl_native//:lib",
+      "package": "openssl",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/openssl-3.6.1-lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+      "spack_hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+      "version": "3.6.1"
+    },
+    "spack_perl": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_berkeley_db",
+        "spack_bzip2",
+        "spack_gdbm",
+        "spack_less",
+        "spack_zlib_ng"
+      ],
+      "link_libs": [],
+      "native_prefix": "@perl_native//:lib",
+      "package": "perl",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/perl-5.42.0-vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+      "spack_hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+      "version": "5.42.0"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "spack_hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "version": "2.5.1"
+    },
+    "spack_readline": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/readline"
+      ],
+      "link_deps": [
+        "spack_ncurses"
+      ],
+      "link_libs": [
+        "history",
+        "readline"
+      ],
+      "native_prefix": "@readline_native//:lib",
+      "package": "readline",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/readline-8.3-uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+      "spack_hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+      "version": "8.3"
+    },
+    "spack_zlib_ng": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "z"
+      ],
+      "native_prefix": "@zlib_ng_native//:lib",
+      "package": "zlib-ng",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/zlib-ng-2.3.3-igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "spack_hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "version": "2.3.3"
+    }
+  },
+  "root": "spack_curl",
+  "schema_version": 1
+}

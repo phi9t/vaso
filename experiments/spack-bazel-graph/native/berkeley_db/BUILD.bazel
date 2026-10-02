@@ -1,0 +1,6 @@
+# Marks native/berkeley_db as a Bazel package so berkeley_db.bzl is loadable
+# from MODULE.bazel.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["berkeley_db.bzl"])

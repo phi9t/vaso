@@ -1,0 +1,6 @@
+# Marks native/xz as a Bazel package so xz.bzl is loadable from MODULE.bazel.
+# The actual @xz_native repo is materialized by the xz_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["xz.bzl"])

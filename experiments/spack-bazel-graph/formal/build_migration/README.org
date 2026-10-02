@@ -1,0 +1,114 @@
+#+TITLE: Formal models — Spack→native build migration
+
+* Scope
+
+This directory holds the executable formal contract for the *migration process*
+of ~experiments/spack-bazel-graph/~: Spack is a reference recipe, and the build
+graph is hillclimbed one package at a time (topological order), flipping each
+node's provider from Spack to a native Bazel build (see
+~docs/native-migration.md~).
+
+The model is the transaction shape of that hillclimb. It mirrors the
+~ferric_continuum/formal/distributed_training/StepTxn.tla~ discipline (a
+distributed step as a versioned commit/abort transaction) and reuses its
+hermetic Bazel + ~tla2tools.jar~ + ~remotejdk_17~ checking scaffold.
+
+* The contract (~Migration.tla~)
+
+A migration is a sequence of per-node *provider flips*. Each node walks a small
+pipeline: ~spack -> recipe -> deps_gated -> gated -> native~ (deep-dive recipe
+capture, then the build-mechanism hermetic dependency guard, then the
+ABI-parity gate, then the provider flip). The design invariants are encoded and
+checked:
+
+1. ~TopologyImmutable~ — a flip changes a node's *provider*, never the graph
+   topology/edges. The observed edge set always equals the initial snapshot.
+2. ~NativeDownwardClosed~ — the native subgraph is downward-closed: no node is
+   native while any migration-relevant dep is still non-native, so every
+   unmigrated consumer's ~depends_on~ stays satisfiable and the prefix/ABI
+   contract is meaningful.
+3. ~HermeticDepsBeforeAbi~ — no node reaches the ABI gate until its
+   build-mechanism-specific hermetic dependency guard has passed. This models
+   ~//tools:hermetic_native_deps_guard_test~: Autotools, CMake, Makefile,
+   generic, and Python-wheel native build rules must consume dependency
+   prefixes through Bazel-owned inputs instead of host discovery.
+4. Gate-before-native — the only transition into ~native~ is ~FlipNative~,
+   guarded by ~status = "gated"~, which is only reachable via ~PassAbiGate~
+   from ~deps_gated~. No node becomes native without passing both guards.
+
+Plus ~FrontMonotone~ (the hillclimb front marches in topological order) and the
+liveness property ~MigrationCompletes~ (every node eventually native).
+
+* Files
+
+- ~Migration.tla~ — the abstract migration-transaction contract (shared base).
+- ~MigrationGood.tla~/~.cfg~ — a legal 2-node instance (zlib-ng leaf + a
+  consumer that depends on it): the hillclimb flips zlib-ng native before the
+  consumer, topology never changes, ~Inv~ + ~MigrationCompletes~ hold.
+- ~MigrationBad.tla~/~.cfg~ — a buggy variant whose ~BadFlip~ action flips the
+  consumer native ahead of its provider AND rewrites a topology edge, violating
+  ~NativeDownwardClosed~ and ~TopologyImmutable~.
+- ~MigrationBadNoDepsGate.tla~/~.cfg~ — a buggy variant that passes ABI parity
+  directly from recipe capture without the hermetic dependency guard, violating
+  ~HermeticDepsBeforeAbi~.
+- ~tlc_bazel_test.py~ — hermetic TLC driver (Bazel ~$(JAVA)~ + pinned
+  ~@tla2tools//jar~), asserts Good clean / Bad invariant-violation.
+
+* Run (hermetic Bazel path, canonical)
+
+No host ~java~ or ~TLA_TOOLS_JAR~ needed. Bazel fetches the pinned
+~tla2tools.jar~ (~http_jar~ in ~MODULE.bazel~, sha256-verified) and runs
+~tlc2.TLC~ with ~remotejdk_17~ (via ~--config=formal~ in ~.bazelrc~; the host
+~local_jdk~ can be Java 8, which is too old for tla2tools 1.8.0).
+
+#+begin_src sh
+bazel test --config=formal //formal/build_migration:migration_tlc_test --test_output=all
+bazel test --config=formal //formal/build_migration:migration_hermetic_deps_tlc_test --test_output=all
+#+end_src
+
+Expected: ~MigrationGood~ satisfies ~Inv~ + ~MigrationCompletes~ (~result =
+success~, exit 0); ~MigrationBad~ violates ~Inv~ (~result =
+invariant_violation~, TLC exit 12). The nonzero exit for the bad model is the
+*expected* outcome, so the test asserts on the classified result.
+
+The target is tagged ~manual~ + ~local-only~ because it fetches the jar over the
+network at repo-rule time (plain ~bazel test //...~ skips it).
+
+* Lean4 (landed): the artifact obligation
+
+TLA+ checks the *process* (topology-preserving, gated, downward-closed, live).
+The complementary Lean4 layer proves the *artifact* obligation each flip must
+discharge — that a native install tree is prefix/ABI-equivalent to the Spack one
+— following the kernel-equivalence style used in
+~modular/research/kernel-optimization/lean-specs~ and the Qwen3 step-trace
+refinement in ~lagrange-torch-mlu-insula/.../Qwen3StepTrace.lean~.
+
+It lives in ~formal/lean/~ (~AbiParity/Basic.lean~, Lean ~v4.34.0~, no Mathlib,
+and is built by ~//formal/lean:lean_abi_parity_test~ with Bazel's pinned
+~@lean_dist~ archive). It models an install prefix as the three axes
+~tools/abi_parity.py~ checks (layout-path set, per-lib SONAME + exported-symbol
+set, public-header set), defines ~AbiEquiv~, and proves:
+
+- ~AbiEquiv.refl~ / ~AbiEquiv.symm~ / ~AbiEquiv.trans~ — ~AbiEquiv~ is an
+  equivalence relation, so the ledger may chain equivalence across a sequence
+  of flips;
+- ~links_preserved~ (the load-bearing theorem) — if a consumer ~LinksAgainst~
+  the Spack prefix and the native prefix is ~AbiEquiv~ to it, the consumer
+  ~LinksAgainst~ the native prefix too. This is the formal counterpart of the
+  empirical link-and-run gate and of the migration invariant that unmigrated
+  consumers ~depends_on~ a flipped node unchanged.
+
+~#print axioms~ confirms the proofs use only ~propext~ (no ~sorry~).
+
+#+begin_src sh
+VASO_FORMAL=1 ./run.sh
+#+end_src
+
+The supported proof path is the Bazel target running inside the insula. Direct
+host ~lake build~ may be useful while editing, but it is not accepted migration
+evidence because it can use host elan/lake state.
+
+So the two verification layers compose: TLA+ guarantees the migration only ever
+flips a node once its ABI gate is green and never edits topology; Lean4
+formalizes what "ABI gate green" *means* for the artifact and proves it implies
+consumers still link.

@@ -1,0 +1,47 @@
+{
+  "packages": {
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    },
+    "spack_util_macros": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@util_macros_native//:lib",
+      "package": "util-macros",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-macros-1.20.2-xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "spack_hash": "xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "version": "1.20.2"
+    },
+    "spack_xtrans": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/X11"
+      ],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@xtrans_native//:lib",
+      "package": "xtrans",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/xtrans-1.6.0-eo6wazbmwm7xirn3upg4nvwogtjtvacj",
+      "spack_hash": "eo6wazbmwm7xirn3upg4nvwogtjtvacj",
+      "version": "1.6.0"
+    }
+  },
+  "root": "spack_xtrans",
+  "schema_version": 1
+}

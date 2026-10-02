@@ -1,0 +1,1356 @@
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+# Marks the experiment root as a Bazel package so tools/*.bzl is loadable.
+
+package(default_visibility = ["//visibility:public"])
+
+# The ABI-parity gate script, consumed by //synthetic:zlib_ng_abi_parity.
+exports_files([
+    "abi_parity.py",
+    "abi_invariants.py",
+    "build_graph.py",
+    "compiler_pathway_guard.py",
+    "compiler_pathways.json",
+    "compiler_provenance.py",
+    "io_hygiene_allowlist.txt",
+    "io_hygiene_guard.py",
+    "insula_test_routing.py",
+    "jaxlib_deps_import_check.py",
+    "live_guard_no_cache.py",
+    "migration_ledger_check.py",
+    "native_build_mechanism_guard.py",
+    "native_dep_wiring_check.py",
+    "native_lock_versions.py",
+    "native_source_versions.py",
+    "np17_acceptance_gate_guard.py",
+    "one_llvm_graph_guard.py",
+    "py_torch_networkx_prune_check.py",
+    "python_freeze_proof.py",
+    "pytorch_odr_policy_check.py",
+    "profile_guard.py",
+    "pytorch_python_protobuf_compat.py",
+    "rootfs_spack_externals.py",
+    "runtime_compiler_assertions.py",
+    "single_copy_cuda_graph_guard.py",
+    "spack_recipe_provenance.py",
+    "spack_to_bazel.py",
+    "toolchain_setting_allowlist.txt",
+    "triumvirate_acceptance.py",
+    "tracker_lint.py",
+    "tracker_lint_allowlist.txt",
+])
+
+filegroup(
+    name = "shell_scripts",
+    srcs = glob(["*.sh"]),
+)
+
+sh_binary(
+    name = "spack_lock",
+    srcs = ["spack_lock.sh"],
+    args = [
+        "$(rootpath @spack_dist//:spack)",
+        "$(rootpath :spack_to_bazel.py)",
+        "$(rootpath :build_graph.py)",
+    ],
+    data = [
+        ":build_graph.py",
+        ":lean_font_resources.sh",
+        ":spack_to_bazel.py",
+        "@spack_dist//:spack",
+    ],
+)
+
+sh_test(
+    name = "spack_lock_test",
+    srcs = ["spack_lock_test.sh"],
+    data = [
+        ":lean_font_resources.sh",
+        ":spack_lock",
+    ],
+)
+
+sh_test(
+    name = "lean_font_resources_test",
+    srcs = ["lean_font_resources_test.sh"],
+    data = [
+        ":lean_font_resources.sh",
+        "//:run.sh",
+    ],
+)
+
+py_test(
+    name = "run_phase0_guard_test",
+    srcs = ["run_phase0_guard_test.py"],
+    data = [
+        "//:run.sh",
+        "//native/common:rootfs_cuda_component.bzl",
+    ],
+    main = "run_phase0_guard_test.py",
+)
+
+py_test(
+    name = "defaults_audit_test",
+    srcs = [
+        "abi_invariants.py",
+        "defaults_audit_test.py",
+        "runtime_compiler_assertions.py",
+    ],
+    data = [
+        ":compiler_pathways.json",
+        ":spack_dist.bzl",
+        "//:run.sh",
+        "//native/jaxlib:plan.py",
+        "//native/pytorch:BUILD.bazel",
+        "//native/pytorch:plan.py",
+        "//native/torchaudio:BUILD.bazel",
+        "//native/torchaudio:plan.py",
+        "//native/torchvision:BUILD.bazel",
+        "//native/torchvision:plan.py",
+        "//scripts/agents:triumvirate-gate-insula.sh",
+        "//workloads:run_workloads.py",
+    ],
+    main = "defaults_audit_test.py",
+)
+
+py_test(
+    name = "py_numpy_rule_guard_test",
+    srcs = ["py_numpy_rule_guard_test.py"],
+    data = [
+        "//native/py_numpy:py_numpy.bzl",
+    ],
+    main = "py_numpy_rule_guard_test.py",
+)
+
+sh_test(
+    name = "hermetic_spack_guard_test",
+    srcs = ["hermetic_spack_guard_test.sh"],
+    data = [
+        ":build_graph.py",
+        ":rootfs_spack_externals.py",
+        ":spack_to_bazel.py",
+        ":spack_dist.bzl",
+        "//:rootfs/build_rootfs.sh",
+        "//:rootfs/cuda_ecosystem.lock.json",
+        "//native/autoconf:autoconf.bzl",
+        "//native/automake:automake.bzl",
+        "//native/bdftopcf:bdftopcf.bzl",
+        "//native/berkeley_db:berkeley_db.bzl",
+        "//native/binutils:binutils.bzl",
+        "//native/bison:bison.bzl",
+        "//native/boost:boost.bzl",
+        "//native/boost:bootstrap-compiler.patch",
+        "//native/bzip2:bzip2.bzl",
+        "//native/ca_certificates_mozilla:ca_certificates_mozilla.bzl",
+        "//native/cairo:cairo.bzl",
+        "//native/cmake:cmake.bzl",
+        "//native/common:python_abi.bzl",
+        "//native/common:rootfs_cuda_component.bzl",
+        "//native/coreutils:coreutils.bzl",
+        "//native/cpuinfo:cpuinfo.bzl",
+        "//native/cuda:cuda.bzl",
+        "//native/cudss:cudss.bzl",
+        "//native/cudnn:cudnn.bzl",
+        "//native/cusparselt:cusparselt.bzl",
+        "//native/curl:curl.bzl",
+        "//native/diffutils:diffutils.bzl",
+        "//native/eigen:eigen.bzl",
+        "//native/elfutils:elfutils.bzl",
+        "//native/expat:expat.bzl",
+        "//native/file:file.bzl",
+        "//native/fp16:fp16.bzl",
+        "//native/fxdiv:fxdiv.bzl",
+        "//native/flex:flex.bzl",
+        "//native/fribidi:fribidi.bzl",
+        "//native/fontconfig:fontconfig.bzl",
+        "//native/fontsproto:fontsproto.bzl",
+        "//native/font_util:font_util.bzl",
+        "//native/freetype:freetype.bzl",
+        "//native/gdbm:gdbm.bzl",
+        "//native/gettext:gettext.bzl",
+        "//native/git:git.bzl",
+        "//native/glib:glib.bzl",
+        "//native/gobject_introspection:gobject_introspection.bzl",
+        "//native/glib_bootstrap:glib_bootstrap.bzl",
+        "//native/gmake:gmake.bzl",
+        "//native/gperf:gperf.bzl",
+        "//native/gzip:gzip.bzl",
+        "//native/harfbuzz:harfbuzz.bzl",
+        "//native/hwloc:hwloc.bzl",
+        "//native/icu4c:icu4c.bzl",
+        "//native/krb5:krb5.bzl",
+        "//native/less:less.bzl",
+        "//native/libbsd:libbsd.bzl",
+        "//native/libedit:libedit.bzl",
+        "//native/libevent:libevent.bzl",
+        "//native/libffi:libffi.bzl",
+        "//native/libfontenc:libfontenc.bzl",
+        "//native/libidn2:libidn2.bzl",
+        "//native/libiconv:libiconv.bzl",
+        "//native/libjpeg_turbo:libjpeg_turbo.bzl",
+        "//native/libpng:libpng.bzl",
+        "//native/libraqm:libraqm.bzl",
+        "//native/libtool:libtool.bzl",
+        "//native/libmd:libmd.bzl",
+        "//native/libpciaccess:libpciaccess.bzl",
+        "//native/libsigsegv:libsigsegv.bzl",
+        "//native/libunistring:libunistring.bzl",
+        "//native/libxcrypt:libxcrypt.bzl",
+        "//native/libxfont:libxfont.bzl",
+        "//native/lua:lua.bzl",
+        "//native/libyaml:libyaml.bzl",
+        "//native/lzo:lzo.bzl",
+        "//native/llvm:llvm.bzl",
+        "//native/llvm:plan.py",
+        "//native/m4:m4.bzl",
+        "//native/magma:magma.bzl",
+        "//native/meson:meson.bzl",
+        "//native/meson:rpath-0.64.patch",
+        "//native/mkfontdir:mkfontdir.bzl",
+        "//native/mkfontscale:mkfontscale.bzl",
+        "//native/libxml2:libxml2.bzl",
+        "//native/nasm:nasm.bzl",
+        "//native/nccl:nccl.bzl",
+        "//native/nlohmann_json:nlohmann_json.bzl",
+        "//native/numactl:numactl.bzl",
+        "//native/nghttp2:nghttp2.bzl",
+        "//native/ninja:ninja.bzl",
+        "//native/ncurses:ncurses.bzl",
+        "//native/nvshmem:nvshmem.bzl",
+        "//native/openblas:openblas.bzl",
+        "//native/nvtx:nvtx.bzl",
+        "//native/openmpi:openmpi.bzl",
+        "//native/openssh:openssh.bzl",
+        "//native/openssl:openssl.bzl",
+        "//native/pcre2:pcre2.bzl",
+        "//native/perl:perl.bzl",
+        "//native/perl_data_dumper:perl_data_dumper.bzl",
+        "//native/pigz:pigz.bzl",
+        "//native/pixman:pixman.bzl",
+        "//native/pmix:pmix.bzl",
+        "//native/pkgconf:pkgconf.bzl",
+        "//native/psimd:psimd.bzl",
+        "//native/pthreadpool:pthreadpool.bzl",
+        "//native/prrte:prrte.bzl",
+        "//native/protobuf:protobuf.bzl",
+        "//native/qhull:qhull.bzl",
+        "//native/py_absl_py:py_absl_py.bzl",
+        "//native/py_calver:py_calver.bzl",
+        "//native/py_beniget:py_beniget.bzl",
+        "//native/py_certifi:py_certifi.bzl",
+        "//native/py_charset_normalizer:py_charset_normalizer.bzl",
+        "//native/py_cppy:py_cppy.bzl",
+        "//native/py_cycler:py_cycler.bzl",
+        "//native/py_cython:py_cython.bzl",
+        "//native/py_flit_core:py_flit_core.bzl",
+        "//native/py_fonttools:py_fonttools.bzl",
+        "//native/py_fsspec:py_fsspec.bzl",
+        "//native/py_gast:py_gast.bzl",
+        "//native/py_filelock:py_filelock.bzl",
+        "//native/py_hatch_fancy_pypi_readme:py_hatch_fancy_pypi_readme.bzl",
+        "//native/py_hatch_vcs:py_hatch_vcs.bzl",
+        "//native/py_hatchling:py_hatchling.bzl",
+        "//native/py_idna:py_idna.bzl",
+        "//native/py_jax:py_jax.bzl",
+        "//native/py_jinja2:py_jinja2.bzl",
+        "//native/py_kiwisolver:py_kiwisolver.bzl",
+        "//native/py_markupsafe:py_markupsafe.bzl",
+        "//native/py_meson_python:py_meson_python.bzl",
+        "//native/py_ml_dtypes:py_ml_dtypes.bzl",
+        "//native/py_mpmath:py_mpmath.bzl",
+        "//native/py_networkx:py_networkx.bzl",
+        "//native/py_numpy:py_numpy.bzl",
+        "//native/py_opt_einsum:py_opt_einsum.bzl",
+        "//native/py_packaging:py_packaging.bzl",
+        "//native/py_pathspec:py_pathspec.bzl",
+        "//native/py_pillow:py_pillow.bzl",
+        "//native/py_pluggy:py_pluggy.bzl",
+        "//native/py_ply:py_ply.bzl",
+        "//native/py_protobuf:py_protobuf.bzl",
+        "//native/py_pythran:py_pythran.bzl",
+        "//native/py_scipy:py_scipy.bzl",
+        "//native/py_pyproject_hooks:py_pyproject_hooks.bzl",
+        "//native/py_lit:py_lit.bzl",
+        "//native/py_build:py_build.bzl",
+        "//native/py_pybind11:py_pybind11.bzl",
+        "//native/py_python_dateutil:py_python_dateutil.bzl",
+        "//native/py_pyparsing:py_pyparsing.bzl",
+        "//native/py_pyproject_metadata:py_pyproject_metadata.bzl",
+        "//native/py_pyyaml:py_pyyaml.bzl",
+        "//native/py_scikit_build_core:py_scikit_build_core.bzl",
+        "//native/py_setuptools_scm:py_setuptools_scm.bzl",
+        "//native/py_six:py_six.bzl",
+        "//native/py_sympy:py_sympy.bzl",
+        "//native/py_tqdm:py_tqdm.bzl",
+        "//native/py_typing_extensions:py_typing_extensions.bzl",
+        "//native/py_urllib3:py_urllib3.bzl",
+        "//native/py_requests:py_requests.bzl",
+        "//native/py_versioneer:py_versioneer.bzl",
+        "//native/re2c:re2c.bzl",
+        "//native/py_trove_classifiers:py_trove_classifiers.bzl",
+        "//native/py_pip:py_pip.bzl",
+        "//native/py_setuptools:py_setuptools.bzl",
+        "//native/py_wheel:py_wheel.bzl",
+        "//native/python:python.bzl",
+        "//native/python_venv:python_venv.bzl",
+        "//native/jaxlib:action_driver.py",
+        "//native/jaxlib:jaxlib_action.bzl",
+        "//native/jaxlib:plan.py",
+        "//native/pytorch:action_driver.py",
+        "//native/pytorch:action_smoke_test.py",
+        "//native/pytorch:gates.py",
+        "//native/pytorch:gates_test.py",
+        "//native/pytorch:plan.py",
+        "//native/pytorch:pytorch_action.bzl",
+        "//native/pytorch:pytorch_native.bzl",
+        "//native/rootfs_bazel:rootfs_bazel.bzl",
+        "//native/rootfs_llvm_23:rootfs_llvm_23.bzl",
+        "//native/torchaudio:action_driver.py",
+        "//native/torchaudio:torchaudio_action.bzl",
+        "//native/torchvision:action_driver.py",
+        "//native/torchvision:torchvision_action.bzl",
+        "//native/triton:action_driver.py",
+        "//native/triton:triton_action.bzl",
+        "//native/readline:readline.bzl",
+        "//native/sleef:sleef.bzl",
+        "//native/sqlite:sqlite.bzl",
+        "//native/swig:swig.bzl",
+        "//native/tar:tar.bzl",
+        "//native/unzip:unzip.bzl",
+        "//native/util_linux_uuid:util_linux_uuid.bzl",
+        "//native/util_macros:util_macros.bzl",
+        "//native/utf8proc:utf8proc.bzl",
+        "//native/xproto:xproto.bzl",
+        "//native/xtrans:xtrans.bzl",
+        "//native/xxd_standalone:xxd_standalone.bzl",
+        "//native/xz:xz.bzl",
+        "//native/zlib_ng:zlib_ng.bzl",
+        "//native/zlib_ng:zlib_ng_action.bzl",
+        "//native/zstd:zstd.bzl",
+    ],
+)
+
+sh_test(
+    name = "hermetic_native_deps_guard_test",
+    srcs = ["hermetic_native_deps_guard_test.sh"],
+    data = [
+        ":native_build_mechanism_guard.py",
+        ":python_abi_literal_allowlist.txt",
+        ":python_abi_literal_guard.py",
+        ":shell_scripts",
+        ":toolchain_setting_allowlist.txt",
+        "//:.bazelrc",
+        "//:MODULE.bazel",
+        "//:run.sh",
+        "//:rootfs/cuda_ecosystem.lock.json",
+        "//native/autoconf:autoconf.bzl",
+        "//native/automake:automake.bzl",
+        "//native/bdftopcf:bdftopcf.bzl",
+        "//native/berkeley_db:berkeley_db.bzl",
+        "//native/binutils:binutils.bzl",
+        "//native/bison:bison.bzl",
+        "//native/boost:boost.bzl",
+        "//native/bzip2:bzip2.bzl",
+        "//native/ca_certificates_mozilla:ca_certificates_mozilla.bzl",
+        "//native/cairo:cairo.bzl",
+        "//native/cmake:cmake.bzl",
+        "//native/common:python_abi.bzl",
+        "//native/common:rootfs_cuda_component.bzl",
+        "//native/coreutils:coreutils.bzl",
+        "//native/cpuinfo:cpuinfo.bzl",
+        "//native/cuda:cuda.bzl",
+        "//native/cudss:cudss.bzl",
+        "//native/cudnn:cudnn.bzl",
+        "//native/cusparselt:cusparselt.bzl",
+        "//native/curl:curl.bzl",
+        "//native/diffutils:diffutils.bzl",
+        "//native/eigen:eigen.bzl",
+        "//native/elfutils:elfutils.bzl",
+        "//native/expat:expat.bzl",
+        "//native/file:file.bzl",
+        "//native/findutils:findutils.bzl",
+        "//native/fp16:fp16.bzl",
+        "//native/fxdiv:fxdiv.bzl",
+        "//native/flex:flex.bzl",
+        "//native/fribidi:fribidi.bzl",
+        "//native/fontconfig:fontconfig.bzl",
+        "//native/fontsproto:fontsproto.bzl",
+        "//native/font_util:font_util.bzl",
+        "//native/freetype:freetype.bzl",
+        "//native/gdbm:gdbm.bzl",
+        "//native/gettext:gettext.bzl",
+        "//native/git:git.bzl",
+        "//native/glib:glib.bzl",
+        "//native/gobject_introspection:gobject_introspection.bzl",
+        "//native/glib_bootstrap:glib_bootstrap.bzl",
+        "//native/gmake:gmake.bzl",
+        "//native/gperf:gperf.bzl",
+        "//native/gzip:gzip.bzl",
+        "//native/harfbuzz:harfbuzz.bzl",
+        "//native/hwloc:hwloc.bzl",
+        "//native/icu4c:icu4c.bzl",
+        "//native/krb5:krb5.bzl",
+        "//native/less:less.bzl",
+        "//native/libbsd:libbsd.bzl",
+        "//native/libedit:libedit.bzl",
+        "//native/libevent:libevent.bzl",
+        "//native/libffi:libffi.bzl",
+        "//native/libfontenc:libfontenc.bzl",
+        "//native/libidn2:libidn2.bzl",
+        "//native/libiconv:libiconv.bzl",
+        "//native/libjpeg_turbo:libjpeg_turbo.bzl",
+        "//native/libpng:libpng.bzl",
+        "//native/libraqm:libraqm.bzl",
+        "//native/libtool:libtool.bzl",
+        "//native/libmd:libmd.bzl",
+        "//native/libpciaccess:libpciaccess.bzl",
+        "//native/libsigsegv:libsigsegv.bzl",
+        "//native/libunistring:libunistring.bzl",
+        "//native/libxcrypt:libxcrypt.bzl",
+        "//native/libxfont:libxfont.bzl",
+        "//native/lua:lua.bzl",
+        "//native/libyaml:libyaml.bzl",
+        "//native/lzo:lzo.bzl",
+        "//native/llvm:llvm.bzl",
+        "//native/llvm:plan_test.py",
+        "//native/llvm:plan.py",
+        "//native/m4:m4.bzl",
+        "//native/magma:magma.bzl",
+        "//native/meson:meson.bzl",
+        "//native/mkfontdir:mkfontdir.bzl",
+        "//native/mkfontscale:mkfontscale.bzl",
+        "//native/libxml2:libxml2.bzl",
+        "//native/nasm:nasm.bzl",
+        "//native/nccl:nccl.bzl",
+        "//native/nlohmann_json:nlohmann_json.bzl",
+        "//native/numactl:numactl.bzl",
+        "//native/nghttp2:nghttp2.bzl",
+        "//native/ninja:ninja.bzl",
+        "//native/ncurses:ncurses.bzl",
+        "//native/nvshmem:nvshmem.bzl",
+        "//native/openblas:openblas.bzl",
+        "//native/nvtx:nvtx.bzl",
+        "//native/openmpi:openmpi.bzl",
+        "//native/openssh:openssh.bzl",
+        "//native/openssl:openssl.bzl",
+        "//native/pcre2:pcre2.bzl",
+        "//native/perl:perl.bzl",
+        "//native/perl_data_dumper:perl_data_dumper.bzl",
+        "//native/pigz:pigz.bzl",
+        "//native/pixman:pixman.bzl",
+        "//native/pmix:pmix.bzl",
+        "//native/pkgconf:pkgconf.bzl",
+        "//native/psimd:psimd.bzl",
+        "//native/pthreadpool:pthreadpool.bzl",
+        "//native/prrte:prrte.bzl",
+        "//native/protobuf:protobuf.bzl",
+        "//native/qhull:qhull.bzl",
+        "//native/py_absl_py:py_absl_py.bzl",
+        "//native/py_calver:py_calver.bzl",
+        "//native/py_beniget:py_beniget.bzl",
+        "//native/py_certifi:py_certifi.bzl",
+        "//native/py_charset_normalizer:py_charset_normalizer.bzl",
+        "//native/py_cppy:py_cppy.bzl",
+        "//native/py_cycler:py_cycler.bzl",
+        "//native/py_cython:py_cython.bzl",
+        "//native/py_flit_core:py_flit_core.bzl",
+        "//native/py_fonttools:py_fonttools.bzl",
+        "//native/py_fsspec:py_fsspec.bzl",
+        "//native/py_gast:py_gast.bzl",
+        "//native/py_filelock:py_filelock.bzl",
+        "//native/py_hatch_fancy_pypi_readme:py_hatch_fancy_pypi_readme.bzl",
+        "//native/py_hatch_vcs:py_hatch_vcs.bzl",
+        "//native/py_hatchling:py_hatchling.bzl",
+        "//native/py_idna:py_idna.bzl",
+        "//native/py_jax:py_jax.bzl",
+        "//native/py_jinja2:py_jinja2.bzl",
+        "//native/py_kiwisolver:py_kiwisolver.bzl",
+        "//native/py_llvmlite:plan.py",
+        "//native/py_llvmlite:plan_test.py",
+        "//native/py_llvmlite:py_llvmlite.bzl",
+        "//native/py_markupsafe:py_markupsafe.bzl",
+        "//native/py_meson_python:py_meson_python.bzl",
+        "//native/py_ml_dtypes:py_ml_dtypes.bzl",
+        "//native/py_mpmath:py_mpmath.bzl",
+        "//native/py_networkx:py_networkx.bzl",
+        "//native/py_numpy:py_numpy.bzl",
+        "//native/py_opt_einsum:py_opt_einsum.bzl",
+        "//native/py_packaging:py_packaging.bzl",
+        "//native/py_pathspec:py_pathspec.bzl",
+        "//native/py_pillow:py_pillow.bzl",
+        "//native/py_pluggy:py_pluggy.bzl",
+        "//native/py_ply:py_ply.bzl",
+        "//native/py_protobuf:py_protobuf.bzl",
+        "//native/py_pythran:py_pythran.bzl",
+        "//native/py_scipy:py_scipy.bzl",
+        "//native/py_pyproject_hooks:py_pyproject_hooks.bzl",
+        "//native/py_lit:py_lit.bzl",
+        "//native/py_build:py_build.bzl",
+        "//native/py_pybind11:py_pybind11.bzl",
+        "//native/py_python_dateutil:py_python_dateutil.bzl",
+        "//native/py_pyparsing:py_pyparsing.bzl",
+        "//native/py_pyproject_metadata:py_pyproject_metadata.bzl",
+        "//native/py_pyyaml:py_pyyaml.bzl",
+        "//native/py_scikit_build_core:py_scikit_build_core.bzl",
+        "//native/py_setuptools_scm:py_setuptools_scm.bzl",
+        "//native/py_six:py_six.bzl",
+        "//native/py_sympy:py_sympy.bzl",
+        "//native/py_tqdm:py_tqdm.bzl",
+        "//native/py_typing_extensions:py_typing_extensions.bzl",
+        "//native/py_urllib3:py_urllib3.bzl",
+        "//native/py_requests:py_requests.bzl",
+        "//native/py_versioneer:py_versioneer.bzl",
+        "//native/re2c:re2c.bzl",
+        "//native/py_trove_classifiers:py_trove_classifiers.bzl",
+        "//native/py_pip:py_pip.bzl",
+        "//native/py_setuptools:py_setuptools.bzl",
+        "//native/py_wheel:py_wheel.bzl",
+        "//native/python:python.bzl",
+        "//native/python_venv:python_venv.bzl",
+        "//native/jaxlib:action_driver.py",
+        "//native/jaxlib:action_driver_test.py",
+        "//native/jaxlib:action_smoke_test.py",
+        "//native/jaxlib:jaxlib_action.bzl",
+        "//native/jaxlib:plan.py",
+        "//native/jaxlib:plan_test.py",
+        "//native/pytorch:action_driver.py",
+        "//native/pytorch:action_smoke_test.py",
+        "//native/pytorch:gates.py",
+        "//native/pytorch:gates_test.py",
+        "//native/pytorch:plan.py",
+        "//native/pytorch:pytorch_action.bzl",
+        "//native/pytorch:pytorch_native.bzl",
+        "//native/pytorch:plan_test.py",
+        "//native/rootfs_bazel:rootfs_bazel.bzl",
+        "//native/rootfs_llvm_23:rootfs_llvm_23.bzl",
+        "//native/torchaudio:action_driver.py",
+        "//native/torchaudio:action_driver_test.py",
+        "//native/torchaudio:action_smoke_test.py",
+        "//native/torchaudio:plan.py",
+        "//native/torchaudio:plan_test.py",
+        "//native/torchaudio:torchaudio_action.bzl",
+        "//native/torchaudio:upstream_pins.json",
+        "//native/torchvision:action_driver.py",
+        "//native/torchvision:action_driver_test.py",
+        "//native/torchvision:action_smoke_test.py",
+        "//native/torchvision:plan.py",
+        "//native/torchvision:plan_test.py",
+        "//native/torchvision:torchvision_action.bzl",
+        "//native/torchvision:upstream_pins.json",
+        "//native/triton:action_driver.py",
+        "//native/triton:action_driver_test.py",
+        "//native/triton:action_smoke_test.py",
+        "//native/readline:readline.bzl",
+        "//native/sleef:sleef.bzl",
+        "//native/sqlite:sqlite.bzl",
+        "//native/swig:swig.bzl",
+        "//native/tar:tar.bzl",
+        "//native/triton:plan.py",
+        "//native/triton:plan_test.py",
+        "//native/triton:triton_action.bzl",
+        "//native/triton:upstream_pins.json",
+        "//native/unzip:unzip.bzl",
+        "//native/util_linux_uuid:util_linux_uuid.bzl",
+        "//native/util_macros:util_macros.bzl",
+        "//native/utf8proc:utf8proc.bzl",
+        "//native/xproto:xproto.bzl",
+        "//native/xtrans:xtrans.bzl",
+        "//native/xxd_standalone:xxd_standalone.bzl",
+        "//native/xz:xz.bzl",
+        "//native/zlib_ng:zlib_ng.bzl",
+        "//native/zlib_ng:zlib_ng_action.bzl",
+        "//native/zstd:zstd.bzl",
+        "//synthetic:shell_scripts",
+    ],
+)
+
+py_test(
+    name = "abi_parity_unit_test",
+    srcs = [
+        "abi_parity.py",
+        "abi_parity_test.py",
+    ],
+    main = "abi_parity_test.py",
+)
+
+py_test(
+    name = "build_graph_unit_test",
+    srcs = [
+        "build_graph.py",
+        "build_graph_test.py",
+        "spack_to_bazel.py",
+    ],
+    data = ["//:py_torch_build_graph.json"],
+    main = "build_graph_test.py",
+)
+
+py_test(
+    name = "insula_test_routing_meta_test",
+    srcs = ["insula_test_routing.py"],
+    args = [
+        "--source-anchor",
+        "$(rootpath :io_hygiene_allowlist.txt)",
+    ],
+    data = [":io_hygiene_allowlist.txt"],
+    main = "insula_test_routing.py",
+)
+
+py_test(
+    name = "live_guard_no_cache_meta_test",
+    srcs = ["live_guard_no_cache.py"],
+    args = [
+        "--source-anchor",
+        "$(rootpath :io_hygiene_allowlist.txt)",
+    ],
+    data = [":io_hygiene_allowlist.txt"],
+    main = "live_guard_no_cache.py",
+)
+
+py_test(
+    name = "migration_ledger_check_live_test",
+    srcs = [
+        "migration_ledger_check.py",
+        "spack_to_bazel.py",
+    ],
+    args = [
+        "--root",
+        "$(rootpath //:migration_ledger.json)",
+    ],
+    data = [
+        "//:migration_ledger.json",
+        "//:native_overrides.json",
+        "//:py_llvmlite_build_graph.json",
+        "//:py_torch_lean_fonts_build_graph.json",
+        "//:py_torch_lean_nx_build_graph.json",
+        "//:recipe_docs",
+        "//synthetic:BUILD.bazel",
+    ],
+    main = "migration_ledger_check.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "migration_ledger_check_unit_test",
+    srcs = [
+        "migration_ledger_check.py",
+        "migration_ledger_check_test.py",
+        "spack_to_bazel.py",
+    ],
+    main = "migration_ledger_check_test.py",
+)
+
+py_test(
+    name = "native_lock_versions_live_test",
+    srcs = ["native_lock_versions.py"],
+    args = [
+        "--native-overrides",
+        "$(rootpath //:native_overrides.json)",
+        "$(locations //:spack_locks)",
+    ],
+    data = [
+        "//:native_overrides.json",
+        "//:spack_locks",
+    ],
+    main = "native_lock_versions.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "native_lock_versions_unit_test",
+    srcs = [
+        "native_lock_versions.py",
+        "native_lock_versions_test.py",
+    ],
+    main = "native_lock_versions_test.py",
+)
+
+py_test(
+    name = "np17_acceptance_gate_guard_test",
+    srcs = [
+        "np17_acceptance_gate_guard.py",
+        "np17_acceptance_gate_guard_test.py",
+    ],
+    main = "np17_acceptance_gate_guard_test.py",
+)
+
+py_binary(
+    name = "np17_acceptance_gate_guard",
+    srcs = ["np17_acceptance_gate_guard.py"],
+    main = "np17_acceptance_gate_guard.py",
+)
+
+py_binary(
+    name = "compiler_pathway_guard",
+    srcs = ["compiler_pathway_guard.py"],
+    data = [":compiler_pathways.json"],
+    main = "compiler_pathway_guard.py",
+)
+
+py_test(
+    name = "compiler_pathway_guard_unit_test",
+    srcs = [
+        "compiler_pathway_guard.py",
+        "compiler_pathway_guard_test.py",
+    ],
+    main = "compiler_pathway_guard_test.py",
+)
+
+py_test(
+    name = "compiler_pathway_guard_live_test",
+    srcs = ["compiler_pathway_guard.py"],
+    args = [
+        "--policy",
+        "$(rootpath :compiler_pathways.json)",
+        "--profile",
+        "torch",
+        "--plan",
+        "torch=$(rootpath //native/pytorch:plan.py)",
+        "--plan",
+        "torchvision=$(rootpath //native/torchvision:plan.py)",
+        "--plan",
+        "torchaudio=$(rootpath //native/torchaudio:plan.py)",
+        "--plan",
+        "triton=$(rootpath //native/triton:plan.py)",
+        # 2026-10-02: B1 owns removing this from the live Triton plan.
+        # Keep this mask exact so any other torch-profile compiler drift fails.
+        "--expect-failure",
+        "triton:TRITON_BUILD_WITH_CLANG_LLD.*1",
+    ],
+    data = [
+        ":compiler_pathways.json",
+        "//native/pytorch:plan.py",
+        "//native/torchaudio:plan.py",
+        "//native/torchvision:plan.py",
+        "//native/triton:plan.py",
+    ],
+    main = "compiler_pathway_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "compiler_pathway_guard_jax_live_test",
+    srcs = ["compiler_pathway_guard.py"],
+    args = [
+        "--policy",
+        "$(rootpath :compiler_pathways.json)",
+        "--profile",
+        "jax",
+        "--plan",
+        "jaxlib=$(rootpath //native/jaxlib:plan.py)",
+    ],
+    data = [
+        ":compiler_pathways.json",
+        "//native/jaxlib:plan.py",
+    ],
+    main = "compiler_pathway_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_binary(
+    name = "compiler_provenance",
+    srcs = ["compiler_provenance.py"],
+    data = [":compiler_pathways.json"],
+    main = "compiler_provenance.py",
+)
+
+py_test(
+    name = "compiler_provenance_unit_test",
+    srcs = [
+        "compiler_provenance.py",
+        "compiler_provenance_test.py",
+    ],
+    data = [":compiler_pathways.json"],
+    main = "compiler_provenance_test.py",
+)
+
+py_test(
+    name = "pytorch_gates_jax_group_test",
+    srcs = ["pytorch_gates_jax_group_test.py"],
+    data = [
+        "//native/pytorch:gates.py",
+    ],
+    main = "pytorch_gates_jax_group_test.py",
+)
+
+py_test(
+    name = "single_copy_cuda_graph_guard_test",
+    srcs = [
+        "single_copy_cuda_graph_guard.py",
+        "single_copy_cuda_graph_guard_test.py",
+    ],
+    main = "single_copy_cuda_graph_guard_test.py",
+)
+
+py_test(
+    name = "triumvirate_acceptance_test",
+    srcs = [
+        "triumvirate_acceptance.py",
+        "triumvirate_acceptance_test.py",
+    ],
+    main = "triumvirate_acceptance_test.py",
+)
+
+py_test(
+    name = "tracker_lint_unit_test",
+    srcs = [
+        "tracker_lint.py",
+        "tracker_lint_test.py",
+    ],
+    main = "tracker_lint_test.py",
+)
+
+py_test(
+    name = "guard_change_protocol_test",
+    srcs = ["guard_change_protocol_test.py"],
+    data = glob(["*guard*.py"]),
+    main = "guard_change_protocol_test.py",
+)
+
+py_test(
+    name = "live_guard_no_cache_unit_test",
+    srcs = [
+        "live_guard_no_cache.py",
+        "live_guard_no_cache_test.py",
+    ],
+    main = "live_guard_no_cache_test.py",
+)
+
+py_test(
+    name = "tracker_lint_live_test",
+    srcs = ["tracker_lint.py"],
+    args = [
+        "--source-anchor",
+        "$(rootpath :tracker_lint_allowlist.txt)",
+        "--tracker-root",
+        "../../.scratch",
+        "--allowlist",
+        "$(rootpath :tracker_lint_allowlist.txt)",
+    ],
+    data = [":tracker_lint_allowlist.txt"],
+    main = "tracker_lint.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "native_source_versions_live_test",
+    srcs = ["native_source_versions.py"],
+    args = [
+        "--native-overrides",
+        "$(rootpath //:native_overrides.json)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:native_overrides.json",
+        "//:recipe_docs",
+        "//native/cuda:cuda.bzl",
+        "//native/cudnn:cudnn.bzl",
+        "//native/cudss:cudss.bzl",
+        "//native/cusparselt:cusparselt.bzl",
+        "//native/nccl:nccl.bzl",
+        "//native/nvshmem:nvshmem.bzl",
+        "//native/rootfs_bazel:rootfs_bazel.bzl",
+        "//native/rootfs_llvm_23:rootfs_llvm_23.bzl",
+    ],
+    main = "native_source_versions.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "native_source_versions_unit_test",
+    srcs = [
+        "native_source_versions.py",
+        "native_source_versions_test.py",
+    ],
+    main = "native_source_versions_test.py",
+)
+
+py_test(
+    name = "estate_unit_test",
+    srcs = [
+        "estate.py",
+        "estate_test.py",
+    ],
+    main = "estate_test.py",
+)
+
+py_test(
+    name = "rootfs_spack_externals_unit_test",
+    srcs = [
+        "rootfs_spack_externals.py",
+        "rootfs_spack_externals_test.py",
+    ],
+    data = ["//spack_overlays/vaso:repo"],
+    main = "rootfs_spack_externals_test.py",
+)
+
+py_test(
+    name = "cuda_ecosystem_lock_test",
+    srcs = ["//:rootfs/cuda_ecosystem_lock_test.py"],
+    data = ["//:rootfs/cuda_ecosystem.lock.json"],
+    main = "rootfs/cuda_ecosystem_lock_test.py",
+)
+
+py_test(
+    name = "llvm_rootfs_cache_unit_test",
+    srcs = ["//:rootfs/llvm_rootfs_cache_test.py"],
+    data = [
+        "//:rootfs/cuda_ecosystem.lock.json",
+        "//:rootfs/llvm_rootfs_cache.py",
+    ],
+    main = "rootfs/llvm_rootfs_cache_test.py",
+)
+
+py_test(
+    name = "verify_cuda_ecosystem_test",
+    srcs = ["//:rootfs/verify_cuda_ecosystem_test.py"],
+    data = [
+        "//:rootfs/cuda_ecosystem.lock.json",
+        "//:rootfs/verify_cuda_ecosystem.py",
+    ],
+    main = "rootfs/verify_cuda_ecosystem_test.py",
+)
+
+py_test(
+    name = "io_hygiene_guard_unit_test",
+    srcs = [
+        "io_hygiene_guard.py",
+        "io_hygiene_guard_test.py",
+    ],
+    main = "io_hygiene_guard_test.py",
+)
+
+py_test(
+    name = "io_hygiene_guard_live_test",
+    srcs = ["io_hygiene_guard.py"],
+    args = [
+        "--allowlist",
+        "$(rootpath :io_hygiene_allowlist.txt)",
+        "--source-anchor",
+        "$(rootpath :io_hygiene_allowlist.txt)",
+    ],
+    data = [":io_hygiene_allowlist.txt"],
+    main = "io_hygiene_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "native_dep_wiring_unit_test",
+    srcs = [
+        "native_dep_wiring_check.py",
+        "native_dep_wiring_check_test.py",
+    ],
+    main = "native_dep_wiring_check_test.py",
+)
+
+py_test(
+    name = "native_dep_wiring_live_test",
+    srcs = ["native_dep_wiring_check.py"],
+    args = [
+        "--module",
+        "$(rootpath //:MODULE.bazel)",
+        "--native-overrides",
+        "$(rootpath //:native_overrides.json)",
+        "--ledger",
+        "$(rootpath //:migration_ledger.json)",
+        "--allowlist",
+        "$(rootpath :native_dep_wiring_allowlist.txt)",
+        "--graph",
+        "$(rootpath //:py_torch_214_full_cu130_build_graph.json)",
+        "--graph",
+        "$(rootpath //:py_torch_214_full_cu129_build_graph.json)",
+    ],
+    data = [
+        ":native_dep_wiring_allowlist.txt",
+        "//:MODULE.bazel",
+        "//:migration_ledger.json",
+        "//:native_overrides.json",
+        "//:py_torch_214_full_cu129_build_graph.json",
+        "//:py_torch_214_full_cu130_build_graph.json",
+    ],
+    main = "native_dep_wiring_check.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "module_spack_repo_imports_test",
+    srcs = ["module_spack_repo_imports_test.py"],
+    args = [
+        "$(rootpath //:MODULE.bazel)",
+        "$(rootpath //:spack_graph.lock.json)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:spack_graph.lock.json",
+    ],
+)
+
+py_test(
+    name = "py_torch_networkx_prune_check_live_test",
+    srcs = ["py_torch_networkx_prune_check.py"],
+    args = [
+        "--old-graph",
+        "$(rootpath //:py_torch_lean_fonts_build_graph.json)",
+        "--new-graph",
+        "$(rootpath //:py_torch_lean_nx_build_graph.json)",
+        "--expected-n-nodes",
+        "144",
+        "--expected-dropped-count",
+        "32",
+        "--allow-added-packages",
+        "--expected-hash-change",
+        "cairo=propagated-from-hwloc-cairo-variant",
+        "--expected-hash-change",
+        "cpuinfo=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "cuda=py-torch-2.14-cu130-rootfs-external",
+        "--expected-hash-change",
+        "cudnn=py-torch-2.14-cu130-rootfs-external",
+        "--expected-hash-change",
+        "cusparselt=py-torch-2.14-cu130-rootfs-external",
+        "--expected-hash-change",
+        "fp16=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "fxdiv=propagated-from-build-only-python-shift",
+        "--expected-hash-change",
+        "glib=propagated-from-meson-ninja-python-shift",
+        "--expected-hash-change",
+        "glib-bootstrap=propagated-from-meson-ninja-python-shift",
+        "--expected-hash-change",
+        "gobject-introspection=propagated-from-meson-ninja-python-shift",
+        "--expected-hash-change",
+        "hwloc=solver-selected-cairo-variant",
+        "--expected-hash-change",
+        "meson=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "ninja=propagated-from-build-only-python-shift",
+        "--expected-hash-change",
+        "nvtx=py-torch-2.14-rootfs-shift",
+        "--expected-hash-change",
+        "openmpi=propagated-from-hwloc-pmix-prrte-shift",
+        "--expected-hash-change",
+        "pixman=propagated-from-meson-ninja-python-shift",
+        "--expected-hash-change",
+        "pmix=propagated-from-hwloc-libtool-shift",
+        "--expected-hash-change",
+        "protobuf=py-torch-2.14-protobuf-policy",
+        "--expected-hash-change",
+        "prrte=propagated-from-hwloc-pmix-libtool-shift",
+        "--expected-hash-change",
+        "psimd=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "pthreadpool=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "py-meson-python=propagated-from-meson-ninja-shift",
+        "--expected-hash-change",
+        "py-networkx=default-extras-disabled",
+        "--expected-hash-change",
+        "py-numpy=propagated-from-py-meson-python-shift",
+        "--expected-hash-change",
+        "py-protobuf=spack-resolve-hash-drift-same-visible-projection",
+        "--expected-hash-change",
+        "py-pybind11=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "py-scikit-build-core=py-torch-2.14-build-backend-minimum",
+        "--expected-hash-change",
+        "py-torch=depends-on-pruned-py-networkx-and-shifted-deps",
+        "--expected-hash-change",
+        "python=additional-build-only-python-3.14-node",
+        "--expected-hash-change",
+        "re2c=propagated-from-build-only-python-shift",
+        "--expected-hash-change",
+        "sleef=propagated-from-ninja-build-python-shift",
+        "--expected-hash-change",
+        "valgrind=propagated-from-openmpi-shift",
+    ],
+    data = [
+        "//:py_torch_lean_fonts_build_graph.json",
+        "//:py_torch_lean_nx_build_graph.json",
+    ],
+    main = "py_torch_networkx_prune_check.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "py_torch_networkx_prune_check_test",
+    srcs = [
+        "py_torch_networkx_prune_check.py",
+        "py_torch_networkx_prune_check_test.py",
+    ],
+    main = "py_torch_networkx_prune_check_test.py",
+)
+
+py_test(
+    name = "python_freeze_proof_unit_test",
+    srcs = [
+        "python_freeze_proof.py",
+        "python_freeze_proof_test.py",
+    ],
+    main = "python_freeze_proof_test.py",
+)
+
+py_test(
+    name = "python_abi_literal_guard_unit_test",
+    srcs = [
+        "python_abi_literal_guard.py",
+        "python_abi_literal_guard_test.py",
+    ],
+    main = "python_abi_literal_guard_test.py",
+)
+
+py_test(
+    name = "native_build_mechanism_guard_unit_test",
+    srcs = [
+        "native_build_mechanism_guard.py",
+        "native_build_mechanism_guard_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:rootfs/cuda_ecosystem.lock.json",
+        "//native/boost:boost.bzl",
+        "//native/common:rootfs_cuda_component.bzl",
+        "//native/cuda:cuda.bzl",
+        "//native/cudnn:cudnn.bzl",
+        "//native/cudss:cudss.bzl",
+        "//native/cusparselt:cusparselt.bzl",
+        "//native/nccl:nccl.bzl",
+        "//native/nvshmem:nvshmem.bzl",
+        "//native/jaxlib:action_driver.py",
+        "//native/jaxlib:jaxlib_action.bzl",
+        "//native/pytorch:action_driver.py",
+        "//native/pytorch:pytorch_action.bzl",
+        "//native/torchaudio:action_driver.py",
+        "//native/torchaudio:torchaudio_action.bzl",
+        "//native/torchvision:action_driver.py",
+        "//native/torchvision:torchvision_action.bzl",
+        "//native/triton:action_driver.py",
+        "//native/triton:triton_action.bzl",
+    ],
+    main = "native_build_mechanism_guard_test.py",
+)
+
+py_test(
+    name = "spack_recipe_provenance_unit_test",
+    srcs = [
+        "spack_recipe_provenance.py",
+        "spack_recipe_provenance_test.py",
+    ],
+    main = "spack_recipe_provenance_test.py",
+)
+
+py_test(
+    name = "jaxlib_deps_import_check_unit_test",
+    srcs = [
+        "jaxlib_deps_import_check.py",
+        "jaxlib_deps_import_check_test.py",
+    ],
+    main = "jaxlib_deps_import_check_test.py",
+)
+
+py_test(
+    name = "triumvirate_gate_profile_test",
+    srcs = ["triumvirate_gate_profile_test.py"],
+    data = ["//scripts/agents:triumvirate-gate-insula.sh"],
+    main = "triumvirate_gate_profile_test.py",
+)
+
+py_test(
+    name = "abi_invariants_unit_test",
+    srcs = [
+        "abi_invariants.py",
+        "abi_invariants_test.py",
+    ],
+    main = "abi_invariants_test.py",
+)
+
+py_test(
+    name = "profile_guard_unit_test",
+    srcs = [
+        "profile_guard.py",
+        "profile_guard_test.py",
+    ],
+    main = "profile_guard_test.py",
+)
+
+py_test(
+    name = "runtime_compiler_assertions_unit_test",
+    srcs = [
+        "runtime_compiler_assertions.py",
+        "runtime_compiler_assertions_test.py",
+    ],
+    main = "runtime_compiler_assertions_test.py",
+)
+
+py_test(
+    name = "profile_guard_torch_live_test",
+    srcs = ["profile_guard.py"],
+    args = [
+        "--profile",
+        "torch",
+        "$(rootpath //:py_torch_214_full_cu130_build_graph.json)",
+        "$(rootpath //:py_torch_214_full_cu129_build_graph.json)",
+        "$(rootpath //:py_triton_pytorch_pin_cu130_build_graph.json)",
+        "$(rootpath //:py_triton_pytorch_pin_cu129_build_graph.json)",
+    ],
+    data = [
+        "//:py_triton_pytorch_pin_cu129_build_graph.json",
+        "//:py_triton_pytorch_pin_cu130_build_graph.json",
+        "//:py_torch_214_full_cu129_build_graph.json",
+        "//:py_torch_214_full_cu130_build_graph.json",
+    ],
+    main = "profile_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "profile_guard_jax_live_test",
+    srcs = ["profile_guard.py"],
+    args = [
+        "--profile",
+        "jax",
+        "$(rootpath //:py_jax_0102_cu130_build_graph.json)",
+        "$(rootpath //:py_jax_0102_cu129_build_graph.json)",
+    ],
+    data = [
+        "//:py_jax_0102_cu129_build_graph.json",
+        "//:py_jax_0102_cu130_build_graph.json",
+    ],
+    main = "profile_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "one_llvm_spack_overlay_test",
+    srcs = ["one_llvm_spack_overlay_test.py"],
+    data = [
+        "//spack_overlays/vaso:repo",
+        ":spack_dist.bzl",
+    ],
+)
+
+py_test(
+    name = "one_llvm_graph_guard_unit_test",
+    srcs = [
+        "one_llvm_graph_guard.py",
+        "one_llvm_graph_guard_test.py",
+    ],
+    main = "one_llvm_graph_guard_test.py",
+)
+
+py_test(
+    name = "one_llvm_graph_guard_live_test",
+    srcs = ["one_llvm_graph_guard.py"],
+    args = [
+        "$(rootpath //:py_jax_0102_cu130_build_graph.json)",
+        "$(rootpath //:py_jax_0102_cu129_build_graph.json)",
+        "$(rootpath //:py_torch_214_full_cu130_build_graph.json)",
+        "$(rootpath //:py_torch_214_full_cu129_build_graph.json)",
+        "$(rootpath //:py_triton_pytorch_pin_cu130_build_graph.json)",
+        "$(rootpath //:py_triton_pytorch_pin_cu129_build_graph.json)",
+        "$(rootpath //:py_llvmlite_build_graph.json)",
+    ],
+    data = [
+        "//:py_jax_0102_cu129_build_graph.json",
+        "//:py_jax_0102_cu130_build_graph.json",
+        "//:py_llvmlite_build_graph.json",
+        "//:py_triton_pytorch_pin_cu129_build_graph.json",
+        "//:py_triton_pytorch_pin_cu130_build_graph.json",
+        "//:py_torch_214_full_cu129_build_graph.json",
+        "//:py_torch_214_full_cu130_build_graph.json",
+    ],
+    main = "one_llvm_graph_guard.py",
+    precompile = "disabled",
+    tags = ["no-cache"],
+)
+
+py_test(
+    name = "pytorch_python_protobuf_compat_test",
+    srcs = [
+        "pytorch_python_protobuf_compat.py",
+        "pytorch_python_protobuf_compat_test.py",
+    ],
+    main = "pytorch_python_protobuf_compat_test.py",
+)
+
+py_test(
+    name = "pytorch_spack_overlay_test",
+    srcs = ["pytorch_spack_overlay_test.py"],
+    data = ["//spack_overlays/vaso:repo"],
+)
+
+py_test(
+    name = "pytorch_odr_policy_check_test",
+    srcs = [
+        "pytorch_odr_policy_check.py",
+        "spack_to_bazel.py",
+    ],
+    args = [
+        "--plan",
+        "$(rootpath //native/pytorch:plan.py)",
+        "--native-overrides",
+        "$(rootpath //:native_overrides.json)",
+        "--ledger",
+        "$(rootpath //:migration_ledger.json)",
+        "--graph",
+        "$(rootpath //:py_torch_build_graph.json)",
+        "--graph",
+        "$(rootpath //:protobuf_policy_check_build_graph.json)",
+    ],
+    data = [
+        "//:migration_ledger.json",
+        "//:native_overrides.json",
+        "//:protobuf_policy_check_build_graph.json",
+        "//:py_torch_build_graph.json",
+        "//:py_torch_lean_fonts_build_graph.json",
+        "//:py_torch_lean_nx_build_graph.json",
+        "//native/pytorch:plan.py",
+    ],
+    main = "pytorch_odr_policy_check.py",
+)
+
+py_test(
+    name = "pytorch_odr_policy_check_unit_test",
+    srcs = [
+        "pytorch_odr_policy_check.py",
+        "pytorch_odr_policy_check_test.py",
+        "spack_to_bazel.py",
+    ],
+    data = ["//native/pytorch:plan.py"],
+    main = "pytorch_odr_policy_check_test.py",
+)
+
+py_test(
+    name = "spack_to_bazel_unit_test",
+    srcs = [
+        "spack_to_bazel.py",
+        "spack_to_bazel_test.py",
+    ],
+    data = ["//:native_overrides.json"],
+    main = "spack_to_bazel_test.py",
+)
+
+sh_test(
+    name = "pytorch_recipe_provenance_test",
+    srcs = ["pytorch_recipe_provenance_test.sh"],
+    args = [
+        "$(rootpath :spack_recipe_provenance.py)",
+        "$(rootpath @spack_dist//:spack)",
+    ],
+    data = [
+        ":spack_recipe_provenance.py",
+        "@spack_dist//:spack",
+    ],
+    tags = ["insula-only"],
+)

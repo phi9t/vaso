@@ -1,0 +1,113 @@
+load(":triton_action.bzl", "triton_action_prefix", "triton_token_flag")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_smoke_test.py",
+    "plan.py",
+    "plan_test.py",
+    "patches/0001-llvm-35901313.patch",
+    "patches/SHA256SUMS",
+    "synthetic_prefix_path.txt",
+    "synthetic_source_anchor.txt",
+    "triton_action.bzl",
+    "upstream_pins.json",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+)
+
+triton_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+triton_action_prefix(
+    name = "triton_action_dry_run",
+    source_anchor = ":synthetic_source_anchor.txt",
+    source_files = ":synthetic_source_anchor.txt",
+    cmake_prefix_file = ":synthetic_prefix_path.txt",
+    cuda_prefix_file = ":synthetic_prefix_path.txt",
+    execute = False,
+    llvm_prefix_file = ":synthetic_prefix_path.txt",
+    ninja_prefix_file = ":synthetic_prefix_path.txt",
+    nlohmann_json_prefix_file = ":synthetic_prefix_path.txt",
+    py_filelock_prefix_file = ":synthetic_prefix_path.txt",
+    py_lit_prefix_file = ":synthetic_prefix_path.txt",
+    py_pip_prefix_file = ":synthetic_prefix_path.txt",
+    py_pybind11_prefix_file = ":synthetic_prefix_path.txt",
+    py_setuptools_prefix_file = ":synthetic_prefix_path.txt",
+    py_wheel_prefix_file = ":synthetic_prefix_path.txt",
+    python_prefix_file = ":synthetic_prefix_path.txt",
+    python_venv_prefix_file = ":synthetic_prefix_path.txt",
+    synthetic_prefixes_for_dry_run = True,
+    zlib_ng_prefix_file = ":synthetic_prefix_path.txt",
+)
+
+triton_action_prefix(
+    name = "triton_action",
+    source_anchor = "@triton_v2_14_0_source//:setup.py",
+    source_files = "@triton_v2_14_0_source//:all_srcs",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    drift_patch = ":patches/0001-llvm-35901313.patch",
+    drift_patch_sha256 = "8a0405802e0f45fae5aa9bd0a6921d81f16a1f50224a705a4f450fe7c03a90d3",
+    execute = True,
+    llvm_prefix_file = "@rootfs_llvm_23_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    nlohmann_json_prefix_file = "@nlohmann_json_native//:prefix_path.txt",
+    py_filelock_prefix_file = "@py_filelock_native//:prefix_path.txt",
+    py_lit_prefix_file = "@py_lit_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pybind11_prefix_file = "@py_pybind11_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    zlib_ng_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":triton_action_dry_run",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "action_driver_test",
+    srcs = [
+        "action_driver.py",
+        "action_driver_test.py",
+    ],
+    data = [
+        ":upstream_pins.json",
+        "plan.py",
+    ],
+    main = "action_driver_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:native_overrides.json",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":patches/0001-llvm-35901313.patch",
+        ":triton_action.bzl",
+        ":upstream_pins.json",
+    ],
+    main = "plan_test.py",
+)

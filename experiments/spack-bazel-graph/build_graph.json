@@ -1,0 +1,4701 @@
+{
+  "build_system_histogram": {
+    "autotools": 39,
+    "generic": 12,
+    "makefile": 2,
+    "python_pip": 14
+  },
+  "n_nodes": 67,
+  "nodes": [
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "ca-certificates-mozilla",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/ca-certificates-mozilla-2026-03-19-rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "spack_hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "status": "spack",
+      "topo_index": 0,
+      "version": "2026-03-19"
+    },
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "compiler-wrapper",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+      "status": "spack",
+      "topo_index": 1,
+      "version": "1.1.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gcc",
+      "parameters": {
+        "binutils": true,
+        "bootstrap": true,
+        "build_system": "autotools",
+        "build_type": "RelWithDebInfo",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "graphite": false,
+        "languages": [
+          "c",
+          "c++",
+          "fortran"
+        ],
+        "ldflags": [],
+        "ldlibs": [],
+        "libsanitizer": true,
+        "mold": false,
+        "nvptx": false,
+        "piclibs": false,
+        "profiled": false,
+        "strip": false
+      },
+      "prefix": "",
+      "spack_hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+      "status": "spack",
+      "topo_index": 2,
+      "version": "13.3.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "glibc",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+      "status": "spack",
+      "topo_index": 3,
+      "version": "2.39"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        }
+      ],
+      "is_toolchain": true,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "gcc-runtime",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+      "status": "spack",
+      "topo_index": 4,
+      "version": "13.3.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        }
+      ],
+      "is_toolchain": true,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "gmake",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "guile": false,
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+      "status": "spack",
+      "topo_index": 5,
+      "version": "4.4.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "berkeley-db",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxx": true,
+        "cxxflags": [],
+        "docs": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "26090f418891757af46ac3b89a9f43d6eb5989f7a3dce3d1cfc99fba547203b3",
+          "b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522"
+        ],
+        "stl": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/berkeley-db-18.1.40-l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+      "spack_hash": "l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+      "status": "spack",
+      "topo_index": 6,
+      "version": "18.1.40"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libffi",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libffi-3.5.2-x7kemqh2g6atu566teml5tuweuocxts5",
+      "spack_hash": "x7kemqh2g6atu566teml5tuweuocxts5",
+      "status": "spack",
+      "topo_index": 7,
+      "version": "3.5.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libiconv",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ]
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libiconv-1.18-c772leslxvswjh32kbc3x6wf7362uxuy",
+      "spack_hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+      "status": "spack",
+      "topo_index": 8,
+      "version": "1.18"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "diffutils",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/diffutils-3.12-5u2vizuxymb72i5qq5qr24s27xeylrz6",
+      "spack_hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+      "status": "spack",
+      "topo_index": 9,
+      "version": "3.12"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "bzip2",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "debug": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "pic": false,
+        "shared": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/bzip2-1.0.8-ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+      "spack_hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+      "status": "spack",
+      "topo_index": 10,
+      "version": "1.0.8"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libmd",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libmd-1.1.0-gezdrd6vz34xg4cr3pulfordntsz3d6c",
+      "spack_hash": "gezdrd6vz34xg4cr3pulfordntsz3d6c",
+      "status": "spack",
+      "topo_index": 11,
+      "version": "1.1.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "gezdrd6vz34xg4cr3pulfordntsz3d6c",
+          "name": "libmd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libbsd",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libbsd-0.12.2-4phsqexh6kzwb6gdc74ab74labuvlwmb",
+      "spack_hash": "4phsqexh6kzwb6gdc74ab74labuvlwmb",
+      "status": "spack",
+      "topo_index": 12,
+      "version": "0.12.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "4phsqexh6kzwb6gdc74ab74labuvlwmb",
+          "name": "libbsd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "expat",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libbsd": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/expat-2.8.1-jdktox37smjr4ebhvzug7j2ijbx4yzlg",
+      "spack_hash": "jdktox37smjr4ebhvzug7j2ijbx4yzlg",
+      "status": "spack",
+      "topo_index": 13,
+      "version": "2.8.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libsigsegv",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libsigsegv-2.15-xl67h6baqo35r34p5d3vzu7226pzicyb",
+      "spack_hash": "xl67h6baqo35r34p5d3vzu7226pzicyb",
+      "status": "spack",
+      "topo_index": 14,
+      "version": "2.15"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libunistring",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libunistring-1.4.2-xhvhs5r5jwmlhcjgmpdafqcimvp7e633",
+      "spack_hash": "xhvhs5r5jwmlhcjgmpdafqcimvp7e633",
+      "status": "spack",
+      "topo_index": 15,
+      "version": "1.4.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "xhvhs5r5jwmlhcjgmpdafqcimvp7e633",
+          "name": "libunistring"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libidn2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libidn2-2.3.8-235bulbzhmqvfcfshoapcgbipvez62kh",
+      "spack_hash": "235bulbzhmqvfcfshoapcgbipvez62kh",
+      "status": "spack",
+      "topo_index": 16,
+      "version": "2.3.8"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "xl67h6baqo35r34p5d3vzu7226pzicyb",
+          "name": "libsigsegv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "m4",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "sigsegv": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/m4-1.4.21-yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+      "spack_hash": "yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+      "status": "spack",
+      "topo_index": 17,
+      "version": "1.4.21"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+          "name": "m4"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "bison",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "color": false,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/bison-3.8.2-zpwg3fuhiuy5qgvioc756omnwxlfxedo",
+      "spack_hash": "zpwg3fuhiuy5qgvioc756omnwxlfxedo",
+      "status": "spack",
+      "topo_index": 18,
+      "version": "3.8.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "pcre2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "jit": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "multibyte": true,
+        "pic": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pcre2-10.44-oill6xxc2orapxiicavzsvz2wvufa4cd",
+      "spack_hash": "oill6xxc2orapxiicavzsvz2wvufa4cd",
+      "status": "spack",
+      "topo_index": 19,
+      "version": "10.44"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "pkgconf",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "spack_hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "status": "spack",
+      "topo_index": 20,
+      "version": "2.5.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "ncurses",
+      "parameters": {
+        "abi": "none",
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "7a351bc4953a4ab70dabdbea31c8db0c03d40ce505335f3b6687180dde24c535"
+        ],
+        "symlinks": false,
+        "termlib": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/ncurses-6.6-anxucerxim6q3r4fpijczh5brrrrgguu",
+      "spack_hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+      "status": "spack",
+      "topo_index": 21,
+      "version": "6.6"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "less",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/less-692-dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+      "spack_hash": "dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+      "status": "spack",
+      "topo_index": 22,
+      "version": "692"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libedit",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libedit-3.1-20251016-gwyes2l3clp54uipuqhsjfminyh6fok6",
+      "spack_hash": "gwyes2l3clp54uipuqhsjfminyh6fok6",
+      "status": "spack",
+      "topo_index": 23,
+      "version": "3.1-20251016"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "nghttp2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/nghttp2-1.67.1-cnlvyswhnr2xm4gtj4rkqzhyy5ong2i5",
+      "spack_hash": "cnlvyswhnr2xm4gtj4rkqzhyy5ong2i5",
+      "status": "spack",
+      "topo_index": 24,
+      "version": "1.67.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "readline",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "21f0a03106dbe697337cd25c70eb0edbaa2bdb6d595b45f83285cdd35bac84de",
+          "72dee13601ce38f6746eb15239999a7c56f8e1ff5eb1ec8153a1f213e4acdb29",
+          "e27364396ba9f6debf7cbaaf1a669e2b2854241ae07f7eca74ca8a8ba0c97472"
+        ]
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/readline-8.3-uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+      "spack_hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+      "status": "spack",
+      "topo_index": 25,
+      "version": "8.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+          "name": "readline"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gdbm",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/gdbm-1.26-n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+      "spack_hash": "n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+      "status": "spack",
+      "topo_index": 26,
+      "version": "1.26"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "util-linux-uuid",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-linux-uuid-2.41-rr3bl2sc5cr5k6ky3mmwaxl6hjhz5nmr",
+      "spack_hash": "rr3bl2sc5cr5k6ky3mmwaxl6hjhz5nmr",
+      "status": "spack",
+      "topo_index": 27,
+      "version": "2.41"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "xz",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "pic": false
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/xz-5.8.3-malvvwrlxiquz5mvu3ouhooissqjxzj2",
+      "spack_hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+      "status": "spack",
+      "topo_index": 28,
+      "version": "5.8.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "zlib-ng",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "compat": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "new_strategies": true,
+        "opt": true,
+        "pic": true,
+        "shared": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/zlib-ng-2.3.3-igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "spack_hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "status": "spack",
+      "topo_index": 29,
+      "version": "2.3.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libxml2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "http": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "pic": true,
+        "python": false,
+        "shared": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libxml2-2.13.9-lp67nrne6ntrdzr6y3jrkwzdyxpiuhqh",
+      "spack_hash": "lp67nrne6ntrdzr6y3jrkwzdyxpiuhqh",
+      "status": "spack",
+      "topo_index": 30,
+      "version": "2.13.9"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+          "name": "berkeley-db"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+          "name": "gdbm"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+          "name": "less"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "perl",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cpanm": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "opcode": true,
+        "open": true,
+        "shared": true,
+        "threads": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/perl-5.42.0-vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+      "spack_hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+      "status": "spack",
+      "topo_index": 31,
+      "version": "5.42.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+          "name": "m4"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "autoconf",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/autoconf-2.72-li42nyxim32jroeh6vhjvuxl2fygwzsz",
+      "spack_hash": "li42nyxim32jroeh6vhjvuxl2fygwzsz",
+      "status": "spack",
+      "topo_index": 32,
+      "version": "2.72"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "li42nyxim32jroeh6vhjvuxl2fygwzsz",
+          "name": "autoconf"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "automake",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/automake-1.18.1-mopd4jmgseufyemcq6yjkv7ivycdhbcv",
+      "spack_hash": "mopd4jmgseufyemcq6yjkv7ivycdhbcv",
+      "status": "spack",
+      "topo_index": 33,
+      "version": "1.18.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libxcrypt",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "obsolete_api": false
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libxcrypt-4.5.2-nc3zjqcspv4xtj5fzgmjlzdc2cp7ml5w",
+      "spack_hash": "nc3zjqcspv4xtj5fzgmjlzdc2cp7ml5w",
+      "status": "spack",
+      "topo_index": 34,
+      "version": "4.5.2"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+          "name": "ca-certificates-mozilla"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "openssl",
+      "parameters": {
+        "build_system": "generic",
+        "certs": "mozilla",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "docs": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "shared": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/openssl-3.6.1-lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+      "spack_hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+      "status": "spack",
+      "topo_index": 35,
+      "version": "3.6.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "cnlvyswhnr2xm4gtj4rkqzhyy5ong2i5",
+          "name": "nghttp2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "curl",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "gssapi": false,
+        "ldap": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "libidn2": false,
+        "librtmp": false,
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "libssh": false,
+        "libssh2": false,
+        "nghttp2": true,
+        "tls": [
+          "openssl"
+        ]
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/curl-8.20.0-rhs5xjezzx2zcevml6qu2qtujxm4pnvm",
+      "spack_hash": "rhs5xjezzx2zcevml6qu2qtujxm4pnvm",
+      "status": "spack",
+      "topo_index": 36,
+      "version": "8.20.0"
+    },
+    {
+      "build_system": "makefile",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "make && make install (rules_foreign_cc/make)",
+      "package": "pigz",
+      "parameters": {
+        "build_system": "makefile",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pigz-2.8-62s7pmgcbvrmrzbso4eilqy3offpswve",
+      "spack_hash": "62s7pmgcbvrmrzbso4eilqy3offpswve",
+      "status": "spack",
+      "topo_index": 37,
+      "version": "2.8"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+          "name": "readline"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "sqlite",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "column_metadata": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "fts": true,
+        "ldflags": [],
+        "ldlibs": [],
+        "rtree": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/sqlite-3.53.1-ihdyhdbsepgukkz732b6pgqgnlcf5k4w",
+      "spack_hash": "ihdyhdbsepgukkz732b6pgqgnlcf5k4w",
+      "status": "spack",
+      "topo_index": 38,
+      "version": "3.53.1"
+    },
+    {
+      "build_system": "makefile",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "make && make install (rules_foreign_cc/make)",
+      "package": "zstd",
+      "parameters": {
+        "build_system": "makefile",
+        "cflags": [],
+        "compression": [
+          "none"
+        ],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "programs": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/zstd-1.5.7-dlwnerltiqkk2o34vbgcioafdx4lnn6x",
+      "spack_hash": "dlwnerltiqkk2o34vbgcioafdx4lnn6x",
+      "status": "spack",
+      "topo_index": 39,
+      "version": "1.5.7"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "dlwnerltiqkk2o34vbgcioafdx4lnn6x",
+          "name": "zstd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "file",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "static": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/file-5.46-ns3pk6ps3uc5ywmsvwjnvlpdav2qj5oz",
+      "spack_hash": "ns3pk6ps3uc5ywmsvwjnvlpdav2qj5oz",
+      "status": "spack",
+      "topo_index": 40,
+      "version": "5.46"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "62s7pmgcbvrmrzbso4eilqy3offpswve",
+          "name": "pigz"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "dlwnerltiqkk2o34vbgcioafdx4lnn6x",
+          "name": "zstd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "tar",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "zip": "pigz"
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/tar-1.35-lg65uss7ujxb45fsafgew55cz5p3go2z",
+      "spack_hash": "lg65uss7ujxb45fsafgew55cz5p3go2z",
+      "status": "spack",
+      "topo_index": 41,
+      "version": "1.35"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lp67nrne6ntrdzr6y3jrkwzdyxpiuhqh",
+          "name": "libxml2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "lg65uss7ujxb45fsafgew55cz5p3go2z",
+          "name": "tar"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link",
+            "run"
+          ],
+          "hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+          "name": "xz"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gettext",
+      "parameters": {
+        "build_system": "autotools",
+        "bzip2": true,
+        "cflags": [],
+        "cppflags": [],
+        "curses": true,
+        "cxxflags": [],
+        "fflags": [],
+        "git": true,
+        "ldflags": [],
+        "ldlibs": [],
+        "libunistring": false,
+        "libxml2": true,
+        "pic": true,
+        "shared": true,
+        "tar": true,
+        "xz": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/gettext-1.0-j43iuqfwki7pqy3kfhnlyiext6im26ej",
+      "spack_hash": "j43iuqfwki7pqy3kfhnlyiext6im26ej",
+      "status": "spack",
+      "topo_index": 42,
+      "version": "1.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "j43iuqfwki7pqy3kfhnlyiext6im26ej",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "findutils",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "440b9543365b4692a2e6e0b5674809659846658d34d1dfc542c4397c8d668b92"
+        ]
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/findutils-4.10.0-di23jlm22xyenz7iqn4cwtuoy5yrsh46",
+      "spack_hash": "di23jlm22xyenz7iqn4cwtuoy5yrsh46",
+      "status": "spack",
+      "topo_index": 43,
+      "version": "4.10.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zpwg3fuhiuy5qgvioc756omnwxlfxedo",
+          "name": "bison"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "di23jlm22xyenz7iqn4cwtuoy5yrsh46",
+          "name": "findutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "j43iuqfwki7pqy3kfhnlyiext6im26ej",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "gwyes2l3clp54uipuqhsjfminyh6fok6",
+          "name": "libedit"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "krb5",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "shared": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/krb5-1.22.2-xm7pcouee57wozmbh2b3lkvcby5vc3wi",
+      "spack_hash": "xm7pcouee57wozmbh2b3lkvcby5vc3wi",
+      "status": "spack",
+      "topo_index": 44,
+      "version": "1.22.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ns3pk6ps3uc5ywmsvwjnvlpdav2qj5oz",
+          "name": "file"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "di23jlm22xyenz7iqn4cwtuoy5yrsh46",
+          "name": "findutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+          "name": "m4"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libtool",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libtool-2.5.4-ihe4etchuy4t3rkd2bqaywukmnziblqb",
+      "spack_hash": "ihe4etchuy4t3rkd2bqaywukmnziblqb",
+      "status": "spack",
+      "topo_index": 45,
+      "version": "2.5.4"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "xm7pcouee57wozmbh2b3lkvcby5vc3wi",
+          "name": "krb5"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "gwyes2l3clp54uipuqhsjfminyh6fok6",
+          "name": "libedit"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nc3zjqcspv4xtj5fzgmjlzdc2cp7ml5w",
+          "name": "libxcrypt"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "openssh",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "gssapi": true,
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/openssh-10.3p1-s4m26ugek53hj42s3jwywoeuiaye4ocs",
+      "spack_hash": "s4m26ugek53hj42s3jwywoeuiaye4ocs",
+      "status": "spack",
+      "topo_index": 46,
+      "version": "10.3p1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "li42nyxim32jroeh6vhjvuxl2fygwzsz",
+          "name": "autoconf"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "mopd4jmgseufyemcq6yjkv7ivycdhbcv",
+          "name": "automake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "rhs5xjezzx2zcevml6qu2qtujxm4pnvm",
+          "name": "curl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "jdktox37smjr4ebhvzug7j2ijbx4yzlg",
+          "name": "expat"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "j43iuqfwki7pqy3kfhnlyiext6im26ej",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "235bulbzhmqvfcfshoapcgbipvez62kh",
+          "name": "libidn2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ihe4etchuy4t3rkd2bqaywukmnziblqb",
+          "name": "libtool"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "yua5vkrsnr5dfj26tskxu5q4gyxp4iug",
+          "name": "m4"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "s4m26ugek53hj42s3jwywoeuiaye4ocs",
+          "name": "openssh"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "oill6xxc2orapxiicavzsvz2wvufa4cd",
+          "name": "pcre2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "git",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "man": true,
+        "nls": true,
+        "perl": true,
+        "subtree": true,
+        "tcltk": false
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/git-2.53.0-okp7t25swul5n7hnm7tpumtwwwybonlw",
+      "spack_hash": "okp7t25swul5n7hnm7tpumtwwwybonlw",
+      "status": "spack",
+      "topo_index": 47,
+      "version": "2.53.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "jdktox37smjr4ebhvzug7j2ijbx4yzlg",
+          "name": "expat"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a6wgd2u2kzahf3vsz4pnini6f4sswghr",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "nks3cb6fv5ufsdfk465wbtc2eqxpz2dq",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+          "name": "gdbm"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "j43iuqfwki7pqy3kfhnlyiext6im26ej",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "dyq732owdcy6q3ihz6a37ewajpmhmbvp",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "x7kemqh2g6atu566teml5tuweuocxts5",
+          "name": "libffi"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+          "name": "readline"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ihdyhdbsepgukkz732b6pgqgnlcf5k4w",
+          "name": "sqlite"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "rr3bl2sc5cr5k6ky3mmwaxl6hjhz5nmr",
+          "name": "util-linux-uuid"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "python",
+      "parameters": {
+        "build_system": "generic",
+        "bz2": true,
+        "cflags": [],
+        "cppflags": [],
+        "ctypes": true,
+        "cxxflags": [],
+        "dbm": true,
+        "debug": false,
+        "fflags": [],
+        "freethreading": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "libxml2": true,
+        "lzma": true,
+        "optimizations": false,
+        "pic": true,
+        "pyexpat": true,
+        "pythoncmd": true,
+        "readline": true,
+        "shared": true,
+        "sqlite3": true,
+        "ssl": true,
+        "static": false,
+        "tests": false,
+        "tkinter": false,
+        "uuid": true,
+        "zlib": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/python-3.13.13-6u37x4adbcqbp247uvyjtokjsun4oewt",
+      "spack_hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+      "status": "spack",
+      "topo_index": 48,
+      "version": "3.13.13"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "python-venv",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/python-venv-1.0-ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+      "spack_hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+      "status": "spack",
+      "topo_index": 49,
+      "version": "1.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-pip",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-pip-26.1.2-rjfumck4mkxpheunqnsc4okzhxxq53lv",
+      "spack_hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+      "status": "spack",
+      "topo_index": 50,
+      "version": "26.1.2"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-setuptools",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-setuptools-79.0.1-ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+      "spack_hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+      "status": "spack",
+      "topo_index": 51,
+      "version": "79.0.1"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-wheel",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-wheel-0.45.1-zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+      "spack_hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+      "status": "spack",
+      "topo_index": 52,
+      "version": "0.45.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-calver",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-calver-2025.10.20-iyr5n23xmhv56wyo5oqsplg742arv4rh",
+      "spack_hash": "iyr5n23xmhv56wyo5oqsplg742arv4rh",
+      "status": "spack",
+      "topo_index": 53,
+      "version": "2025.10.20"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-certifi",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-certifi-2026.2.25-qr2dzfvb6zm5zmrknw4g6zgmrirt45f4",
+      "spack_hash": "qr2dzfvb6zm5zmrknw4g6zgmrirt45f4",
+      "status": "spack",
+      "topo_index": 54,
+      "version": "2026.2.25"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-charset-normalizer",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-charset-normalizer-3.4.4-lkfmjjyoqfo5vq7tazvefplkc6iawmg6",
+      "spack_hash": "lkfmjjyoqfo5vq7tazvefplkc6iawmg6",
+      "status": "spack",
+      "topo_index": 55,
+      "version": "3.4.4"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-flit-core",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-flit-core-3.12.0-vjkcb3p4z7cjbtr2bf7ky2w3n7vtwb7j",
+      "spack_hash": "vjkcb3p4z7cjbtr2bf7ky2w3n7vtwb7j",
+      "status": "spack",
+      "topo_index": 56,
+      "version": "3.12.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vjkcb3p4z7cjbtr2bf7ky2w3n7vtwb7j",
+          "name": "py-flit-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-idna",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-idna-3.15-owb4oymihbbo4pbbuaxvzduel6vvwn2k",
+      "spack_hash": "owb4oymihbbo4pbbuaxvzduel6vvwn2k",
+      "status": "spack",
+      "topo_index": 57,
+      "version": "3.15"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vjkcb3p4z7cjbtr2bf7ky2w3n7vtwb7j",
+          "name": "py-flit-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-packaging",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-packaging-26.2-ay6pupbu4l5xddd2q7peiih7lu357c6e",
+      "spack_hash": "ay6pupbu4l5xddd2q7peiih7lu357c6e",
+      "status": "spack",
+      "topo_index": 58,
+      "version": "26.2"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "vjkcb3p4z7cjbtr2bf7ky2w3n7vtwb7j",
+          "name": "py-flit-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-pathspec",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-pathspec-1.1.1-juc2nvnl7525vcbmbogyjso4oer44nt3",
+      "spack_hash": "juc2nvnl7525vcbmbogyjso4oer44nt3",
+      "status": "spack",
+      "topo_index": 59,
+      "version": "1.1.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "okp7t25swul5n7hnm7tpumtwwwybonlw",
+          "name": "git"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ay6pupbu4l5xddd2q7peiih7lu357c6e",
+          "name": "py-packaging"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-setuptools-scm",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "toml": true
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-setuptools-scm-8.2.1-so3yrawsljehtiw2xy43in2dqw447gw7",
+      "spack_hash": "so3yrawsljehtiw2xy43in2dqw447gw7",
+      "status": "spack",
+      "topo_index": 60,
+      "version": "8.2.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "so3yrawsljehtiw2xy43in2dqw447gw7",
+          "name": "py-setuptools-scm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-pluggy",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-pluggy-1.6.0-nqass3m46bgyyqt6yo5uikwncp7xs55g",
+      "spack_hash": "nqass3m46bgyyqt6yo5uikwncp7xs55g",
+      "status": "spack",
+      "topo_index": 61,
+      "version": "1.6.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "iyr5n23xmhv56wyo5oqsplg742arv4rh",
+          "name": "py-calver"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-trove-classifiers",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-trove-classifiers-2026.6.1.19-7p4ac5tedu36m3sqmacdjwiia4emjurj",
+      "spack_hash": "7p4ac5tedu36m3sqmacdjwiia4emjurj",
+      "status": "spack",
+      "topo_index": 62,
+      "version": "2026.6.1.19"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ay6pupbu4l5xddd2q7peiih7lu357c6e",
+          "name": "py-packaging"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "juc2nvnl7525vcbmbogyjso4oer44nt3",
+          "name": "py-pathspec"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "nqass3m46bgyyqt6yo5uikwncp7xs55g",
+          "name": "py-pluggy"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "7p4ac5tedu36m3sqmacdjwiia4emjurj",
+          "name": "py-trove-classifiers"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-hatchling",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-hatchling-1.29.0-rvc6nusqzula36tijlks5ojhdvnja4vi",
+      "spack_hash": "rvc6nusqzula36tijlks5ojhdvnja4vi",
+      "status": "spack",
+      "topo_index": 63,
+      "version": "1.29.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "rvc6nusqzula36tijlks5ojhdvnja4vi",
+          "name": "py-hatchling"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "so3yrawsljehtiw2xy43in2dqw447gw7",
+          "name": "py-setuptools-scm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-hatch-vcs",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-hatch-vcs-0.5.0-4ewjmi6wdgd4mzdoayoqqielxiklitp4",
+      "spack_hash": "4ewjmi6wdgd4mzdoayoqqielxiklitp4",
+      "status": "spack",
+      "topo_index": 64,
+      "version": "0.5.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4ewjmi6wdgd4mzdoayoqqielxiklitp4",
+          "name": "py-hatch-vcs"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rvc6nusqzula36tijlks5ojhdvnja4vi",
+          "name": "py-hatchling"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "so3yrawsljehtiw2xy43in2dqw447gw7",
+          "name": "py-setuptools-scm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-urllib3",
+      "parameters": {
+        "brotli": false,
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "socks": false
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-urllib3-2.6.3-2etwtx236g5ucvgbhgjagnouggocqyoa",
+      "spack_hash": "2etwtx236g5ucvgbhgjagnouggocqyoa",
+      "status": "spack",
+      "topo_index": 65,
+      "version": "2.6.3"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "qr2dzfvb6zm5zmrknw4g6zgmrirt45f4",
+          "name": "py-certifi"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "lkfmjjyoqfo5vq7tazvefplkc6iawmg6",
+          "name": "py-charset-normalizer"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "owb4oymihbbo4pbbuaxvzduel6vvwn2k",
+          "name": "py-idna"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rjfumck4mkxpheunqnsc4okzhxxq53lv",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ahvs37zplvfrbijtnucmlc2upqxl5ijk",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "2etwtx236g5ucvgbhgjagnouggocqyoa",
+          "name": "py-urllib3"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "zkzfjve4om2w4y2nwjai4d2hp53vgnwt",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "6u37x4adbcqbp247uvyjtokjsun4oewt",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ab2pdnquesi6tr3e5jrieb2itp4jdbab",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-requests",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "socks": false
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/py-requests-2.33.1-vlx7flw3cyzgcxeatz64tjjpl26wngel",
+      "spack_hash": "vlx7flw3cyzgcxeatz64tjjpl26wngel",
+      "status": "spack",
+      "topo_index": 66,
+      "version": "2.33.1"
+    }
+  ],
+  "root": "py-requests",
+  "schema_version": 1,
+  "topological_order": [
+    "ca-certificates-mozilla",
+    "compiler-wrapper",
+    "gcc",
+    "glibc",
+    "gcc-runtime",
+    "gmake",
+    "berkeley-db",
+    "libffi",
+    "libiconv",
+    "diffutils",
+    "bzip2",
+    "libmd",
+    "libbsd",
+    "expat",
+    "libsigsegv",
+    "libunistring",
+    "libidn2",
+    "m4",
+    "bison",
+    "pcre2",
+    "pkgconf",
+    "ncurses",
+    "less",
+    "libedit",
+    "nghttp2",
+    "readline",
+    "gdbm",
+    "util-linux-uuid",
+    "xz",
+    "zlib-ng",
+    "libxml2",
+    "perl",
+    "autoconf",
+    "automake",
+    "libxcrypt",
+    "openssl",
+    "curl",
+    "pigz",
+    "sqlite",
+    "zstd",
+    "file",
+    "tar",
+    "gettext",
+    "findutils",
+    "krb5",
+    "libtool",
+    "openssh",
+    "git",
+    "python",
+    "python-venv",
+    "py-pip",
+    "py-setuptools",
+    "py-wheel",
+    "py-calver",
+    "py-certifi",
+    "py-charset-normalizer",
+    "py-flit-core",
+    "py-idna",
+    "py-packaging",
+    "py-pathspec",
+    "py-setuptools-scm",
+    "py-pluggy",
+    "py-trove-classifiers",
+    "py-hatchling",
+    "py-hatch-vcs",
+    "py-urllib3",
+    "py-requests"
+  ]
+}

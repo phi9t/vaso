@@ -1,0 +1,48 @@
+load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "plan.py",
+    "plan_test.py",
+    "py_llvmlite.bzl",
+])
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = ["py_llvmlite.bzl"],
+    main = "plan_test.py",
+)
+
+sh_test(
+    name = "mechanism_guard_test",
+    srcs = ["mechanism_guard_test.sh"],
+    args = [
+        "$(rootpath //tools:native_build_mechanism_guard.py)",
+        "$(rootpath :py_llvmlite.bzl)",
+    ],
+    data = [
+        ":py_llvmlite.bzl",
+        "//tools:native_build_mechanism_guard.py",
+    ],
+    tags = ["insula-only"],
+)
+
+sh_test(
+    name = "recipe_provenance_test",
+    srcs = ["recipe_provenance_test.sh"],
+    args = [
+        "$(rootpath //tools:spack_recipe_provenance.py)",
+        "$(rootpath @spack_dist//:spack)",
+    ],
+    data = [
+        "//tools:spack_recipe_provenance.py",
+        "@spack_dist//:spack",
+    ],
+    tags = ["insula-only"],
+)

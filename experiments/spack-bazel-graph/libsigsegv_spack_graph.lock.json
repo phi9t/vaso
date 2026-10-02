@@ -1,0 +1,21 @@
+{
+  "packages": {
+    "spack_libsigsegv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "sigsegv"
+      ],
+      "native_prefix": "@libsigsegv_native//:lib",
+      "package": "libsigsegv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libsigsegv-2.15-r4a3kvxxanxl6ca2iyz3hlrhjjklzvaz",
+      "spack_hash": "r4a3kvxxanxl6ca2iyz3hlrhjjklzvaz",
+      "version": "2.15"
+    }
+  },
+  "root": "spack_libsigsegv",
+  "schema_version": 1
+}

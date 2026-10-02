@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_cudnn": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@cudnn_native//:lib",
+      "package": "cudnn",
+      "prefix": "",
+      "spack_hash": "ovppfem2oxv5f7dkzhssxz7bvqtnvqk6",
+      "version": "9.24.0.43-12"
+    }
+  },
+  "root": "spack_cudnn",
+  "schema_version": 1
+}

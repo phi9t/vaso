@@ -1,0 +1,7 @@
+# Marks native/nasm as a Bazel package so nasm.bzl is loadable from
+# MODULE.bazel. The @nasm_native repo is materialized by the nasm_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["nasm.bzl"])

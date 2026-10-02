@@ -1,0 +1,41 @@
+# Root package: exposes spack_graph.lock.json as a loadable label and holds
+# the synthetic consumer entry alias.
+exports_files([
+    ".bazelrc",
+    "MODULE.bazel",
+    "migration_ledger.json",
+    "native_overrides.json",
+    "protobuf_policy_check_build_graph.json",
+    "py_jax_0102_cu129_build_graph.json",
+    "py_jax_0102_cu130_build_graph.json",
+    "py_llvmlite_build_graph.json",
+    "py_triton_pytorch_pin_cu129_build_graph.json",
+    "py_triton_pytorch_pin_cu130_build_graph.json",
+    "py_torch_214_full_cu129_build_graph.json",
+    "py_torch_214_full_cu130_build_graph.json",
+    "py_torch_build_graph.json",
+    "py_torch_214_full_build_graph.json",
+    "py_torch_lean_fonts_build_graph.json",
+    "py_torch_lean_nx_build_graph.json",
+    "rootfs/build_rootfs.sh",
+    "rootfs/cuda_ecosystem.lock.json",
+    "rootfs/cuda_ecosystem_lock_test.py",
+    "rootfs/llvm_rootfs_cache.py",
+    "rootfs/llvm_rootfs_cache_test.py",
+    "rootfs/verify_cuda_ecosystem.py",
+    "rootfs/verify_cuda_ecosystem_test.py",
+    "run.sh",
+    "spack_graph.lock.json",
+])
+
+filegroup(
+    name = "spack_locks",
+    srcs = glob(["*spack_graph.lock.json"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "recipe_docs",
+    srcs = glob(["docs/recipes/*.md"]),
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "spack_lzo": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/lzo"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "lzo2"
+      ],
+      "native_prefix": "@lzo_native//:lib",
+      "package": "lzo",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/lzo-2.10-2r7dy6hr7azy57pznmyl5vds62g52dch",
+      "spack_hash": "2r7dy6hr7azy57pznmyl5vds62g52dch",
+      "version": "2.10"
+    }
+  },
+  "root": "spack_lzo",
+  "schema_version": 1
+}

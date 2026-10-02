@@ -1,4 +1,4 @@
-<!-- Agentic Engineering Workflow v2026.09.02.1. Canonical source: ultron/docs/agents/agentic-engineering.md. Sibling copies are managed by Ultron. -->
+<!-- Agentic Engineering Workflow v2026.08.14.1. Canonical source: ultron/docs/agents/agentic-engineering.md. Sibling copies are managed by Ultron. -->
 # Agentic Engineering Workflow
 
 > Scale agent execution, not agent authority.
@@ -33,14 +33,6 @@ in the configured tracker:
 - Cross-repository work starts in Ultron at `.scratch/<effort>/`. Create linked
   child tickets in every affected repository and point each child back to the
   Ultron map.
-
-Every managed repository carries an Ultron-scoped mainline pointer,
-`ultron/mainline`, so cross-repo policy and landing work has one stable branch
-name to target regardless of whether a repository's native default is `main` or
-`master`. `tools/sync_agentic_workflow.py --check` reports `MISSING-BRANCH`
-drift when the branch is absent, and `--apply` creates it at the repository's
-`base_branch` tip. The convention is ensure-exists only: an existing
-`ultron/mainline` is never moved, force-updated, or deleted.
 
 The **short path** is available only when every condition holds: one repository,
 one session, reversible, narrowly scoped, and no public API or schema,
@@ -128,3 +120,11 @@ Complete these gates in order:
   require explicit authorization for the specific action.
 - Preserve existing work and repository-specific rules. Direct user
   instructions and more specific repository guidance take precedence.
+
+## Foundations before builds
+
+Before briefing or claiming any build ticket in a multi-day effort, complete
+`docs/agents/foundations-checklist.md` in the effort spec, and get the human's
+confirmation (versions per line, compiler per profile, LLVM, runtime pins,
+feature scope, profiles, silent defaults, the acceptance gate, resource
+parameters).

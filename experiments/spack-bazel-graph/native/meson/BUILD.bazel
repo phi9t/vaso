@@ -1,0 +1,9 @@
+# Marks native/meson as a Bazel package so meson.bzl is loadable from
+# MODULE.bazel.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "meson.bzl",
+    "rpath-0.64.patch",
+])

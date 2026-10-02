@@ -1,0 +1,30 @@
+╭ AUTOLAND ────────────────────────────────────────────────────────────────────────────────────────╮
+│RUNNING  pid 4242   HEARTBEAT  40s ago   ALIVE  busy 1xbazel 2xpython3   REFS  beef001 → cafe999  │
+│idle 20m0s / 45m  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  review in 3h20m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ OK  current conditions nominal                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Loop Events ─────────────────────────────────────────────────────────────────────────────────────╮
+│12:05:00 MOVED a000005 -> beef001: Commit fixture 40 - re-seat pytorch provider shard with an     │
+│  intentionally long subject that should wrap cleanly instead of being cut off at the pane edge   │
+│  REBASED (detached) onto vaso/target -> beef001                                                  │
+│  Executed 0 out of 28 tests: 27 tests pass, 1 fails.                                             │
+│  //native/pytorch:plan_test FAILED in 12.4s                                                      │
+│  VERIFY_FAILED //native/pytorch:plan_test                                                        │
+│12:35:00 RED VERIFY_FAILED //native/pytorch:plan_test                                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Messages ────────────────────────────────────────────────────────────────────────────────────────╮
+│2026-09-29T12:34Z  08-reseat-python-bound-natives.md  (TRAE)                                      │
+│package-scoped re-seat is py-pathspec.                                                            │
+│Verified prefix parity, kept the insula proof log, and left the target commit ready for the       │
+│autoland loop.                                                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Follower Log Tail  20260929-1234.log  5m0s ago ──────────────────────────────────────────────────╮
+│proof fixture line 01: checking installed prefix metadata                                         │
+│proof fixture line 02: checking installed prefix metadata                                         │
+│proof fixture line 03: checking installed prefix metadata                                         │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Recent Target Commits ───────────────────────────────────────────────────────────────────────────╮
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Stats ───────────────────────────────────────────────────────────────────────────────────────────╮
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+ q  quit   r  restart   ?  help   Tab  focus:events   j/k  scroll   PgUp/PgDn  page   G  bottom

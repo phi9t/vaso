@@ -2,7 +2,6 @@
 
 **Status:** Draft design record
 **Date:** 2026-08-19
-**Last updated:** 2026-09-04
 
 ## Purpose
 
@@ -15,41 +14,6 @@ The innermost insulation layer is always a `bwrap` rootfs. Docker is not a
 runtime dependency for Vaso execution. Rootfs materialization may be automated
 by scripts, but the runtime contract is a `bwrap` process over a materialized
 root filesystem, with all host state projected explicitly.
-
-## Reference and Downstream Implementations
-
-Vaso owns the versioned rootfs contract, schemas, conformance behavior, and an
-executable reference implementation. The Vaso CLI is the reference operator
-surface for materialization, planning, execution, and evidence. A downstream
-ML repository may expose its own repository-specific launcher while preserving
-the observable Vaso contract.
-
-Downstream implementations are self-contained. They pin a released Vaso
-specification version and digest, implement and test the required behavior in
-their own repository, and pass the public conformance suite. They do not import
-the Vaso Python package, call a Vaso service, require a Vaso checkout, or depend
-on another repository at build or runtime. Compatibility is behavioral rather
-than a shared-code dependency.
-
-The specification, digest, and conformance suite described here become public
-interfaces only when v1 is frozen. Until then, this document and the current
-implementation are a draft reference and must not be represented as a released
-compatibility standard.
-
-## Initial GPU Qualification
-
-NVIDIA B200 is the first production GPU qualification target. Qualification
-must cover the PyTorch/CUDA userspace stack, projected host driver, device
-access, and applicable distributed communication behavior from inside the
-selected rootfs. A sanitized qualification receipt binds the result to the
-exact Vaso commit, rootfs identity, profile, and qualification inputs. Signing
-and trust-root requirements belong to the release trust model and must be
-defined before production qualification.
-
-The validation tiers below remain a functional progression; B200 qualification
-is a release gate over the applicable tiers, not a replacement name for any
-tier. Other accelerators and GPU generations remain unqualified until their own
-profiles and evidence are approved.
 
 ## Source-Grounded References
 
@@ -74,6 +38,14 @@ Codex's Linux sandbox implementation, inspected on 2026-08-19:
   `docs/distributions.rst`, and `docs/quirks.rst`.
 - Astral GPU wheel research captured in
   `docs/research/astral-gpu-wheels.md`.
+- Draccus local Spack environment references, inspected on 2026-08-19:
+  - `~/draccus/envs/base-sys/spack.yaml`
+  - `~/draccus/envs/base-ml/spack.yaml`
+  - `~/draccus/envs/common/rootfs-externals.yaml`
+  - `~/draccus/scripts/refresh-spack-lockfiles.sh`
+  - `~/draccus/scripts/validate-base-sys.sh`
+  - `~/draccus/scripts/validate-base-ml.sh`
+
 Vaso should vendor/pin Bubblewrap source before implementing the runtime, using
 Codex's `codex-rs/bwrap` pattern as the reference shape: prefer a usable system
 `bwrap` when it satisfies capability probes, but keep a pinned bundled bwrap
@@ -194,11 +166,11 @@ workspace:
       sandbox: /workspace/vaso
       mode: rw
     monarch:
-      host: /srv/vaso/workspaces/monarch
+      host: $HOME/workspace/monarch
       sandbox: /workspace/monarch
       mode: rw
     cutlass:
-      host: /srv/vaso/workspaces/cutlass
+      host: $HOME/workspace/cutlass
       sandbox: /workspace/cutlass
       mode: ro
 ```
@@ -802,7 +774,7 @@ For ordinary Python development, Vaso may create or update
 native Python repos, `uv` is an authoring tool for lockfiles and metadata while
 Bazel remains the execution owner.
 
-Python's default package index remains PyPI or an explicitly configured
+Python's default package index remains PyPI or an explicitly declared internal
 mirror. Astral's wheel service is supplemental and must not be configured as
 the global default index for ordinary packages. Index URLs are part of the Vaso
 toolchain/dependency manifest and must be recorded in `bwrap-plan.json` for
@@ -1041,7 +1013,7 @@ Required fields:
     {
       "name": "workspace:vaso",
       "operation": "bind",
-      "host_path": "/srv/vaso/workspaces/vaso",
+      "host_path": "$REPO_ROOT",
       "sandbox_path": "/workspace/vaso",
       "mode": "rw"
     }
@@ -1150,7 +1122,7 @@ Tier 2 validates the default Python ML dependency path. It uses
 
 The fixture project declares:
 
-- default Python index: PyPI or a configured package mirror;
+- default Python index: PyPI or a configured internal mirror;
 - named PyTorch CUDA index, for example `pytorch-cu128`;
 - named explicit Astral CUDA index, for example `astral-cu128`;
 - dependencies for `torch`, `flash-attn`, and `vllm` where supported by the
@@ -1307,7 +1279,7 @@ session artifacts or an explicit `raw_trace_unavailable` marker.
   with the host driver projection under `/run/nvidia-driver`.
 - Spack-provided Python, `py-torch`, or `py-jax` are absent from normal
   development profiles unless an explicit ABI-rebuild profile selects them.
-- ordinary Python package default index is PyPI or a configured package mirror,
+- ordinary Python package default index is PyPI or a declared internal mirror,
   not the supplemental Astral index.
 - configured Astral GPU package sources use the selected CUDA-channel URL such
   as `https://wheels.astral.sh/simple/cu128/` and are named explicit uv indexes.

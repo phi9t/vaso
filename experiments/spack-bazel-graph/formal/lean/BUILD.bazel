@@ -1,0 +1,34 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+package(default_visibility = ["//visibility:private"])
+
+filegroup(
+    name = "lean_sources",
+    srcs = [
+        "AbiParity.lean",
+        "AbiParity/Basic.lean",
+        "lake-manifest.json",
+        "lakefile.toml",
+        "lean-toolchain",
+    ],
+)
+
+sh_test(
+    name = "lean_abi_parity_test",
+    srcs = ["lean_bazel_test.sh"],
+    args = [
+        "$(rootpath @lean_dist//:bin/lake)",
+        "$(rootpath @lean_dist//:bin/lean)",
+    ],
+    data = [
+        ":lean_sources",
+        "@lean_dist//:bin/lake",
+        "@lean_dist//:bin/lean",
+        "@lean_dist//:dist",
+    ],
+    tags = [
+        "insula-only",
+        "local-only",
+        "manual",
+    ],
+)

@@ -1,0 +1,67 @@
+{
+  "build_system_histogram": {
+    "generic": 2
+  },
+  "n_nodes": 2,
+  "nodes": [
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "cuda",
+      "parameters": {
+        "allow-unsupported-compilers": false,
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "dev": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/usr/local/cuda",
+      "spack_hash": "yfvwiwltmxesbkufmd6rstmn36l6c5hf",
+      "status": "spack",
+      "topo_index": 0,
+      "version": "12.9.1"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "yfvwiwltmxesbkufmd6rstmn36l6c5hf",
+          "name": "cuda"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "cudnn",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/cudnn-9.21.0.82-12-zjmc3jvphnlhr52uinusyimqvg5wbr5p",
+      "spack_hash": "zjmc3jvphnlhr52uinusyimqvg5wbr5p",
+      "status": "spack",
+      "topo_index": 1,
+      "version": "9.21.0.82-12"
+    }
+  ],
+  "root": "cudnn",
+  "schema_version": 1,
+  "topological_order": [
+    "cuda",
+    "cudnn"
+  ]
+}

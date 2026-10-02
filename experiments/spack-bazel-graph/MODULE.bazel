@@ -1,0 +1,3551 @@
+module(name = "vaso_spack_bazel_graph_synthetic", version = "0.1.0")
+
+bazel_dep(name = "rules_cc", version = "0.0.17")
+bazel_dep(name = "rules_shell", version = "0.3.0")
+bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_java", version = "9.3.0")
+
+# Pinned, content-addressed tla2tools.jar for the hermetic TLC model checks of
+# the build-migration formal model (formal/build_migration/). Bazel fetches it
+# by sha256 and runs tlc2.TLC with its own JDK (remotejdk_17 via --config=formal
+# in .bazelrc), so no host `java` or TLA_TOOLS_JAR is required. Mirrors the
+# ferric_continuum formal setup.
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
+http_jar(
+    name = "tla2tools",
+    sha256 = "32d64fbbc464559fc7192341b27b885fa4eb6b92d1648d2b49fb9cdcb7aacf81",
+    urls = [
+        "https://github.com/tlaplus/tlaplus/releases/download/v1.8.0/tla2tools.jar",
+    ],
+)
+
+# Pinned Lean distribution for the ABI/prefix proof in formal/lean. Bazel
+# fetches/extracts this archive from inside the insula, then the test runs the
+# bundled lake/lean binaries without host elan or host lake.
+http_archive(
+    name = "lean_dist",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "bin/lake",
+    "bin/lean",
+])
+
+filegroup(
+    name = "dist",
+    srcs = glob(["**"]),
+)
+""",
+    sha256 = "caaa98356098c85dc0fcbbd28e1ec66f39eb6551829972b752ff20e1286b646b",
+    strip_prefix = "lean-4.34.0-linux",
+    urls = [
+        "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux.tar.zst",
+    ],
+)
+
+# Native (Bazel-owned) zlib-ng build: the Task-3 leaf proof that a node's
+# provider can flip from Spack to a native build while staying prefix/ABI
+# identical. Same 2.3.3 tag + sha256 the Spack zlib-ng package pins.
+zlib_ng_native = use_repo_rule("//native/zlib_ng:zlib_ng.bzl", "zlib_ng_native")
+
+zlib_ng_native(
+    name = "zlib_ng_native",
+    urls = ["https://github.com/zlib-ng/zlib-ng/archive/2.3.3.tar.gz"],
+    sha256 = "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+    strip_prefix = "zlib-ng-2.3.3",
+)
+
+# Pilot action-backed zlib-ng source repository. Consumers stay on
+# @zlib_ng_native until the action-provider migration is proven.
+http_archive(
+    name = "zlib_ng_action_src",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+exports_files(["configure"])
+""",
+    sha256 = "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+    strip_prefix = "zlib-ng-2.3.3",
+    urls = ["https://github.com/zlib-ng/zlib-ng/archive/2.3.3.tar.gz"],
+)
+
+# Offline-pinned PyTorch v2.14.0 recursive source bundle for the configured
+# action path. Build/test invocations provide the estate distdir; the invalid
+# URL prevents this target from silently fetching an unreviewed source.
+# Dry-run action consumer label: @pytorch_v2_14_0_source//:setup.py. The
+# full execute action must use a curated source manifest, not a recursive
+# glob(["**"]), because the recursive PyTorch submodule archive contains
+# symlink cycles under third_party/ittapi.
+http_archive(
+    name = "pytorch_v2_14_0_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["setup.py"])
+""",
+    sha256 = "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+    strip_prefix = "pytorch-v2.14.0",
+    type = "tar.zst",
+    urls = ["https://example.invalid/vaso/pytorch-v2.14.0-2b3ec348-recursive.tar.zst"],
+)
+
+http_file(
+    name = "pytorch_v2_14_0_source_archive",
+    downloaded_file_path = "pytorch-v2.14.0-2b3ec348-recursive.tar.zst",
+    sha256 = "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+    urls = ["https://example.invalid/vaso/pytorch-v2.14.0-2b3ec348-recursive.tar.zst"],
+)
+
+# Offline-pinned source inputs for the PyTorch v2.14 torch.compile/Triton
+# phase. These repositories are dormant until ticket 15 wires the native
+# provider; builds must supply them through the insula distdir.
+http_archive(
+    name = "triton_v2_14_0_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["setup.py"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+""",
+    sha256 = "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825",
+    strip_prefix = "triton-675c59878aa2280b31f722aaf42b825fcee21de8",
+    urls = ["https://example.invalid/vaso/triton-675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz"],
+)
+
+http_archive(
+    name = "triton_llvm_v2_14_0_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+""",
+    sha256 = "3d5f91c1d6eea1ee585af1f9ce4e5acc29cc4968edcfbb95681df51edfad0462",
+    strip_prefix = "llvm-project-4611156032e1ebac68b2b8f6107b1475a7c60800",
+    urls = ["https://example.invalid/vaso/llvm-project-4611156032e1ebac68b2b8f6107b1475a7c60800.tar.gz"],
+)
+
+# Offline-pinned torchvision 0.29.0 source for the native PyTorch v2.14.0
+# vision/audio phase. Build/test invocations provide the estate distdir; the
+# invalid URL prevents silent network fetches outside the explicit prefetch.
+http_archive(
+    name = "torchvision_v0_29_0_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["setup.py"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+""",
+    sha256 = "24be57d922927d8a2ac2e8f076f07c3447ddf8f1d25ddbb7b65578f36c9ab8e3",
+    strip_prefix = "vision-0.29.0",
+    urls = ["https://example.invalid/vaso/torchvision-v0.29.0.tar.gz"],
+)
+
+# Offline-pinned torchaudio 2.11.0 source selected for torch 2.14.0 by the
+# upstream future-release compatibility statement in TorchAudio's maintenance
+# README. The explicit prefetch path supplies this archive to Bazel offline.
+http_archive(
+    name = "torchaudio_v2_11_0_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["setup.py"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+""",
+    sha256 = "599ec24e7e1eef476ef21f0178e33da00e2434f930ba42e9cc20bf4002220486",
+    strip_prefix = "audio-2.11.0",
+    urls = ["https://example.invalid/vaso/torchaudio-v2.11.0.tar.gz"],
+)
+
+# Offline-pinned JAX/JAXLIB 0.10.2 source bundle for the native jaxlib
+# configured action. Build/test invocations provide the estate distdir; the
+# invalid URL prevents this target from silently fetching an unreviewed source.
+http_archive(
+    name = "jax_v0_10_2_source",
+    build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["WORKSPACE"])
+""",
+    sha256 = "fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7",
+    strip_prefix = "jax-jax-v0.10.2",
+    urls = ["https://example.invalid/vaso/jax-v0.10.2.tar.gz"],
+)
+
+http_file(
+    name = "jax_v0_10_2_source_archive",
+    downloaded_file_path = "jax-v0.10.2.tar.gz",
+    sha256 = "fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7",
+    urls = ["https://example.invalid/vaso/jax-v0.10.2.tar.gz"],
+)
+
+# Native (Bazel-owned) utf8proc build: the second migration node and first
+# cmake-build-system proof. Same 2.10.0 tag + sha256 the Spack package pins;
+# reproduces Spack's CMakeBuilder (cmake -G "Unix Makefiles" Release,
+# BUILD_SHARED_LIBS=OFF). The build uses cmake from the insula PATH.
+utf8proc_native = use_repo_rule("//native/utf8proc:utf8proc.bzl", "utf8proc_native")
+
+utf8proc_native(
+    name = "utf8proc_native",
+    urls = ["https://github.com/JuliaStrings/utf8proc/archive/v2.10.0.tar.gz"],
+    sha256 = "6f4f1b639daa6dca9f80bc5db1233e9cbaa31a67790887106160b33ef743f136",
+    strip_prefix = "utf8proc-2.10.0",
+)
+
+# Native (Bazel-owned) zstd build: the third migration node and first
+# makefile-build-system proof. Same 1.5.7 tag + sha256 the Spack zstd package
+# pins; reproduces Spack's MakefileBuilder install targets (libs=shared,static;
+# programs; compression=none). Exercises the ABI soname+symbol axis (shared .so).
+zstd_native = use_repo_rule("//native/zstd:zstd.bzl", "zstd_native")
+
+zstd_native(
+    name = "zstd_native",
+    urls = ["https://github.com/facebook/zstd/archive/v1.5.7.tar.gz"],
+    sha256 = "37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3",
+    strip_prefix = "zstd-1.5.7",
+)
+
+# Native (Bazel-owned) GNU binutils build: Autotools library/tool prefix used
+# by the py-torch frontier. Concrete variants match hermetic Spack:
+# libs=shared,static +plugins ~gas ~ld ~nls compress_debug_sections=zlib.
+binutils_native = use_repo_rule("//native/binutils:binutils.bzl", "binutils_native")
+
+binutils_native(
+    name = "binutils_native",
+    urls = ["https://ftpmirror.gnu.org/binutils/binutils-2.46.1.tar.bz2"],
+    sha256 = "324ed40ada2633a28eaa5d104ca5db165fd3cc3162cc1d48a7b7fa9c932da439",
+    strip_prefix = "binutils-2.46.1",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) xz build: prerequisite to migrating real consumers like
+# libxml2, which links against liblzma. Built via autotools configure/make.
+xz_native = use_repo_rule("//native/xz:xz.bzl", "xz_native")
+
+xz_native(
+    name = "xz_native",
+    urls = ["https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz"],
+    sha256 = "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+    strip_prefix = "xz-5.8.3",
+)
+
+# Native (Bazel-owned) libxml2 build. Dependency prefixes are read from native
+# provider prefix_path files so the build stays in the Bazel/insula graph.
+libxml2_native = use_repo_rule("//native/libxml2:libxml2.bzl", "libxml2_native")
+
+libxml2_native(
+    name = "libxml2_native",
+    urls = ["https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.9.tar.xz"],
+    sha256 = "a2c9ae7b770da34860050c309f903221c67830c86e4a7e760692b803df95143a",
+    strip_prefix = "libxml2-2.13.9",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+libxml2_native(
+    name = "libxml2_215_native",
+    urls = ["https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.3.tar.xz"],
+    sha256 = "78262a6e7ac170d6528ebfe2efccdf220191a5af6a6cd61ea4a9a9a5042c7a07",
+    strip_prefix = "libxml2-2.15.3",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libiconv build: autotools shared+static libs (libiconv +
+# libcharset). Used by consumers like libxml2.
+libiconv_native = use_repo_rule("//native/libiconv:libiconv.bzl", "libiconv_native")
+
+libiconv_native(
+    name = "libiconv_native",
+    urls = ["https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz"],
+    sha256 = "3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8",
+    strip_prefix = "libiconv-1.18",
+)
+
+# Native (Bazel-owned) pkgconf build: build-time tool plus libpkgconf shared
+# library. This is the next topological node in the libxml2 build DAG.
+pkgconf_native = use_repo_rule("//native/pkgconf:pkgconf.bzl", "pkgconf_native")
+
+pkgconf_native(
+    name = "pkgconf_native",
+    urls = ["https://distfiles.ariadne.space/pkgconf/pkgconf-2.5.1.tar.xz"],
+    sha256 = "cd05c9589b9f86ecf044c10a2269822bc9eb001eced2582cfffd658b0a50c243",
+    strip_prefix = "pkgconf-2.5.1",
+)
+
+# Native (Bazel-owned) ca-certificates-mozilla data prefix: one-file generic
+# Spack recipe, installed as share/cacert.pem. This is the first Python-DAG
+# frontier node and exercises non-ELF data-prefix parity.
+ca_certificates_mozilla_native = use_repo_rule(
+    "//native/ca_certificates_mozilla:ca_certificates_mozilla.bzl",
+    "ca_certificates_mozilla_native",
+)
+
+ca_certificates_mozilla_native(
+    name = "ca_certificates_mozilla_native",
+    urls = ["https://curl.se/ca/cacert-2026-03-19.pem"],
+    sha256 = "b6e66569cc3d438dd5abe514d0df50005d570bfc96c14dca8f768d020cb96171",
+)
+
+# Native (Bazel-owned) Berkeley DB build: first Python-DAG C library after the
+# data-only CA certificate bundle. Uses Berkeley DB's dist/build_unix autotools
+# layout with Spack's configure args.
+berkeley_db_native = use_repo_rule("//native/berkeley_db:berkeley_db.bzl", "berkeley_db_native")
+
+berkeley_db_native(
+    name = "berkeley_db_native",
+    urls = ["https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz"],
+    sha256 = "0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8",
+    strip_prefix = "db-18.1.40",
+)
+
+# Native (Bazel-owned) libffi build: Autotools package used by Python's ctypes
+# extension. Same 3.5.2 release + sha256 the Spack package pins.
+libffi_native = use_repo_rule("//native/libffi:libffi.bzl", "libffi_native")
+
+libffi_native(
+    name = "libffi_native",
+    urls = ["https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz"],
+    sha256 = "f3a3082a23b37c293a4fcd1053147b371f2ff91fa7ea1b2a52e335676bac82dc",
+    strip_prefix = "libffi-3.5.2",
+)
+
+# Native (Bazel-owned) GNU diffutils build: executable-only Autotools package.
+diffutils_native = use_repo_rule("//native/diffutils:diffutils.bzl", "diffutils_native")
+
+diffutils_native(
+    name = "diffutils_native",
+    urls = ["https://ftp.gnu.org/gnu/diffutils/diffutils-3.12.tar.xz"],
+    sha256 = "7c8b7f9fc8609141fdea9cece85249d308624391ff61dedaf528fcb337727dfd",
+    strip_prefix = "diffutils-3.12",
+)
+
+# Native (Bazel-owned) GNU gperf build: first new Autotools tool-prefix node in
+# the py-torch frontier after Boost. It has no non-toolchain dependencies.
+gperf_native = use_repo_rule("//native/gperf:gperf.bzl", "gperf_native")
+
+gperf_native(
+    name = "gperf_native",
+    urls = ["https://ftpmirror.gnu.org/gperf/gperf-3.3.tar.gz"],
+    sha256 = "fd87e0aba7e43ae054837afd6cd4db03a3f2693deb3619085e6ed9d8d9604ad8",
+    strip_prefix = "gperf-3.3",
+)
+
+# Native (Bazel-owned) xxd-standalone build: Vim-bundled Makefile tool-prefix
+# node required by the JAX/XLA build graph. The Spack recipe builds
+# `make -C src/xxd` and installs only bin/xxd.
+xxd_standalone_native = use_repo_rule("//native/xxd_standalone:xxd_standalone.bzl", "xxd_standalone_native")
+
+xxd_standalone_native(
+    name = "xxd_standalone_native",
+    urls = ["https://github.com/vim/vim/archive/v8.2.1201.tar.gz"],
+    sha256 = "39032fe866f44724b104468038dc9ac4ff2c00a4b18c9a1e2c27064ab1f1143d",
+    strip_prefix = "vim-8.2.1201",
+)
+
+# Native (Bazel-owned) GNU Make build: tool-prefix node used by the torch,
+# Triton, and JAX frontiers. Concrete variant matches Spack: ~guile.
+gmake_native = use_repo_rule("//native/gmake:gmake.bzl", "gmake_native")
+
+gmake_native(
+    name = "gmake_native",
+    urls = ["https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz"],
+    sha256 = "dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3",
+    strip_prefix = "make-4.4.1",
+)
+
+# Native (Bazel-owned) GNU gzip build: Autotools tool-prefix node after gperf in
+# the py-torch frontier. It has no non-toolchain dependencies.
+gzip_native = use_repo_rule("//native/gzip:gzip.bzl", "gzip_native")
+
+gzip_native(
+    name = "gzip_native",
+    urls = ["https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.gz"],
+    sha256 = "613d6ea44f1248d7370c7ccdeee0dd0017a09e6c39de894b3c6f03f981191c6b",
+    strip_prefix = "gzip-1.14",
+)
+
+# Native (Bazel-owned) GNU libsigsegv build: Autotools C library after gzip in
+# the py-torch frontier. It has no non-toolchain dependencies.
+libsigsegv_native = use_repo_rule("//native/libsigsegv:libsigsegv.bzl", "libsigsegv_native")
+
+libsigsegv_native(
+    name = "libsigsegv_native",
+    urls = ["https://ftpmirror.gnu.org/libsigsegv/libsigsegv-2.15.tar.gz"],
+    sha256 = "036855660225cb3817a190fc00e6764ce7836051bacb48d35e26444b8c1729d9",
+    strip_prefix = "libsigsegv-2.15",
+)
+
+# Native (Bazel-owned) GNU libunistring build: Autotools C library after
+# libsigsegv in the py-torch frontier. It consumes the native libiconv prefix.
+libunistring_native = use_repo_rule("//native/libunistring:libunistring.bzl", "libunistring_native")
+
+libunistring_native(
+    name = "libunistring_native",
+    urls = ["https://ftpmirror.gnu.org/libunistring/libunistring-1.4.2.tar.xz"],
+    sha256 = "5b46e74377ed7409c5b75e7a96f95377b095623b689d8522620927964a41499c",
+    strip_prefix = "libunistring-1.4.2",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU libidn2 build: Autotools C library after
+# libunistring in the py-torch frontier. It consumes native libunistring and
+# libiconv prefixes explicitly instead of relying on ambient discovery.
+libidn2_native = use_repo_rule("//native/libidn2:libidn2.bzl", "libidn2_native")
+
+libidn2_native(
+    name = "libidn2_native",
+    urls = ["https://ftpmirror.gnu.org/libidn/libidn2-2.3.8.tar.gz"],
+    sha256 = "f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a",
+    strip_prefix = "libidn2-2.3.8",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libunistring_prefix_file = "@libunistring_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libyaml build: Autotools C library after libidn2 in the
+# py-torch frontier. It has no non-toolchain dependency prefixes.
+libyaml_native = use_repo_rule("//native/libyaml:libyaml.bzl", "libyaml_native")
+
+libyaml_native(
+    name = "libyaml_native",
+    urls = ["https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"],
+    sha256 = "c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4",
+    strip_prefix = "yaml-0.2.5",
+)
+
+# Native (Bazel-owned) LZO build: Autotools C compression library after
+# libyaml in the py-torch frontier. It has no non-toolchain dependency prefixes.
+lzo_native = use_repo_rule("//native/lzo:lzo.bzl", "lzo_native")
+
+lzo_native(
+    name = "lzo_native",
+    urls = ["https://www.oberhumer.com/opensource/lzo/download/lzo-2.10.tar.gz"],
+    sha256 = "c0f892943208266f9b6543b3ae308fab6284c5c90e627931446fb49b4221a072",
+    strip_prefix = "lzo-2.10",
+)
+
+# Native (Bazel-owned) GNU m4 build: Autotools executable node after lzo in the
+# py-torch frontier. It consumes native diffutils as a build tool and native
+# libsigsegv as a build/link dependency.
+m4_native = use_repo_rule("//native/m4:m4.bzl", "m4_native")
+
+m4_native(
+    name = "m4_native",
+    urls = ["https://ftpmirror.gnu.org/m4/m4-1.4.21.tar.gz"],
+    sha256 = "38ae59f7a30bf9c108193cc5c25fbb06014f21e230c7ede2eff614f7b7c37ed8",
+    strip_prefix = "m4-1.4.21",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    libsigsegv_prefix_file = "@libsigsegv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU Bison build: Autotools parser-generator node after
+# m4 in the py-torch frontier. It consumes native diffutils and native m4.
+bison_native = use_repo_rule("//native/bison:bison.bzl", "bison_native")
+
+bison_native(
+    name = "bison_native",
+    urls = ["https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.gz"],
+    sha256 = "06c9e13bdf7eb24d4ceb6b59205a4f67c2c7e7213119644430fe82fbd14a0abb",
+    strip_prefix = "bison-3.8.2",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) NASM build: Autotools assembler/disassembler node after
+# bison in the py-torch frontier. It has no non-toolchain dependency prefixes.
+nasm_native = use_repo_rule("//native/nasm:nasm.bzl", "nasm_native")
+
+nasm_native(
+    name = "nasm_native",
+    urls = ["https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.gz"],
+    sha256 = "5bc940dd8a4245686976a8f7e96ba9340a0915f2d5b88356874890e207bdb581",
+    strip_prefix = "nasm-2.16.03",
+)
+
+# Native (Bazel-owned) OpenBLAS build: Makefile BLAS/LAPACK library after NASM
+# in the py-torch frontier. Concrete variants: ~fortran, +dynamic_dispatch,
+# threads=none, +locking, +shared.
+openblas_native = use_repo_rule("//native/openblas:openblas.bzl", "openblas_native")
+
+openblas_native(
+    name = "openblas_native",
+    urls = ["https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.33/OpenBLAS-0.3.33.tar.gz"],
+    sha256 = "6761af1d9f5d353ab4f0b7497be2643313b36c8f31caec0144bfef198e71e6ab",
+    strip_prefix = "OpenBLAS-0.3.33",
+    patch_urls = ["https://github.com/OpenMathLib/OpenBLAS/commit/88705a932831c0de1ed136b461c6c239802828b2.diff?full_index=1"],
+    patch_sha256 = "723ddc1553b6d27ff89d96985f7732695935c0d4d8df766987702689bdb750ac",
+)
+
+# Native (Bazel-owned) PCRE2 build: Autotools regex library after OpenBLAS in
+# the py-torch frontier. Concrete variants: +multibyte, ~jit, +pic.
+pcre2_native = use_repo_rule("//native/pcre2:pcre2.bzl", "pcre2_native")
+
+pcre2_native(
+    name = "pcre2_native",
+    urls = ["https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.44/pcre2-10.44.tar.bz2"],
+    sha256 = "d34f02e113cf7193a1ebf2770d3ac527088d485d4e047ed10e5d217c6ef5de96",
+    strip_prefix = "pcre2-10.44",
+)
+
+# Native (Bazel-owned) libxcrypt build: Autotools crypt library after Automake
+# in the py-torch frontier. Concrete variant: ~obsolete_api. It consumes native
+# Perl through an explicit prefix file for the build-time tool channel.
+libxcrypt_native = use_repo_rule("//native/libxcrypt:libxcrypt.bzl", "libxcrypt_native")
+
+libxcrypt_native(
+    name = "libxcrypt_native",
+    urls = ["https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz"],
+    sha256 = "71513a31c01a428bccd5367a32fd95f115d6dac50fb5b60c779d5c7942aec071",
+    strip_prefix = "libxcrypt-4.5.2",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) bzip2 build: generic Makefile package after diffutils in
+# the Python-root topological frontier. Mirrors Spack's +shared install flow.
+bzip2_native = use_repo_rule("//native/bzip2:bzip2.bzl", "bzip2_native")
+
+bzip2_native(
+    name = "bzip2_native",
+    urls = ["https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"],
+    sha256 = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+    strip_prefix = "bzip2-1.0.8",
+)
+
+# Native (Bazel-owned) file/libmagic build: Autotools library/tool prefix used
+# by the py-torch frontier after binutils. Concrete variants match hermetic
+# Spack: +static with zlib, bzip2, xz, and zstd support.
+file_native = use_repo_rule("//native/file:file.bzl", "file_native")
+
+file_native(
+    name = "file_native",
+    urls = ["https://astron.com/pub/file/file-5.46.tar.gz"],
+    sha256 = "c9cc77c7c560c543135edc555af609d5619dbef011997e988ce40a3d75d86088",
+    strip_prefix = "file-5.46",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Boost build: first py-torch frontier node after the
+# Python closure. Spack declares it as generic, but the concrete recipe is
+# Boost.Build; this rule pins bootstrap.sh/user-config.jam/b2 axes to the
+# hermetic Spack v1.2.2 capture for boost@1.90.0.
+boost_native = use_repo_rule("//native/boost:boost.bzl", "boost_native")
+
+boost_native(
+    name = "boost_native",
+    urls = ["https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2"],
+    sha256 = "49551aff3b22cbc5c5a9ed3dbc92f0e23ea50a0f7325b0d198b705e8ee3fc305",
+    strip_prefix = "boost_1_90_0",
+    bootstrap_compiler_patch = "//native/boost:bootstrap-compiler.patch",
+)
+
+# Native (Bazel-owned) libmd build: Autotools digest library immediately after
+# bzip2 in the Python-root topological frontier.
+libmd_native = use_repo_rule("//native/libmd:libmd.bzl", "libmd_native")
+
+libmd_native(
+    name = "libmd_native",
+    urls = ["https://archive.hadrons.org/software/libmd/libmd-1.1.0.tar.xz"],
+    sha256 = "1bd6aa42275313af3141c7cf2e5b964e8b1fd488025caf2f971f43b00776b332",
+    strip_prefix = "libmd-1.1.0",
+)
+
+# Native (Bazel-owned) libbsd build: Autotools BSD portability library after
+# libmd in the Python-root frontier. It consumes @libmd_native's emitted prefix.
+libbsd_native = use_repo_rule("//native/libbsd:libbsd.bzl", "libbsd_native")
+
+libbsd_native(
+    name = "libbsd_native",
+    urls = ["https://libbsd.freedesktop.org/releases/libbsd-0.12.2.tar.xz"],
+    sha256 = "b88cc9163d0c652aaf39a99991d974ddba1c3a9711db8f1b5838af2a14731014",
+    strip_prefix = "libbsd-0.12.2",
+    libmd_prefix_file = "@libmd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) expat build: Autotools XML parser immediately after
+# libbsd in the Python-root frontier. It preserves the Spack DAG edge to
+# libbsd while reproducing Spack's Autotools configure args.
+expat_native = use_repo_rule("//native/expat:expat.bzl", "expat_native")
+
+expat_native(
+    name = "expat_native",
+    urls = ["https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.bz2"],
+    sha256 = "f5833dd2e1cd7739ec9182804a1a29c4f0cc7c2f26b633d3a2188b7766a88ecb",
+    strip_prefix = "expat-2.8.1",
+    libbsd_prefix_file = "@libbsd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) ncurses build: Autotools terminal database/library node
+# immediately after pkgconf in the Python-root frontier. Applies the same
+# rxvt-unicode terminfo patch as the hermetic Spack v1.2.2 recipe.
+ncurses_native = use_repo_rule("//native/ncurses:ncurses.bzl", "ncurses_native")
+
+ncurses_native(
+    name = "ncurses_native",
+    urls = ["https://ftp.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz"],
+    sha256 = "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11",
+    strip_prefix = "ncurses-6.6",
+    rxvt_patch = "//native/ncurses:rxvt_unicode_6_4.patch",
+)
+
+# Native (Bazel-owned) less build: executable-only Autotools node immediately
+# after ncurses in the Python-root frontier. It consumes @ncurses_native's
+# emitted prefix, preserving Spack's DAG edge while flipping only the provider.
+less_native = use_repo_rule("//native/less:less.bzl", "less_native")
+
+less_native(
+    name = "less_native",
+    urls = ["https://www.greenwoodsoftware.com/less/less-692.tar.gz"],
+    sha256 = "61300f603798ecf1d7786570789f0ff3f5a1acf075a6fb9f756837d166e37d14",
+    strip_prefix = "less-692",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libedit build: Autotools editline library node in the
+# py-torch frontier. It consumes @ncurses_native and @pkgconf_native prefixes
+# so configure resolves termlib from the native ncurses install tree.
+libedit_native = use_repo_rule("//native/libedit:libedit.bzl", "libedit_native")
+
+libedit_native(
+    name = "libedit_native",
+    urls = ["http://thrysoee.dk/editline/libedit-20251016-3.1.tar.gz"],
+    sha256 = "21362b00653bbfc1c71f71a7578da66b5b5203559d43134d2dd7719e313ce041",
+    strip_prefix = "libedit-20251016-3.1",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) nghttp2 build: Autotools HTTP/2 C library node in the
+# py-torch frontier. It consumes native diffutils and pkgconf as build tools and
+# disables every optional dependency discovery path from the Spack recipe.
+nghttp2_native = use_repo_rule("//native/nghttp2:nghttp2.bzl", "nghttp2_native")
+
+nghttp2_native(
+    name = "nghttp2_native",
+    urls = ["https://github.com/nghttp2/nghttp2/releases/download/v1.67.1/nghttp2-1.67.1.tar.gz"],
+    sha256 = "da8d640f55036b1f5c9cd950083248ec956256959dc74584e12c43550d6ec0ef",
+    strip_prefix = "nghttp2-1.67.1",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) UnZip build: MakefilePackage node in the py-torch
+# frontier after nghttp2/readline/gdbm. It mirrors the hermetic Spack v1.2.2
+# patch set and make/install targets, with no non-toolchain dependency prefixes.
+unzip_native = use_repo_rule("//native/unzip:unzip.bzl", "unzip_native")
+
+unzip_native(
+    name = "unzip_native",
+    urls = ["https://downloads.sourceforge.net/infozip/unzip60.tar.gz"],
+    sha256 = "036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37",
+    strip_prefix = "unzip60",
+    configure_cflags_patch_urls = ["https://raw.githubusercontent.com/spack/spack-packages/d4f7c711a6a42f1c4d551c8fd10fce9a11340a81/repos/spack_repo/builtin/packages/unzip/configure-cflags.patch"],
+    configure_cflags_patch_sha256 = "f6f62365acad3ab3b5f4b2982e418168a8fa29420868c7571a6c59cc475dd167",
+    strip_patch_urls = ["https://raw.githubusercontent.com/spack/spack-packages/d4f7c711a6a42f1c4d551c8fd10fce9a11340a81/repos/spack_repo/builtin/packages/unzip/strip.patch"],
+    strip_patch_sha256 = "881d2ed0755926f8ca1a0393b0ae0b5fe6d69ec784d6d5bfa1db06742246d0ea",
+    patch_urls = [
+        "https://src.fedoraproject.org/rpms/unzip/raw/2ee90c9b5cc4e48e4481f40f08153d1a335b701f/f/unzip-6.0-attribs-overflow.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/197087d9bc61cf08b4fc8f7846695c6304ffa195/f/unzip-6.0-symlink.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/df221ec2aca0a4c225e2c462b3a2dc7cd7a4be29/f/unzip-6.0-cve-2014-8140.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/df221ec2aca0a4c225e2c462b3a2dc7cd7a4be29/f/unzip-6.0-overflow.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/f6883dfa8599e8b93a75c8f85f08879be28a5910/f/unzip-6.0-cve-2014-8139.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/f6883dfa8599e8b93a75c8f85f08879be28a5910/f/unzip-6.0-cve-2014-8141.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/f6883dfa8599e8b93a75c8f85f08879be28a5910/f/unzip-6.0-overflow-long-fsize.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/36af2c8ca922dc45b55f600ffd9d0b9fcd520fd9/f/unzip-6.0-heap-overflow-infloop.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/ee4e72f3fc47f04af21d4860cc2604cf69d37dac/f/0001-Fix-CVE-2016-9844-rhbz-1404283.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/8d5c0ff1a961f1052df9b86884a8b5d4587adaa5/f/unzip-6.0-cve-2018-1000035-heap-based-overflow.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/84dde352234b72fd10f5e288dee67e75199ee0c1/f/unzip-6.0-cve-2018-18384.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/0cde67cbab320b39c4c9d357e50c956e77b9dbf5/f/unzip-zipbomb-part1.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/0cde67cbab320b39c4c9d357e50c956e77b9dbf5/f/unzip-zipbomb-part2.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/0cde67cbab320b39c4c9d357e50c956e77b9dbf5/f/unzip-zipbomb-part3.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/a2a4f62759e625676e77436c7e5037e6fd0d9e13/f/unzip-zipbomb-part4.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/a2a4f62759e625676e77436c7e5037e6fd0d9e13/f/unzip-zipbomb-part5.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/a2a4f62759e625676e77436c7e5037e6fd0d9e13/f/unzip-zipbomb-part6.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/a6d716afe05ebb723d223e397945aaa437f045bc/f/unzip-zipbomb-switch.patch",
+        "https://src.fedoraproject.org/rpms/unzip/raw/c98fc67064eee9a7437bc3dc5bce3432c3571d5c/f/unzip-zipbomb-manpage.patch",
+    ],
+    patch_sha256s = [
+        "74bc961e8013a4058687a3730590a709b7889203beb74a4a8369ba0301bef0e2",
+        "fde8f9d6dbc5e9dc59f4497de8e4e313fd74318eaf5f33421acd74442fd10706",
+        "64f64985270e026c01d2c19c6b66c218cf5bcfc7cf3d4a44e601fad41975ec73",
+        "c9a863e570bdaf2637c43bf1bba3d97808a1b0504d85418f6a8550ac286788f2",
+        "337131428f491b7030f96ee5b8ef3d8f5963730d1619b2754c624f4616d79adb",
+        "b7a14c33db93d1e5b4fc6ce113b4b99ff7a81ed56f46c87e001f22ec085e0273",
+        "251d5755ffb1e9701434c545fcda0fbfc2a16372f9d807fd07606b1364a1b55b",
+        "b6f64d7b57e74ceaa794dd13a6937f063ec915343f3d5d88b0f81c919e7bf171",
+        "7d8e5c77ad99f9bf56d4cbf224b5635367feb44f81745dec84b44365f8f5eb16",
+        "aced0f27191a67f9b8b3fdc5995938a64fd87cea64a0bbba2106e06137ef91c2",
+        "47e9deff12845e71de98cd19506a51c21d756a61bb67c0b17e77b84bdbe9fb84",
+        "24582ff3dcd926d1a46caf8506f76999d2525dd66e36f50b25dca50799695f12",
+        "f88b9d4119a1e256f3335a2d2c142dd95d13d7c5f9e5ecd4371e547249f3557c",
+        "ee9e26018190a515572b66a26118916843aa1002131a86b5c52769dc663b7acb",
+        "179330daaf395b631025d23ec666c227707caa8859a872cc39d3ea0e2a645e97",
+        "44599c80ea507c1fcfb8fb58b4c9d8d18f3157de453c1e0469a703322deb042a",
+        "81ca46cfd3cf732de8cf78c57790ed7d5c73a5e8d41943b8f6313cede6004f3e",
+        "59c0983b53801d3080684bc616d3570ccacfe471f3a8c442916b87f2f3bfa334",
+        "4e5a081aa8d0ad9aa5ceeda9eaeefbb6a7e7666d6b7a5b81cb0a61a3ff99a942",
+    ],
+)
+
+# Native (Bazel-owned) readline build: Autotools library node immediately after
+# less in the Python-root frontier. It consumes @ncurses_native's emitted prefix
+# and mirrors Spack's readline-specific SHLIB_LIBS build override.
+readline_native = use_repo_rule("//native/readline:readline.bzl", "readline_native")
+
+readline_native(
+    name = "readline_native",
+    urls = ["https://ftp.gnu.org/gnu/readline/readline-8.3.tar.gz"],
+    sha256 = "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc",
+    strip_prefix = "readline-8.3",
+    patches = [
+        "https://ftpmirror.gnu.org/readline/readline-8.3-patches/readline83-001",
+        "https://ftpmirror.gnu.org/readline/readline-8.3-patches/readline83-002",
+        "https://ftpmirror.gnu.org/readline/readline-8.3-patches/readline83-003",
+    ],
+    patch_sha256s = [
+        "21f0a03106dbe697337cd25c70eb0edbaa2bdb6d595b45f83285cdd35bac84de",
+        "e27364396ba9f6debf7cbaaf1a669e2b2854241ae07f7eca74ca8a8ba0c97472",
+        "72dee13601ce38f6746eb15239999a7c56f8e1ff5eb1ec8153a1f213e4acdb29",
+    ],
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) gdbm build: Autotools library node immediately after
+# readline in the Python-root frontier. It consumes @readline_native's emitted
+# prefix, preserving Spack's DAG edge while flipping only the provider.
+gdbm_native = use_repo_rule("//native/gdbm:gdbm.bzl", "gdbm_native")
+
+gdbm_native(
+    name = "gdbm_native",
+    urls = ["https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz"],
+    sha256 = "6a24504a14de4a744103dcb936be976df6fbe88ccff26065e54c1c47946f4a5e",
+    strip_prefix = "gdbm-1.26",
+    readline_prefix_file = "@readline_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) util-linux-uuid build: Autotools libuuid provider
+# immediately after gdbm in the Python-root frontier. It builds only libuuid
+# from the larger util-linux release archive, matching Spack's package split.
+util_linux_uuid_native = use_repo_rule(
+    "//native/util_linux_uuid:util_linux_uuid.bzl",
+    "util_linux_uuid_native",
+)
+
+util_linux_uuid_native(
+    name = "util_linux_uuid_native",
+    urls = ["https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.tar.gz"],
+    sha256 = "c014b5861695b603d0be2ad1e6f10d5838b9d7859e1dd72d01504556817d8a87",
+    strip_prefix = "util-linux-2.41",
+)
+
+# Native (Bazel-owned) util-macros build: data-only Autotools X.Org macro
+# provider immediately after util-linux-uuid in the py-torch frontier.
+util_macros_native = use_repo_rule("//native/util_macros:util_macros.bzl", "util_macros_native")
+
+util_macros_native(
+    name = "util_macros_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/util/util-macros-1.20.2.tar.xz"],
+    sha256 = "9ac269eba24f672d7d7b3574e4be5f333d13f04a7712303b1821b2a51ac82e8e",
+    strip_prefix = "util-macros-1.20.2",
+)
+
+# Native (Bazel-owned) fontsproto build: X.Org protocol header/pkg-config
+# package after util-macros in the py-torch frontier.
+fontsproto_native = use_repo_rule("//native/fontsproto:fontsproto.bzl", "fontsproto_native")
+
+fontsproto_native(
+    name = "fontsproto_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/proto/fontsproto-2.1.3.tar.gz"],
+    sha256 = "72c44e63044b2b66f6fa112921621ecc20c71193982de4f198d9a29cda385c5e",
+    strip_prefix = "fontsproto-2.1.3",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libpciaccess build: X.Org PCI access library after
+# fontsproto in the py-torch frontier.
+libpciaccess_native = use_repo_rule("//native/libpciaccess:libpciaccess.bzl", "libpciaccess_native")
+
+libpciaccess_native(
+    name = "libpciaccess_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/lib/libpciaccess-0.17.tar.gz"],
+    sha256 = "bf6985a77d2ecb00e2c79da3edfb26b909178ffca3f2e9d14ed0620259ab733b",
+    strip_prefix = "libpciaccess-0.17",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) xproto build: X.Org core protocol header/pkg-config
+# package after libpciaccess in the py-torch frontier. Spack requires serial
+# install for this Autotools package.
+xproto_native = use_repo_rule("//native/xproto:xproto.bzl", "xproto_native")
+
+xproto_native(
+    name = "xproto_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/proto/xproto-7.0.31.tar.gz"],
+    sha256 = "6d755eaae27b45c5cc75529a12855fed5de5969b367ed05003944cf901ed43c7",
+    strip_prefix = "xproto-7.0.31",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) xtrans build: X.Org transport header/pkg-config/macro
+# package after xproto in the py-torch frontier.
+xtrans_native = use_repo_rule("//native/xtrans:xtrans.bzl", "xtrans_native")
+
+xtrans_native(
+    name = "xtrans_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.6.0.tar.gz"],
+    sha256 = "936b74c60b19c317c3f3cb1b114575032528dbdaf428740483200ea874c2ca0a",
+    strip_prefix = "xtrans-1.6.0",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libfontenc build: X.Org font encoding library after
+# xtrans in the py-torch frontier. It links to native zlib-ng and consumes the
+# native xproto build-time prefix through pkg-config.
+libfontenc_native = use_repo_rule("//native/libfontenc:libfontenc.bzl", "libfontenc_native")
+
+libfontenc_native(
+    name = "libfontenc_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/lib/libfontenc-1.1.8.tar.gz"],
+    sha256 = "b55039f70959a1b2f02f4ec8db071e5170528d2c9180b30575dccf7510d7fb9f",
+    strip_prefix = "libfontenc-1.1.8",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+    xproto_prefix_file = "@xproto_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) hwloc build: Autotools hardware-topology library/tool
+# package after libfontenc in the py-torch frontier. It consumes the already
+# migrated libpciaccess, libxml2, ncurses, and pkgconf prefixes explicitly.
+hwloc_native = use_repo_rule("//native/hwloc:hwloc.bzl", "hwloc_native")
+
+hwloc_native(
+    name = "hwloc_native",
+    urls = ["https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz"],
+    sha256 = "1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d",
+    strip_prefix = "hwloc-2.13.0",
+    patch_urls = ["https://github.com/open-mpi/hwloc/commit/f7f1f76573ce505dae73568c912d2b2efdbf0f71.patch?full_index=1"],
+    patch_sha256 = "b4db98b39733435273e57b8229ee834ce50d2785641d1587d8039598752b1a3d",
+    libpciaccess_prefix_file = "@libpciaccess_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Perl build: generic package immediately after
+# util-linux-uuid in the Python-root frontier. It runs Perl's own Configure,
+# consumes native DB/zlib/bzip2/gdbm prefixes, and installs the cpanm resource.
+perl_native = use_repo_rule("//native/perl:perl.bzl", "perl_native")
+
+perl_native(
+    name = "perl_native",
+    urls = ["https://www.cpan.org/src/5.0/perl-5.42.0.tar.gz"],
+    sha256 = "e093ef184d7f9a1b9797e2465296f55510adb6dab8842b0c3ed53329663096dc",
+    strip_prefix = "perl-5.42.0",
+    cpanm_urls = ["https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7042.tar.gz"],
+    cpanm_sha256 = "9da50e155df72bce55cb69f51f1dbb4b62d23740fb99f6178bb27f22ebdf8a46",
+    cpanm_strip_prefix = "App-cpanminus-1.7042",
+    berkeley_db_prefix_file = "@berkeley_db_native//:prefix_path.txt",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    gdbm_prefix_file = "@gdbm_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU Autoconf build: executable/data Autotools package
+# after Perl and hwloc in the py-torch frontier. It consumes native m4 and Perl
+# as explicit build/run tool prefixes, preserving Spack's concrete script paths.
+autoconf_native = use_repo_rule("//native/autoconf:autoconf.bzl", "autoconf_native")
+
+autoconf_native(
+    name = "autoconf_native",
+    urls = ["https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz"],
+    sha256 = "afb181a76e1ee72832f6581c0eddf8df032b83e2e0239ef79ebedc4467d92d6e",
+    strip_prefix = "autoconf-2.72",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU Automake build: executable/data Autotools package
+# after Autoconf in the py-torch frontier. It consumes native Autoconf and Perl
+# through explicit prefix files and preserves Spack's env-perl script patch.
+automake_native = use_repo_rule("//native/automake:automake.bzl", "automake_native")
+
+automake_native(
+    name = "automake_native",
+    urls = ["https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.gz"],
+    sha256 = "63e585246d0fc8772dffdee0724f2f988146d1a3f1c756a3dc5cfbefa3c01915",
+    strip_prefix = "automake-1.18.1",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) OpenSSL build: generic package immediately after Perl in
+# the Python-root frontier. It runs OpenSSL's own ./config flow, consumes the
+# native Perl and zlib-ng prefixes, and installs the native Mozilla CA bundle.
+openssl_native = use_repo_rule("//native/openssl:openssl.bzl", "openssl_native")
+
+openssl_native(
+    name = "openssl_native",
+    urls = ["https://www.openssl.org/source/openssl-3.6.1.tar.gz"],
+    sha256 = "b1bfedcd5b289ff22aee87c9d600f515767ebf45f77168cb6d64f231f518a82e",
+    strip_prefix = "openssl-3.6.1",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    ca_certificates_mozilla_prefix_file = "@ca_certificates_mozilla_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU coreutils build: Autotools executable package after
+# OpenSSL in the py-torch frontier. It consumes the native OpenSSL prefix
+# explicitly and preserves Spack's --disable-nls configure contract.
+coreutils_native = use_repo_rule("//native/coreutils:coreutils.bzl", "coreutils_native")
+
+coreutils_native(
+    name = "coreutils_native",
+    urls = ["https://ftpmirror.gnu.org/coreutils/coreutils-9.10.tar.xz"],
+    sha256 = "16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25",
+    strip_prefix = "coreutils-9.10",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libevent build: Autotools event library after Eigen in
+# the py-torch frontier. It consumes native OpenSSL, pkgconf, and zlib-ng
+# prefixes explicitly so configure cannot discover host/rootfs dependencies.
+libevent_native = use_repo_rule("//native/libevent:libevent.bzl", "libevent_native")
+
+libevent_native(
+    name = "libevent_native",
+    urls = ["https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"],
+    sha256 = "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb",
+    strip_prefix = "libevent-2.1.12-stable",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) pigz build: executable-only MakefilePackage after
+# OpenSSL in the Python-root frontier. It consumes the native zlib-ng prefix.
+pigz_native = use_repo_rule("//native/pigz:pigz.bzl", "pigz_native")
+
+pigz_native(
+    name = "pigz_native",
+    urls = ["https://github.com/madler/pigz/archive/v2.8.tar.gz"],
+    sha256 = "2f7f6a6986996d21cb8658535fff95f1c7107ddce22b5324f4b41890e2904706",
+    strip_prefix = "pigz-2.8",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) sqlite build: Autotools library/tool package after pigz
+# in the Python-root frontier. It consumes the native readline and zlib-ng
+# prefixes, preserving Spack's DAG edges while flipping only the provider.
+sqlite_native = use_repo_rule("//native/sqlite:sqlite.bzl", "sqlite_native")
+
+sqlite_native(
+    name = "sqlite_native",
+    urls = ["https://www.sqlite.org/2026/sqlite-autoconf-3530100.tar.gz"],
+    sha256 = "83e6b2020a034e9a7ad4a72feea59e1ad52f162e09cbd26735a3ffb98359fc4f",
+    strip_prefix = "sqlite-autoconf-3530100",
+    readline_prefix_file = "@readline_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU tar build: Autotools executable package after
+# sqlite/zstd in the Python-root frontier. It consumes native compressor
+# prefixes and libiconv, preserving Spack's absolute-tool configure contract.
+tar_native = use_repo_rule("//native/tar:tar.bzl", "tar_native")
+
+tar_native(
+    name = "tar_native",
+    urls = ["https://ftp.gnu.org/gnu/tar/tar-1.35.tar.gz"],
+    sha256 = "14d55e32063ea9526e057fbf35fcabd53378e769787eff7919c3755b02d2b57e",
+    strip_prefix = "tar-1.35",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    pigz_prefix_file = "@pigz_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU gettext build: Autotools library/tool package after
+# tar in the Python-root frontier. It consumes only already-migrated native
+# prefixes and preserves Spack's concrete configure interface.
+gettext_native = use_repo_rule("//native/gettext:gettext.bzl", "gettext_native")
+
+gettext_native(
+    name = "gettext_native",
+    urls = ["https://ftpmirror.gnu.org/gettext/gettext-1.0.tar.xz"],
+    sha256 = "71132a3fb71e68245b8f2ac4e9e97137d3e5c02f415636eb508ae607bc01add7",
+    strip_prefix = "gettext-1.0",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    tar_prefix_file = "@tar_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) elfutils build: Autotools library/tool package after
+# gettext in the focused elfutils/PyTorch frontier. It consumes only native
+# compression, iconv, gettext, m4, and pkgconf prefixes.
+elfutils_native = use_repo_rule("//native/elfutils:elfutils.bzl", "elfutils_native")
+
+elfutils_native(
+    name = "elfutils_native",
+    urls = ["https://sourceware.org/elfutils/ftp/0.194/elfutils-0.194.tar.bz2"],
+    sha256 = "09e2ff033d39baa8b388a2d7fbc5390bfde99ae3b7c67c7daaf7433fbcf0f01e",
+    strip_prefix = "elfutils-0.194",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU findutils build: executable Autotools package after
+# elfutils in the PyTorch frontier. It consumes gettext only as a build tool.
+findutils_native = use_repo_rule("//native/findutils:findutils.bzl", "findutils_native")
+
+findutils_native(
+    name = "findutils_native",
+    urls = ["https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz"],
+    sha256 = "1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5",
+    strip_prefix = "findutils-4.10.0",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) flex build: Autotools scanner-generator node in the
+# py-torch frontier. Concrete variants match hermetic Spack: ~nls +lex.
+flex_native = use_repo_rule("//native/flex:flex.bzl", "flex_native")
+
+flex_native(
+    name = "flex_native",
+    urls = ["https://github.com/westes/flex/releases/download/v2.6.3/flex-2.6.3.tar.gz"],
+    sha256 = "68b2742233e747c462f781462a2a1e299dc6207401dac8f0bbb316f48565c2aa",
+    strip_prefix = "flex-2.6.3",
+    bison_prefix_file = "@bison_native//:prefix_path.txt",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    findutils_prefix_file = "@findutils_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) MIT Kerberos build: Autotools shared-library/tool node
+# after flex in the lean py-torch frontier. It consumes only native prefixes
+# matching the hermetic Spack DAG and configures from krb5's nested src/.
+krb5_native = use_repo_rule("//native/krb5:krb5.bzl", "krb5_native")
+
+krb5_native(
+    name = "krb5_native",
+    urls = ["https://kerberos.org/dist/krb5/1.22/krb5-1.22.2.tar.gz"],
+    sha256 = "3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13",
+    strip_prefix = "krb5-1.22.2",
+    bison_prefix_file = "@bison_native//:prefix_path.txt",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    findutils_prefix_file = "@findutils_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libedit_prefix_file = "@libedit_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU libtool build: Autotools tool/library node after
+# krb5 in the lean py-torch frontier. It consumes native file, findutils, and
+# m4 prefixes matching the hermetic Spack DAG.
+libtool_native = use_repo_rule("//native/libtool:libtool.bzl", "libtool_native")
+
+libtool_native(
+    name = "libtool_native",
+    urls = ["https://ftpmirror.gnu.org/libtool/libtool-2.5.4.tar.gz"],
+    sha256 = "da8ebb2ce4dcf46b90098daf962cffa68f4b4f62ea60f798d0ef12929ede6adf",
+    strip_prefix = "libtool-2.5.4",
+    file_prefix_file = "@file_native//:prefix_path.txt",
+    findutils_prefix_file = "@findutils_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) PMIx build: Autotools process-management library/tool
+# package after hwloc, libevent, and libtool in the PyTorch frontier. Concrete
+# variants match hermetic Spack: ~munge, ~python, shared+static.
+pmix_native = use_repo_rule("//native/pmix:pmix.bzl", "pmix_native")
+
+pmix_native(
+    name = "pmix_native",
+    urls = ["https://github.com/openpmix/openpmix/releases/download/v6.1.0/pmix-6.1.0.tar.bz2"],
+    sha256 = "bb9021c8e100a376f5070ecca727f83a29b5f652dfe381793b88daa79a3b98a2",
+    strip_prefix = "pmix-6.1.0",
+    hwloc_prefix_file = "@hwloc_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libevent_prefix_file = "@libevent_native//:prefix_path.txt",
+    libpciaccess_prefix_file = "@libpciaccess_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) PRRTE build: Autotools process-runtime prefix after
+# PMIx in the py-torch frontier. Spack applies two upstream patches and forces
+# autoreconf through perl autogen.pl before configure/make/install.
+prrte_native = use_repo_rule("//native/prrte:prrte.bzl", "prrte_native")
+
+prrte_native(
+    name = "prrte_native",
+    urls = ["https://github.com/pmix/prrte/releases/download/v4.1.0/prrte-4.1.0.tar.bz2"],
+    sha256 = "285ad62b670075708b9fcfe14c54baa599733bc274d10502a82e8eebba0b7c70",
+    strip_prefix = "prrte-4.1.0",
+    patch_urls = [
+        "https://github.com/openpmix/prrte/commit/378c61c1d8eff9858a7774c869fbd332c48711a8.patch?full_index=1",
+        "https://github.com/openpmix/prrte/commit/a6b09c9c3fb84838b056c31e802b5f79ac4e8d6b.patch?full_index=1",
+    ],
+    patch_sha256s = [
+        "64faa1acb89eddea096307a2658b11ccdaf85dc8c870fed4b3f8670329706a4f",
+        "91b28f5c701c8543b4807a29e9b5154b9d7e62f5d3a1e3036dadf1a9b5b0ca65",
+    ],
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    flex_prefix_file = "@flex_native//:prefix_path.txt",
+    hwloc_prefix_file = "@hwloc_native//:prefix_path.txt",
+    libevent_prefix_file = "@libevent_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    pmix_prefix_file = "@pmix_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) GNU FriBidi build: Autotools C library after libtool in
+# the lean py-torch frontier. It consumes native Autotools tool prefixes.
+fribidi_native = use_repo_rule("//native/fribidi:fribidi.bzl", "fribidi_native")
+
+fribidi_native(
+    name = "fribidi_native",
+    urls = ["https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz"],
+    sha256 = "0cd233f97fc8c67bb3ac27ce8440def5d3ffacf516765b91c2cc654498293495",
+    strip_prefix = "fribidi-1.0.12",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) numactl build: Autotools Linux NUMA library/tool prefix
+# after fribidi in the lean py-torch frontier. It consumes native Autotools
+# build-tool prefixes and emits libnuma plus the numactl/numastat tools.
+numactl_native = use_repo_rule("//native/numactl:numactl.bzl", "numactl_native")
+
+numactl_native(
+    name = "numactl_native",
+    urls = ["https://github.com/numactl/numactl/archive/v2.0.19.tar.gz"],
+    sha256 = "8b84ffdebfa0d730fb2fc71bb7ec96bb2d38bf76fb67246fde416a68e04125e4",
+    strip_prefix = "numactl-2.0.19",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) OpenSSH build: Autotools executable/config prefix after
+# numactl in the lean py-torch frontier. It consumes the native Kerberos,
+# OpenSSL, zlib-ng, libedit, ncurses, and libxcrypt prefixes explicitly.
+openssh_native = use_repo_rule("//native/openssh:openssh.bzl", "openssh_native")
+
+openssh_native(
+    name = "openssh_native",
+    urls = ["https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.3p1.tar.gz"],
+    sha256 = "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4",
+    strip_prefix = "openssh-10.3p1",
+    krb5_prefix_file = "@krb5_native//:prefix_path.txt",
+    libedit_prefix_file = "@libedit_native//:prefix_path.txt",
+    libxcrypt_prefix_file = "@libxcrypt_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) OpenMPI build: Autotools MPI prefix after native PMIx,
+# PRRTE, hwloc, libevent, numactl, and OpenSSH in the lean py-torch frontier.
+# It mirrors the hermetic Spack openmpi@5.0.10 recipe and keeps Fortran MPI
+# enabled from the insula rootfs compiler.
+openmpi_native = use_repo_rule("//native/openmpi:openmpi.bzl", "openmpi_native")
+
+openmpi_native(
+    name = "openmpi_native",
+    urls = ["https://download.open-mpi.org/release/open-mpi/v5.0/openmpi-5.0.10.tar.bz2"],
+    sha256 = "0acecc4fc218e5debdbcb8a41d182c6b0f1d29393015ed763b2a91d5d7374cc6",
+    strip_prefix = "openmpi-5.0.10",
+    patch_urls = [
+        "https://github.com/open-mpi/ompi/commit/aa024ac73d624611cfe3af6f541b5d28dedf07bb.patch?full_index=1",
+    ],
+    patch_sha256s = [
+        "646eb1a7382d628eb821715ca69fc5467a9a25aaddfe8290dbce008536dbfaa0",
+    ],
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    hwloc_prefix_file = "@hwloc_native//:prefix_path.txt",
+    libevent_prefix_file = "@libevent_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    numactl_prefix_file = "@numactl_native//:prefix_path.txt",
+    openssh_prefix_file = "@openssh_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    pmix_prefix_file = "@pmix_native//:prefix_path.txt",
+    prrte_prefix_file = "@prrte_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Git build: Autotools executable/script/data prefix after
+# OpenSSH in the lean py-torch frontier. It mirrors Spack's Git recipe,
+# including manpages, completions, Perl support, NLS, and git-subtree.
+git_native = use_repo_rule("//native/git:git.bzl", "git_native")
+
+git_native(
+    name = "git_native",
+    urls = ["https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.53.0.tar.gz"],
+    sha256 = "429dc0f5fe5f14109930cdbbb588c5d6ef5b8528910f0d738040744bebdc6275",
+    strip_prefix = "git-2.53.0",
+    manpage_urls = ["https://www.kernel.org/pub/software/scm/git/git-manpages-2.53.0.tar.gz"],
+    manpage_sha256 = "4954390466c125e82dce4a978dd1dadda13a916564d908cfdbd319f2e174a8ae",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    curl_prefix_file = "@curl_native//:prefix_path.txt",
+    diffutils_prefix_file = "@diffutils_native//:prefix_path.txt",
+    expat_prefix_file = "@expat_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libidn2_prefix_file = "@libidn2_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+    openssh_prefix_file = "@openssh_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) CPython build: generic Spack package that drives
+# CPython's configure/make flow after gettext in the Python-root frontier.
+python_native = use_repo_rule("//native/python:python.bzl", "python_native")
+
+python_native(
+    name = "python_native",
+    version = "3.14.5",
+    urls = ["https://www.python.org/ftp/python/3.14.5/Python-3.14.5.tgz"],
+    sha256 = "9c22bfe9939a6c5418fc74b289a5f1cc41859ae82ac6b163016b5844bd0a86bc",
+    strip_prefix = "Python-3.14.5",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    expat_prefix_file = "@expat_native//:prefix_path.txt",
+    gdbm_prefix_file = "@gdbm_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    readline_prefix_file = "@readline_native//:prefix_path.txt",
+    sqlite_prefix_file = "@sqlite_native//:prefix_path.txt",
+    util_linux_uuid_prefix_file = "@util_linux_uuid_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+python_native(
+    name = "python_313_native",
+    version = "3.13.13",
+    urls = ["https://www.python.org/ftp/python/3.13.13/Python-3.13.13.tgz"],
+    sha256 = "f9cde7b0e2ec8165d7326e2a0f59ea2686ce9d0c617dbbb3d66a7e54d31b74b9",
+    strip_prefix = "Python-3.13.13",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    expat_prefix_file = "@expat_native//:prefix_path.txt",
+    gdbm_prefix_file = "@gdbm_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    readline_prefix_file = "@readline_native//:prefix_path.txt",
+    sqlite_prefix_file = "@sqlite_native//:prefix_path.txt",
+    util_linux_uuid_prefix_file = "@util_linux_uuid_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+)
+
+
+# Native (Bazel-owned) python-venv build: Spack's generic PythonVenv package
+# after CPython in the lean py-torch frontier. It consumes only the native
+# Python prefix and derives the concrete Python ABI from that prefix.
+python_venv_native = use_repo_rule("//native/python_venv:python_venv.bzl", "python_venv_native")
+
+python_venv_native(
+    name = "python_venv_native",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pip build: Spack's generic PyPip package after
+# python-venv. It bootstraps pip from the exact upstream wheel using only the
+# native Python and python-venv prefixes inside the insula.
+py_pip_native = use_repo_rule("//native/py_pip:py_pip.bzl", "py_pip_native")
+
+py_pip_native(
+    name = "py_pip_native",
+    urls = ["https://files.pythonhosted.org/packages/py3/p/pip/pip-26.1.2-py3-none-any.whl"],
+    sha256 = "382ff9f685ee3bc25864f820aa50505825f10f5458ffff07e30a6d96e5715cab",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-setuptools build: Spack's generic PySetuptools
+# package after py-pip. It installs the exact upstream wheel with
+# python-venv/bin/python3 -m pip, where pip comes from the native py-pip prefix
+# on PYTHONPATH, all inside the insula.
+py_setuptools_native = use_repo_rule("//native/py_setuptools:py_setuptools.bzl", "py_setuptools_native")
+
+py_setuptools_native(
+    name = "py_setuptools_native",
+    urls = ["https://files.pythonhosted.org/packages/py3/s/setuptools/setuptools-79.0.1-py3-none-any.whl"],
+    sha256 = "e147c0549f27767ba362f9da434eab9c5dc0045d5304feb602a0af001089fc51",
+    package_version = "79.0.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-setuptools@82.0.1 build for the JAX/Triton 0.10.2
+# graph helpers. This exact-key repo preserves the older 79.0.1 bootstrap
+# provider for existing consumers.
+py_setuptools_native(
+    name = "py_setuptools_82_native",
+    urls = ["https://files.pythonhosted.org/packages/py3/s/setuptools/setuptools-82.0.1-py3-none-any.whl"],
+    sha256 = "a59e362652f08dcd477c78bb6e7bd9d80a7995bc73ce773050228a348ce2e5bb",
+    package_version = "82.0.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-wheel build: Spack's generic PyWheel package after
+# py-pip. It installs the exact upstream wheel with python-venv/bin/python3 -m
+# pip, where pip comes from the native py-pip prefix on PYTHONPATH, all inside
+# the insula.
+py_wheel_native = use_repo_rule("//native/py_wheel:py_wheel.bzl", "py_wheel_native")
+
+py_wheel_native(
+    name = "py_wheel_native",
+    urls = ["https://files.pythonhosted.org/packages/py3/w/wheel/wheel-0.45.1-py3-none-any.whl"],
+    sha256 = "708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-calver build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It builds from the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip, setuptools, and
+# wheel are all supplied by native prefixes on PYTHONPATH inside the insula.
+py_calver_native = use_repo_rule("//native/py_calver:py_calver.bzl", "py_calver_native")
+
+py_calver_native(
+    name = "py_calver_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/calver/calver-2025.10.20.tar.gz"],
+    sha256 = "c98b376c2424642224d456b2f70c51402343e008c63d204634665e1a2a2835f5",
+    strip_prefix = "calver-2025.10.20",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-certifi build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It builds from the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip, setuptools, and
+# wheel are all supplied by native prefixes on PYTHONPATH inside the insula.
+py_certifi_native = use_repo_rule("//native/py_certifi:py_certifi.bzl", "py_certifi_native")
+
+py_certifi_native(
+    name = "py_certifi_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/certifi/certifi-2026.2.25.tar.gz"],
+    sha256 = "e887ab5cee78ea814d3472169153c2d12cd43b14bd03329a39a9c6e2e80bfba7",
+    strip_prefix = "certifi-2026.2.25",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-charset-normalizer build: Spack's PythonPackage path
+# after the Python packaging bootstrap trio. It builds from the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, and wheel are supplied by native prefixes on PYTHONPATH inside the
+# insula.
+py_charset_normalizer_native = use_repo_rule("//native/py_charset_normalizer:py_charset_normalizer.bzl", "py_charset_normalizer_native")
+
+py_charset_normalizer_native(
+    name = "py_charset_normalizer_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/charset_normalizer/charset_normalizer-3.4.4.tar.gz"],
+    sha256 = "94537985111c35f28720e43603b8e7b43a6ecfb2ce1d3058bbe955b73404e21a",
+    strip_prefix = "charset_normalizer-3.4.4",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-cycler build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It builds from the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip, setuptools, and
+# wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_cycler_native = use_repo_rule("//native/py_cycler:py_cycler.bzl", "py_cycler_native")
+
+py_cycler_native(
+    name = "py_cycler_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/cycler/cycler-0.12.1.tar.gz"],
+    sha256 = "88bb128f02ba341da8ef447245a9e138fae777f6a23943da4540077d3601eb1c",
+    strip_prefix = "cycler-0.12.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-cython build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It builds from the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., compiling CPython extension
+# modules against the native Python prefix and running only inside the insula.
+py_cython_native = use_repo_rule("//native/py_cython:py_cython.bzl", "py_cython_native")
+
+py_cython_native(
+    name = "py_cython_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/cython/cython-3.2.4.tar.gz"],
+    sha256 = "84226ecd313b233da27dc2eb3601b4f222b8209c3a7216d8733b031da1dc64e6",
+    strip_prefix = "cython-3.2.4",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) nvtx build: Spack's generic package copies the C
+# header/CMake surface and installs the Python package from the source tree's
+# python/ subdirectory using the native Python packaging chain inside the insula.
+nvtx_native = use_repo_rule("//native/nvtx:nvtx.bzl", "nvtx_native")
+
+nvtx_native(
+    name = "nvtx_native",
+    urls = ["https://github.com/NVIDIA/NVTX/archive/refs/tags/v3.3.0.tar.gz"],
+    sha256 = "67d0cda2f9d19a89684592dab40c0bf2c2b13d5d588e51392076c0890a64b6c0",
+    strip_prefix = "NVTX-3.3.0",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_cython_prefix_file = "@py_cython_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-flit-core build: Spack's PythonPackage path after the
+# Python packaging bootstrap pieces. It installs the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip and wheel are
+# supplied by native prefixes on PYTHONPATH inside the insula.
+py_flit_core_native = use_repo_rule("//native/py_flit_core:py_flit_core.bzl", "py_flit_core_native")
+
+py_flit_core_native(
+    name = "py_flit_core_native",
+    urls = ["https://files.pythonhosted.org/packages/source/f/flit-core/flit_core-3.12.0.tar.gz"],
+    sha256 = "18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2",
+    strip_prefix = "flit_core-3.12.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-absl-py build: Spack's PythonPackage path for the
+# JAX Mosaic/Pallas runtime dependency. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# and wheel are supplied by native prefixes inside the insula.
+py_absl_py_native = use_repo_rule("//native/py_absl_py:py_absl_py.bzl", "py_absl_py_native")
+
+py_absl_py_native(
+    name = "py_absl_py_native",
+    urls = ["https://files.pythonhosted.org/packages/source/a/absl-py/absl-py-1.4.0.tar.gz"],
+    sha256 = "d2c244d01048ba476e7c080bd2c6df5e141d211de80223460d5b3b8a2a58433d",
+    strip_prefix = "absl-py-1.4.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-fonttools build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It installs the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip, setuptools, and
+# wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_fonttools_native = use_repo_rule("//native/py_fonttools:py_fonttools.bzl", "py_fonttools_native")
+
+py_fonttools_native(
+    name = "py_fonttools_native",
+    urls = ["https://files.pythonhosted.org/packages/source/f/fonttools/fonttools-4.39.4.zip"],
+    sha256 = "dba8d7cdb8e2bac1b3da28c5ed5960de09e59a2fe7e63bb73f5a59e57b0430d2",
+    strip_prefix = "fonttools-4.39.4",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-gast build: Spack's PythonPackage path after the
+# Python packaging bootstrap trio. It installs the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while pip, setuptools, and
+# wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_gast_native = use_repo_rule("//native/py_gast:py_gast.bzl", "py_gast_native")
+
+py_gast_native(
+    name = "py_gast_native",
+    urls = ["https://files.pythonhosted.org/packages/source/g/gast/gast-0.6.0.tar.gz"],
+    sha256 = "88fc5300d32c7ac6ca7b515310862f71e6fdf2c029bbec7c66c0f5dd47b6b1fb",
+    strip_prefix = "gast-0.6.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-beniget build: Spack's PythonPackage path after
+# py-gast. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., while pip, setuptools, wheel, and
+# py-gast are supplied by native prefixes on PYTHONPATH inside the insula.
+py_beniget_native = use_repo_rule("//native/py_beniget:py_beniget.bzl", "py_beniget_native")
+
+py_beniget_native(
+    name = "py_beniget_native",
+    urls = ["https://files.pythonhosted.org/packages/source/b/beniget/beniget-0.4.2.post1.tar.gz"],
+    sha256 = "a0258537e65e7e14ec33a86802f865a667f949bb6c73646d55e42f7c45a052ae",
+    strip_prefix = "beniget-0.4.2.post1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_gast_prefix_file = "@py_gast_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-idna build: Spack's PythonPackage path after
+# py-flit-core. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., while pip, wheel, and py-flit-core
+# are supplied by native prefixes on PYTHONPATH inside the insula.
+py_idna_native = use_repo_rule("//native/py_idna:py_idna.bzl", "py_idna_native")
+
+py_idna_native(
+    name = "py_idna_native",
+    urls = ["https://files.pythonhosted.org/packages/source/i/idna/idna-3.15.tar.gz"],
+    sha256 = "ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc",
+    strip_prefix = "idna-3.15",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-markupsafe build: Spack's PythonPackage path after
+# py-idna. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., compiling the _speedups CPython
+# extension against the native Python prefix while pip, setuptools, and wheel
+# are supplied by native prefixes on PYTHONPATH inside the insula.
+py_markupsafe_native = use_repo_rule("//native/py_markupsafe:py_markupsafe.bzl", "py_markupsafe_native")
+
+py_markupsafe_native(
+    name = "py_markupsafe_native",
+    urls = ["https://files.pythonhosted.org/packages/source/M/MarkupSafe/markupsafe-3.0.3.tar.gz"],
+    sha256 = "722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698",
+    strip_prefix = "markupsafe-3.0.3",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-jinja2 build: Spack's PythonPackage path after
+# py-markupsafe. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., while pip, wheel, flit-core, and
+# MarkupSafe are supplied by native prefixes on PYTHONPATH inside the insula.
+py_jinja2_native = use_repo_rule("//native/py_jinja2:py_jinja2.bzl", "py_jinja2_native")
+
+py_jinja2_native(
+    name = "py_jinja2_native",
+    urls = ["https://files.pythonhosted.org/packages/source/j/jinja2/jinja2-3.1.6.tar.gz"],
+    sha256 = "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d",
+    strip_prefix = "jinja2-3.1.6",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+    py_markupsafe_prefix_file = "@py_markupsafe_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-mpmath build: Spack's PythonPackage path after
+# py-jinja2 in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# and wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_mpmath_native = use_repo_rule("//native/py_mpmath:py_mpmath.bzl", "py_mpmath_native")
+
+py_mpmath_native(
+    name = "py_mpmath_native",
+    urls = ["https://files.pythonhosted.org/packages/source/m/mpmath/mpmath-1.3.0.tar.gz"],
+    sha256 = "7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f",
+    strip_prefix = "mpmath-1.3.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-networkx build: Spack's PythonPackage path after
+# py-mpmath in the pruned PyTorch frontier. FC-14 keeps NetworkX's default and
+# extra dependency sets disabled, so this source install consumes only the
+# core pip/setuptools/wheel Python build channel.
+py_networkx_native = use_repo_rule("//native/py_networkx:py_networkx.bzl", "py_networkx_native")
+
+py_networkx_native(
+    name = "py_networkx_native",
+    urls = ["https://pypi.io/packages/source/n/networkx/networkx-3.6.1.tar.gz"],
+    sha256 = "26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509",
+    strip_prefix = "networkx-3.6.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-packaging build: Spack's PythonPackage path after
+# py-networkx in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, wheel, and
+# flit-core are supplied by native prefixes on PYTHONPATH inside the insula.
+py_packaging_native = use_repo_rule("//native/py_packaging:py_packaging.bzl", "py_packaging_native")
+
+py_packaging_native(
+    name = "py_packaging_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/packaging/packaging-26.2.tar.gz"],
+    sha256 = "ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661",
+    strip_prefix = "packaging-26.2",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pathspec build: Spack's PythonPackage path after
+# py-packaging in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, wheel, and
+# flit-core are supplied by native prefixes on PYTHONPATH inside the insula.
+py_pathspec_native = use_repo_rule("//native/py_pathspec:py_pathspec.bzl", "py_pathspec_native")
+
+py_pathspec_native(
+    name = "py_pathspec_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/pathspec/pathspec-1.1.1.tar.gz"],
+    sha256 = "17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a",
+    strip_prefix = "pathspec-1.1.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pyparsing build: Spack's PythonPackage path after
+# py-ply in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, wheel, and
+# flit-core are supplied by native prefixes on PYTHONPATH inside the insula.
+py_pyparsing_native = use_repo_rule("//native/py_pyparsing:py_pyparsing.bzl", "py_pyparsing_native")
+
+py_pyparsing_native(
+    name = "py_pyparsing_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/pyparsing/pyparsing-3.3.2.tar.gz"],
+    sha256 = "c777f4d763f140633dcb6d8a3eda953bf7a214dc4eff598413c070bcdc117cbc",
+    strip_prefix = "pyparsing-3.3.2",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pyproject-hooks build: Spack's PythonPackage path
+# in the JAX 0.10.2 dependency closure. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, wheel, and
+# flit-core are supplied by native prefixes on PYTHONPATH inside the insula.
+py_pyproject_hooks_native = use_repo_rule("//native/py_pyproject_hooks:py_pyproject_hooks.bzl", "py_pyproject_hooks_native")
+
+py_pyproject_hooks_native(
+    name = "py_pyproject_hooks_native",
+    urls = ["https://files.pythonhosted.org/packages/e7/82/28175b2414effca1cdac8dc99f76d660e7a4fb0ceefa4b4ab8f5f6742925/pyproject_hooks-1.2.0.tar.gz"],
+    sha256 = "1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c970da1f8",
+    strip_prefix = "pyproject_hooks-1.2.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-build build: Spack's PythonPackage path in the JAX
+# 0.10.2 dependency closure. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., while flit-core, packaging,
+# pyproject-hooks, pip, and wheel are supplied by native prefixes.
+py_build_native = use_repo_rule("//native/py_build:py_build.bzl", "py_build_native")
+
+py_build_native(
+    name = "py_build_native",
+    urls = ["https://files.pythonhosted.org/packages/3f/16/4b272700dea44c1d2e8ca963ebb3c684efe22b3eba8cfa31c5fdb60de707/build-1.4.3.tar.gz"],
+    sha256 = "5aa4231ae0e807efdf1fd0623e07366eca2ab215921345a2e38acdd5d0fa0a74",
+    strip_prefix = "build-1.4.3",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pyproject_hooks_prefix_file = "@py_pyproject_hooks_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pyproject-metadata build: Spack's PythonPackage path
+# after py-pyparsing in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# wheel, flit-core, and packaging are supplied by native prefixes on PYTHONPATH
+# inside the insula.
+py_pyproject_metadata_native = use_repo_rule("//native/py_pyproject_metadata:py_pyproject_metadata.bzl", "py_pyproject_metadata_native")
+
+py_pyproject_metadata_native(
+    name = "py_pyproject_metadata_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/pyproject_metadata/pyproject_metadata-0.11.0.tar.gz"],
+    sha256 = "c72fa49418bb7c5a10f25e050c418009898d1c051721d19f98a6fb6da59a66cf",
+    strip_prefix = "pyproject_metadata-0.11.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-meson-python build: Spack's PythonPackage path after
+# py-pyproject-metadata in the current full PyTorch closure. It installs the
+# exact PyPI source archive with python-venv/bin/python3 -m pip install .,
+# while Meson, Ninja, packaging, pyproject-metadata, pip, and wheel are
+# supplied by native prefixes inside the insula.
+py_meson_python_native = use_repo_rule("//native/py_meson_python:py_meson_python.bzl", "py_meson_python_native")
+
+py_meson_python_native(
+    name = "py_meson_python_native",
+    urls = ["https://files.pythonhosted.org/packages/source/m/meson_python/meson_python-0.19.0.tar.gz"],
+    sha256 = "9959d198aa69b57fcfd354a34518c6f795b781a73ed0656f4d01660160cc2553",
+    strip_prefix = "meson_python-0.19.0",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pyproject_metadata_prefix_file = "@py_pyproject_metadata_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-numpy build: Spack's PythonPackage path after
+# py-meson-python in the current full PyTorch closure. It applies Spack's
+# check_executables.patch and builds NumPy 2.4.6 from the exact PyPI source
+# archive against native OpenBLAS with meson-python.
+py_numpy_native = use_repo_rule("//native/py_numpy:py_numpy.bzl", "py_numpy_native")
+
+py_numpy_native(
+    name = "py_numpy_native",
+    urls = ["https://files.pythonhosted.org/packages/source/n/numpy/numpy-2.4.6.tar.gz"],
+    sha256 = "f3a3570c4a2a16746ac2c31a7c7c7b0c186b95ce902e33db6f28094ed7387dda",
+    strip_prefix = "numpy-2.4.6",
+    check_executables_patch = "//native/py_numpy:check_executables.patch",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    py_cython_prefix_file = "@py_cython_native//:prefix_path.txt",
+    py_meson_python_prefix_file = "@py_meson_python_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pyproject_metadata_prefix_file = "@py_pyproject_metadata_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pyyaml build: Spack's PythonPackage path after
+# py-pyproject-metadata in the lean PyTorch frontier. It installs the exact
+# PyPI source archive with python-venv/bin/python3 -m pip install ., enabling
+# the libyaml C extension through --with-libyaml and native Cython.
+py_pyyaml_native = use_repo_rule("//native/py_pyyaml:py_pyyaml.bzl", "py_pyyaml_native")
+
+py_pyyaml_native(
+    name = "py_pyyaml_native",
+    urls = ["https://pypi.io/packages/source/p/pyyaml/pyyaml-6.0.3.tar.gz"],
+    sha256 = "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f",
+    strip_prefix = "pyyaml-6.0.3",
+    libyaml_prefix_file = "@libyaml_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_cython_prefix_file = "@py_cython_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-setuptools-scm build: Spack's PythonPackage path
+# after py-pyyaml in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, wheel, packaging, and git are supplied by native prefixes inside
+# the insula.
+py_setuptools_scm_native = use_repo_rule("//native/py_setuptools_scm:py_setuptools_scm.bzl", "py_setuptools_scm_native")
+
+py_setuptools_scm_native(
+    name = "py_setuptools_scm_native",
+    urls = ["https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-8.2.1.tar.gz"],
+    sha256 = "51cfdd1deefc9b8c08d1a61e940a59c4dec39eb6c285d33fa2f1b4be26c7874d",
+    strip_prefix = "setuptools_scm-8.2.1",
+    package_version = "8.2.1",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-setuptools-scm@9.2.2 build for the JAX/Triton
+# Python 3.13 helper graph. It consumes the matching py-setuptools@82.0.1
+# native prefix from that graph while leaving the 8.2.1 bootstrap provider
+# exact-keyed for existing PyTorch helper consumers.
+py_setuptools_scm_native(
+    name = "py_setuptools_scm_9_native",
+    urls = ["https://files.pythonhosted.org/packages/7b/b1/19587742aad604f1988a8a362e660e8c3ac03adccdb71c96d86526e5eb62/setuptools_scm-9.2.2.tar.gz"],
+    sha256 = "1c674ab4665686a0887d7e24c03ab25f24201c213e82ea689d2f3e169ef7ef57",
+    strip_prefix = "setuptools_scm-9.2.2",
+    package_version = "9.2.2",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-cppy build: Spack's PythonPackage path after
+# py-setuptools-scm in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, setuptools-scm, wheel, packaging, and git are supplied by native
+# prefixes inside the insula.
+py_cppy_native = use_repo_rule("//native/py_cppy:py_cppy.bzl", "py_cppy_native")
+
+py_cppy_native(
+    name = "py_cppy_native",
+    urls = ["https://files.pythonhosted.org/packages/source/c/cppy/cppy-1.3.1.tar.gz"],
+    sha256 = "55b5307c11874f242ea135396f398cb67a5bbde4fab3e3c3294ea5fce43a6d68",
+    strip_prefix = "cppy-1.3.1",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-kiwisolver build: Spack's PythonPackage path after
+# py-cppy in the focused py-kiwisolver frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while cppy,
+# pip, setuptools, setuptools-scm, wheel, packaging, git, and python are
+# supplied by native prefixes inside the insula.
+py_kiwisolver_native = use_repo_rule("//native/py_kiwisolver:py_kiwisolver.bzl", "py_kiwisolver_native")
+
+py_kiwisolver_native(
+    name = "py_kiwisolver_native",
+    urls = ["https://files.pythonhosted.org/packages/source/k/kiwisolver/kiwisolver-1.5.0.tar.gz"],
+    sha256 = "d4193f3d9dc3f6f79aaed0e5637f45d98850ebf01f7ca20e69457f3e8946b66a",
+    strip_prefix = "kiwisolver-1.5.0",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_prefix_file = "@python_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_cppy_prefix_file = "@py_cppy_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pluggy build: Spack's PythonPackage path after
+# py-kiwisolver in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, setuptools-scm, wheel, packaging, and git are supplied by native
+# prefixes inside the insula.
+py_pluggy_native = use_repo_rule("//native/py_pluggy:py_pluggy.bzl", "py_pluggy_native")
+
+py_pluggy_native(
+    name = "py_pluggy_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/pluggy/pluggy-1.6.0.tar.gz"],
+    sha256 = "7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3",
+    strip_prefix = "pluggy-1.6.0",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-six build: Spack's PythonPackage path after
+# py-pluggy in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# and wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_six_native = use_repo_rule("//native/py_six:py_six.bzl", "py_six_native")
+
+py_six_native(
+    name = "py_six_native",
+    urls = ["https://files.pythonhosted.org/packages/source/s/six/six-1.17.0.tar.gz"],
+    sha256 = "ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81",
+    strip_prefix = "six-1.17.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-protobuf build: upstream PyTorch v2.14.0 vendors C++
+# protobuf v3.21.12 (hermetic Spack package key protobuf@21.12); PyPI
+# protobuf 4.21.12 is the matching Python package line on the Python 3.13
+# compatibility island.
+py_protobuf_native = use_repo_rule("//native/py_protobuf:py_protobuf.bzl", "py_protobuf_native")
+
+py_protobuf_native(
+    name = "py_protobuf_native",
+    urls = ["https://files.pythonhosted.org/packages/ba/dd/f8a01b146bf45ac12a829bbc599e6590aa6a6849ace7d28c42d77041d6ab/protobuf-4.21.12.tar.gz"],
+    sha256 = "7cd532c4566d0e6feafecc1059d04c7915aec8e182d1cf7adee8b24ef1e2e6ab",
+    strip_prefix = "protobuf-4.21.12",
+    dist_info = "protobuf-4.21.12.dist-info",
+    patch_file = "//native/py_protobuf:protobuf-4.21.12-python-3.11-frame-api.patch",
+    protobuf_prefix_file = "@protobuf_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-python-dateutil build: Spack's pure PythonPackage
+# path after py-protobuf in the lean PyTorch frontier. It installs the exact
+# PyPI source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, setuptools-scm, six, and wheel are supplied by native prefixes on
+# PYTHONPATH inside the insula.
+py_python_dateutil_native = use_repo_rule(
+    "//native/py_python_dateutil:py_python_dateutil.bzl",
+    "py_python_dateutil_native",
+)
+
+py_python_dateutil_native(
+    name = "py_python_dateutil_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/python-dateutil/python-dateutil-2.9.0.post0.tar.gz"],
+    sha256 = "37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3",
+    strip_prefix = "python-dateutil-2.9.0.post0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_six_prefix_file = "@py_six_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-sympy build: Spack's pure PythonPackage path after
+# py-python-dateutil in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, wheel, and mpmath are supplied by native prefixes on PYTHONPATH
+# inside the insula.
+py_sympy_native = use_repo_rule("//native/py_sympy:py_sympy.bzl", "py_sympy_native")
+
+py_sympy_native(
+    name = "py_sympy_native",
+    urls = ["https://files.pythonhosted.org/packages/source/s/sympy/sympy-1.14.0.tar.gz"],
+    sha256 = "d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517",
+    strip_prefix = "sympy-1.14.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_mpmath_prefix_file = "@py_mpmath_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-tqdm build: Spack's pure PythonPackage path after
+# py-sympy in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# setuptools-scm, packaging, wheel, and git are supplied by native prefixes
+# inside the insula.
+py_tqdm_native = use_repo_rule("//native/py_tqdm:py_tqdm.bzl", "py_tqdm_native")
+
+py_tqdm_native(
+    name = "py_tqdm_native",
+    urls = ["https://files.pythonhosted.org/packages/source/t/tqdm/tqdm-4.67.3.tar.gz"],
+    sha256 = "7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb",
+    strip_prefix = "tqdm-4.67.3",
+    git_prefix_file = "@git_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-trove-classifiers build: Spack's pure PythonPackage
+# path after py-tqdm in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while pip,
+# setuptools, calver, and wheel are supplied by native prefixes inside the
+# insula.
+py_trove_classifiers_native = use_repo_rule(
+    "//native/py_trove_classifiers:py_trove_classifiers.bzl",
+    "py_trove_classifiers_native",
+)
+
+py_trove_classifiers_native(
+    name = "py_trove_classifiers_native",
+    urls = ["https://files.pythonhosted.org/packages/source/t/trove_classifiers/trove_classifiers-2026.6.1.19.tar.gz"],
+    sha256 = "c5132b4b61a829d11cfbd2d72e97f20a45ed6edb95e45c5efdeb5e00836b2745",
+    strip_prefix = "trove_classifiers-2026.6.1.19",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_calver_prefix_file = "@py_calver_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-hatchling build: Spack's pure PythonPackage path
+# after py-trove-classifiers in the lean PyTorch frontier. It installs the
+# exact PyPI source archive with python-venv/bin/python3 -m pip install .,
+# while packaging, pathspec, pip, pluggy, trove-classifiers, and wheel are
+# supplied by native prefixes inside the insula.
+py_hatchling_native = use_repo_rule(
+    "//native/py_hatchling:py_hatchling.bzl",
+    "py_hatchling_native",
+)
+
+py_hatchling_native(
+    name = "py_hatchling_native",
+    urls = ["https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.29.0.tar.gz"],
+    sha256 = "793c31816d952cee405b83488ce001c719f325d9cda69f1fc4cd750527640ea6",
+    strip_prefix = "hatchling-1.29.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-hatch-fancy-pypi-readme build: Spack's pure
+# PythonPackage path in the JAX 0.10.2 dependency frontier. It installs the
+# exact PyPI source archive with python-venv/bin/python3 -m pip install .,
+# while hatchling, pip, wheel, and hatchling's Python dependencies are supplied
+# by native prefixes inside the insula.
+py_hatch_fancy_pypi_readme_native = use_repo_rule(
+    "//native/py_hatch_fancy_pypi_readme:py_hatch_fancy_pypi_readme.bzl",
+    "py_hatch_fancy_pypi_readme_native",
+)
+
+py_hatch_fancy_pypi_readme_native(
+    name = "py_hatch_fancy_pypi_readme_native",
+    urls = ["https://files.pythonhosted.org/packages/f3/0f/aed57c301f339936eb91cb4d8c1e5088a101081854bd3ec18a889df32365/hatch_fancy_pypi_readme-25.1.0.tar.gz"],
+    sha256 = "9c58ed3dff90d51f43414ce37009ad1d5b0f08ffc9fc216998a06380f01c0045",
+    strip_prefix = "hatch_fancy_pypi_readme-25.1.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-hatch-vcs build: Spack's pure PythonPackage path
+# after py-hatchling in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while hatchling,
+# setuptools-scm, pip, wheel, and hatchling's Python dependencies are supplied
+# by native prefixes inside the insula.
+py_hatch_vcs_native = use_repo_rule(
+    "//native/py_hatch_vcs:py_hatch_vcs.bzl",
+    "py_hatch_vcs_native",
+)
+
+py_hatch_vcs_native(
+    name = "py_hatch_vcs_native",
+    urls = ["https://files.pythonhosted.org/packages/source/h/hatch-vcs/hatch_vcs-0.5.0.tar.gz"],
+    sha256 = "0395fa126940340215090c344a2bf4e2a77bcbe7daab16f41b37b98c95809ff9",
+    strip_prefix = "hatch_vcs-0.5.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-opt-einsum build: Spack's pure PythonPackage path in
+# the JAX 0.10.2 dependency frontier. It installs the exact PyPI source archive
+# with python-venv/bin/python3 -m pip install ., while hatchling, hatch-vcs,
+# hatch-fancy-pypi-readme, pip, wheel, and hatchling's Python dependencies are
+# supplied by native prefixes inside the insula.
+py_opt_einsum_native = use_repo_rule(
+    "//native/py_opt_einsum:py_opt_einsum.bzl",
+    "py_opt_einsum_native",
+)
+
+py_opt_einsum_native(
+    name = "py_opt_einsum_native",
+    urls = ["https://files.pythonhosted.org/packages/8c/b9/2ac072041e899a52f20cf9510850ff58295003aa75525e58343591b0cbfb/opt_einsum-3.4.0.tar.gz"],
+    sha256 = "96ca72f1b886d148241348783498194c577fa30a8faac108586b14f1ba4473ac",
+    strip_prefix = "opt_einsum-3.4.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatch_fancy_pypi_readme_prefix_file = "@py_hatch_fancy_pypi_readme_native//:prefix_path.txt",
+    py_hatch_vcs_prefix_file = "@py_hatch_vcs_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-ml-dtypes build: Spack's PythonPackage path in the
+# JAX 0.10.2 dependency frontier. It builds the CPython C++ extension from the
+# exact PyPI source archive against native Python 3.13 and NumPy, with the
+# single Eigen file missing from the sdist overlaid from Spack's pinned
+# third_party/eigen submodule commit.
+py_ml_dtypes_native = use_repo_rule(
+    "//native/py_ml_dtypes:py_ml_dtypes.bzl",
+    "py_ml_dtypes_native",
+)
+
+py_ml_dtypes_native(
+    name = "py_ml_dtypes_native",
+    urls = ["https://files.pythonhosted.org/packages/32/49/6e67c334872d2c114df3020e579f3718c333198f8312290e09ec0216703a/ml_dtypes-0.5.1.tar.gz"],
+    sha256 = "ac5b58559bb84a95848ed6984eb8013249f90b6bab62aa5acbad876e256002c9",
+    strip_prefix = "ml_dtypes-0.5.1",
+    eigen_trsm_unrolls_urls = ["https://gitlab.com/libeigen/eigen/-/raw/7bf2968fed5f246c0589e1111004cb420fcd7c71/Eigen/src/Core/arch/AVX512/TrsmUnrolls.inc"],
+    eigen_trsm_unrolls_sha256 = "aa05b280fc2419e0378961a534de8c0fb2be5b15cf7638b314a6097863e5634f",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-filelock build: Spack's pure PythonPackage path
+# after py-hatch-vcs in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while hatch-vcs,
+# hatchling, pip, setuptools, wheel, and hatchling's Python dependencies are
+# supplied by native prefixes inside the insula.
+py_filelock_native = use_repo_rule(
+    "//native/py_filelock:py_filelock.bzl",
+    "py_filelock_native",
+)
+
+py_filelock_native(
+    name = "py_filelock_native",
+    urls = ["https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.29.1.tar.gz"],
+    sha256 = "d97e6b1b9757569626c58caa07dc4beb1613f4a2938b1e8cc81afca398906c9e",
+    strip_prefix = "filelock-3.29.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatch_vcs_prefix_file = "@py_hatch_vcs_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-fsspec build: Spack's pure PythonPackage path after
+# py-filelock in the lean PyTorch frontier. The active graph has +http disabled,
+# so this source install consumes only the hatch-vcs/hatchling build channel and
+# does not introduce py-aiohttp.
+py_fsspec_native = use_repo_rule(
+    "//native/py_fsspec:py_fsspec.bzl",
+    "py_fsspec_native",
+)
+
+py_fsspec_native(
+    name = "py_fsspec_native",
+    urls = ["https://files.pythonhosted.org/packages/source/f/fsspec/fsspec-2026.3.0.tar.gz"],
+    sha256 = "1ee6a0e28677557f8c2f994e3eea77db6392b4de9cd1f5d7a9e87a0ae9d01b41",
+    strip_prefix = "fsspec-2026.3.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatch_vcs_prefix_file = "@py_hatch_vcs_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-scikit-build-core build: Spack's pure
+# PythonPackage path after py-fsspec in the lean PyTorch frontier. The package
+# is pure Python, but Spack declares CMake plus packaging/pathspec as build/run
+# dependencies, so all three remain explicit native prefix inputs.
+py_scikit_build_core_native = use_repo_rule(
+    "//native/py_scikit_build_core:py_scikit_build_core.bzl",
+    "py_scikit_build_core_native",
+)
+
+py_scikit_build_core_native(
+    name = "py_scikit_build_core_native",
+    urls = ["https://files.pythonhosted.org/packages/29/e2/4c0431fe84f9d8c24c1fc77b27264f568c71724ca888f514766986f270b0/scikit_build_core-1.0.0.tar.gz"],
+    sha256 = "b82a8b41dd66926b96096a61e8fc8df22214bbec437d251c0fda1bfb9d7df558",
+    strip_prefix = "scikit_build_core-1.0.0",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatch_vcs_prefix_file = "@py_hatch_vcs_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-typing-extensions build: Spack's pure PythonPackage
+# path after py-scikit-build-core in the focused py-typing-extensions frontier.
+# It installs the exact PyPI source archive with python-venv/bin/python3 -m pip
+# install ., while flit-core, pip, and wheel are supplied by native prefixes on
+# PYTHONPATH inside the insula.
+py_typing_extensions_native = use_repo_rule(
+    "//native/py_typing_extensions:py_typing_extensions.bzl",
+    "py_typing_extensions_native",
+)
+
+py_typing_extensions_native(
+    name = "py_typing_extensions_native",
+    urls = ["https://files.pythonhosted.org/packages/source/t/typing_extensions/typing_extensions-4.15.0.tar.gz"],
+    sha256 = "0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466",
+    strip_prefix = "typing_extensions-4.15.0",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_flit_core_prefix_file = "@py_flit_core_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-urllib3 build: Spack's pure PythonPackage path after
+# py-typing-extensions in the lean PyTorch frontier. It installs the exact PyPI
+# source archive with python-venv/bin/python3 -m pip install ., while hatchling,
+# hatch-vcs, setuptools-scm, pip, wheel, and hatchling's Python dependencies are
+# supplied by native prefixes inside the insula.
+py_urllib3_native = use_repo_rule(
+    "//native/py_urllib3:py_urllib3.bzl",
+    "py_urllib3_native",
+)
+
+py_urllib3_native(
+    name = "py_urllib3_native",
+    urls = ["https://files.pythonhosted.org/packages/source/u/urllib3/urllib3-2.6.3.tar.gz"],
+    sha256 = "1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed",
+    strip_prefix = "urllib3-2.6.3",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_hatch_vcs_prefix_file = "@py_hatch_vcs_native//:prefix_path.txt",
+    py_hatchling_prefix_file = "@py_hatchling_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pluggy_prefix_file = "@py_pluggy_native//:prefix_path.txt",
+    py_setuptools_scm_prefix_file = "@py_setuptools_scm_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_trove_classifiers_prefix_file = "@py_trove_classifiers_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-requests build: Spack's pure PythonPackage path after
+# py-urllib3 in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while setuptools, pip,
+# wheel, and requests' HTTP dependency quartet are supplied by native prefixes
+# inside the insula.
+py_requests_native = use_repo_rule(
+    "//native/py_requests:py_requests.bzl",
+    "py_requests_native",
+)
+
+py_requests_native(
+    name = "py_requests_native",
+    urls = ["https://files.pythonhosted.org/packages/source/r/requests/requests-2.33.1.tar.gz"],
+    sha256 = "18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517",
+    strip_prefix = "requests-2.33.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_certifi_prefix_file = "@py_certifi_native//:prefix_path.txt",
+    py_charset_normalizer_prefix_file = "@py_charset_normalizer_native//:prefix_path.txt",
+    py_idna_prefix_file = "@py_idna_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_urllib3_prefix_file = "@py_urllib3_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-versioneer build: Spack's PythonPackage path after
+# py-requests in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# and wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_versioneer_native = use_repo_rule(
+    "//native/py_versioneer:py_versioneer.bzl",
+    "py_versioneer_native",
+)
+
+py_versioneer_native(
+    name = "py_versioneer_native",
+    urls = ["https://files.pythonhosted.org/packages/source/v/versioneer/versioneer-0.29.tar.gz"],
+    sha256 = "5ab283b9857211d61b53318b7c792cf68e798e765ee17c27ade9f6c924235731",
+    strip_prefix = "versioneer-0.29",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) re2c build: Autotools scanner-generator and libre2c
+# library node after py-versioneer in the lean py-torch frontier. The concrete
+# Spack build uses Python as a build tool and enables the library/wrapper set.
+re2c_native = use_repo_rule("//native/re2c:re2c.bzl", "re2c_native")
+
+re2c_native(
+    name = "re2c_native",
+    urls = ["https://github.com/skvadrik/re2c/releases/download/4.4/re2c-4.4.tar.xz"],
+    sha256 = "6b6b865924447ef992d5db4e52fb9307e5f65f26edd43efa91395da810f4280a",
+    strip_prefix = "re2c-4.4",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Ninja build: generic Python bootstrap tool node after
+# re2c in the lean py-torch frontier. The concrete Spack build runs
+# configure.py --bootstrap with Python and re2c as build tools, then installs
+# bin/ninja, bin/ninja-build, and misc/.
+ninja_native = use_repo_rule("//native/ninja:ninja.bzl", "ninja_native")
+
+ninja_native(
+    name = "ninja_native",
+    urls = ["https://github.com/ninja-build/ninja/archive/v1.13.2.tar.gz"],
+    sha256 = "974d6b2f4eeefa25625d34da3cb36bdcebe7fbce40f4c16ac0835fd1c0cbae17",
+    strip_prefix = "ninja-1.13.2",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    re2c_prefix_file = "@re2c_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Meson build: Spack's PythonPackage path after native
+# Ninja in the lean py-torch frontier. It applies Spack's rpath patch and
+# installs the exact GitHub source archive with python-venv/bin/python3 -m pip
+# install ., while pip, setuptools, wheel, Python, and Ninja are supplied by
+# native prefixes inside the insula.
+meson_native = use_repo_rule("//native/meson:meson.bzl", "meson_native")
+
+meson_native(
+    name = "meson_native",
+    urls = ["https://github.com/mesonbuild/meson/archive/1.11.1.tar.gz"],
+    sha256 = "1a2219422be4a66ad0e8daed125c2a3d5c963458e289203eae22edf3224f5d3e",
+    strip_prefix = "meson-1.11.1",
+    rpath_patch = "//native/meson:rpath-0.64.patch",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) glib-bootstrap build: first real MesonPackage in the
+# lean PyTorch frontier after the native Meson tool provider. It consumes only
+# native concrete dependency prefixes and mirrors Spack's bootstrap-disabled
+# Meson options.
+glib_bootstrap_native = use_repo_rule("//native/glib_bootstrap:glib_bootstrap.bzl", "glib_bootstrap_native")
+
+glib_bootstrap_native(
+    name = "glib_bootstrap_native",
+    urls = ["https://download.gnome.org/sources/glib/2.88/glib-2.88.1.tar.xz"],
+    sha256 = "51ab804c56f6eab3e5045c774d1290ac5e4c923d4f9a3d8e33123bee45c1840e",
+    strip_prefix = "glib-2.88.1",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) gobject-introspection provider: Meson node after gated
+# LLVM in the py-torch frontier. Flipped by exact version in native_overrides.
+gobject_introspection_native = use_repo_rule("//native/gobject_introspection:gobject_introspection.bzl", "gobject_introspection_native")
+
+gobject_introspection_native(
+    name = "gobject_introspection_native",
+    urls = ["https://download.gnome.org/sources/gobject-introspection/1.86/gobject-introspection-1.86.0.tar.xz"],
+    sha256 = "920d1a3fcedeadc32acff95c2e203b319039dd4b4a08dd1a2dfd283d19c0b9ae",
+    strip_prefix = "gobject-introspection-1.86.0",
+    setuptools_patch = "//native/gobject_introspection:setuptools.patch",
+    bison_prefix_file = "@bison_native//:prefix_path.txt",
+    flex_prefix_file = "@flex_native//:prefix_path.txt",
+    glib_bootstrap_prefix_file = "@glib_bootstrap_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) full GLib build: the PyTorch frontier node after
+# gobject-introspection. It keeps Spack's concrete +introspection/~libmount
+# Meson configuration and consumes only Bazel-owned native prefixes.
+glib_native = use_repo_rule("//native/glib:glib.bzl", "glib_native")
+
+glib_native(
+    name = "glib_native",
+    urls = ["https://download.gnome.org/sources/glib/2.88/glib-2.88.1.tar.xz"],
+    sha256 = "51ab804c56f6eab3e5045c774d1290ac5e4c923d4f9a3d8e33123bee45c1840e",
+    strip_prefix = "glib-2.88.1",
+    elfutils_prefix_file = "@elfutils_native//:prefix_path.txt",
+    gettext_prefix_file = "@gettext_native//:prefix_path.txt",
+    glib_bootstrap_prefix_file = "@glib_bootstrap_native//:prefix_path.txt",
+    gobject_introspection_prefix_file = "@gobject_introspection_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-ply build: Spack's PythonPackage path after
+# py-pathspec in the lean PyTorch frontier. It installs the exact PyPI source
+# archive with python-venv/bin/python3 -m pip install ., while pip, setuptools,
+# and wheel are supplied by native prefixes on PYTHONPATH inside the insula.
+py_ply_native = use_repo_rule("//native/py_ply:py_ply.bzl", "py_ply_native")
+
+py_ply_native(
+    name = "py_ply_native",
+    urls = ["https://files.pythonhosted.org/packages/source/p/ply/ply-3.11.tar.gz"],
+    sha256 = "00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3",
+    strip_prefix = "ply-3.11",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pythran build: Spack's PythonPackage path in the JAX
+# 0.10.2 dependency frontier. It installs the exact PyPI source archive while
+# NumPy, Gast, Beniget and Ply are supplied as native prefixes.
+py_pythran_native = use_repo_rule(
+    "//native/py_pythran:py_pythran.bzl",
+    "py_pythran_native",
+)
+
+py_pythran_native(
+    name = "py_pythran_native",
+    urls = ["https://files.pythonhosted.org/packages/d4/84/17c4c44a24f5ec709991e603e601bf316d09c4fe915fbe348c689dede998/pythran-0.18.1.tar.gz"],
+    sha256 = "8803ed948bf841a11bbbb10472a8ff6ea24ebd70e67c3f77b77be3db900eccfe",
+    strip_prefix = "pythran-0.18.1",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_beniget_prefix_file = "@py_beniget_native//:prefix_path.txt",
+    py_gast_prefix_file = "@py_gast_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_ply_prefix_file = "@py_ply_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-scipy build: Spack's PythonPackage path in the JAX
+# 0.10.2 dependency frontier. It builds SciPy 1.17.1 with meson-python against
+# native OpenBLAS, NumPy, Pythran and pybind11.
+py_scipy_native = use_repo_rule(
+    "//native/py_scipy:py_scipy.bzl",
+    "py_scipy_native",
+)
+
+py_scipy_native(
+    name = "py_scipy_native",
+    urls = ["https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz"],
+    sha256 = "95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0",
+    strip_prefix = "scipy-1.17.1",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    py_beniget_prefix_file = "@py_beniget_native//:prefix_path.txt",
+    py_cython_prefix_file = "@py_cython_native//:prefix_path.txt",
+    py_gast_prefix_file = "@py_gast_native//:prefix_path.txt",
+    py_meson_python_prefix_file = "@py_meson_python_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_ply_prefix_file = "@py_ply_native//:prefix_path.txt",
+    py_pybind11_prefix_file = "@py_pybind11_native//:prefix_path.txt",
+    py_pyproject_metadata_prefix_file = "@py_pyproject_metadata_native//:prefix_path.txt",
+    py_pythran_prefix_file = "@py_pythran_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-jax build: Spack's pure PythonPackage path for the
+# JAX 0.10.2 profile root. It installs the exact PyPI source archive with
+# python-venv/bin/python3 -m pip install ., while pip, setuptools, and wheel are
+# supplied by native prefixes inside the insula. Runtime JAX deps are assembled
+# by the profile gate so this repository rule does not import jax.
+py_jax_native = use_repo_rule("//native/py_jax:py_jax.bzl", "py_jax_native")
+
+py_jax_native(
+    name = "py_jax_native",
+    urls = ["https://files.pythonhosted.org/packages/source/j/jax/jax-0.10.2.tar.gz"],
+    sha256 = "bf77428a8c2e6904c4f46d5ab12aa5cfc6cad2179f07f7e4c0fc75ac86ef0639",
+    strip_prefix = "jax-0.10.2",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native boundary for Spack cuda. CUDA is not rebuilt from source; the rule
+# validates the exact SDK already present in the selected hermetic insula rootfs
+# and the Spack-declared binary-installer tool dependencies.
+cuda_native = use_repo_rule("//native/cuda:cuda.bzl", "cuda_native")
+
+cuda_native(
+    name = "cuda_native",
+    coreutils_prefix_file = "@coreutils_native//:prefix_path.txt",
+    gzip_prefix_file = "@gzip_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_native//:prefix_path.txt",
+)
+
+# Native rootfs boundary for cuDNN. The selected insula rootfs owns the
+# single cuDNN copy; this rule validates the manifest-pinned version and
+# exposes the stable @cudnn_native prefix labels.
+cudnn_native = use_repo_rule("//native/cudnn:cudnn.bzl", "cudnn_native")
+
+cudnn_native(
+    name = "cudnn_native",
+)
+
+# Native rootfs boundary for cuSPARSELt. The selected insula rootfs owns the
+# single cuSPARSELt copy.
+cusparselt_native = use_repo_rule("//native/cusparselt:cusparselt.bzl", "cusparselt_native")
+
+cusparselt_native(
+    name = "cusparselt_native",
+)
+
+# Native rootfs boundary for cuDSS. The selected insula rootfs owns the single
+# cuDSS copy.
+cudss_native = use_repo_rule("//native/cudss:cudss.bzl", "cudss_native")
+
+cudss_native(
+    name = "cudss_native",
+)
+
+# Native rootfs boundary for NVSHMEM. The selected insula rootfs owns the
+# single NVSHMEM copy.
+nvshmem_native = use_repo_rule("//native/nvshmem:nvshmem.bzl", "nvshmem_native")
+
+nvshmem_native(
+    name = "nvshmem_native",
+)
+
+# Native rootfs boundary for NCCL. The selected insula rootfs owns the single
+# NCCL copy.
+nccl_native = use_repo_rule("//native/nccl:nccl.bzl", "nccl_native")
+
+nccl_native(
+    name = "nccl_native",
+)
+
+# Native (Bazel-owned) curl build: Autotools HTTP client/library node after
+# CUDA/cuDNN in the py-torch frontier. It consumes native nghttp2, OpenSSL,
+# pkgconf, and zlib-ng prefixes through explicit configure/pkg-config/linker
+# channels.
+curl_native = use_repo_rule("//native/curl:curl.bzl", "curl_native")
+
+curl_native(
+    name = "curl_native",
+    urls = ["https://curl.se/download/curl-8.20.0.tar.bz2"],
+    sha256 = "4be48e69cf467246cb97d369b85d78a08528f2b37cffef2418ee16e6a4eb596e",
+    strip_prefix = "curl-8.20.0",
+    nghttp2_prefix_file = "@nghttp2_native//:prefix_path.txt",
+    openssl_prefix_file = "@openssl_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) CMake build: CMake's own bootstrap/make tool-prefix node
+# after curl in the py-torch frontier. It consumes native curl, ncurses, and
+# zlib-ng prefixes through CMake bootstrap/CMAKE_PREFIX_PATH channels.
+cmake_native = use_repo_rule("//native/cmake:cmake.bzl", "cmake_native")
+
+cmake_native(
+    name = "cmake_native",
+    urls = ["https://github.com/Kitware/CMake/releases/download/v3.31.11/cmake-3.31.11.tar.gz"],
+    sha256 = "c0a3b3f2912b2166f522d5010ffb6029d8454ee635f5ad7a3247e0be7f9a15c9",
+    strip_prefix = "cmake-3.31.11",
+    curl_prefix_file = "@curl_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native rootfs boundary for the one LLVM used by Triton and JAX. This is not
+# the legacy @llvm_native source build; it exposes the rootfs-installed
+# llvm-project 35901313 prefix at /usr/lib/llvm-23 for action consumers.
+rootfs_llvm_23_native = use_repo_rule(
+    "//native/rootfs_llvm_23:rootfs_llvm_23.bzl",
+    "rootfs_llvm_23_native",
+)
+
+rootfs_llvm_23_native(
+    name = "rootfs_llvm_23_native",
+)
+
+# Native boundary for the Bazel binary JAX build.py is allowed to run. The
+# top-level repo may use a newer Bazel to drive this graph, but jaxlib's nested
+# build must see the version pinned by the JAX source tree.
+rootfs_bazel_native = use_repo_rule("//native/rootfs_bazel:rootfs_bazel.bzl", "rootfs_bazel_native")
+
+rootfs_bazel_native(
+    name = "rootfs_bazel_native",
+    required_version = "7.7.0",
+)
+
+# Native (Bazel-owned) nlohmann-json build: the header-only JSON dependency
+# that Triton's offline CMake build consumes through JSON_SYSPATH.
+nlohmann_json_native = use_repo_rule(
+    "//native/nlohmann_json:nlohmann_json.bzl",
+    "nlohmann_json_native",
+)
+
+nlohmann_json_native(
+    name = "nlohmann_json_native",
+    urls = ["https://github.com/nlohmann/json/archive/v3.11.3.tar.gz"],
+    sha256 = "0d8ef5af7f9794e3263480193c491549b2ba6cc74bb018906202ada498a79406",
+    strip_prefix = "json-3.11.3",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-lit build: Triton's lit test helper as a Python
+# package prefix.
+py_lit_native = use_repo_rule("//native/py_lit:py_lit.bzl", "py_lit_native")
+
+py_lit_native(
+    name = "py_lit_native",
+    urls = ["https://files.pythonhosted.org/packages/source/l/lit/lit-18.1.8.tar.gz"],
+    sha256 = "47c174a186941ae830f04ded76a3444600be67d5e5fb8282c3783fba671c4edb",
+    strip_prefix = "lit-18.1.8",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pybind11 build: pybind11@3.0.2 through the
+# scikit-build-core backend so Triton can consume PYBIND11_SYSPATH offline.
+py_pybind11_native = use_repo_rule(
+    "//native/py_pybind11:py_pybind11.bzl",
+    "py_pybind11_native",
+)
+
+py_pybind11_native(
+    name = "py_pybind11_native",
+    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v3.0.2.tar.gz"],
+    sha256 = "2f20a0af0b921815e0e169ea7fec63909869323581b89d7de1553468553f6a2d",
+    strip_prefix = "pybind11-3.0.2",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_scikit_build_core_prefix_file = "@py_scikit_build_core_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) SLEEF build: the static libm/GNUABI vector math prefix
+# consumed by PyTorch.
+sleef_native = use_repo_rule("//native/sleef:sleef.bzl", "sleef_native")
+
+sleef_native(
+    name = "sleef_native",
+    urls = ["https://github.com/shibatch/sleef/archive/3.8.tar.gz"],
+    sha256 = "a12ccd50f57083c530e1c76f10d52865defbd19fc9e2c85b483493065709874a",
+    strip_prefix = "sleef-3.8",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) MAGMA provider for PyTorch v2.14.0's CUDA 12.9 wheel
+# line. Hermetic Spack rejects magma@2.6.1 with cuda@12.9.1, so this is an
+# exact PyTorch-official source provider and intentionally not a package-name
+# override for Spack's unconstrained magma@2.10.0 recipe.
+magma_native = use_repo_rule("//native/magma:magma.bzl", "magma_native")
+
+magma_native(
+    name = "magma_native",
+    urls = ["http://icl.utk.edu/projectsfiles/magma/downloads/magma-2.6.1.tar.gz"],
+    sha256 = "6cd83808c6e8bc7a44028e05112b3ab4e579bcc73202ed14733f66661127e213",
+    strip_prefix = "magma-2.6.1",
+    patch_urls = [
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/CMake.patch",
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/cmakelists.patch",
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/thread_queue.patch",
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/cuda13.patch",
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/getrf_shfl.patch",
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/getrf_nbparam.patch",
+    ],
+    patch_sha256 = [
+        "c6ee9d0f4412e7c08b1fc15f60c26a35b32f6b67ddeb97ecb336a2991aaa28f0",
+        "16cb9a7e647591fd4832843017d2e16ba0fa568028d606587c29076aaaef1abd",
+        "126031f4f9bc698ea89b9622a5b415bc7b5d354527629e1061b8e18357e6f616",
+        "8821f65bf2b1b278d5c4743babd68f11fadca13c7055627a39216c6ccadeb947",
+        "8cabcc164f0108619bc71d282ac40ccb6efdf1489ac304c1f74500d8486f0a71",
+        "8179c1ebf1751956dfc1d67352dcdab6bda8bbcd494bc1c2284f7894fbe9da9b",
+    ],
+    sha_file_urls = ["https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/.ci/magma/package_files/magma-2.6.1.sha256"],
+    sha_file_sha256 = "999ec065d71da536ec7f5916fdbdb926578f2af3ad4e2f3438f3d6e19180b8bd",
+    cuda_arch_list = "-gencode arch=compute_100,code=sm_100",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) cpuinfo build: CMakePackage frontier node after Ninja in
+# the lean py-torch graph. It consumes native CMake as the build driver and
+# native Ninja as the CMake generator through explicit prefix files.
+cpuinfo_native = use_repo_rule("//native/cpuinfo:cpuinfo.bzl", "cpuinfo_native")
+
+cpuinfo_native(
+    name = "cpuinfo_native",
+    urls = ["https://github.com/pytorch/cpuinfo/archive/f858c30bcb16f8effd5ff46996f0514539e17abc.tar.gz"],
+    sha256 = "30c390d5ac7c59ae1c0a8a1aefb9bb70cb4d482bd15e8de706f5c8bf60357fa6",
+    strip_prefix = "cpuinfo-f858c30bcb16f8effd5ff46996f0514539e17abc",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) FP16 build: CMakePackage header-only frontier node after
+# cpuinfo in the lean py-torch graph. It consumes native CMake and Ninja through
+# explicit prefix files and vendors Spack's psimd resource at a fixed commit.
+fp16_native = use_repo_rule("//native/fp16:fp16.bzl", "fp16_native")
+
+fp16_native(
+    name = "fp16_native",
+    urls = ["https://github.com/Maratyszcza/FP16/archive/4dfe081cf6bcd15db339cf2680b9281b8451eeb3.tar.gz"],
+    sha256 = "90f20492621d5ed80b442aa682ff92d7ccf333ac8fac4a10e7e02afb159f3c13",
+    strip_prefix = "FP16-4dfe081cf6bcd15db339cf2680b9281b8451eeb3",
+    psimd_urls = ["https://github.com/Maratyszcza/psimd/archive/072586a71b55b7f8c584153d223e95687148a900.tar.gz"],
+    psimd_sha256 = "f6c4dab91ae9a03b3019e7cab0572743afd0e1b6e75b97fcca50259c737c924e",
+    psimd_strip_prefix = "psimd-072586a71b55b7f8c584153d223e95687148a900",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) FXdiv build: CMakePackage header-only frontier node after
+# fp16 in the lean py-torch graph. It consumes native CMake and Ninja through
+# explicit prefix files and emits the one-header Spack prefix surface.
+fxdiv_native = use_repo_rule("//native/fxdiv:fxdiv.bzl", "fxdiv_native")
+
+fxdiv_native(
+    name = "fxdiv_native",
+    urls = ["https://github.com/Maratyszcza/FXdiv/archive/b408327ac2a15ec3e43352421954f5b1967701d1.tar.gz"],
+    sha256 = "9ccf554541666b5c089ad5dd465141d671c99971f36d72f313652f5c49ffce14",
+    strip_prefix = "FXdiv-b408327ac2a15ec3e43352421954f5b1967701d1",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+)
+
+# Legacy native LLVM 20.1.8 build-action skeleton. It remains only for the
+# pruned numba/py-llvmlite frontier path and must not satisfy torch, Triton, JAX,
+# jaxlib, or any one-LLVM host-compiler role. Those consumers use the rootfs
+# llvm-project 35901313 external under /usr/lib/llvm-23; //tools:one_llvm_graph_guard_live_test
+# enforces that captured triumvirate graphs do not depend on this node.
+llvm_native = use_repo_rule("//native/llvm:llvm.bzl", "llvm_native")
+
+llvm_native(
+    name = "llvm_native",
+    urls = ["https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-20.1.8.tar.gz"],
+    sha256 = "a6cbad9b2243b17e87795817cfff2107d113543a12486586f8a055a2bb044963",
+    strip_prefix = "llvm-project-llvmorg-20.1.8",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_prefix_file = "@python_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    perl_data_dumper_prefix_file = "@perl_data_dumper_native//:prefix_path.txt",
+    hwloc_prefix_file = "@hwloc_native//:prefix_path.txt",
+    libedit_prefix_file = "@libedit_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_native//:prefix_path.txt",
+    lua_prefix_file = "@lua_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    swig_prefix_file = "@swig_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_ng_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Eigen build: CMakePackage header/CMake metadata prefix
+# after CMake and cuSPARSELt in the py-torch frontier. It consumes native CMake
+# through a prefix file and preserves the Spack header-only consumer contract.
+eigen_native = use_repo_rule("//native/eigen:eigen.bzl", "eigen_native")
+
+eigen_native(
+    name = "eigen_native",
+    urls = ["https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz"],
+    sha256 = "e9c326dc8c05cd1e044c71f30f1b2e34a6161a3b6ecf445d56b53ff1669e3dec",
+    strip_prefix = "eigen-5.0.1",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libjpeg-turbo build: CMakePackage C image-codec node
+# after libevent in the py-torch frontier. It consumes native CMake and NASM
+# through explicit prefix files and pins CMake's NASM compiler discovery.
+libjpeg_turbo_native = use_repo_rule("//native/libjpeg_turbo:libjpeg_turbo.bzl", "libjpeg_turbo_native")
+
+libjpeg_turbo_native(
+    name = "libjpeg_turbo_native",
+    urls = ["https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.3.tar.gz"],
+    sha256 = "3a13a5ba767dc8264bc40b185e41368a80d5d5f945944d1dbaa4b2fb0099f4e5",
+    strip_prefix = "libjpeg-turbo-3.1.3",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    nasm_prefix_file = "@nasm_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libpng build: CMakePackage PNG library node immediately
+# after libjpeg-turbo in the py-torch frontier. It consumes native CMake and
+# zlib-ng through explicit prefix files and pins Spack's ZLIB_* CMake cache.
+libpng_native = use_repo_rule("//native/libpng:libpng.bzl", "libpng_native")
+
+libpng_native(
+    name = "libpng_native",
+    urls = ["https://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.xz"],
+    sha256 = "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775",
+    strip_prefix = "libpng-1.6.58",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) py-pillow build for the torchvision import surface.
+# Pillow is required by torchvision's Python import path; keep optional codecs
+# disabled unless native providers are already in this graph.
+py_pillow_native = use_repo_rule("//native/py_pillow:py_pillow.bzl", "py_pillow_native")
+
+py_pillow_native(
+    name = "py_pillow_native",
+    urls = ["https://files.pythonhosted.org/packages/8c/21/c2bcdd5906101a30244eaffc1b6e6ce71a31bd0742a01eb89e660ebfac2d/pillow-12.2.0.tar.gz"],
+    sha256 = "a830b1a40919539d07806aa58e1b114df53ddd43213d9c8b75847eee6c0182b5",
+    strip_prefix = "pillow-12.2.0",
+    libjpeg_turbo_prefix_file = "@libjpeg_turbo_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_pybind11_prefix_file = "@py_pybind11_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Pixman build: MesonPackage pixel-compositing library
+# after native libpng in the py-torch frontier. It applies Spack's libpng
+# Meson discovery patch and consumes parser/build tools through explicit
+# native prefix files.
+pixman_native = use_repo_rule("//native/pixman:pixman.bzl", "pixman_native")
+
+pixman_native(
+    name = "pixman_native",
+    urls = ["https://cairographics.org/releases/pixman-0.46.4.tar.gz"],
+    sha256 = "d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c",
+    strip_prefix = "pixman-0.46.4",
+    bison_prefix_file = "@bison_native//:prefix_path.txt",
+    flex_prefix_file = "@flex_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    libpng_patch = "//native/pixman:libpng.patch",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) freetype build: AutotoolsPackage font library node after
+# libpng in the py-torch frontier. It consumes bzip2, libpng, pkgconf, and the
+# zlib-ng pkg-config channel needed by libpng's Requires.private metadata.
+freetype_native = use_repo_rule("//native/freetype:freetype.bzl", "freetype_native")
+
+freetype_native(
+    name = "freetype_native",
+    urls = ["https://download.savannah.gnu.org/releases/freetype/freetype-2.14.2.tar.gz"],
+    sha256 = "752c2671f85c54a84b7f0dd2b5cd26b6b741117033886ffbc5ac89a68464b848",
+    strip_prefix = "freetype-2.14.2",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libXfont build: AutotoolsPackage X.Org font library
+# after freetype in the py-torch frontier. It consumes only Bazel-owned native
+# prefixes through Autotools/pkg-config/compiler/linker channels.
+libxfont_native = use_repo_rule("//native/libxfont:libxfont.bzl", "libxfont_native")
+
+libxfont_native(
+    name = "libxfont_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/lib/libXfont-1.5.4.tar.gz"],
+    sha256 = "59be6eab53f7b0feb6b7933c11d67d076ae2c0fd8921229c703fc7a4e9a80d6e",
+    strip_prefix = "libXfont-1.5.4",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    fontsproto_prefix_file = "@fontsproto_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    libfontenc_prefix_file = "@libfontenc_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+    xproto_prefix_file = "@xproto_native//:prefix_path.txt",
+    xtrans_prefix_file = "@xtrans_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) bdftopcf build: executable-only X.Org AutotoolsPackage
+# after libXfont in the py-torch frontier. The final binary only needs libc,
+# but configure/pkg-config consumes the native X.Org font closure explicitly.
+bdftopcf_native = use_repo_rule("//native/bdftopcf:bdftopcf.bzl", "bdftopcf_native")
+
+bdftopcf_native(
+    name = "bdftopcf_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/util/bdftopcf-1.1.2.tar.gz"],
+    sha256 = "31c88b9194c34ee35c433759d141eaca177dcdead835c8832021cc013324b924",
+    strip_prefix = "bdftopcf-1.1.2",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    fontsproto_prefix_file = "@fontsproto_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    libfontenc_prefix_file = "@libfontenc_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    libxfont_prefix_file = "@libxfont_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+    xproto_prefix_file = "@xproto_native//:prefix_path.txt",
+    xtrans_prefix_file = "@xtrans_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Lua build: MakefilePackage after bdftopcf in the
+# py-torch frontier. It consumes readline/ncurses through Makefile compiler and
+# linker channels, and curl/unzip through LuaRocks' explicit tool PATH.
+lua_native = use_repo_rule("//native/lua:lua.bzl", "lua_native")
+
+lua_native(
+    name = "lua_native",
+    urls = ["https://www.lua.org/ftp/lua-5.3.6.tar.gz"],
+    sha256 = "fc5fd69bb8736323f026672b1b7235da613d7177e72558893a0bdcd320466d60",
+    strip_prefix = "lua-5.3.6",
+    luarocks_urls = ["https://luarocks.github.io/luarocks/releases/luarocks-3.11.1.tar.gz"],
+    luarocks_sha256 = "c3fb3d960dffb2b2fe9de7e3cb004dc4d0b34bb3d342578af84f84325c669102",
+    luarocks_strip_prefix = "luarocks-3.11.1",
+    curl_prefix_file = "@curl_native//:prefix_path.txt",
+    ncurses_prefix_file = "@ncurses_native//:prefix_path.txt",
+    readline_prefix_file = "@readline_native//:prefix_path.txt",
+    unzip_prefix_file = "@unzip_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) mkfontscale build: executable-only X.Org
+# AutotoolsPackage after Lua in the py-torch frontier. It consumes the native
+# font stack and private pkg-config closure through explicit prefix files.
+mkfontscale_native = use_repo_rule("//native/mkfontscale:mkfontscale.bzl", "mkfontscale_native")
+
+mkfontscale_native(
+    name = "mkfontscale_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/app/mkfontscale-1.2.3.tar.gz"],
+    sha256 = "3a026b468874eb672a1d0a57dbd3ddeda4f0df09886caf97d30097b70c2df3f8",
+    strip_prefix = "mkfontscale-1.2.3",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    libfontenc_prefix_file = "@libfontenc_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+    xproto_prefix_file = "@xproto_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) mkfontdir build: executable-only X.Org
+# AutotoolsPackage after mkfontscale in the py-torch frontier. It consumes the
+# native mkfontscale runtime wrapper through an explicit prefix file.
+mkfontdir_native = use_repo_rule("//native/mkfontdir:mkfontdir.bzl", "mkfontdir_native")
+
+mkfontdir_native(
+    name = "mkfontdir_native",
+    urls = ["https://xorg.freedesktop.org/archive/individual/app/mkfontdir-1.0.7.tar.gz"],
+    sha256 = "bccc5fb7af1b614eabe4a22766758c87bfc36d66191d08c19d2fa97674b7b5b7",
+    strip_prefix = "mkfontdir-1.0.7",
+    mkfontscale_prefix_file = "@mkfontscale_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) font-util build: X.Org Autotools package plus the lean
+# `fonts:=encodings` resource set after mkfontdir in the py-torch frontier.
+font_util_native = use_repo_rule("//native/font_util:font_util.bzl", "font_util_native")
+
+font_util_native(
+    name = "font_util_native",
+    urls = ["https://www.x.org/archive/individual/font/font-util-1.4.1.tar.gz"],
+    sha256 = "f029ae80cdd75d89bee7f7af61c21e07982adfb9f72344a158b99f91f77ef5ed",
+    strip_prefix = "font-util-1.4.1",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    bdftopcf_prefix_file = "@bdftopcf_native//:prefix_path.txt",
+    mkfontdir_prefix_file = "@mkfontdir_native//:prefix_path.txt",
+    mkfontscale_prefix_file = "@mkfontscale_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    util_macros_prefix_file = "@util_macros_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) fontconfig build: AutotoolsPackage font
+# discovery/configuration library after the lean font-util resource capture.
+# The recipe uses native gperf/python build tools, native pkg-config, and the
+# freetype/libxml2/uuid/font-util prefix channels observed in hermetic Spack.
+fontconfig_native = use_repo_rule("//native/fontconfig:fontconfig.bzl", "fontconfig_native")
+
+fontconfig_native(
+    name = "fontconfig_native",
+    urls = ["https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.0.tar.gz"],
+    sha256 = "f5f359d6332861bd497570848fcb42520964a9e83d5e3abe397b6b6db9bcaaf4",
+    strip_prefix = "fontconfig-2.15.0",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    font_util_prefix_file = "@font_util_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    gperf_prefix_file = "@gperf_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    util_linux_uuid_prefix_file = "@util_linux_uuid_native//:prefix_path.txt",
+    xz_prefix_file = "@xz_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) Cairo build: MesonPackage 2D graphics library after the
+# font/freetype/pixman closure in the lean py-torch frontier. It consumes every
+# private pkg-config/runtime dependency through explicit native prefix files.
+cairo_native = use_repo_rule("//native/cairo:cairo.bzl", "cairo_native")
+
+cairo_native(
+    name = "cairo_native",
+    urls = ["https://www.cairographics.org/releases/cairo-1.18.4.tar.xz"],
+    sha256 = "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb",
+    strip_prefix = "cairo-1.18.4",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    fontconfig_prefix_file = "@fontconfig_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    lzo_prefix_file = "@lzo_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pixman_prefix_file = "@pixman_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) HarfBuzz build: MesonPackage text shaping library after
+# Cairo in the lean py-torch frontier. It keeps FreeType, GLib/GObject, ICU,
+# and Cairo enabled while introspection remains disabled to match Spack.
+harfbuzz_native = use_repo_rule("//native/harfbuzz:harfbuzz.bzl", "harfbuzz_native")
+
+harfbuzz_native(
+    name = "harfbuzz_native",
+    urls = ["https://github.com/harfbuzz/harfbuzz/releases/download/11.5.1/harfbuzz-11.5.1.tar.xz"],
+    sha256 = "972a60a8d274d49e70361da6920c3a73dfb0fb4387f6c6811906a47ba634d8a1",
+    strip_prefix = "harfbuzz-11.5.1",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    cairo_prefix_file = "@cairo_native//:prefix_path.txt",
+    fontconfig_prefix_file = "@fontconfig_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    glib_prefix_file = "@glib_native//:prefix_path.txt",
+    gobject_introspection_prefix_file = "@gobject_introspection_native//:prefix_path.txt",
+    icu4c_prefix_file = "@icu4c_native//:prefix_path.txt",
+    libffi_prefix_file = "@libffi_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    lzo_prefix_file = "@lzo_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    pixman_prefix_file = "@pixman_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) libraqm build: MesonPackage text layout library after
+# HarfBuzz/FriBidi/FreeType in the lean py-torch frontier. It consumes the
+# native text stack and native Meson/Ninja/pkgconf prefixes explicitly.
+libraqm_native = use_repo_rule("//native/libraqm:libraqm.bzl", "libraqm_native")
+
+libraqm_native(
+    name = "libraqm_native",
+    urls = ["https://github.com/HOST-Oman/libraqm/releases/download/v0.10.5/raqm-0.10.5.tar.xz"],
+    sha256 = "563053e724892a7b037913110ea2daef50ad575d4fa9f7c368ae1e4515f5e856",
+    strip_prefix = "raqm-0.10.5",
+    bzip2_prefix_file = "@bzip2_native//:prefix_path.txt",
+    freetype_prefix_file = "@freetype_native//:prefix_path.txt",
+    fribidi_prefix_file = "@fribidi_native//:prefix_path.txt",
+    glib_prefix_file = "@glib_native//:prefix_path.txt",
+    harfbuzz_prefix_file = "@harfbuzz_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    meson_prefix_file = "@meson_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) psimd build: CMakePackage header-only frontier node
+# after HarfBuzz in the lean py-torch graph. It consumes native CMake and
+# Ninja through explicit prefix files and emits the one-header Spack prefix
+# surface.
+psimd_native = use_repo_rule("//native/psimd:psimd.bzl", "psimd_native")
+
+psimd_native(
+    name = "psimd_native",
+    urls = ["https://github.com/Maratyszcza/psimd/archive/072586a71b55b7f8c584153d223e95687148a900.tar.gz"],
+    sha256 = "f6c4dab91ae9a03b3019e7cab0572743afd0e1b6e75b97fcca50259c737c924e",
+    strip_prefix = "psimd-072586a71b55b7f8c584153d223e95687148a900",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) pthreadpool build: CMakePackage static-library frontier
+# node after psimd in the lean py-torch graph. It consumes native CMake, Ninja,
+# and Python through explicit prefix files and vendors only the required FXdiv
+# source resource; GoogleTest/Benchmark remain unfetched because Spack disables
+# tests and benchmarks for this concrete package.
+pthreadpool_native = use_repo_rule("//native/pthreadpool:pthreadpool.bzl", "pthreadpool_native")
+
+pthreadpool_native(
+    name = "pthreadpool_native",
+    urls = ["https://github.com/Maratyszcza/pthreadpool/archive/4fe0e1e183925bf8cfa6aae24237e724a96479b8.tar.gz"],
+    sha256 = "9e8fb6a8ce03616b84f773d7b50ebe0ea2fe3af5b7df6c6f96fa6b3f049a3303",
+    strip_prefix = "pthreadpool-4fe0e1e183925bf8cfa6aae24237e724a96479b8",
+    fxdiv_urls = ["https://github.com/Maratyszcza/FXdiv/archive/b408327ac2a15ec3e43352421954f5b1967701d1.tar.gz"],
+    fxdiv_sha256 = "9ccf554541666b5c089ad5dd465141d671c99971f36d72f313652f5c49ffce14",
+    fxdiv_strip_prefix = "FXdiv-b408327ac2a15ec3e43352421954f5b1967701d1",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) icu4c build: AutotoolsPackage Unicode library/tool
+# prefix after fontconfig in the lean py-torch frontier. The native rule
+# validates the hermetic Autotools/libtool/Python build-tool prefixes and
+# configures from the upstream archive's source/ directory, matching Spack.
+icu4c_native = use_repo_rule("//native/icu4c:icu4c.bzl", "icu4c_native")
+
+icu4c_native(
+    name = "icu4c_native",
+    urls = ["https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.tgz"],
+    sha256 = "dfacb46bfe4747410472ce3e1144bf28a102feeaa4e3875bac9b4c6cf30f4f3e",
+    strip_prefix = "icu",
+    autoconf_prefix_file = "@autoconf_native//:prefix_path.txt",
+    automake_prefix_file = "@automake_native//:prefix_path.txt",
+    libtool_prefix_file = "@libtool_native//:prefix_path.txt",
+    m4_prefix_file = "@m4_native//:prefix_path.txt",
+    python_prefix_file = "@python_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) perl-data-dumper build: first CPAN PerlPackage node in
+# the lean py-torch frontier after font-util. It consumes native Perl through
+# ExtUtils::MakeMaker's interpreter/header/config channel.
+perl_data_dumper_native = use_repo_rule("//native/perl_data_dumper:perl_data_dumper.bzl", "perl_data_dumper_native")
+
+perl_data_dumper_native(
+    name = "perl_data_dumper_native",
+    urls = ["https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Data-Dumper-2.173.tar.gz"],
+    sha256 = "697608b39330988e519131be667ff47168aaaaf99f06bd2095d5b46ad05d76fa",
+    strip_prefix = "Data-Dumper-2.173",
+    perl_prefix_file = "@perl_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) protobuf build: CMakePackage frontier node after
+# perl-data-dumper in the lean py-torch graph. It consumes native CMake as the
+# build driver and native zlib-ng as the zlib provider through prefix files.
+protobuf_native = use_repo_rule("//native/protobuf:protobuf.bzl", "protobuf_native")
+
+protobuf_native(
+    name = "protobuf_native",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.12.tar.gz"],
+    sha256 = "930c2c3b5ecc6c9c12615cf5ad93f1cd6e12d0aba862b572e076259970ac3a53",
+    strip_prefix = "protobuf-3.21.12",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) qhull build: next CMakePackage frontier node after
+# protobuf in the lean py-torch graph. It consumes native CMake as the build
+# driver and has no package-specific link dependency prefixes.
+qhull_native = use_repo_rule("//native/qhull:qhull.bzl", "qhull_native")
+
+qhull_native(
+    name = "qhull_native",
+    urls = ["https://github.com/qhull/qhull/archive/refs/tags/2020.2.tar.gz"],
+    sha256 = "59356b229b768e6e2b09a701448bfa222c37b797a84f87f864f97462d8dbc7c5",
+    strip_prefix = "qhull-2020.2",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+)
+
+# Native (Bazel-owned) SWIG build: executable/tool AutotoolsPackage frontier
+# node after qhull/sqlite in the lean py-torch graph. It consumes pcre2,
+# pkgconf, and zlib-ng through explicit native prefix files.
+swig_native = use_repo_rule("//native/swig:swig.bzl", "swig_native")
+
+swig_native(
+    name = "swig_native",
+    urls = ["https://downloads.sourceforge.net/project/swig/swig/swig-4.4.1/swig-4.4.1.tar.gz"],
+    sha256 = "40162a706c56f7592d08fd52ef5511cb7ac191f3593cf07306a0a554c6281fcf",
+    strip_prefix = "swig-4.4.1",
+    pcre2_prefix_file = "@pcre2_native//:prefix_path.txt",
+    pkgconf_prefix_file = "@pkgconf_native//:prefix_path.txt",
+    zlib_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+# Bazel-owned hermetic Spack: a pinned, content-addressed release fetched into
+# @spack_dist and exposed as a runnable `spack` tool. The Spack *tool* is owned
+# by the Bazel module graph, not an ambient host checkout.
+spack_toolchain = use_extension("//tools:spack_dist.bzl", "spack_toolchain")
+spack_toolchain.dist(
+    urls = ["https://github.com/spack/spack/releases/download/v1.2.2/spack-1.2.2.tar.gz"],
+    sha256 = "ed39d08bc295571cdec23a4566cbd8aa7ef4ebd582013d43874471a2b1257bf5",
+    strip_prefix = "spack-1.2.2",
+)
+use_repo(spack_toolchain, "spack_dist")
+
+# The generated @spack_* repos load cc_library from @rules_cc. Give them a
+# stable apparent name to that repo.
+spack_graph = use_extension("//tools:spack_repo.bzl", "spack_graph")
+spack_graph.graph(
+    lockfile = "//:spack_graph.lock.json",
+    ensure_repos = [
+        "spack_zlib_ng",
+        "spack_zstd",
+        "spack_xz",
+        "spack_libxml2",
+        "spack_libiconv",
+        "spack_pkgconf",
+        "spack_ncurses",
+        "spack_ca_certificates_mozilla",
+        "spack_berkeley_db",
+        "spack_binutils",
+        "spack_file",
+        "spack_libffi",
+        "spack_diffutils",
+        "spack_bzip2",
+        "spack_libmd",
+        "spack_libbsd",
+        "spack_expat",
+        "spack_less",
+        "spack_libedit",
+        "spack_nghttp2",
+        "spack_readline",
+        "spack_gdbm",
+        "spack_util_linux_uuid",
+        "spack_util_macros",
+        "spack_fontsproto",
+        "spack_xproto",
+        "spack_xtrans",
+        "spack_libfontenc",
+        "spack_libxfont",
+        "spack_bdftopcf",
+        "spack_lua",
+        "spack_mkfontscale",
+        "spack_mkfontdir",
+        "spack_font_util",
+        "spack_icu4c",
+        "spack_perl_data_dumper",
+        "spack_hwloc",
+        "spack_perl",
+        "spack_autoconf",
+        "spack_automake",
+        "spack_bison",
+        "spack_findutils",
+        "spack_git",
+        "spack_libtool",
+        "spack_libxcrypt",
+        "spack_m4",
+        "spack_openssh",
+        "spack_pcre2",
+        "spack_openssl",
+        "spack_coreutils",
+        "spack_cuda",
+        "spack_cudnn",
+        "spack_cusparselt",
+        "spack_nccl",
+        "spack_curl",
+        "spack_cmake",
+        "spack_cpuinfo",
+        "spack_fp16",
+        "spack_fxdiv",
+        "spack_psimd",
+        "spack_pthreadpool",
+        "spack_sleef",
+        "spack_eigen",
+        "spack_libjpeg_turbo",
+        "spack_libpng",
+        "spack_pixman",
+        "spack_cairo",
+        "spack_harfbuzz",
+        "spack_libraqm",
+        "spack_freetype",
+        "spack_pigz",
+        "spack_abseil_cpp",
+        "spack_protobuf",
+        "spack_sqlite",
+        "spack_tar",
+        "spack_gettext",
+        "spack_elfutils",
+        "spack_python",
+        "spack_python_venv",
+        "spack_py_absl_py",
+        "spack_py_calver",
+        "spack_py_certifi",
+        "spack_py_charset_normalizer",
+        "spack_py_cycler",
+        "spack_py_cython",
+        "spack_py_flit_core",
+        "spack_py_filelock",
+        "spack_py_fsspec",
+        "spack_py_hatch_vcs",
+        "spack_py_hatchling",
+        "spack_py_idna",
+        "spack_py_packaging",
+        "spack_py_pathspec",
+        "spack_py_pluggy",
+        "spack_py_pyproject_hooks",
+        "spack_py_build",
+        "spack_py_protobuf",
+        "spack_py_scikit_build_core",
+        "spack_py_typing_extensions",
+        "spack_py_urllib3",
+        "spack_py_requests",
+        "spack_py_pip",
+        "spack_py_setuptools",
+        "spack_py_setuptools_scm",
+        "spack_py_trove_classifiers",
+        "spack_py_wheel",
+        "spack_swig",
+        "spack_boost",
+        "spack_gperf",
+        "spack_re2c",
+        "spack_gzip",
+        "spack_libsigsegv",
+        "spack_libunistring",
+        "spack_libidn2",
+        "spack_libyaml",
+        "spack_krb5",
+        "spack_pmix",
+        "spack_prrte",
+        "spack_nvtx",
+        "spack_meson",
+        "spack_glib_bootstrap",
+    ],
+)
+use_repo(
+    spack_graph,
+    "spack_zlib_ng",
+    "spack_zstd",
+    "spack_xz",
+    "spack_libxml2",
+    "spack_libiconv",
+    "spack_pkgconf",
+    "spack_ncurses",
+    "spack_ca_certificates_mozilla",
+    "spack_berkeley_db",
+    "spack_binutils",
+    "spack_file",
+    "spack_libffi",
+    "spack_diffutils",
+    "spack_bzip2",
+    "spack_libmd",
+    "spack_libbsd",
+    "spack_expat",
+    "spack_less",
+    "spack_libedit",
+    "spack_nghttp2",
+    "spack_readline",
+    "spack_gdbm",
+    "spack_util_linux_uuid",
+    "spack_util_macros",
+    "spack_fontsproto",
+    "spack_xproto",
+    "spack_xtrans",
+    "spack_libfontenc",
+    "spack_libxfont",
+    "spack_bdftopcf",
+    "spack_lua",
+    "spack_mkfontscale",
+    "spack_mkfontdir",
+    "spack_font_util",
+    "spack_icu4c",
+    "spack_perl_data_dumper",
+    "spack_hwloc",
+    "spack_perl",
+    "spack_autoconf",
+    "spack_automake",
+    "spack_bison",
+    "spack_findutils",
+    "spack_git",
+    "spack_libtool",
+    "spack_libxcrypt",
+    "spack_m4",
+    "spack_openssh",
+    "spack_pcre2",
+    "spack_openssl",
+    "spack_coreutils",
+    "spack_cuda",
+    "spack_cudnn",
+    "spack_cusparselt",
+    "spack_nccl",
+    "spack_curl",
+    "spack_cmake",
+    "spack_cpuinfo",
+    "spack_fp16",
+    "spack_fxdiv",
+    "spack_psimd",
+    "spack_pthreadpool",
+    "spack_sleef",
+    "spack_eigen",
+    "spack_libjpeg_turbo",
+    "spack_libpng",
+    "spack_pixman",
+    "spack_cairo",
+    "spack_harfbuzz",
+    "spack_libraqm",
+    "spack_freetype",
+    "spack_pigz",
+    "spack_abseil_cpp",
+    "spack_protobuf",
+    "spack_sqlite",
+    "spack_tar",
+    "spack_gettext",
+    "spack_elfutils",
+    "spack_python",
+    "spack_python_venv",
+    "spack_py_absl_py",
+    "spack_py_calver",
+    "spack_py_certifi",
+    "spack_py_charset_normalizer",
+    "spack_py_cycler",
+    "spack_py_cython",
+    "spack_py_flit_core",
+    "spack_py_filelock",
+    "spack_py_fsspec",
+    "spack_py_hatch_vcs",
+    "spack_py_hatchling",
+    "spack_py_idna",
+    "spack_py_packaging",
+    "spack_py_pathspec",
+    "spack_py_pluggy",
+    "spack_py_pyproject_hooks",
+    "spack_py_build",
+    "spack_py_protobuf",
+    "spack_py_scikit_build_core",
+    "spack_py_typing_extensions",
+    "spack_py_urllib3",
+    "spack_py_requests",
+    "spack_py_pip",
+    "spack_py_setuptools",
+    "spack_py_setuptools_scm",
+    "spack_py_trove_classifiers",
+    "spack_py_wheel",
+    "spack_swig",
+    "spack_boost",
+    "spack_gperf",
+    "spack_re2c",
+    "spack_gzip",
+    "spack_libsigsegv",
+    "spack_libunistring",
+    "spack_libidn2",
+    "spack_libyaml",
+    "spack_nvtx",
+    "spack_krb5",
+    "spack_pmix",
+    "spack_prrte",
+    "spack_meson",
+    "spack_glib_bootstrap",
+)

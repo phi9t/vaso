@@ -1,0 +1,4 @@
+exports_files([
+    "py_protobuf.bzl",
+    "protobuf-4.21.12-python-3.11-frame-api.patch",
+])

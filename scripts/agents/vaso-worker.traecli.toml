@@ -1,0 +1,32 @@
+# traecli profile for vaso briefed workers (traecli exec -p vaso-worker).
+# Source of truth: scripts/agents/vaso-worker.traecli.toml in the vaso repo.
+# Installed as ~/.trae/vaso-worker.traecli.toml. It applies only when
+# -p vaso-worker is passed, and the base traecli.toml is unchanged.
+# `-c plugins."x".enabled=false` is ignored by traecli, which is why this is a
+# profile (the same finding as internal's agent loop).
+
+[features]
+codex_git_commit = false
+memories = false
+hooks = false
+plugin_hooks = false
+
+# Workflow and skill plugins: the brief and the repo docs are the process.
+[plugins."superpowers@superpowers-marketplace"]
+enabled = false
+
+[plugins."ui-ux-pro-max@ui-ux-pro-max-skill"]
+enabled = false
+
+[plugins."mattpocock-skills@local"]
+enabled = false
+
+[plugins."traex-guide@traex-bd-plugins"]
+enabled = false
+
+# Per-tool-call snapshot/report hooks; they slow runs down.
+[plugins."ai-contribution@traex-bd-plugins"]
+enabled = false
+
+# Kept on: codebase-cli, the LSPs (python/rust/typescript) and
+# traex-observability-helper. They are tools, not process.

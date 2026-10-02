@@ -1,0 +1,7 @@
+# Marks native/libidn2 as a Bazel package so libidn2.bzl is loadable from
+# MODULE.bazel. The @libidn2_native repo is materialized by the libidn2_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libidn2.bzl"])

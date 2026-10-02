@@ -1,0 +1,7 @@
+# Marks native/cusparselt as a Bazel package so cusparselt.bzl is loadable from
+# MODULE.bazel. The @cusparselt_native repo is materialized by the repository
+# rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["cusparselt.bzl"])

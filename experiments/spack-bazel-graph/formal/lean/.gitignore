@@ -1,0 +1,3 @@
+# Ignore Lean build artifacts.
+/.lake/
+/build/

@@ -1,0 +1,996 @@
+{
+  "components": {
+    "llvm": {
+      "build": {
+        "base_image": {
+          "digest": "sha256:496754492fb28b4d3049432f2ca787449331e23fb14f0dd3fffea86bf5a93eb4",
+          "reference": "ubuntu:24.04@sha256:496754492fb28b4d3049432f2ca787449331e23fb14f0dd3fffea86bf5a93eb4",
+          "repository": "ubuntu",
+          "sha256": "496754492fb28b4d3049432f2ca787449331e23fb14f0dd3fffea86bf5a93eb4",
+          "tag": "24.04",
+          "ubuntu_version": "24.04"
+        },
+        "cmake": {
+          "BUILD_SHARED_LIBS": "OFF",
+          "CMAKE_BUILD_TYPE": "Release",
+          "LLVM_BUILD_LLVM_DYLIB": "OFF",
+          "LLVM_ENABLE_ASSERTIONS": "OFF",
+          "LLVM_ENABLE_PROJECTS": "llvm;clang;lld;mlir",
+          "LLVM_ENABLE_ZLIB": "OFF",
+          "LLVM_ENABLE_ZSTD": "OFF",
+          "LLVM_APPEND_VC_REV": "ON",
+          "LLVM_FORCE_VC_REPOSITORY": "https://github.com/llvm/llvm-project",
+          "LLVM_FORCE_VC_REVISION": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+          "LLVM_INSTALL_UTILS": "ON",
+          "LLVM_LINK_LLVM_DYLIB": "OFF",
+          "LLVM_TARGETS_TO_BUILD": "X86;NVPTX;AMDGPU",
+          "MLIR_ENABLE_BINDINGS_PYTHON": "OFF"
+        },
+        "compiler": {
+          "cc": "/usr/bin/gcc",
+          "cxx": "/usr/bin/g++",
+          "version": "13.3"
+        },
+        "install_artifacts": [
+          "bin/clang",
+          "bin/clang++",
+          "bin/ld.lld",
+          "bin/mlir-tblgen",
+          "lib/cmake/llvm/LLVMConfig.cmake",
+          "lib/cmake/mlir/MLIRConfig.cmake"
+        ],
+        "max_jobs": 64
+      },
+      "commit": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+      "install_layout": {
+        "bin": "/usr/lib/llvm-23/bin",
+        "cmake_llvm": "/usr/lib/llvm-23/lib/cmake/llvm",
+        "cmake_mlir": "/usr/lib/llvm-23/lib/cmake/mlir",
+        "include": "/usr/lib/llvm-23/include",
+        "lib": "/usr/lib/llvm-23/lib",
+        "prefix": "/usr/lib/llvm-23",
+        "style": "single-line-independent-toolchain"
+      },
+      "patches": [
+        {
+          "name": "generated.patch",
+          "sha256": "3072a498ccea4daab771fb9ebf9ffde12ff5718f2761d26cfa69f5031f778de9",
+          "strip": "-p1",
+          "url": "https://raw.githubusercontent.com/openxla/xla/5a9e73cbd92530cac2ac36f4736a774b2412afe2/third_party/llvm/generated.patch"
+        },
+        {
+          "name": "b514740398.patch",
+          "sha256": "ec5f91ebffd137c946cc342e0f7e96fbdf293ab7a5220761ddef990fa2c24396",
+          "strip": "-p1",
+          "url": "https://raw.githubusercontent.com/openxla/xla/5a9e73cbd92530cac2ac36f4736a774b2412afe2/third_party/llvm/b514740398.patch"
+        }
+      ],
+      "source": {
+        "kind": "tarball",
+        "sha256": "c3f06997045e0f9aa43628616df3217f229aa43d478bd78bd445e2448637d4ef",
+        "strip_prefix": "llvm-project-35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+        "url": "https://storage.googleapis.com/mirror.tensorflow.org/github.com/llvm/llvm-project/archive/35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz",
+        "urls": [
+          "https://storage.googleapis.com/mirror.tensorflow.org/github.com/llvm/llvm-project/archive/35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz",
+          "https://github.com/llvm/llvm-project/archive/35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz"
+        ]
+      },
+      "verify": {
+        "expect": {
+          "clang_version": "23.0.0git",
+          "commit": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+          "prefix": "/usr/lib/llvm-23"
+        },
+        "how": "clang --version, required tools and CMake exports, single-install scan"
+      },
+      "version": "23.0.0git"
+    }
+  },
+  "conflicts": [
+    {
+      "component": "triton ptxas-blackwell",
+      "id": "C1",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Point TRITON_PTXAS_PATH and TRITON_PTXAS_BLACKWELL_PATH at the line's /usr/local/cuda/bin/ptxas. ptx_get_version maps 12.9->88, 13.0->90; locally verified both assemble tcgen05 + clusterlaunchcontrol for sm_100a and accept --regAllocOptLevel=2. The only PTX-version gate in C++ is ptxVersion>=81 (TargetInfo.cpp:635). Risk: codegen/ptxas bugs fixed after 13.0 that upstream CI (always 13.3.33) never exercises -> run triton's test/unit + inductor B200 smoke. Alternative (breaks single-copy): add cuda_nvcc 13.3.33 ptxas only for Triton.",
+      "severity": "high",
+      "what": "Triton pins ptxas-blackwell 13.3.33 (PTX 9.3) for sm_100; single-copy rootfs gives 12.9.86 (PTX 8.8) or 13.0.88 (PTX 9.0)."
+    },
+    {
+      "component": "triton cuobjdump/nvdisasm/cudacrt/cudart headers/cupti",
+      "id": "C2",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Use line's copies via TRITON_CUOBJDUMP_PATH, TRITON_NVDISASM_PATH, TRITON_CUDACRT_PATH=TRITON_CUDART_PATH=/usr/local/cuda/include, TRITON_CUPTI_INCLUDE_PATH, TRITON_CUPTI_LIB_PATH=TRITON_CUPTI_LIB_BLACKWELL_PATH=/usr/local/cuda/lib64 at BOTH build and runtime (override path at build only skips the copy; runtime falls back to the in-package path). driver.c verified to compile (gcc -fsyntax-only) against cudart 12.9.79 and 13.0.96 cuda.h. cuobjdump/nvdisasm only used for asm dumps.",
+      "severity": "medium",
+      "what": "Triton pins 13.1.80 tools/headers, cupti 12.8.90 headers + cupti-blackwell 13.3.35 libs."
+    },
+    {
+      "component": "libdevice.10.bc",
+      "id": "C3",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Set TRITON_LIBDEVICE_PATH=/usr/local/cuda/nvvm/libdevice/libdevice.10.bc and drop the packaged file (or accept as data file).",
+      "severity": "low",
+      "what": "Triton ships in-tree third_party/nvidia/backend/lib/libdevice.10.bc -> second copy of libdevice."
+    },
+    {
+      "component": "CUDA toolkit patch",
+      "id": "C4",
+      "lines": [
+        "cu130"
+      ],
+      "resolution": "Pin 13.0.3 (all components except cuBLAS are byte-identical to 13.0.2 per redist sha256).",
+      "severity": "medium",
+      "what": "Torch CI docker installs CUDA 13.0.2 (install_cuda.sh:170) while torch wheel metadata pins cuda-toolkit==13.0.3 (generate_binary_build_matrix.py:71). Only diff: cuBLAS 13.1.0.3 vs 13.1.1.3."
+    },
+    {
+      "component": "nccl",
+      "id": "C5",
+      "lines": [
+        "cu130"
+      ],
+      "resolution": "Build NCCL from git tag v2.30.7-1 (commit 73cf1122...) against CUDA 13.0.3 nvcc exactly as torch CI (install_nccl.sh). For cu129 the same source build is preferred for symmetry; redist/apt +cuda12.9 are acceptable alternates.",
+      "severity": "medium",
+      "what": "No NVIDIA-built NCCL 2.30.7 for CUDA 13.0: apt only has +cuda13.3; redist cuda13.3 JSON points at the same URL as the cuda12.9 build (served file is the 12.9 one)."
+    },
+    {
+      "component": "tensorrt",
+      "id": "C6",
+      "lines": [
+        "cu130"
+      ],
+      "resolution": "cu129: libnvinfer11=11.1.0.106-1+cuda12.9 (exact). cu130: use +cuda13.3 build relying on CUDA 13.x minor-version compatibility (NVIDIA: 'Compatible with CUDA 13.x versions only'); needs driver >=580; UNVERIFIED on 13.0.3 userspace. If it fails, TRT forces a CUDA>=13.3 line.",
+      "severity": "medium",
+      "what": "Torch-TensorRT 2.14 requires tensorrt>=11.1,<11.2 -> 11.1.0.106; only +cuda12.9 and +cuda13.3 builds exist, no +cuda13.0."
+    },
+    {
+      "component": "jax nvshmem",
+      "id": "C7",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Runtime newer within soname libnvshmem_host.so.3; set MOSAIC_GPU_NVSHMEM_SO_PATH and MOSAIC_GPU_NVSHMEM_BC_PATH to the rootfs copies (host .so and device .bc must be the same version). UNVERIFIED: 3.3->3.4 host ABI compat for XLA collectives.",
+      "severity": "low",
+      "what": "jax plugins built with NVSHMEM 3.3.9 (cu12) / 3.3.20 (cu13); rootfs has 3.4.5 (torch pin)."
+    },
+    {
+      "component": "jax cudnn/nccl/cuda",
+      "id": "C8",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Agree: rootfs versions are all >= build versions (cuDNN 9.24.0.43, NCCL 2.30.7, CUDA 12.9.1 exact / 13.0.3). No mismatch forced.",
+      "severity": "low",
+      "what": "jax built with cuDNN 9.8.0/9.12.0, NCCL 2.27.7, CUDA 12.9.1/13.0.0."
+    },
+    {
+      "component": "cupti headers 13.3.75 (torch CI side dir)",
+      "id": "C9",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "Omit from rootfs; torch/kineto builds against the line's cupti (12.9.79 / 13.0.85).",
+      "severity": "info",
+      "what": "Torch CI stages CUPTI 13.3.75 headers in /usr/local/cupti-headers-13.3 (not on include path)."
+    },
+    {
+      "component": "torch wheel line",
+      "id": "C10",
+      "lines": [
+        "cu129"
+      ],
+      "resolution": "Line A component versions are taken from redistrib_12.9.1.json; torch-side library pins (cuDNN/cuSPARSELt/NVSHMEM/NCCL) from install_129.",
+      "severity": "info",
+      "what": "12.9 is not a torch 2.14 wheel line (CUDA_ARCHES=[12.6,13.0,13.2]); only CI docker install_129 exists."
+    },
+    {
+      "component": "jax-cuda-pjrt statically linked NVIDIA code",
+      "id": "C11",
+      "lines": [
+        "cu129",
+        "cu130"
+      ],
+      "resolution": "UNVERIFIED: inspect jax_cuda1x_pjrt .so (readelf -d / nm) during integration; static copies can't be deduplicated without building jaxlib from source against the rootfs.",
+      "severity": "info",
+      "what": "XLA may statically link nvptxcompiler/nvjitlink/cudart pieces into the pjrt .so (hermetic CUDA 12.9.1 / 13.0.0)."
+    }
+  ],
+  "consumers": {
+    "jax": {
+      "cuda12_plugin_built_with": {
+        "cuda": "12.9.1",
+        "cudnn": "9.8.0",
+        "nccl": "2.27.7",
+        "nvshmem": "3.3.9",
+        "sass": "sm_50,sm_60,sm_70,sm_80,sm_90,sm_100 + compute_120 PTX"
+      },
+      "cuda13_plugin_built_with": {
+        "cuda": "13.0.0",
+        "cudnn": "9.12.0",
+        "nccl": "2.27.7",
+        "nvshmem": "3.3.20",
+        "sass": "sm_75,sm_80,sm_90,sm_100 + compute_120 PTX"
+      },
+      "driver_min": ">=525 for CUDA 12, >=580 for CUDA 13 (docs/installation.md:83)",
+      "compiler_contract": {
+        "applies_to": [
+          "py-jax@0.10.2",
+          "py-jaxlib@0.10.2"
+        ],
+        "host_compiler": "/usr/lib/llvm-23/bin/clang",
+        "host_cxx_compiler": "/usr/lib/llvm-23/bin/clang++",
+        "cuda_compiler": "nvcc",
+        "llvm": "llvm@23.0.0 +clang +lld +mlir"
+      },
+      "evidence": [
+        "GitHub jax-v0.10.2 source archive sha256 fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7",
+        "jax-v0.10.2/.bazelversion: 7.7.0",
+        "jax-v0.10.2/build/build.py: --clang_path, --build_cuda_with_clang, --cuda_major_version, LOCAL_{CUDA,CUDNN,NCCL,NVSHMEM}_PATH",
+        "jax-v0.10.2/.bazelrc: build_cuda_with_nvcc/build_cuda_with_clang and cuda_libraries_from_stubs configs",
+        "PyPI JSON jax 0.10.2: Requires-Python >=3.11, numpy>=2.0, scipy>=1.14, ml_dtypes>=0.5.0, jaxlib<=0.10.2,>=0.10.1, sdist sha256 bf77428a8c2e6904c4f46d5ab12aa5cfc6cad2179f07f7e4c0fc75ac86ef0639",
+        "PyPI JSON jax-cuda12-plugin/jax-cuda13-plugin 0.10.2 requires_dist",
+        "research-2026-09-30.md sections A3, C and D4"
+      ],
+      "local_mode": "extras cuda12-local / cuda13-local exist in PyPI jax 0.10.2 requires_dist. Build uses source jaxlib/plugin/pjrt against rootfs CUDA instead of nvidia.* wheel payloads.",
+      "pip_with_cuda_extras_cu12": "cublas>=12.1.3.1, cupti>=12.1.105, nvcc>=12.6.85, cudart>=12.1.105, cudnn>=9.8,<10, cufft>=11.0.2.54, cusolver>=11.4.5.107, cusparse>=12.1.0.106, nccl>=2.18.1, nvjitlink>=12.1.105, nvrtc>=12.1.55, nvshmem>=3.2.5",
+      "pip_with_cuda_extras_cu13": "cublas>=13.0.0.19, cupti>=13.0.48, nvcc>=13.0.48, cudart>=13.0.48, cudnn>=9.12.0.46,<10, cufft>=12.0.0.15, cusolver>=12.0.3.29, cusparse>=12.6.2.49, nccl>=2.27.7, nvjitlink>=13.0.39, nvrtc>=13.0.48, nvshmem>=3.3.20, nvidia-nvvm",
+      "runtime_checks": "jax_plugins/cuda/__init__.py _check_cuda_versions: CUDA runtime>=12.1 (12010); cuDNN min = build//100 compared to UNSCALED runtime (effectively always passes); cuFFT same pattern; cuPTI>=18; cuBLAS>=120100; cuSPARSE>=12100; cuDNN 9.10.0 and cuDNN<9.10.1 with cuBLAS>=12.9 multi-GPU rejected. XLA itself additionally requires runtime cuDNN major==build major and minor>=build minor (UNVERIFIED in this checkout; lives in XLA).",
+      "version": "0.10.2"
+    },
+    "torch": {
+      "cu129": {
+        "cuda": "12.9.1 (CI docker only; NOT a published wheel line: CUDA_ARCHES=[12.6,13.0,13.2])",
+        "cudnn": "==9.24.0.43",
+        "cudnn_min_build": ">=8.5 (cmake/Dependencies.cmake:997-998)",
+        "cudss": "unpinned (install_cudss.sh no-op for 12.9); API needs >=0.3",
+        "cusparselt": "==0.8.1.1",
+        "nccl": "v2.30.7-1 (git, built vs toolkit)",
+        "nccl_min": ">=2.23 for full c10d features (torch/csrc/distributed/c10d/NCCLUtils.hpp:22-37)",
+        "nvshmem": "==3.4.5"
+      },
+      "cu130": {
+        "cuda": "13.0.3 (wheel metadata) / 13.0.2 (CI docker runfile)",
+        "cuda_bindings": ">=13.0.3,<14",
+        "cuda_components_wheel": "cuda-toolkit[nvrtc,cudart,cupti,cufft,curand,cusolver,cusparse,cublas,cufile,nvjitlink,nvtx]==13.0.3 => cublas 13.1.1.3, cudart 13.0.96, cupti 13.0.85, nvrtc 13.0.88, cufft 12.0.0.61, curand 10.4.0.35, cusolver 12.0.4.66, cusparse 12.6.3.3, cufile 1.15.1.6, nvjitlink >=13.0.88,<14, nvtx 13.0.85",
+        "cudnn": "==9.24.0.43",
+        "cusparselt": "==0.8.1 (redist 0.8.1.1)",
+        "nccl": "==2.30.7",
+        "nvshmem": "==3.4.5"
+      },
+      "evidence": [
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/common/install_cuda.sh:13-14,127-141,165-179,260",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.github/scripts/generate_binary_build_matrix.py:25-39,70-77",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/common/install_nccl.sh:7,22-33",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/ci_commit_pins/nccl.txt:1",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/common/install_cusparselt.sh:22-28",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/common/install_cudss.sh:8-21",
+        "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/CMakeLists.txt:319"
+      ],
+      "compiler_contract": {
+        "host_compiler": "/usr/bin/gcc",
+        "host_cxx_compiler": "/usr/bin/g++",
+        "cuda_compiler": "nvcc"
+      },
+      "source": "$VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0",
+      "tensorrt_via_torch_tensorrt_2.14.0": "tensorrt>=11.1.0,<11.2.0 (PyPI requires_dist)",
+      "version": "2.14.0"
+    },
+    "triton": {
+      "bundled_toolchain_default": {
+        "cudacrt": "13.1.80",
+        "cudart(headers)": "13.1.80",
+        "cuobjdump": "13.1.80",
+        "cupti": "12.8.90",
+        "cupti-blackwell": "13.3.35",
+        "libdevice.10.bc": "in-tree third_party/nvidia/backend/lib/libdevice.10.bc",
+        "nvdisasm": "13.1.80",
+        "ptxas": "12.9.86 (<sm_100)",
+        "ptxas-blackwell": "13.3.33 (sm_100+)"
+      },
+      "commit": "675c59878aa2280b31f722aaf42b825fcee21de8 ($VASO_ESTATE_ROOT/sources/pytorch/pytorch-v2.14.0/.ci/docker/ci_commit_pins/triton.txt:1)",
+      "evidence": [
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/cmake/nvidia-toolchain-version.json:1-10",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/third_party/nvidia/backend/compiler.py:38-39,52-72,75-94,103-106,480-501,513-551",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/python/triton/knobs.py:176-216,322-331,500-513,543-548",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/python/build_helpers.py:448-480,482-584 (500: separate ptxas for blackwell 'since there are some bugs when using it for hopper')",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/CMakeLists.txt:25,34-42,49-86,138-151",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/setup.py:150-163,252-265,342-361",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/third_party/nvidia/backend/driver.py:13-16,26-45",
+        "$VASO_ESTATE_ROOT/sources/triton/triton-675c59878aa2280b31f722aaf42b825fcee21de8/third_party/proton/proton/profile.py:35-44"
+      ],
+      "hard_requirements_sm100": "ptxas that accepts PTX ISA = ptx_get_version(ptxas release) and sm_100a; tcgen05/clusterlaunchcontrol/TMA gather4 need PTX>=8.6/8.7 => ptxas >= 12.8. Both 12.9.86 (PTX 8.8) and 13.0.88 (PTX 9.0) verified locally to assemble tcgen05.alloc/ld/dealloc + clusterlaunchcontrol for sm_100a with --regAllocOptLevel=2.",
+      "llvm_hash": "4611156032e1ebac68b2b8f6107b1475a7c60800 (cmake/llvm-info.json; note: there is no cmake/llvm-hash.txt at this commit)",
+      "system_tool_knobs": {
+        "build (cmake/setup.py passthrough)": [
+          "TRITON_OFFLINE_BUILD=1 (skips ALL downloads; requires LLVM_SYSPATH and JSON_SYSPATH)",
+          "TRITON_PTXAS_PATH",
+          "TRITON_PTXAS_BLACKWELL_PATH",
+          "TRITON_CUOBJDUMP_PATH",
+          "TRITON_NVDISASM_PATH",
+          "TRITON_CUDACRT_PATH",
+          "TRITON_CUDART_PATH",
+          "TRITON_CUPTI_INCLUDE_PATH",
+          "TRITON_CUPTI_LIB_PATH",
+          "TRITON_CUPTI_LIB_BLACKWELL_PATH",
+          "LLVM_SYSPATH",
+          "JSON_SYSPATH",
+          "PYBIND11_SYSPATH"
+        ],
+        "runtime (python/triton/knobs.py)": [
+          "TRITON_PTXAS_PATH",
+          "TRITON_PTXAS_BLACKWELL_PATH",
+          "TRITON_CUOBJDUMP_PATH",
+          "TRITON_NVDISASM_PATH",
+          "TRITON_CUDACRT_PATH",
+          "TRITON_CUDART_PATH",
+          "TRITON_LIBDEVICE_PATH",
+          "TRITON_LIBCUDA_PATH",
+          "TRITON_CUPTI_LIB_PATH",
+          "TRITON_CUPTI_LIB_BLACKWELL_PATH"
+        ]
+      }
+    }
+  },
+  "generated": "2026-09-30",
+  "lines": {
+    "cu129": {
+      "base_image": {
+        "digest": "sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+        "image_id": "sha256:eecafe98c3e152dda62a8a2370b9776a3dc83d6043d7341dabeb6dc4a031d8ea",
+        "reference": "nvidia/cuda:12.9.1-devel-ubuntu24.04@sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+        "repository": "nvidia/cuda",
+        "sha256": "020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+        "tag": "12.9.1-devel-ubuntu24.04",
+        "ubuntu_version": "24.04"
+      },
+      "components": {
+        "cuda_toolkit": {
+          "install_layout": {
+            "bin": "/usr/local/cuda/bin",
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "nvidia-cuda-devel-base-image"
+          },
+          "source": {
+            "digest": "sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+            "kind": "docker_base",
+            "sha256": "020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+            "tag": "12.9.1-devel-ubuntu24.04"
+          },
+          "verify": {
+            "expect": {
+              "components": {
+                "cuda_cccl": "12.9.27",
+                "cuda_cudart": "12.9.79",
+                "cuda_cuobjdump": "12.9.82",
+                "cuda_cupti": "12.9.79",
+                "cuda_cuxxfilt": "12.9.82",
+                "cuda_nvcc": "12.9.86",
+                "cuda_nvdisasm": "12.9.88",
+                "cuda_nvml_dev": "12.9.79",
+                "cuda_nvrtc": "12.9.86",
+                "cuda_nvtx": "12.9.79",
+                "cuda_profiler_api": "12.9.79",
+                "cuda_sanitizer_api": "12.9.79",
+                "libcublas": "12.9.1.4",
+                "libcufft": "11.4.1.4",
+                "libcufile": "1.14.1.1",
+                "libcurand": "10.3.10.19",
+                "libcusolver": "11.7.5.82",
+                "libcusparse": "12.5.10.65",
+                "libnvfatbin": "12.9.82",
+                "libnvjitlink": "12.9.86"
+              },
+              "cuda_api": "12.9",
+              "nvcc": "12.9.86",
+              "version": "12.9.1"
+            },
+            "how": "headers, sonames and nvcc --version"
+          },
+          "version": "12.9.1"
+        },
+        "cudnn": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cudnn/redist/redistrib_9.24.0.json",
+            "sha256": "7dea7fc8436fdd65cb22cd6634e5a2834e4a8508217abea5286c15affa9a80a0",
+            "url": "https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-9.24.0.43_cuda12-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 92400,
+              "version": "9.24.0.43"
+            },
+            "how": "header CUDNN_* macros and cudnnGetVersion"
+          },
+          "version": "9.24.0.43"
+        },
+        "cudss": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cudss/redist/redistrib_0.7.1.json",
+            "sha256": "946571d9ea164f948e402dd97a14541cb90fbec800336cfa7ae644af5937632f",
+            "url": "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.7.1.4_cuda12-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 701,
+              "version": "0.7.1.4"
+            },
+            "how": "header CUDSS_VERSION and cudssGetVersion"
+          },
+          "version": "0.7.1.4"
+        },
+        "cusparselt": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cusparselt/redist/redistrib_0.8.1.json",
+            "sha256": "b34272e683e9f798435af05dc124657d1444cd0e13802c3d2f3152e31cd898a3",
+            "url": "https://developer.download.nvidia.com/compute/cusparselt/redist/libcusparse_lt/linux-x86_64/libcusparse_lt-linux-x86_64-0.8.1.1_cuda12-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 801,
+              "version": "0.8.1.1"
+            },
+            "how": "header CUSPARSELT_VERSION and cusparseLtGetVersion"
+          },
+          "version": "0.8.1.1"
+        },
+        "nccl": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "build": "make -j src.build against this line's nvcc (as torch CI)",
+            "commit": "73cf112295c33aee2b895f329f592f2a9b4b0f97",
+            "kind": "git",
+            "tag": "v2.30.7-1",
+            "url": "https://github.com/NVIDIA/nccl.git"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 23007,
+              "version": "2.30.7"
+            },
+            "how": "header NCCL_* macros and ncclGetVersion"
+          },
+          "version": "2.30.7"
+        },
+        "nvshmem": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/nvshmem/redist/redistrib_3.4.5.json",
+            "sha256": "058cbaddc4ff8646b8d1bd9322e93c90eae54c86e1ac8922f20d8a55a7fa8b7e",
+            "url": "https://developer.download.nvidia.com/compute/nvshmem/redist/libnvshmem/linux-x86_64/libnvshmem-linux-x86_64-3.4.5_cuda12-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "version": "3.4.5"
+            },
+            "how": "header NVSHMEM_MAJOR/MINOR/PATCH and nvshmemx_vendor_get_version_info"
+          },
+          "version": "3.4.5"
+        },
+        "tensorrt": {
+          "install_layout": {
+            "include": "/usr/include/x86_64-linux-gnu",
+            "lib": "/usr/lib/x86_64-linux-gnu",
+            "packages_held": true,
+            "style": "ubuntu2404-nvidia-apt"
+          },
+          "source": {
+            "kind": "apt",
+            "package": "tensorrt=11.1.0.106-1+cuda12.9",
+            "packages": [
+              {
+                "package": "tensorrt=11.1.0.106-1+cuda12.9",
+                "sha256": "8eac0f661014480ca93db0b6163ef9e3bca7de5ec8fab7d7c24f8c987f6c047f",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer11=11.1.0.106-1+cuda12.9",
+                "sha256": "e1a0d4e11d8b3c7b72e44b1b3cd1ab943aab41f43b11f667ad5afda91cf1b6ca",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-plugin11=11.1.0.106-1+cuda12.9",
+                "sha256": "9a98bc3d6f5270dfc1bccf4a1f7d038e2a19e98141022d9b7d4682c431a2d16b",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-vc-plugin11=11.1.0.106-1+cuda12.9",
+                "sha256": "37d93d45de46f91d537a87d56d1d10f7dd9fdc35521b9c687a144f0f5607fb8a",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-lean11=11.1.0.106-1+cuda12.9",
+                "sha256": "a77e462a3de15c8587f03a338762c0d1e31989a2b334de0ac4a1040078e07ee5",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dispatch11=11.1.0.106-1+cuda12.9",
+                "sha256": "3c034a3ab5b757e0a8e949712914c7f84a61f8f92adeb24d9191ffd0402e5d88",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvonnxparsers11=11.1.0.106-1+cuda12.9",
+                "sha256": "9ca4754f3565b61c08d48ec52f96417888670d0bafbb103ce7d59ed74f1f9a35",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-bin=11.1.0.106-1+cuda12.9",
+                "sha256": "1d6ab43edece55c481668cd172cfc3f2160f34ad2f3c4f0d263fe332ed0b16ab",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-bin_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "e06b53607462711dbf54e95c8d893c959160b7d61ba565fbbac00ca4bd42bb53",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-lean-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "29adef0dcec1ad4f3f98cd2e3a70ffb32c7e3ea57c7aaa857c068b157186c65e",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-plugin-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "53a25417926f06c3c8a4480e4e0d0e7b45f19f9ffe44784cb2b8ebf96a6fc866",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-vc-plugin-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "06f13074bf01e4b3e20a87d050c0788120d76a3f85009781cef4c4d1f85984ee",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dispatch-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "d2b25c81a9782d0acd7e6e29460c1f690757bb7c5f510ae576163524c0a55c89",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvonnxparsers-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "45d9201698b4494c604ecbff0088deccd023f6da0afdd5f058482e9c6ef3d8af",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-win-builder-resource11=11.1.0.106-1+cuda12.9",
+                "sha256": "79fad3391eb7bbc351c2568f73a1fa4a586a570e8f0e003b08fd554d0fd7388e",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-win-builder-resource11_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "5105aa9ac328ba9c6abfbfee600ee2192a594de3f387d6a3e49ed564fa3ba659",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-python-plugin-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "00a9fe47fe6053cae6636816e874fd28d342b6fc9e989ce8b4c3b0d155fb830d",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-python-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "41aaa8c90590ae23374221e7feac8e2ee6666c09a2d0bce9fd7463fa0adef297",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-safe-headers-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "95deddc41006a440bf5598f3da5f8c135f9ba063efd17aba08b66443fc37efa7",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-safe-headers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-plugin-dev=11.1.0.106-1+cuda12.9",
+                "sha256": "1a859ec454cb33cf09ff89fb1ab743d3ff8d6973ece0023e3fa131cc84a5eefc",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer=11.1.0.106-1+cuda12.9",
+                "sha256": "40d332aacfa6f3f61c5d927741a0d0545e12a05a3ca55a9ed2bf3e85bc12b9f2",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-lean=11.1.0.106-1+cuda12.9",
+                "sha256": "532341714a90eff2c81b6bdc3cdbab1f8249adbb8df2c8616d5647752b91b36a",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-lean_11.1.0.106-1+cuda12.9_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-dispatch=11.1.0.106-1+cuda12.9",
+                "sha256": "3551e049d54b48c5fc8a97b15b1ebd5cbb6f789fe226f455d95cd128e0825ff1",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dispatch_11.1.0.106-1+cuda12.9_amd64.deb"
+              }
+            ],
+            "repo": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/",
+            "sha256": "8eac0f661014480ca93db0b6163ef9e3bca7de5ec8fab7d7c24f8c987f6c047f",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": [
+                11,
+                1,
+                0
+              ],
+              "version": "11.1.0.106"
+            },
+            "how": "dpkg package versions, NvInferVersion.h macros and getInferLibVersion"
+          },
+          "version": "11.1.0.106"
+        }
+      },
+      "runtime_driver": {
+        "bind_libs": [
+          "/run/nvidia-driver/lib/libcuda.so.1",
+          "/run/nvidia-driver/lib/libnvidia-ml.so.1"
+        ],
+        "host_version": "580.105.08",
+        "minimum_version": "575.57.08",
+        "rootfs_policy": "absent outside /usr/local/cuda/lib64/stubs"
+      }
+    },
+    "cu130": {
+      "base_image": {
+        "digest": "sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+        "image_id": "sha256:0e655e18c204cbf20beaec9f02a4b4adc6069a12d410be4bc6d11c54a3990cca",
+        "reference": "nvidia/cuda:13.0.3-devel-ubuntu24.04@sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+        "repository": "nvidia/cuda",
+        "sha256": "b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+        "tag": "13.0.3-devel-ubuntu24.04",
+        "ubuntu_version": "24.04"
+      },
+      "components": {
+        "cuda_toolkit": {
+          "install_layout": {
+            "bin": "/usr/local/cuda/bin",
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "nvidia-cuda-devel-base-image"
+          },
+          "source": {
+            "digest": "sha256:b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+            "kind": "docker_base",
+            "sha256": "b7ae301dea2c162444795462ce17a05f6a516e5a75944b57af5b88540a1a2266",
+            "tag": "13.0.3-devel-ubuntu24.04"
+          },
+          "verify": {
+            "expect": {
+              "components": {
+                "cuda_cccl": "13.0.85",
+                "cuda_crt": "13.0.88",
+                "cuda_cudart": "13.0.96",
+                "cuda_culibos": "13.0.85",
+                "cuda_cuobjdump": "13.0.85",
+                "cuda_cupti": "13.0.85",
+                "cuda_cuxxfilt": "13.0.85",
+                "cuda_nvcc": "13.0.88",
+                "cuda_nvdisasm": "13.0.85",
+                "cuda_nvml_dev": "13.0.87",
+                "cuda_nvrtc": "13.0.88",
+                "cuda_nvtx": "13.0.85",
+                "cuda_profiler_api": "13.0.85",
+                "cuda_sanitizer_api": "13.0.85",
+                "libcublas": "13.1.1.3",
+                "libcufft": "12.0.0.61",
+                "libcufile": "1.15.1.6",
+                "libcurand": "10.4.0.35",
+                "libcusolver": "12.0.4.66",
+                "libcusparse": "12.6.3.3",
+                "libnvfatbin": "13.0.85",
+                "libnvjitlink": "13.0.88",
+                "libnvptxcompiler": "13.0.88",
+                "libnvvm": "13.0.88"
+              },
+              "cuda_api": "13.0",
+              "nvcc": "13.0.88",
+              "version": "13.0.3"
+            },
+            "how": "headers, sonames and nvcc --version"
+          },
+          "version": "13.0.3"
+        },
+        "cudnn": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cudnn/redist/redistrib_9.24.0.json",
+            "sha256": "63f1900222c69ee7e94583408181ccdb988dc2833531ce6bde0df43bbdd04a6d",
+            "url": "https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-9.24.0.43_cuda13-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 92400,
+              "version": "9.24.0.43"
+            },
+            "how": "header CUDNN_* macros and cudnnGetVersion"
+          },
+          "version": "9.24.0.43"
+        },
+        "cudss": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cudss/redist/redistrib_0.7.1.json",
+            "sha256": "84b34ebe7fad40ec10f2aab2957a63b6070bd8ce16e3ada3e6bcac7317256347",
+            "url": "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.7.1.4_cuda13-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 701,
+              "version": "0.7.1.4"
+            },
+            "how": "header CUDSS_VERSION and cudssGetVersion"
+          },
+          "version": "0.7.1.4"
+        },
+        "cusparselt": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/cusparselt/redist/redistrib_0.8.1.json",
+            "sha256": "82dd3e5ebc199a27011f58857a80cd825e77bba634ab2286ba3d4e13115db89a",
+            "url": "https://developer.download.nvidia.com/compute/cusparselt/redist/libcusparse_lt/linux-x86_64/libcusparse_lt-linux-x86_64-0.8.1.1_cuda13-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 801,
+              "version": "0.8.1.1"
+            },
+            "how": "header CUSPARSELT_VERSION and cusparseLtGetVersion"
+          },
+          "version": "0.8.1.1"
+        },
+        "nccl": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "build": "make -j src.build against CUDA 13.0.3 nvcc (as torch CI)",
+            "commit": "73cf112295c33aee2b895f329f592f2a9b4b0f97",
+            "kind": "git",
+            "tag": "v2.30.7-1",
+            "url": "https://github.com/NVIDIA/nccl.git"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": 23007,
+              "version": "2.30.7"
+            },
+            "how": "header NCCL_* macros and ncclGetVersion"
+          },
+          "version": "2.30.7"
+        },
+        "nvshmem": {
+          "install_layout": {
+            "include": "/usr/local/cuda/include",
+            "lib": "/usr/local/cuda/lib64",
+            "prefix": "/usr/local/cuda",
+            "style": "torch-ci-layout"
+          },
+          "source": {
+            "kind": "redist",
+            "manifest": "https://developer.download.nvidia.com/compute/nvshmem/redist/redistrib_3.4.5.json",
+            "sha256": "18f12807c23bc5b270581af1f9bafd540369da783e557171558887623d77842c",
+            "url": "https://developer.download.nvidia.com/compute/nvshmem/redist/libnvshmem/linux-x86_64/libnvshmem-linux-x86_64-3.4.5_cuda13-archive.tar.xz"
+          },
+          "verify": {
+            "expect": {
+              "version": "3.4.5"
+            },
+            "how": "header NVSHMEM_MAJOR/MINOR/PATCH and nvshmemx_vendor_get_version_info"
+          },
+          "version": "3.4.5"
+        },
+        "tensorrt": {
+          "install_layout": {
+            "include": "/usr/include/x86_64-linux-gnu",
+            "lib": "/usr/lib/x86_64-linux-gnu",
+            "packages_held": true,
+            "style": "ubuntu2404-nvidia-apt"
+          },
+          "source": {
+            "kind": "apt",
+            "package": "tensorrt=11.1.0.106-1+cuda13.3",
+            "packages": [
+              {
+                "package": "tensorrt=11.1.0.106-1+cuda13.3",
+                "sha256": "96aa34516445ba5b5c3bc9a2a93b540a56192eec5d144332436c5f21727b6571",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer11=11.1.0.106-1+cuda13.3",
+                "sha256": "5df5c04749849f112bb8ba365dbd1db53f50e65f4ea7168c4237590abb1af135",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-plugin11=11.1.0.106-1+cuda13.3",
+                "sha256": "139f95af009e10a9d9d9c3e6da1d607625c82a2c3a727ff99e17a1cd09f52a9b",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-vc-plugin11=11.1.0.106-1+cuda13.3",
+                "sha256": "561d438f88e88873c3d83c510a6df875e863cef0472ebcac0bb348daeb1b9923",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-lean11=11.1.0.106-1+cuda13.3",
+                "sha256": "d05b87a67832cbc74ad255c5c7369f788ebe3ac08faeda1546c4296e6daec8a0",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dispatch11=11.1.0.106-1+cuda13.3",
+                "sha256": "64b1905a6e950e6155142961007c8830c7a7c442befabee9676b33d5fedbbec9",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvonnxparsers11=11.1.0.106-1+cuda13.3",
+                "sha256": "4f0a66d0e2d6e3f8baf928bb1c98c2e0c00a92737b6684ae601594a0417733ac",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-bin=11.1.0.106-1+cuda13.3",
+                "sha256": "1ed704a4c5277675252d3696a764c2a198475d60489d6a1548cfda0be478c386",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-bin_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "7cebe7266c185d9133544465480c798e0f39cca0b9c12e2c6947b6377a39e93b",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-lean-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "dd71ad47987778c2994de53a3aa7f7a3db90b8fa4854afa499943a6279da0fdf",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-plugin-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "cc4a630060bd3557453b72c119dcb170d1b453b312c8701518d3821b0a49dda3",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-vc-plugin-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "ee0700056366394c48dcafbf092eaadc24d4100808e51485168e055ca928bbb7",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-dispatch-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "5ceff8e88d1d1100b9c17b74bd7cf4973532d51a39979d354f8d654abf31fb6c",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvonnxparsers-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "308bfb70a38f7262b57df9fe56d6ffc11746512c15c499dcbf9359dbc637377e",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-win-builder-resource11=11.1.0.106-1+cuda13.3",
+                "sha256": "2dfd9f573fdbb4a58da5f3918f7945edb619f8cb72f72b799a87da873bb23f08",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-win-builder-resource11_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "93af3421032fd5313b6a04f64028466deba000b6a37da6d4b2c007fd7e547298",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-python-plugin-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "6e63b7857c350bef4b566818f9c6394c69146e674d4d75cede871560a4cf8e1a",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-python-plugin-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "af7870ee878dc9afb5ed4236654bcb2663e133dca78432cfcafad74b36a1e88a",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-safe-headers-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "6d36ef493a22be277efa7ffe1fcf524a61367b7f15e4e21a1d93c67fff5bebff",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-safe-headers-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "libnvinfer-headers-plugin-dev=11.1.0.106-1+cuda13.3",
+                "sha256": "75e1d44653ab0a313a801e1dff88821b1c8d814c9fa8f63b26b06fdd36472637",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-plugin-dev_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer=11.1.0.106-1+cuda13.3",
+                "sha256": "fe611818a381b81308324252ea82c0792b8da0bfe9b450de82975c035321b541",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-lean=11.1.0.106-1+cuda13.3",
+                "sha256": "308f27209a2324cec5f55652e1d50290a48cd0deca1a4b7510c6e46bca25a923",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-lean_11.1.0.106-1+cuda13.3_amd64.deb"
+              },
+              {
+                "package": "python3-libnvinfer-dispatch=11.1.0.106-1+cuda13.3",
+                "sha256": "e76181fc13916530d86a9cf1d1d4f06c0ffcc0d1395f879f57b0f3c8a94efb8d",
+                "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dispatch_11.1.0.106-1+cuda13.3_amd64.deb"
+              }
+            ],
+            "repo": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/",
+            "sha256": "96aa34516445ba5b5c3bc9a2a93b540a56192eec5d144332436c5f21727b6571",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda13.3_amd64.deb"
+          },
+          "verify": {
+            "expect": {
+              "runtime_version": [
+                11,
+                1,
+                0
+              ],
+              "version": "11.1.0.106"
+            },
+            "how": "dpkg package versions, NvInferVersion.h macros and getInferLibVersion"
+          },
+          "version": "11.1.0.106"
+        }
+      },
+      "runtime_driver": {
+        "bind_libs": [
+          "/run/nvidia-driver/lib/libcuda.so.1",
+          "/run/nvidia-driver/lib/libnvidia-ml.so.1"
+        ],
+        "host_version": "580.105.08",
+        "minimum_version": "580.0",
+        "rootfs_policy": "absent outside /usr/local/cuda/lib64/stubs"
+      }
+    }
+  },
+  "schema_version": 1
+}

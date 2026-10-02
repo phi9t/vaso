@@ -1,0 +1,6 @@
+# Marks native/gettext as a Bazel package so gettext.bzl is loadable from
+# MODULE.bazel. The @gettext_native repo is materialized by the repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["gettext.bzl"])
