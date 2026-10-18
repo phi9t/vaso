@@ -1,0 +1,47 @@
+{
+  "packages": {
+    "spack_fontsproto": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/X11"
+      ],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@fontsproto_native//:lib",
+      "package": "fontsproto",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/fontsproto-2.1.3-xudq6b5zs4jphqvhpyngxlrea7yhqh5p",
+      "spack_hash": "xudq6b5zs4jphqvhpyngxlrea7yhqh5p",
+      "version": "2.1.3"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    },
+    "spack_util_macros": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@util_macros_native//:lib",
+      "package": "util-macros",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-macros-1.20.2-xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "spack_hash": "xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "version": "1.20.2"
+    }
+  },
+  "root": "spack_fontsproto",
+  "schema_version": 1
+}

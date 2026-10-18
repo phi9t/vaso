@@ -1,0 +1,4 @@
+# Native consumers still wired to a provider the lean py-torch graph no longer
+# selects for that dependency. Format: <repo>.<attr> @<expected repo>  # ticket
+# Ratchet: entries are removed as consumers are re-seated (ticket 08). Stale
+# entries fail //tools:native_dep_wiring_live_test.

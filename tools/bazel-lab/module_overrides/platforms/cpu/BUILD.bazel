@@ -1,0 +1,4 @@
+package(default_visibility = ["//visibility:public"])
+
+constraint_setting(name = "cpu")
+constraint_value(name = "x86_64", constraint_setting = ":cpu")

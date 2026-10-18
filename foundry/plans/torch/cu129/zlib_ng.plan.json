@@ -1,0 +1,114 @@
+{
+  "build": {
+    "argv": [
+      "make",
+      "-j{jobs}"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "{src}/configure",
+      "--prefix=/",
+      "--zlib-compat"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "deps": {},
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:872b35bdc75864341c9939312371bde76191534ddb0862c29b4871bd45dc20b6",
+    "source_date_epoch": 1770153003
+  },
+  "gpu_archs": [],
+  "inputs": [],
+  "install": {
+    "argv": [
+      "make",
+      "DESTDIR={out}",
+      "install"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "line": "cu129",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-12-9"
+        ],
+        "expect_stdout": "12.9.79-1",
+        "name": "dpkg-cuda-cudart-12-9"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    }
+  ],
+  "package": {
+    "name": "zlib-ng",
+    "version": "2.3.3"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+      "strip_prefix": "zlib-ng-2.3.3",
+      "urls": [
+        "https://github.com/zlib-ng/zlib-ng/archive/2.3.3.tar.gz"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@12.9.1",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu129/rootfs.identity.json",
+      "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+    }
+  }
+}

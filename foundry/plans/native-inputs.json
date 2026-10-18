@@ -1,0 +1,525 @@
+{
+  "common_inputs": [
+    {
+      "cause": "flags",
+      "detail": "release Bazel arguments can reach native action keys",
+      "path": "run.sh",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "flags",
+      "detail": "gate wrapper forwards release build settings",
+      "path": "scripts/agents/triumvirate-gate.sh",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "flags",
+      "detail": "gate Bazel arguments can reach native action keys",
+      "path": "scripts/agents/triumvirate-gate-insula.sh",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "other",
+      "detail": "per-commit determinism settings currently feed native action keys",
+      "path": "tools/native_determinism_args.sh",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "other",
+      "detail": "native toolchain helper can change action env, args, and declared inputs",
+      "path": "native/common/native_action_toolchain.bzl",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "flags",
+      "detail": "native build settings can change action arguments",
+      "path": "native/common/build_settings.bzl",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "toolchain",
+      "detail": "rootfs toolchain identity can reach native action keys",
+      "glob": "toolchains/**",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "toolchain",
+      "detail": "CUDA/rootfs identity can reach native action keys",
+      "path": "rootfs/cuda_ecosystem.lock.json",
+      "status": "may-rebuild"
+    },
+    {
+      "cause": "source",
+      "detail": "profile locks can change native source or dependency pins",
+      "glob": "locks/*.lock.json",
+      "status": "may-rebuild"
+    }
+  ],
+  "generated_by": "tools/rebuild_impact.py --refresh-manifest",
+  "native_mnemonics": [
+    "Bzip2ActionPrefix",
+    "XzActionPrefix",
+    "ZstdActionPrefix",
+    "ZlibNgActionPrefix",
+    "PytorchNativePrefix",
+    "TorchvisionNativePrefix",
+    "TorchaudioNativePrefix",
+    "TritonNativePrefix",
+    "JaxlibNativePrefix"
+  ],
+  "packages": {
+    "bzip2": {
+      "host_exact": true,
+      "host_targets": [
+        "//native/bzip2:bzip2_action_prefix"
+      ],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/bzip2/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/bzip2/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "bzip2 action wrapper changed",
+          "path": "native/bzip2/bzip2_action.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "bzip2 shared committed-plan prefix rule changed",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "bzip2 action prefix provider contract changed",
+          "path": "native/common/native_action_inputs.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "bzip2 action content manifest writer changed",
+          "path": "native/common/prefix_manifest.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "bzip2 committed plan changed configure/build flags or source identity",
+          "glob": "plans/torch/*/bzip2.plan.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/bzip2:bzip2_action_prefix"
+      ],
+      "mnemonic": "Bzip2ActionPrefix"
+    },
+    "jaxlib": {
+      "host_exact": false,
+      "host_targets": [],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/jaxlib/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/jaxlib/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "jaxlib native action driver is a declared action tool",
+          "path": "native/jaxlib/action_driver.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "jaxlib native action definition changed",
+          "path": "native/jaxlib/jaxlib_action.bzl",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "jaxlib plan can change configure/build flags",
+          "path": "native/jaxlib/plan.py",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "jaxlib upstream source pins changed",
+          "path": "native/jaxlib/upstream_pins.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "jaxlib nested Bazel archive pins changed",
+          "path": "native/jaxlib/nested_http_archives.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/jaxlib:jaxlib_action"
+      ],
+      "mnemonic": "JaxlibNativePrefix"
+    },
+    "pytorch": {
+      "host_exact": false,
+      "host_targets": [],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/pytorch/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/pytorch/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "PyTorch consumes the zstd action prefix target",
+          "path": "native/zstd/BUILD.bazel",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "PyTorch consumes the zstd action prefix provider",
+          "path": "native/zstd/zstd_action.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "PyTorch consumes zstd built by the shared committed-plan prefix rule",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "PyTorch resolves zstd through the action prefix provider contract",
+          "path": "native/common/native_action_inputs.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "PyTorch consumes the zstd action content manifest",
+          "path": "native/common/prefix_manifest.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "PyTorch consumes the zstd action prefix key",
+          "glob": "plans/torch/*/zstd.plan.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "pytorch native action driver is a declared action tool",
+          "path": "native/pytorch/action_driver.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "pytorch native action definition changed",
+          "path": "native/pytorch/pytorch_action.bzl",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "pytorch plan can change configure/build flags",
+          "path": "native/pytorch/plan.py",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "pytorch upstream source pins changed",
+          "path": "native/pytorch/upstream_pins.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "PyTorch recursive source manifest changed",
+          "path": "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/pytorch:pytorch_action"
+      ],
+      "mnemonic": "PytorchNativePrefix"
+    },
+    "torchaudio": {
+      "host_exact": false,
+      "host_targets": [],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/torchaudio/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/torchaudio/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "torchaudio committed-plan action attributes can change native action flags or inputs",
+          "path": "native/torchaudio/torchaudio_action.bzl",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "torchaudio committed plan changed configure/build flags",
+          "glob": "plans/torch/*/torchaudio.plan.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "torchaudio upstream source pins changed",
+          "path": "native/torchaudio/upstream_pins.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/torchaudio:torchaudio_action"
+      ],
+      "mnemonic": "TorchaudioNativePrefix"
+    },
+    "torchvision": {
+      "host_exact": false,
+      "host_targets": [],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/torchvision/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/torchvision/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "torchvision committed-plan action attributes can change native action flags or inputs",
+          "path": "native/torchvision/torchvision_action.bzl",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "torchvision committed plan changed configure/build flags",
+          "glob": "plans/torch/*/torchvision.plan.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "torchvision upstream source pins changed",
+          "path": "native/torchvision/upstream_pins.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/torchvision:torchvision_action"
+      ],
+      "mnemonic": "TorchvisionNativePrefix"
+    },
+    "triton": {
+      "host_exact": false,
+      "host_targets": [],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/triton/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/triton/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "Triton committed-plan action attributes can change native action flags or inputs",
+          "path": "native/triton/triton_action.bzl",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "Triton committed plan changed configure/build flags",
+          "glob": "plans/torch/*/triton.plan.json",
+          "status": "rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "triton upstream source pins changed",
+          "path": "native/triton/upstream_pins.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/triton:triton_action"
+      ],
+      "mnemonic": "TritonNativePrefix"
+    },
+    "xz": {
+      "host_exact": true,
+      "host_targets": [
+        "//native/xz:xz_action_prefix"
+      ],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/xz/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/xz/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "xz action wrapper changed",
+          "path": "native/xz/xz_action.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "xz shared committed-plan prefix rule changed",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "xz action prefix provider contract changed",
+          "path": "native/common/native_action_inputs.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "xz action content manifest writer changed",
+          "path": "native/common/prefix_manifest.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "xz committed plan changed configure/build flags or source identity",
+          "glob": "plans/torch/*/xz.plan.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/xz:xz_action_prefix"
+      ],
+      "mnemonic": "XzActionPrefix"
+    },
+    "zlib-ng": {
+      "host_exact": true,
+      "host_targets": [
+        "//native/zlib_ng:zlib_ng_action_prefix"
+      ],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/zlib_ng/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/zlib_ng/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "zlib-ng action implementation changed",
+          "path": "native/zlib_ng/zlib_ng_action.bzl",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/zlib_ng:zlib_ng_action_prefix"
+      ],
+      "mnemonic": "ZlibNgActionPrefix"
+    },
+    "zstd": {
+      "host_exact": true,
+      "host_targets": [
+        "//native/zstd:zstd_action_prefix"
+      ],
+      "inputs": [
+        {
+          "cause": "flags",
+          "detail": "native action target attributes can change build flags or inputs",
+          "path": "native/zstd/BUILD.bazel",
+          "status": "may-rebuild"
+        },
+        {
+          "cause": "source",
+          "detail": "native source patch content changed",
+          "glob": "native/zstd/patches/**",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "zstd action wrapper changed",
+          "path": "native/zstd/zstd_action.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "zstd shared committed-plan prefix rule changed",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "zstd action prefix provider contract changed",
+          "path": "native/common/native_action_inputs.bzl",
+          "status": "rebuild"
+        },
+        {
+          "cause": "other",
+          "detail": "zstd action content manifest writer changed",
+          "path": "native/common/prefix_manifest.py",
+          "status": "rebuild"
+        },
+        {
+          "cause": "flags",
+          "detail": "zstd committed plan changed configure/build flags or source identity",
+          "glob": "plans/torch/*/zstd.plan.json",
+          "status": "rebuild"
+        }
+      ],
+      "insula_targets": [
+        "//native/zstd:zstd_action_prefix"
+      ],
+      "mnemonic": "ZstdActionPrefix"
+    }
+  },
+  "schema_version": 1
+}

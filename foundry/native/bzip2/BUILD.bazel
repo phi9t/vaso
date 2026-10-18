@@ -1,0 +1,39 @@
+load(":bzip2_action.bzl", "bzip2_action_prefix")
+load("@rules_python//python:defs.bzl", "py_test")
+
+# Marks native/bzip2 as a Bazel package so bzip2.bzl is loadable from MODULE.bazel.
+# The @bzip2_native repo remains as a deprecated repository-rule alias for
+# repository-rule consumers until they move to action prefixes.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "bzip2.bzl",
+    "bzip2_action.bzl",
+])
+
+bzip2_action_prefix(
+    name = "bzip2_action_prefix",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/bzip2.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/bzip2.plan.json",
+    }),
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@bzip2_action_archive//file",
+)
+
+filegroup(
+    name = "bzip2_action_prefix_manifest",
+    srcs = [":bzip2_action_prefix"],
+    output_group = "manifest",
+)
+
+py_test(
+    name = "bzip2_test",
+    srcs = ["bzip2_test.py"],
+    data = [":bzip2.bzl"],
+    main = "bzip2_test.py",
+)

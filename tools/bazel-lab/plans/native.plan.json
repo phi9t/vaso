@@ -1,0 +1,49 @@
+{
+  "build": {
+    "argv": [
+      "make",
+      "all"
+    ],
+    "env": {
+      "CFLAGS": "-O2"
+    }
+  },
+  "configure": {
+    "argv": [
+      "make",
+      "configure"
+    ],
+    "env": {
+      "LC_ALL": "C"
+    }
+  },
+  "deps": [
+    "//pkg:dep_prefix"
+  ],
+  "determinism": {
+    "prefix_maps": [
+      "{work}=.",
+      "{out}=."
+    ],
+    "seed": "native-plan-seed",
+    "source_date_epoch": "2026-10-06T00:00:00Z"
+  },
+  "install": {
+    "argv": [
+      "make",
+      "install"
+    ]
+  },
+  "name": "native-pkg",
+  "schema": 1,
+  "source": {
+    "files": [
+      "pkg/pkg.c"
+    ],
+    "patches": []
+  },
+  "toolchain": {
+    "cc": "toolchain:host_gcc",
+    "identity": "host-gcc-wrapper"
+  }
+}

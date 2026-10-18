@@ -1,0 +1,94 @@
+  │ store_id="$(python3 - <<'PY'
+  │ … +19 lines
+  └ Starting HDFS download for 1 source(s) into $HOME/workspace/soma/.scratch/emacs-gym/insula/artifacts/soma-emacs-0bddf41e6539849c-9dbdc1166f7f8d34388e5c65f1566a736beb5bd74f8ab6151d34/
+    hdfs-retrieved/soma-emacs-0bddf41e6539849c-9dbdc1166f7f8d34388e5c65f1566a736beb5bd74f8ab6151d34.tar.zst
+    … +10 lines (ctrl+o to expand)
+    {"ok":true,"remote_dir":"hdfs://<internal-storage>/path","retrieve_dir":"$HOME/
+    workspace/soma/.scratch/emacs-gym/insula/artifacts/soma-emacs-0bddf41e6539849c-9dbdc1166f7f8d34388e5c65f1566a736beb5bd74f8ab6151d34/hdfs-retrieved"}
+
+◆ Waited for command · set -euo pipefail
+soma=$HOME/workspace/soma
+store_id="$(python3 - <<'PY'
+import json
+from pathlib import Path
+print(json.loads(Path('$HOME/workspace/soma/.scratch/emacs-gym/insula/rootfs-store/selected.json').read_text())['store_id'])
+PY
+)"
+artifact_dir="$soma/.scratch/emacs-gym/insula/artifacts/$store_id"
+retrieve_dir="$artifact_dir/hdfs-retrieved"
+mkdir -p "$retrieve_dir"
+remote_dir="$(./scripts/waystone storage-prefix --child "soma/insula-rootfs/$store_id" --json | python3 -c 'import json,sys; print(json.load(sys.stdin)["path"])')"
+./scripts/waystone --overwrite get "$remote_dir/$store_id.tar.zst" "$retrieve_dir/$store_id.tar.zst"
+./scripts/waystone --overwrite get "$remote_dir/$store_id.manifest.json" "$retrieve_dir/$store_id.manifest.json"
+./scripts/waystone --overwrite get "$remote_dir/$store_id.waystone-storage-request.json" "$retrieve_dir/$store_id.waystone-storage-request.json"
+cd "$artifact_dir"
+sha256sum "$store_id.tar.zst" "$store_id.manifest.json" "$store_id.waystone-storage-request.json" "hdfs-retrieved/$store_id.tar.zst" "hdfs-retrieved/$store_id.manifest.json" "hdfs-retrieved/$store_id.waystone-
+storage-request.json"
+cmp -s "$store_id.tar.zst" "hdfs-retrieved/$store_id.tar.zst"
+cmp -s "$store_id.manifest.json" "hdfs-retrieved/$store_id.manifest.json"
+cmp -s "$store_id.waystone-storage-request.json" "hdfs-retrieved/$store_id.waystone-storage-request.json"
+printf '{"ok":true,"remote_dir":"%s","retrieve_dir":"%s"}\n' "$remote_dir" "$retrieve_dir"
+
+◆ The full rootfs archive round trip passed byte-for-byte comparison for the archive, manifest, and request file. I’m checking the HDFS listing and the local artifact footprint so I can report exact locations.
+
+◆ I’m doing one final evidence pass now: remote listing, local files, and git status to make sure the large byproducts stayed ignored.
+
+◆ Ran set -euo pipefail
+  │ soma=$HOME/workspace/soma
+  │ store_id="$(python3 - <<'PY'
+  │ … +11 lines
+  └ Found 3 items in hdfs://<internal-storage>/path
+    Name                                                                                                                  Size      Type  Modified
+    … +15 lines (ctrl+o to expand)
+
+    git status in soma:
+
+◆ I'm thinking about the tar archive containing a top-level directory named store_id. When I use the pack command, it extracts under a new parent which creates that store_id directory. I can use /tmp or
+  artifacts/hdfs-restore-check. Running validation against the extracted path seems valuable, but I wonder if we're already at the final step. We can still continue with the restore validation as part of the
+  "try," although it’s a long process. We'll need to decide on that in planning.
+
+◆ The HDFS-backed persist/retrieve path is proven byte-for-byte now. I’m marking the check complete; I did not unpack the retrieved archive into a new selected rootfs, so the remaining validation step would be
+  a restore-from-archive check, not a storage check.
+
+◆ Yes. We successfully persisted and retrieved the Soma rootfs artifact through Waystone HDFS.
+
+  What passed:
+
+  - Waystone wrapper readiness: ./scripts/waystone --doctor passed.
+  - Small HDFS probe passed: upload, list, download, SHA-256 compare, cleanup.
+  - Full Soma rootfs artifact path passed:
+      - Packed selected Soma rootfs into a tar.zst.
+      - Uploaded archive, manifest, and Waystone request file to HDFS through Waystone.
+      - Downloaded all three back into a separate local retrieve directory.
+      - Compared original vs retrieved files byte-for-byte with matching SHA-256s.
+
+  Remote HDFS location:
+
+  hdfs://<internal-storage>/path
+
+  Remote files:
+
+  - soma-emacs-...tar.zst — 3.36GB
+  - soma-emacs-...manifest.json — 3.2KB
+  - soma-emacs-...waystone-storage-request.json — 2.3KB
+
+  Key archive SHA-256:
+
+  ff4c077d72278af313b52836532db2669177ed3deadaa802d5249b288fe53cef
+
+  The local retrieved archive matched that same SHA exactly.
+
+  One caveat: during packing, tar printed POSIX ACL support is not available, but the pack command exited successfully. I have proven storage persistence and retrieval integrity for the archive bytes; I have
+  not yet unpacked the retrieved archive into a fresh rootfs directory and run validate-emacs-rootfs-contract.py --verify-rootfs-tree on the restored tree.
+
+  Git status in Soma is clean; the packed and retrieved artifacts are under ignored .scratch/emacs-gym/insula/artifacts/.
+
+  Worked for 6m 13s · 9:33 PM
+
+※ Recap: We successfully verified the end-to-end process of persisting and retrieving the Soma rootfs artifact using Waystone HDFS. The next step is to integrate this storage workflow into the
+         automated build pipeline.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── Design Emacs specialist models ─
+❯ Improve documentation in @filename
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  GPT-5.5 · Context 32% left · ~/workspace/soma · mainline                                                                          ☢ Full Access (shift+tab to cycle) · ← for agents · Goal achieved (20h 42m)

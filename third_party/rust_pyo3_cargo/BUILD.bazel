@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+# The offline Cargo source directory for the Rust PyO3 consumer: crates.io
+# sources as `cargo vendor` wrote them. vendor-manifest.tsv pins each crate's
+# sha256; vendor_pin_test.py checks the tree against it.
+filegroup(
+    name = "vendor",
+    srcs = glob(["vendor/**"], allow_empty = False),
+)
+
+exports_files(["vendor-manifest.tsv"])

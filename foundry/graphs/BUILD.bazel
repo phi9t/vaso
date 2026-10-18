@@ -1,0 +1,10 @@
+exports_files(glob([
+    "*_build_graph.json",
+    "*_spack_graph.lock.json",
+]))
+
+filegroup(
+    name = "graph_locks",
+    srcs = glob(["*_spack_graph.lock.json"]) + ["//locks:profile_locks"],
+    visibility = ["//visibility:public"],
+)

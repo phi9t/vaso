@@ -1,0 +1,72 @@
+module(name = "vaso_consumers", version = "0.0.0")
+
+bazel_dep(name = "vaso_graph", version = "0.1.0")
+
+vaso_graph = use_extension("@vaso_graph//:extensions.bzl", "vaso_graph")
+vaso_graph.profile(
+    name = "torch",
+    lock = "@vaso_graph//locks:torch.lock.json",
+)
+vaso_graph.torch_artifact(
+    name = "torch",
+    line = "cu129",
+    archive = "/vaso/artifacts/torch/cu129/torch-prefix-cu129-b050106d6e5baaf18af428962408c8f13ecc527cb9ebbe4c2eded63b67f3cc4f.tar",
+    sha256 = "b050106d6e5baaf18af428962408c8f13ecc527cb9ebbe4c2eded63b67f3cc4f",
+)
+vaso_graph.torch_artifact(
+    name = "torch",
+    line = "cu130",
+    archive = "/vaso/artifacts/torch/cu130/torch-prefix-cu130-1e79907c097c6e2f1084074aa2fcc91967dad1de5ab442f8a88d8c2ba7d84c9a.tar",
+    sha256 = "1e79907c097c6e2f1084074aa2fcc91967dad1de5ab442f8a88d8c2ba7d84c9a",
+)
+use_repo(
+    vaso_graph,
+    "vaso_torch_artifact_cu129",
+    "vaso_torch_artifact_cu130",
+)
+
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
+bazel_dep(name = "cutlass", version = "4.2.1")
+bazel_dep(name = "eigen", version = "5.0.1.bcr.2")
+bazel_dep(name = "fmt", version = "11.2.0")
+bazel_dep(name = "googletest", version = "1.17.0")
+bazel_dep(name = "glm", version = "1.0.1")
+bazel_dep(name = "gsplat_cuda", version = "1.5.3")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "protobuf", version = "33.4")
+bazel_dep(name = "pybind11_bazel", version = "2.12.0")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_rust", version = "0.70.0")
+bazel_dep(name = "rules_shell", version = "0.6.1")
+bazel_dep(name = "rust_pyo3_cargo", version = "0.24.2")
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2021",
+    versions = [],
+)
+use_repo(rust, "rust_toolchains")
+register_toolchains("@rust_toolchains//:all")
+
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "rust_pyo3_crates",
+    cargo_lockfile = "//rust_pyo3:Cargo.lock",
+    isolated = True,
+    manifests = ["//rust_pyo3:Cargo.toml"],
+    skip_cargo_lockfile_overwrite = True,
+)
+
+register_toolchains("//rust_pyo3:registered_rust_pyo3_toolchain")
+register_toolchains("//:consumer_default_test_toolchain")
+
+local_path_override(
+    module_name = "vaso_graph",
+    path = "../..",
+)
+
+local_path_override(
+    module_name = "rust_pyo3_cargo",
+    path = "../../../third_party/rust_pyo3_cargo",
+)

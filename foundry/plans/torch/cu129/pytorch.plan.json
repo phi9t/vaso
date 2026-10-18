@@ -1,0 +1,348 @@
+{
+  "build": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/pytorch-cu129\"\nif [ \"$(cat \"$fixed_root/owner\" 2>/dev/null)\" != \"{work}\" ]; then\n  echo \"fixed torch build root $fixed_root is owned by another action\" >&2\n  exit 2\nfi\nset -euo pipefail; source \"$1\"; rm -rf \"{work}/wheelhouse\"; mkdir -p \"{work}/wheelhouse\"; python3 -m pip wheel --no-deps --no-build-isolation --no-index -w \"{work}/wheelhouse\" \"/vaso/build/pytorch-cu129/src\"; set -- \"{work}/wheelhouse\"/torch-*.whl; if [ \"$#\" -ne 1 ] || [ ! -f \"$1\" ]; then echo 'expected exactly one wheel matching torch-*.whl' >&2; exit 2; fi",
+      "build",
+      "{work}/pytorch-build-env.sh"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/pytorch-cu129\"\nrm -rf \"$fixed_root\"\nmkdir -p \"$fixed_root/src\"\nprintf \"%s\\n\" \"{work}\" > \"$fixed_root/owner\"\ncp -a \"{src}/.\" \"$fixed_root/src/\"\nenv_file=\"$1\"\nshift\nroot=\"$PWD\"\nabs_prefix() ( case \"$1\" in /*) printf \"%s\\n\" \"$1\" ;; *) printf \"%s/%s\\n\" \"$root\" \"$1\" ;; esac )\ncuda=\"$(abs_prefix \"$1\")\"\nshift\ncudnn=\"$(abs_prefix \"$1\")\"\nshift\nnccl=\"$(abs_prefix \"$1\")\"\nshift\npython=\"$(abs_prefix \"$1\")\"\nshift\ncmake=\"$(abs_prefix \"$1\")\"\nshift\nninja=\"$(abs_prefix \"$1\")\"\nshift\nopenblas=\"$(abs_prefix \"$1\")\"\nshift\nprotobuf=\"$(abs_prefix \"$1\")\"\nshift\ncusparselt=\"$(abs_prefix \"$1\")\"\nshift\ncudss=\"$(abs_prefix \"$1\")\"\nshift\nnvshmem=\"$(abs_prefix \"$1\")\"\nshift\nopenmpi=\"$(abs_prefix \"$1\")\"\nshift\nlibevent=\"$(abs_prefix \"$1\")\"\nshift\nhwloc=\"$(abs_prefix \"$1\")\"\nshift\nlibpciaccess=\"$(abs_prefix \"$1\")\"\nshift\nlibxml2=\"$(abs_prefix \"$1\")\"\nshift\nlibiconv=\"$(abs_prefix \"$1\")\"\nshift\npmix=\"$(abs_prefix \"$1\")\"\nshift\nnumactl=\"$(abs_prefix \"$1\")\"\nshift\ncpuinfo=\"$(abs_prefix \"$1\")\"\nshift\nfp16=\"$(abs_prefix \"$1\")\"\nshift\nfxdiv=\"$(abs_prefix \"$1\")\"\nshift\npsimd=\"$(abs_prefix \"$1\")\"\nshift\npthreadpool=\"$(abs_prefix \"$1\")\"\nshift\npy_pip=\"$(abs_prefix \"$1\")\"\nshift\npy_setuptools=\"$(abs_prefix \"$1\")\"\nshift\npy_wheel=\"$(abs_prefix \"$1\")\"\nshift\npy_scikit_build_core=\"$(abs_prefix \"$1\")\"\nshift\npy_numpy=\"$(abs_prefix \"$1\")\"\nshift\npy_pyyaml=\"$(abs_prefix \"$1\")\"\nshift\npy_typing_extensions=\"$(abs_prefix \"$1\")\"\nshift\npy_six=\"$(abs_prefix \"$1\")\"\nshift\npy_packaging=\"$(abs_prefix \"$1\")\"\nshift\npy_pathspec=\"$(abs_prefix \"$1\")\"\nshift\npy_protobuf=\"$(abs_prefix \"$1\")\"\nshift\nfirst_provider_libdir() (\n  local prefix=\"$1\"\n  shift\n  local libdir name\n  for libdir in lib lib64 lib/x86_64-linux-gnu; do\n    for name in \"$@\"; do\n      if [ -e \"$prefix/$libdir/$name\" ]; then\n        printf \"%s\\n\" \"$prefix/$libdir\"\n        return 0\n      fi\n    done\n  done\n  printf \"%s/lib\\n\" \"$prefix\"\n)\nfirst_existing_library() (\n  local prefix=\"$1\"\n  shift\n  local libdir name\n  for libdir in lib lib64 lib/x86_64-linux-gnu; do\n    for name in \"$@\"; do\n      if [ -e \"$prefix/$libdir/$name\" ]; then\n        printf \"%s\\n\" \"$prefix/$libdir/$name\"\n        return 0\n      fi\n    done\n  done\n  printf \"%s/lib/%s\\n\" \"$prefix\" \"$1\"\n)\nnormalize_aten_config_include_dir() (\n  local template=\"/vaso/build/pytorch-cu129/src/aten/src/ATen/ATenConfig.cmake.in\"\n  local lists=\"/vaso/build/pytorch-cu129/src/aten/src/ATen/CMakeLists.txt\"\n  [ -f \"$template\" ] || return 0\n  python3 - \"$template\" \"$lists\" <<'PY'\nimport pathlib\nimport sys\n# ATEN_INCLUDE_DIR is the wheel build's temporary install prefix; point it at the\n# installed config's own location (torch/share/cmake/ATen -> torch/include).\ntemplate = pathlib.Path(sys.argv[1])\nlists = pathlib.Path(sys.argv[2])\nlb = chr(123)\nrb = chr(125)\nbroken = 'set(ATEN_INCLUDE_DIR \"@ATEN_INCLUDE_DIR@\")'\nfixed = 'get_filename_component(ATEN_INCLUDE_DIR \"$' + lb + 'CMAKE_CURRENT_LIST_DIR' + rb + '/../../../include\" ABSOLUTE)'\ntext = template.read_text(encoding=\"utf-8\")\nif fixed not in text:\n    if text.count(broken) != 1:\n        raise SystemExit(\"cannot make ATenConfig.cmake relocatable; ATEN_INCLUDE_DIR template line is missing\")\n    template.write_text(text.replace(broken, fixed, 1), encoding=\"utf-8\")\nconfigure = 'configure_file(ATenConfig.cmake.in \"$' + lb + 'CMAKE_CURRENT_BINARY_DIR' + rb + '/cmake-exports/ATenConfig.cmake\")'\nonly = configure[:-1] + \" @ONLY)\"\ntext = lists.read_text(encoding=\"utf-8\")\nif only not in text:\n    if text.count(configure) != 1:\n        raise SystemExit(\"cannot make ATenConfig.cmake relocatable; configure_file line is missing\")\n    lists.write_text(text.replace(configure, only, 1), encoding=\"utf-8\")\nPY\n)\nnormalize_macros_build_flags() (\n  local path=\"/vaso/build/pytorch-cu129/src/cmake/Codegen.cmake\"\n  [ -f \"$path\" ] || return 0\n  python3 - \"$path\" <<'PY'\nimport pathlib\nimport sys\n# caffe2/core/macros.h embeds CMAKE_CXX_FLAGS and CMAKE_CUDA_FLAGS as build strings.\n# Our -f*-prefix-map flags name action-local paths, so strip them for that one header.\npath = pathlib.Path(sys.argv[1])\ntext = path.read_text(encoding=\"utf-8\")\nmarker = \"# vaso: strip prefix-map flags from macros.h build strings\"\nif marker in text:\n    raise SystemExit(0)\nanchor = \"# ---[ Write the macros file\\n\"\nif text.count(anchor) != 1:\n    raise SystemExit(\"cannot strip prefix-map flags from macros.h; Codegen.cmake anchor is missing\")\nlb = chr(123)\nrb = chr(125)\nregex = \"(-Xcompiler=)?-f(file|debug|macro)-prefix-map=[^ ]*\"\nblock = [marker]\nfor var in (\"CMAKE_CXX_FLAGS\", \"CMAKE_CUDA_FLAGS\"):\n    block.append(\"set(VASO_SAVED_\" + var + \" \\\"$\" + lb + var + rb + \"\\\")\")\n    block.append(\"string(REGEX REPLACE \\\"\" + regex + \"\\\" \\\"\\\" \" + var + \" \\\"$\" + lb + var + rb + \"\\\")\")\npath.write_text(text.replace(anchor, \"\\n\".join(block) + \"\\n\" + anchor, 1), encoding=\"utf-8\")\ntext = path.read_text(encoding=\"utf-8\")\nend = \"    $\" + lb + \"CMAKE_BINARY_DIR\" + rb + \"/caffe2/core/macros.h)\\n\"\nif text.count(end) != 1:\n    raise SystemExit(\"cannot strip prefix-map flags from macros.h; configure_file anchor is missing\")\nrestore = \"\".join(\"set(\" + var + \" \\\"$\" + lb + \"VASO_SAVED_\" + var + rb + \"\\\")\\n\" for var in (\"CMAKE_CXX_FLAGS\", \"CMAKE_CUDA_FLAGS\"))\npath.write_text(text.replace(end, end + restore, 1), encoding=\"utf-8\")\nPY\n)\nnormalize_cudss_csr_row_end() (\n  local path=\"/vaso/build/pytorch-cu129/src/aten/src/ATen/native/sparse/cuda/SparseCsrTensorMath.cu\"\n  [ -f \"$path\" ] || return 0\n  python3 - \"$path\" <<'PY'\nimport pathlib\nimport sys\npath = pathlib.Path(sys.argv[1])\ntext = path.read_text(encoding=\"utf-8\")\nbroken = \"rowOffsets, rowOffsets + crow.size(0), colIndices, values_ptr\"\nfixed = \"rowOffsets, nullptr, colIndices, values_ptr\"\nif fixed in text:\n    raise SystemExit(0)\nif broken not in text:\n    if \"cudssMatrixCreateCsr\" in text:\n        raise SystemExit(\"cannot patch cuDSS CSR rowEnd; expected PyTorch v2.14.0 cudssMatrixCreateCsr argument snippet is missing\")\n    raise SystemExit(0)\npath.write_text(text.replace(broken, fixed, 1), encoding=\"utf-8\")\nPY\n)\nnormalize_externalized_psimd_source() (\n  local dir=\"/vaso/build/pytorch-cu129/src/third_party/psimd\"\n  local sentinel\n  for sentinel in CMakeLists.txt Makefile setup.py LICENSE LICENSE.md LICENSE.txt; do\n    [ -e \"$dir/$sentinel\" ] && return 0\n  done\n  mkdir -p \"$dir\"\n  local unexpected\n  unexpected=\"$(find \"$dir\" -mindepth 1 -maxdepth 1 ! -name .git -printf \"%f\\n\" | LC_ALL=C sort | paste -sd, -)\"\n  if [ -n \"$unexpected\" ]; then\n    echo \"third_party/psimd has no PyTorch prebuild sentinel but is not an empty externalized submodule: $unexpected\" >&2\n    exit 2\n  fi\n  if [ ! -f \"$psimd/include/psimd.h\" ]; then\n    echo \"native psimd header is missing: $psimd/include/psimd.h\" >&2\n    exit 2\n  fi\n  python3 - \"$dir/CMakeLists.txt\" \"$psimd/include\" <<'PY'\nimport pathlib\nimport sys\npath = pathlib.Path(sys.argv[1])\ninclude = str(pathlib.Path(sys.argv[2])).replace(\"\\\\\", \"/\").replace('\"', '\\\\\"')\npath.write_text(\"\\n\".join([\n    \"cmake_minimum_required(VERSION 3.5)\",\n    \"project(psimd_native_prefix NONE)\",\n    \"add_library(psimd INTERFACE)\",\n    'target_include_directories(psimd INTERFACE \"' + include + '\")',\n    \"\",\n]) + \"\\n\", encoding=\"utf-8\")\nPY\n)\nnormalize_top_level_helper_imports() (\n  local path=\"/vaso/build/pytorch-cu129/src/cmake/Dependencies.cmake\"\n  [ -f \"$path\" ] || return 0\n  python3 - \"$path\" \"$cpuinfo/include/cpuinfo.h\" \"$pthreadpool/include/pthreadpool.h\" <<'PY'\nimport pathlib\nimport sys\npath = pathlib.Path(sys.argv[1])\ncpuinfo_header = pathlib.Path(sys.argv[2])\npthreadpool_header = pathlib.Path(sys.argv[3])\ntext = path.read_text(encoding=\"utf-8\")\nlines = text.splitlines(keepends=True)\nchanged = False\nlbrace = chr(123)\nrbrace = chr(125)\nfor target, library_var, source_var, header in (\n    (\"cpuinfo\", \"CPUINFO_LIBRARY\", \"CPUINFO_SOURCE_DIR\", cpuinfo_header),\n    (\"pthreadpool\", \"PTHREADPOOL_LIBRARY\", \"PTHREADPOOL_SOURCE_DIR\", pthreadpool_header),\n):\n    source_ref = \"$\" + lbrace + source_var + rbrace\n    library_ref = \"$\" + lbrace + library_var + rbrace\n    property_line = 'set_property(TARGET ' + target + ' PROPERTY INTERFACE_INCLUDE_DIRECTORIES \"' + source_ref + '/include\")'\n    if property_line in \"\".join(lines):\n        continue\n    location_lines = (\n        'set_property(TARGET ' + target + ' PROPERTY IMPORTED_LOCATION \"' + library_ref + '\")',\n        'set_target_properties(' + target + ' PROPERTIES IMPORTED_LOCATION \"' + library_ref + '\")',\n    )\n    patch_index = next((i for i, line in enumerate(lines) if line.strip() in location_lines), None)\n    if patch_index is None:\n        continue\n    if not header.is_file():\n        raise SystemExit(\"native \" + target + \" header is missing: \" + str(header))\n    indent = lines[patch_index][:len(lines[patch_index]) - len(lines[patch_index].lstrip())]\n    lines.insert(patch_index + 1, indent + property_line + \"\\n\")\n    changed = True\nif changed:\n    path.write_text(\"\".join(lines), encoding=\"utf-8\")\nPY\n)\nnormalize_qnnpack_helper_imports() (\n  local path=\"/vaso/build/pytorch-cu129/src/aten/src/ATen/native/quantized/cpu/qnnpack/CMakeLists.txt\"\n  [ -f \"$path\" ] || return 0\n  python3 - \"$path\" \"$psimd/include\" \"$pthreadpool/include\" <<'PY'\nimport pathlib\nimport sys\npath = pathlib.Path(sys.argv[1])\npsimd_include = pathlib.Path(sys.argv[2])\npthreadpool_include = pathlib.Path(sys.argv[3])\ntext = path.read_text(encoding=\"utf-8\")\nchanged = False\ndef cmake_escape(value):\n    return str(value).replace(chr(92), \"/\").replace(chr(34), chr(92) + chr(34))\nlbrace = chr(123)\nrbrace = chr(125)\npsimd_property = '  set_property(TARGET psimd PROPERTY INTERFACE_INCLUDE_DIRECTORIES \"' + cmake_escape(psimd_include) + '\")'\nif psimd_property not in text:\n    psimd_needle = \"  set_property(TARGET psimd PROPERTY LINKER_LANGUAGE C)\"\n    if psimd_needle in text:\n        header = psimd_include / \"psimd.h\"\n        if not header.is_file():\n            raise SystemExit(\"native psimd header is missing: \" + str(header))\n        text = text.replace(psimd_needle, psimd_needle + \"\\n\" + psimd_property, 1)\n        changed = True\npthreadpool_header = pthreadpool_include / \"pthreadpool.h\"\nif not pthreadpool_header.is_file():\n    raise SystemExit(\"native pthreadpool header is missing: \" + str(pthreadpool_header))\npthreadpool_property = 'INTERFACE_INCLUDE_DIRECTORIES \"' + cmake_escape(pthreadpool_include) + '\"'\nif pthreadpool_property not in text:\n    pthreadpool_ref = \"$\" + lbrace + \"PTHREADPOOL_LIBRARY\" + rbrace\n    needle = '  set_target_properties(pthreadpool PROPERTIES\\n    IMPORTED_LOCATION \"' + pthreadpool_ref + '\")'\n    if needle not in text:\n        raise SystemExit(\"cannot patch qnnpack pthreadpool import; expected PyTorch v2.14.0 CMake snippet is missing\")\n    replacement = '  set_target_properties(pthreadpool PROPERTIES\\n    IMPORTED_LOCATION \"' + pthreadpool_ref + '\"\\n    ' + pthreadpool_property + \")\"\n    text = text.replace(needle, replacement, 1)\n    changed = True\nif changed:\n    path.write_text(text, encoding=\"utf-8\")\nPY\n)\nnormalize_nnpack_peachpy_launcher() (\n  local path=\"/vaso/build/pytorch-cu129/src/third_party/NNPACK/CMakeLists.txt\"\n  [ -f \"$path\" ] || return 0\n  python3 - \"$path\" <<'PY'\nimport pathlib\nimport sys\npath = pathlib.Path(sys.argv[1])\ntext = path.read_text(encoding=\"utf-8\")\nlbrace = chr(123)\nrbrace = chr(125)\ncmake_command = \"$\" + lbrace + \"CMAKE_COMMAND\" + rbrace\npeachpy_pythonpath = \"$\" + lbrace + \"PEACHPY_PYTHONPATH\" + rbrace\nfixed = 'COMMAND \"' + cmake_command + '\" -E env \"PYTHONPATH=' + peachpy_pythonpath + '\"'\nbroken = 'COMMAND \"PYTHONPATH=' + peachpy_pythonpath + '\"'\nif fixed not in text and broken in text:\n    path.write_text(text.replace(broken, fixed, 1), encoding=\"utf-8\")\nPY\n)\nnormalize_cudss_csr_row_end\nnormalize_externalized_psimd_source\nnormalize_macros_build_flags\nnormalize_aten_config_include_dir\nnormalize_top_level_helper_imports\nnormalize_qnnpack_helper_imports\nnormalize_nnpack_peachpy_launcher\ncompiler_prefix_map_flags=\"\"\ncuda_prefix_map_flags=\"\"\nfor logical_map_root in $cuda $cudnn $nccl $python $cmake $ninja $openblas $protobuf $cusparselt $cudss $nvshmem $openmpi $libevent $hwloc $libpciaccess $libxml2 $libiconv $pmix $numactl $cpuinfo $fp16 $fxdiv $psimd $pthreadpool $py_pip $py_setuptools $py_wheel $py_scikit_build_core $py_numpy $py_pyyaml $py_typing_extensions $py_six $py_packaging $py_pathspec $py_protobuf; do\n  resolved_map_root=\"$(readlink -f \"$logical_map_root\" 2>/dev/null || printf \"%s\" \"$logical_map_root\")\"\n  for map_root in \"$logical_map_root\" \"$resolved_map_root\"; do\n    compiler_prefix_map_flags=\"$compiler_prefix_map_flags -ffile-prefix-map=$map_root=. -fdebug-prefix-map=$map_root=. -fmacro-prefix-map=$map_root=.\"\n    cuda_prefix_map_flags=\"$cuda_prefix_map_flags -Xcompiler=-ffile-prefix-map=$map_root=. -Xcompiler=-fdebug-prefix-map=$map_root=. -Xcompiler=-fmacro-prefix-map=$map_root=.\"\n  done\ndone\nmkdir -p \"$(dirname \"$env_file\")\" \"{work}/home\" \"{work}/pip-cache\"\ncudnn_library=\"$(first_provider_libdir \"$cudnn\" libcudnn.so libcudnn_static.a)\"\nnccl_lib_dir=\"$(first_provider_libdir \"$nccl\" libnccl.so libnccl_static.a)\"\ncudss_library=\"$(first_existing_library \"$cudss\" libcudss.so libcudss_static.a)\"\npy_six_source_dir=\"$py_six/lib/python3.13/site-packages\"\ncat > \"$env_file\" <<EOF\nset -euo pipefail\nexport USE_GFLAGS=0\nexport USE_GLOG=0\nexport USE_MKL=0\nexport USE_MKLDNN=0\nexport USE_MPI=1\nexport USE_NUMA=1\nexport USE_TENSORPIPE=1\nexport USE_RPC=1\nexport USE_TENSORRT=0\nexport USE_XPU=0\nexport USE_ROCM=0\nexport USE_MPS=0\nexport USE_OPENMP=1\nexport USE_FBGEMM=1\nexport USE_QNNPACK=1\nexport USE_XNNPACK=1\nexport USE_NNPACK=1\nexport USE_KINETO=1\nexport USE_GLOO=1\nexport USE_FLASH_ATTENTION=1\nexport USE_MEM_EFF_ATTENTION=1\nexport USE_MAGMA=0\nexport TH_BINARY_BUILD=1\nexport ATEN_STATIC_CUDA=0\nexport USE_CUDA_STATIC_LINK=0\nexport USE_STATIC_CUDNN=0\nexport _GLIBCXX_USE_CXX11_ABI=1\nexport COLORIZE_OUTPUT=0\nexport BUILD_TEST=0\nexport BUILD_BINARY=0\nexport BUILD_CAFFE2_OPS=0\nexport BUILD_CUSTOM_PROTOBUF=OFF\nexport USE_STATIC_DISPATCH=0\nexport PYTORCH_BUILD_NUMBER=1\nexport USE_CUDA=1\nexport USE_CUDNN=1\nexport USE_NCCL=1\nexport USE_DISTRIBUTED=1\nexport USE_SYSTEM_NCCL=1\nexport USE_STATIC_NCCL=0\nexport USE_CUSPARSELT=1\nexport USE_CUDSS=1\nexport USE_NVSHMEM=1\nexport USE_SYSTEM_CPUINFO=1\nexport USE_SYSTEM_FXDIV=1\nexport USE_SYSTEM_PSIMD=1\nexport USE_SYSTEM_PTHREADPOOL=1\nexport ONNX_BUILD_CUSTOM_PROTOBUF=OFF\nexport ONNX_USE_PROTOBUF_SHARED_LIBS=ON\nexport TORCH_CUDA_ARCH_LIST=10.0+PTX\nexport PYTORCH_BUILD_VERSION=2.14.0\nexport PYTHONHOME=\nexport PYTHONNOUSERSITE=1\nexport PIP_DISABLE_PIP_VERSION_CHECK=1\nexport PIP_NO_INDEX=1\nexport PIP_NO_INPUT=1\nexport CFLAGS=\"$CFLAGS $compiler_prefix_map_flags\"\nexport CXXFLAGS=\"$CXXFLAGS $compiler_prefix_map_flags\"\nexport CUDAFLAGS=\"$CUDAFLAGS $cuda_prefix_map_flags\"\nexport NVCC_FLAGS=\"$NVCC_FLAGS $cuda_prefix_map_flags\"\nexport CMAKE_C_COMPILER=\"$CC\"\nexport CMAKE_CXX_COMPILER=\"$CXX\"\nexport CMAKE_ARGS=\"-DCPUINFO_SOURCE_DIR=$cpuinfo -DPYTHON_SIX_SOURCE_DIR=$py_six_source_dir -DPYTHON_PEACHPY_SOURCE_DIR=/vaso/build/pytorch-cu129/src/third_party/python-peachpy -DPTHREADPOOL_SOURCE_DIR=$pthreadpool\"\nexport CUDA_HOME=\"$cuda\"\nexport CUDA_TOOLKIT_ROOT_DIR=\"$cuda\"\nexport CUDA_PATH=\"$cuda\"\nexport CUDNN_ROOT=\"$cudnn\"\nexport CUDNN_INCLUDE_DIR=\"$cudnn/include\"\nexport CUDNN_LIBRARY=\"$cudnn_library\"\nexport NCCL_ROOT=\"$nccl\"\nexport NCCL_INCLUDE_DIR=\"$nccl/include\"\nexport NCCL_LIB_DIR=\"$nccl_lib_dir\"\nexport BLAS=OpenBLAS\nexport OpenBLAS_HOME=\"$openblas\"\nexport CUSPARSELT_ROOT=\"$cusparselt\"\nexport CUDSS_ROOT=\"$cudss\"\nexport CUDSS_INCLUDE_DIR=\"$cudss/include\"\nexport CUDSS_LIBRARY=\"$cudss_library\"\nexport NVSHMEM_HOME=\"$nvshmem\"\nexport MPI_HOME=\"$openmpi\"\nexport NUMA_ROOT=\"$numactl\"\nexport PROTOBUF_PROTOC_EXECUTABLE=\"$protobuf/bin/protoc\"\nexport PYTHONPATH=\"$py_pip/lib/python3.13/site-packages:$py_setuptools/lib/python3.13/site-packages:$py_wheel/lib/python3.13/site-packages:$py_scikit_build_core/lib/python3.13/site-packages:$py_numpy/lib/python3.13/site-packages:$py_pyyaml/lib/python3.13/site-packages:$py_typing_extensions/lib/python3.13/site-packages:$py_six/lib/python3.13/site-packages:$py_packaging/lib/python3.13/site-packages:$py_pathspec/lib/python3.13/site-packages:$py_protobuf/lib/python3.13/site-packages\"\nexport PATH=\"$python/bin:$cmake/bin:$ninja/bin:$cuda/bin:$py_pip/bin:$py_wheel/bin:/usr/bin:/bin\"\nexport CMAKE_PREFIX_PATH=\"$python:$cmake:$protobuf:$openblas:$cusparselt:$cudss:$nvshmem:$openmpi:$numactl:$cpuinfo:$fp16:$fxdiv:$psimd:$pthreadpool\"\nexport MAX_JOBS={jobs}\nexport CMAKE_BUILD_PARALLEL_LEVEL={jobs}\nexport HOME=\"{work}/home\"\nexport PIP_CACHE_DIR=\"{work}/pip-cache\"\nEOF",
+      "configure",
+      "{work}/pytorch-build-env.sh",
+      "{prefix:cuda}",
+      "{prefix:cudnn}",
+      "{prefix:nccl}",
+      "{prefix:python}",
+      "{prefix:cmake}",
+      "{prefix:ninja}",
+      "{prefix:openblas}",
+      "{prefix:protobuf}",
+      "{prefix:cusparselt}",
+      "{prefix:cudss}",
+      "{prefix:nvshmem}",
+      "{prefix:openmpi}",
+      "{prefix:libevent}",
+      "{prefix:hwloc}",
+      "{prefix:libpciaccess}",
+      "{prefix:libxml2}",
+      "{prefix:libiconv}",
+      "{prefix:pmix}",
+      "{prefix:numactl}",
+      "{prefix:cpuinfo}",
+      "{prefix:fp16}",
+      "{prefix:fxdiv}",
+      "{prefix:psimd}",
+      "{prefix:pthreadpool}",
+      "{prefix:py-pip}",
+      "{prefix:py-setuptools}",
+      "{prefix:py-wheel}",
+      "{prefix:py-scikit-build-core}",
+      "{prefix:py-numpy}",
+      "{prefix:py-pyyaml}",
+      "{prefix:py-typing-extensions}",
+      "{prefix:py-six}",
+      "{prefix:py-packaging}",
+      "{prefix:py-pathspec}",
+      "{prefix:py-protobuf}"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "deps": {
+    "cmake": {
+      "key": "manifest:@cmake_native//:prefix_manifest.json",
+      "label": "@cmake_native//:prefix_path.txt",
+      "manifest": "@cmake_native//:prefix_manifest.json"
+    },
+    "cpuinfo": {
+      "key": "manifest:@cpuinfo_native//:prefix_manifest.json",
+      "label": "@cpuinfo_native//:prefix_path.txt",
+      "manifest": "@cpuinfo_native//:prefix_manifest.json"
+    },
+    "cuda": {
+      "key": "manifest:@cuda_native//:prefix_manifest.json",
+      "label": "@cuda_native//:prefix_path.txt",
+      "manifest": "@cuda_native//:prefix_manifest.json"
+    },
+    "cudnn": {
+      "key": "manifest:@cudnn_native//:prefix_manifest.json",
+      "label": "@cudnn_native//:prefix_path.txt",
+      "manifest": "@cudnn_native//:prefix_manifest.json"
+    },
+    "cudss": {
+      "key": "manifest:@cudss_native//:prefix_manifest.json",
+      "label": "@cudss_native//:prefix_path.txt",
+      "manifest": "@cudss_native//:prefix_manifest.json"
+    },
+    "cusparselt": {
+      "key": "manifest:@cusparselt_native//:prefix_manifest.json",
+      "label": "@cusparselt_native//:prefix_path.txt",
+      "manifest": "@cusparselt_native//:prefix_manifest.json"
+    },
+    "fp16": {
+      "key": "manifest:@fp16_native//:prefix_manifest.json",
+      "label": "@fp16_native//:prefix_path.txt",
+      "manifest": "@fp16_native//:prefix_manifest.json"
+    },
+    "fxdiv": {
+      "key": "manifest:@fxdiv_native//:prefix_manifest.json",
+      "label": "@fxdiv_native//:prefix_path.txt",
+      "manifest": "@fxdiv_native//:prefix_manifest.json"
+    },
+    "hwloc": {
+      "key": "manifest:@hwloc_native//:prefix_manifest.json",
+      "label": "@hwloc_native//:prefix_path.txt",
+      "manifest": "@hwloc_native//:prefix_manifest.json"
+    },
+    "libevent": {
+      "key": "manifest:@libevent_native//:prefix_manifest.json",
+      "label": "@libevent_native//:prefix_path.txt",
+      "manifest": "@libevent_native//:prefix_manifest.json"
+    },
+    "libiconv": {
+      "key": "manifest:@libiconv_native//:prefix_manifest.json",
+      "label": "@libiconv_native//:prefix_path.txt",
+      "manifest": "@libiconv_native//:prefix_manifest.json"
+    },
+    "libpciaccess": {
+      "key": "manifest:@libpciaccess_native//:prefix_manifest.json",
+      "label": "@libpciaccess_native//:prefix_path.txt",
+      "manifest": "@libpciaccess_native//:prefix_manifest.json"
+    },
+    "libxml2": {
+      "key": "manifest:@libxml2_215_native//:prefix_manifest.json",
+      "label": "@libxml2_215_native//:prefix_path.txt",
+      "manifest": "@libxml2_215_native//:prefix_manifest.json"
+    },
+    "nccl": {
+      "key": "manifest:@nccl_native//:prefix_manifest.json",
+      "label": "@nccl_native//:prefix_path.txt",
+      "manifest": "@nccl_native//:prefix_manifest.json"
+    },
+    "ninja": {
+      "key": "manifest:@ninja_native//:prefix_manifest.json",
+      "label": "@ninja_native//:prefix_path.txt",
+      "manifest": "@ninja_native//:prefix_manifest.json"
+    },
+    "numactl": {
+      "key": "manifest:@numactl_native//:prefix_manifest.json",
+      "label": "@numactl_native//:prefix_path.txt",
+      "manifest": "@numactl_native//:prefix_manifest.json"
+    },
+    "nvshmem": {
+      "key": "manifest:@nvshmem_native//:prefix_manifest.json",
+      "label": "@nvshmem_native//:prefix_path.txt",
+      "manifest": "@nvshmem_native//:prefix_manifest.json"
+    },
+    "openblas": {
+      "key": "manifest:@openblas_native//:prefix_manifest.json",
+      "label": "@openblas_native//:prefix_path.txt",
+      "manifest": "@openblas_native//:prefix_manifest.json"
+    },
+    "openmpi": {
+      "key": "manifest:@openmpi_native//:prefix_manifest.json",
+      "label": "@openmpi_native//:prefix_path.txt",
+      "manifest": "@openmpi_native//:prefix_manifest.json"
+    },
+    "pmix": {
+      "key": "manifest:@pmix_native//:prefix_manifest.json",
+      "label": "@pmix_native//:prefix_path.txt",
+      "manifest": "@pmix_native//:prefix_manifest.json"
+    },
+    "protobuf": {
+      "key": "manifest:@protobuf_native//:prefix_manifest.json",
+      "label": "@protobuf_native//:prefix_path.txt",
+      "manifest": "@protobuf_native//:prefix_manifest.json"
+    },
+    "psimd": {
+      "key": "manifest:@psimd_native//:prefix_manifest.json",
+      "label": "@psimd_native//:prefix_path.txt",
+      "manifest": "@psimd_native//:prefix_manifest.json"
+    },
+    "pthreadpool": {
+      "key": "manifest:@pthreadpool_native//:prefix_manifest.json",
+      "label": "@pthreadpool_native//:prefix_path.txt",
+      "manifest": "@pthreadpool_native//:prefix_manifest.json"
+    },
+    "py-numpy": {
+      "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+      "label": "@py_numpy_native//:prefix_path.txt",
+      "manifest": "@py_numpy_native//:prefix_manifest.json"
+    },
+    "py-packaging": {
+      "key": "manifest:@py_packaging_native//:prefix_manifest.json",
+      "label": "@py_packaging_native//:prefix_path.txt",
+      "manifest": "@py_packaging_native//:prefix_manifest.json"
+    },
+    "py-pathspec": {
+      "key": "manifest:@py_pathspec_native//:prefix_manifest.json",
+      "label": "@py_pathspec_native//:prefix_path.txt",
+      "manifest": "@py_pathspec_native//:prefix_manifest.json"
+    },
+    "py-pip": {
+      "key": "manifest:@py_pip_native//:prefix_manifest.json",
+      "label": "@py_pip_native//:prefix_path.txt",
+      "manifest": "@py_pip_native//:prefix_manifest.json"
+    },
+    "py-protobuf": {
+      "key": "manifest:@py_protobuf_native//:prefix_manifest.json",
+      "label": "@py_protobuf_native//:prefix_path.txt",
+      "manifest": "@py_protobuf_native//:prefix_manifest.json"
+    },
+    "py-pyyaml": {
+      "key": "manifest:@py_pyyaml_native//:prefix_manifest.json",
+      "label": "@py_pyyaml_native//:prefix_path.txt",
+      "manifest": "@py_pyyaml_native//:prefix_manifest.json"
+    },
+    "py-scikit-build-core": {
+      "key": "manifest:@py_scikit_build_core_native//:prefix_manifest.json",
+      "label": "@py_scikit_build_core_native//:prefix_path.txt",
+      "manifest": "@py_scikit_build_core_native//:prefix_manifest.json"
+    },
+    "py-setuptools": {
+      "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+      "label": "@py_setuptools_native//:prefix_path.txt",
+      "manifest": "@py_setuptools_native//:prefix_manifest.json"
+    },
+    "py-six": {
+      "key": "manifest:@py_six_native//:prefix_manifest.json",
+      "label": "@py_six_native//:prefix_path.txt",
+      "manifest": "@py_six_native//:prefix_manifest.json"
+    },
+    "py-typing-extensions": {
+      "key": "manifest:@py_typing_extensions_native//:prefix_manifest.json",
+      "label": "@py_typing_extensions_native//:prefix_path.txt",
+      "manifest": "@py_typing_extensions_native//:prefix_manifest.json"
+    },
+    "py-wheel": {
+      "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+      "label": "@py_wheel_native//:prefix_path.txt",
+      "manifest": "@py_wheel_native//:prefix_manifest.json"
+    },
+    "python": {
+      "key": "manifest:@python_313_native//:prefix_manifest.json",
+      "label": "@python_313_native//:prefix_path.txt",
+      "manifest": "@python_313_native//:prefix_manifest.json"
+    },
+    "zstd": {
+      "key": "action://native/zstd:zstd_action_prefix_manifest",
+      "label": "//native/zstd:zstd_action_prefix",
+      "manifest": "action://native/zstd:zstd_action_prefix_manifest"
+    }
+  },
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:a2935c29a5e123c46e144cbb96e973ba63551fb110c04b5af6058d5a533349b1",
+    "source_date_epoch": 0
+  },
+  "gpu_archs": [
+    "sm_100+PTX"
+  ],
+  "inputs": [
+    {
+      "path": "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+      "sha256": "c71a4e26005b95e4f1a5ebc9ff6f28a94ccf3f1739942b9882559487baf0ecc0"
+    }
+  ],
+  "install": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/pytorch-cu129\"\nif [ \"$(cat \"$fixed_root/owner\" 2>/dev/null)\" != \"{work}\" ]; then\n  echo \"fixed torch build root $fixed_root is owned by another action\" >&2\n  exit 2\nfi\nset -euo pipefail; source \"$1\"; set -- \"{work}/wheelhouse\"/torch-*.whl; if [ \"$#\" -ne 1 ] || [ ! -f \"$1\" ]; then echo 'expected exactly one wheel matching torch-*.whl' >&2; exit 2; fi; wheel=\"$1\"; python3 -m pip install --no-deps --ignore-installed --no-build-isolation --no-compile --no-warn-script-location --no-index --no-cache-dir --prefix \"{out}\" \"$wheel\"; python3 -c 'import pathlib, shutil, sys\nprefix = pathlib.Path(sys.argv[1])\nfor pyc in prefix.rglob(\"*.pyc\"):\n    if not pyc.is_symlink():\n        pyc.unlink()\nfor pycache in sorted(prefix.rglob(\"__pycache__\"), reverse=True):\n    if pycache.is_dir() and not pycache.is_symlink():\n        shutil.rmtree(pycache)\nfor direct_url in prefix.rglob(\"direct_url.json\"):\n    if direct_url.parent.name.endswith(\".dist-info\") and direct_url.is_file() and not direct_url.is_symlink():\n        direct_url.unlink()\n        record = direct_url.parent / \"RECORD\"\n        if record.is_file():\n            record.write_text(\"\".join(line for line in record.read_text(encoding=\"utf-8\").splitlines(True) if not line.split(\",\", 1)[0].endswith(\"/direct_url.json\")), encoding=\"utf-8\")\nbin_dir = prefix / \"bin\"\nif bin_dir.is_dir():\n    for script in sorted(bin_dir.iterdir()):\n        if script.is_symlink() or not script.is_file():\n            continue\n        data = script.read_bytes()\n        first, sep, rest = data.partition(b\"\\n\")\n        if not sep or not first.startswith(b\"#!\"):\n            continue\n        interp = first[2:].strip().split(maxsplit=1)[0]\n        name = pathlib.PurePosixPath(interp.decode(\"utf-8\", \"ignore\")).name\n        if name.startswith(\"python\"):\n            script.write_bytes(b\"#!/usr/bin/env python3\\n\" + rest)\n' \"{out}\"; mkdir -p \"$(dirname \"{wheel}\")\"; cp \"$wheel\" \"{wheel}\"\nrm -rf \"/vaso/build/pytorch-cu129\"\n",
+      "install",
+      "{work}/pytorch-build-env.sh"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "line": "cu129",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-12-9"
+        ],
+        "expect_stdout": "12.9.79-1",
+        "name": "dpkg-cuda-cudart-12-9"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    },
+    {
+      "kind": "wheel",
+      "path": "{wheel}"
+    }
+  ],
+  "package": {
+    "name": "py-torch",
+    "version": "2.14.0"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a",
+      "strip_prefix": "pytorch-v2.14.0",
+      "urls": [
+        "https://example.invalid/vaso/pytorch-v2.14.0-2b3ec348-recursive.tar.zst"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@12.9.1",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu129/rootfs.identity.json",
+      "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+    }
+  }
+}

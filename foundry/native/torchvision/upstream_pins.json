@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "pytorch": {
+    "version": "2.14.0"
+  },
+  "torchvision": {
+    "version": "0.29.0",
+    "tag": "v0.29.0",
+    "source_url": "https://github.com/pytorch/vision/archive/refs/tags/v0.29.0.tar.gz",
+    "archive_sha256": "24be57d922927d8a2ac2e8f076f07c3447ddf8f1d25ddbb7b65578f36c9ab8e3",
+    "requires_python": "!=3.14.1,>=3.10",
+    "requires_torch": "==2.14.0",
+    "requires_dist": [
+      "numpy",
+      "torch==2.14.0",
+      "pillow!=8.3.*,>=5.3.0"
+    ]
+  },
+  "pillow": {
+    "version": "12.2.0",
+    "source_url": "https://files.pythonhosted.org/packages/8c/21/c2bcdd5906101a30244eaffc1b6e6ce71a31bd0742a01eb89e660ebfac2d/pillow-12.2.0.tar.gz",
+    "archive_sha256": "a830b1a40919539d07806aa58e1b114df53ddd43213d9c8b75847eee6c0182b5"
+  }
+}

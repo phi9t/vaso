@@ -1,0 +1,5 @@
+# Existing tracker violations are grandfathered here as:
+# .scratch/<effort>/issues/<ticket>.md<TAB><rule-code>
+# Entries must only shrink: a stale entry fails //tools:tracker_lint_live_test.
+# PB-A1 is actively owned by pb-release; remove when its real run evidence lands.
+# FC-N1-2 intentionally changes native action keys; TRAE runs the real torch/jaxlib rebuild proof after landing.

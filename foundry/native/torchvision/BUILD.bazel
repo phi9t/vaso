@@ -1,0 +1,151 @@
+load(":torchvision_action.bzl", "torchvision_action_prefix", "torchvision_token_flag")
+load("//native/common:native_output_path_query.bzl", "native_action_prefix_path")
+load("//native/common:release_wheel_action.bzl", "release_wheel_action")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_driver_test.py",
+    "action_prefix_test.py",
+    "action_smoke_test.py",
+    "plan.py",
+    "plan_test.py",
+    "synthetic_prefix_path.txt",
+    "synthetic_source_anchor.txt",
+    "torchvision_action.bzl",
+    "upstream_pins.json",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+)
+
+torchvision_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+native_action_prefix_path(
+    name = "torchvision_action_prefix_path",
+    output_basename = "torchvision_action",
+    profile = "torch",
+    tags = ["manual"],
+)
+
+torchvision_action_prefix(
+    name = "torchvision_action",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    execute = True,
+    inputs = {
+        ":upstream_pins.json": "native/torchvision/upstream_pins.json",
+    },
+    libjpeg_turbo_prefix_file = "@libjpeg_turbo_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/torchvision.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/torchvision.plan.json",
+    }),
+    py_filelock_prefix_file = "@py_filelock_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pillow_prefix_file = "@py_pillow_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@torchvision_v0_29_0_source_archive//file",
+    tags = ["manual"],
+    torch_prefix = "//native/pytorch:pytorch_action",
+    zlib_ng_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+release_wheel_action(
+    name = "torchvision_release_wheel",
+    input = ":torchvision_action",
+    profile = "torch",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "action_prefix_test",
+    srcs = ["action_prefix_test.py"],
+    args = [
+        "--repo-root",
+        "$(rootpath //:MODULE.bazel)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//native/common:BUILD.bazel",
+        "//native/common:plan_executor",
+        "//native/common:plan_executor.py",
+        "//native/common:plan_schema.py",
+        "//native/common:prefix_manifest.py",
+        "//native/common:toolchain_helper_files",
+        "//native/pytorch:BUILD.bazel",
+        "//native/pytorch:action_driver.py",
+        "//native/pytorch:pytorch-v2.14.0-2b3ec348-submodules.json",
+        "//native/pytorch:pytorch_action.bzl",
+        "//plans:committed_plan_files",
+        "//toolchains:toolchain_files",
+        "//tools:nested_bazel_fixture.py",
+        ":BUILD.bazel",
+        ":torchvision_action.bzl",
+        ":upstream_pins.json",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_BAZEL_OB",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "action_prefix_test.py",
+    precompile = "disabled",
+    size = "small",
+    timeout = "short",
+    tags = [
+        "external",
+        "no-cache",
+    ],
+)
+
+py_test(
+    name = "action_driver_test",
+    srcs = [
+        "action_driver.py",
+        "action_driver_test.py",
+    ],
+    data = [
+        "//plans:keys.json",
+        "//plans:torch/cu130/torchvision.plan.json",
+    ],
+    main = "action_driver_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:dev.MODULE.bazel",
+        "//:run.sh",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":torchvision_action.bzl",
+        ":upstream_pins.json",
+    ],
+    deps = ["//native/common:native_action_toolchain_py"],
+    main = "plan_test.py",
+)

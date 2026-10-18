@@ -1,0 +1,7 @@
+.vaso/
+.pytest_cache/
+__pycache__/
+*.pyc
+target/
+.scratch/production-build/evidence/
+.trae/

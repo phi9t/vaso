@@ -1,0 +1,80 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load(":rust_pyo3.bzl", "rust_pyo3_toolchain", "rust_pyo3_wheel")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(name = "rust_pyo3_toolchain_type")
+
+rust_pyo3_toolchain(
+    name = "rust_pyo3_estate_toolchain",
+    cargo_sha256 = "e0f7d6c8bec403352efe5567371126d439a2642ad5164dc36f41a54f48da4eab",
+    rust_toolchain = "/vaso/sources/rust/toolchains/rust-1.86.0-x86_64-unknown-linux-gnu",
+    rust_toolchain_archive_sha256 = "6b448b3669e0c74f7f4b87da7da4868a552fcbba1f955032d8925ad2fffb3798",
+    rustc_sha256 = "daf6e73fb92c938dc287347e01c35f29da80616100a0ac5c7484c5c78ab2426a",
+)
+
+toolchain(
+    name = "registered_rust_pyo3_toolchain",
+    toolchain = ":rust_pyo3_estate_toolchain",
+    toolchain_type = ":rust_pyo3_toolchain_type",
+)
+
+filegroup(
+    name = "consumer_rust_pyo3_files",
+    srcs = [
+        ".cargo/config.toml",
+        "BUILD.bazel",
+        "Cargo.lock",
+        "Cargo.toml",
+        "host_toolchain_poison_test.sh",
+        "package/__init__.py",
+        "package_wheel.py",
+        "run_verifier.sh",
+        "rust-toolchain-manifest.json",
+        "rust_pyo3.bzl",
+        "rust_pyo3_verifier.py",
+        "src/lib.rs",
+    ],
+)
+
+rust_pyo3_wheel(
+    name = "rust_pyo3_wheel",
+    cargo_files = [".cargo/config.toml"],
+    cargo_vendor = "@rust_pyo3_cargo//:vendor",
+    linker = "@vaso_graph//toolchains:gcc_13_3_cxx_driver",
+    lockfile = "Cargo.lock",
+    manifest = "Cargo.toml",
+    package_init = "package/__init__.py",
+    packager = "package_wheel.py",
+    rust_toolchain_manifest = "rust-toolchain-manifest.json",
+    srcs = ["src/lib.rs"],
+    tags = ["insula-only"],
+    vendor_manifest = "@rust_pyo3_cargo//:vendor-manifest.tsv",
+)
+
+sh_test(
+    name = "rust_pyo3_wheel_verifier",
+    srcs = ["run_verifier.sh"],
+    args = [
+        "$(VASO_PYTHON_PREFIX)/bin/python3.13",
+        "$(rootpath :rust_pyo3_wheel)",
+        "$(rootpath :rust_pyo3_verifier.py)",
+    ],
+    data = [
+        ":rust_pyo3_wheel",
+        "rust_pyo3_verifier.py",
+    ],
+    env = {
+        "LD_LIBRARY_PATH": "$(VASO_PYTHON_PREFIX)/lib:$(VASO_TORCH_PREFIX)/lib/python3.13/site-packages/torch/lib:$(VASO_TORCH_PREFIX)/lib/python3.13/site-packages/torch.libs:/run/nvidia-driver/lib:/usr/local/cuda/lib64",
+        "VASO_TORCH_PREFIX": "$(VASO_TORCH_PREFIX)",
+    },
+    tags = ["insula-only"],
+)
+
+sh_test(
+    name = "rust_pyo3_host_toolchain_poison_test",
+    srcs = ["host_toolchain_poison_test.sh"],
+    args = ["$(rootpath :rust_pyo3_wheel)"],
+    data = [":rust_pyo3_wheel"],
+    tags = ["insula-only"],
+)

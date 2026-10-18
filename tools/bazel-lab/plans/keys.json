@@ -1,0 +1,59 @@
+{
+  "entries": {
+    "dep-prefix": {
+      "inputs": [
+        {
+          "path": "plans/dep.plan.json",
+          "sha256": "ded86da41eb135a2e40fc4ca961851744b6ec523ba1777e58da9a7707620b538"
+        },
+        {
+          "path": "pkg/dep.c",
+          "sha256": "996b7016d6a6c096f09deb3df5277b6b25a906bb30f42a81c7ee46ecc41299a5"
+        },
+        {
+          "path": "tools/executor.py",
+          "sha256": "8261c87ebe657b829d2c15bc54b3a877cae4f14c7423419d33aa02cea7cdb2e8"
+        },
+        {
+          "path": "toolchains/gcc_driver.sh",
+          "sha256": "9601f82549bc3f1b73c759471c8c1af92518266065d881a9fdab81201c7de293"
+        },
+        {
+          "path": "toolchains/host_c_toolchain.bzl",
+          "sha256": "62bde8ba4761973be2cb8f0574455388cefd05671b2a4181cd440ab66259b271"
+        }
+      ],
+      "merkle": "4ba9bdf77642d4d1bb898045aaa420bcfe1075e7af1ddba64dc701c06eb7c683"
+    },
+    "native-pkg": {
+      "inputs": [
+        {
+          "path": "plans/native.plan.json",
+          "sha256": "1b2dc669ab1d15955c3eac735d0667e93532d4ae1345a00758dd9a83aca2484b"
+        },
+        {
+          "path": "pkg/pkg.c",
+          "sha256": "f0dbc78a98c0656693ac6820a6a55885386dc5993b31621321d7235fdd37e4e1"
+        },
+        {
+          "path": "pkg/dep.txt",
+          "sha256": "a49fe3da4ecf2003f746f5854dfbe245c5cf3c99c798dc5dd8a8d90b905b941a"
+        },
+        {
+          "path": "tools/executor.py",
+          "sha256": "8261c87ebe657b829d2c15bc54b3a877cae4f14c7423419d33aa02cea7cdb2e8"
+        },
+        {
+          "path": "toolchains/gcc_driver.sh",
+          "sha256": "9601f82549bc3f1b73c759471c8c1af92518266065d881a9fdab81201c7de293"
+        },
+        {
+          "path": "toolchains/host_c_toolchain.bzl",
+          "sha256": "62bde8ba4761973be2cb8f0574455388cefd05671b2a4181cd440ab66259b271"
+        }
+      ],
+      "merkle": "8029f29f0dd24d98bc641d1d93c91f64ca67b91370d7ec3bb958807b13dd2933"
+    }
+  },
+  "schema": 1
+}

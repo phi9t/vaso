@@ -1,0 +1,5 @@
+# Commands run from the scrubbed publication worktree before verify.
+python3 foundry/tools/gen_plans.py --repo-root foundry
+python3 foundry/tools/plan_key_snapshot.py --repo-root foundry --out foundry/plans/keys.json
+python3 tools/publish/regenerate_pending_torch_artifacts.py --repo-root foundry
+python3 tools/publish/regenerate_vendor_checksums.py

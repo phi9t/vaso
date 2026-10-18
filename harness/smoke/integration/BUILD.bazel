@@ -1,0 +1,11 @@
+py_binary(
+    name = "check",
+    srcs = ["check.py"],
+    data = ["//cpp:hello_cpp", "//python:hello_python"],
+    main = "check.py",
+)
+
+alias(
+    name = "all",
+    actual = ":check",
+)

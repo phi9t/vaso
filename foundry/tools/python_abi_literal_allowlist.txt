@@ -1,0 +1,13 @@
+# Native rules and plans that still hard-code a Python ABI (python3.X, cpython-3XY,
+# pip3.X, cp3XY). Format: <path> <number of lines with a literal>. Ratchet: counts
+# may only go down, and an entry is removed when its file derives the ABI from
+# the Python prefix (tickets 06/08, .scratch/pytorch-frontier-convergence).
+native/icu4c/icu4c.bzl 1
+native/llvm/llvm.bzl 3
+native/llvm/plan.py 2
+native/llvm/plan_test.py 2
+native/py_cppy/py_cppy.bzl 7
+native/py_kiwisolver/py_kiwisolver.bzl 12
+native/py_pyparsing/py_pyparsing.bzl 5
+native/py_python_dateutil/py_python_dateutil.bzl 7
+native/py_versioneer/py_versioneer.bzl 5

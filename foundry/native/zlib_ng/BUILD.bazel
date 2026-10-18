@@ -1,0 +1,70 @@
+load(":zlib_ng_action.bzl", "zlib_ng_action_prefix")
+load(":leak_scan_fixture.bzl", "leak_scan_real_action_fixture")
+load("@rules_python//python:defs.bzl", "py_test")
+
+# Marks native/zlib_ng as a Bazel package so zlib_ng.bzl is loadable from
+# MODULE.bazel. The actual @zlib_ng_native repo is materialized by the
+# zlib_ng_native repository_rule; the action pilot below is separate and is not
+# wired to consumers.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "action_prefix_test.py",
+    "leak_scan_fixture.bzl",
+    "zlib_ng.bzl",
+    "zlib_ng_action.bzl",
+])
+
+zlib_ng_action_prefix(
+    name = "zlib_ng_action_prefix",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/zlib_ng.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/zlib_ng.plan.json",
+    }),
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@zlib_ng_action_archive//file",
+)
+
+leak_scan_real_action_fixture(
+    name = "leak_scan_real_action_fixture",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "action_prefix_test",
+    srcs = ["action_prefix_test.py"],
+    args = [
+        "--repo-root",
+        "$(rootpath //:MODULE.bazel)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//native/common:BUILD.bazel",
+        "//native/common:plan_executor",
+        "//native/common:toolchain_helper_files",
+        "//native/common:plan_executor.py",
+        "//native/common:plan_schema.py",
+        "//plans:committed_plan_files",
+        "//tools:nested_bazel_fixture.py",
+        ":zlib_ng_action.bzl",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_BAZEL_OB",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "action_prefix_test.py",
+    precompile = "disabled",
+    size = "small",
+    timeout = "short",
+    tags = [
+        "external",
+        "no-cache",
+    ],
+)

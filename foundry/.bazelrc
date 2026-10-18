@@ -1,0 +1,12 @@
+# Idle Bazel servers exit after 15 minutes. Host-side agent verifies used to
+# leave one JVM per output base for Bazel's 3-hour default; the insula runs with
+# --batch and is unaffected. See docs/agents/cross-agent-collaboration.md.
+startup --max_idle_secs=900
+
+# The build-migration TLC model check
+# (//formal/build_migration:migration_tlc_test) fetches the pinned tla2tools.jar
+# and runs tlc2.TLC with a hermetic JDK. TLC needs a modern JDK (17+); the
+# auto-detected host local_jdk can be Java 8, which is too old. Select
+# remotejdk_17 explicitly under --config=formal.
+common:formal --java_runtime_version=remotejdk_17
+common:formal --tool_java_runtime_version=remotejdk_17

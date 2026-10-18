@@ -1,0 +1,7 @@
+# Marks native/tar as a Bazel package so tar.bzl is loadable from MODULE.bazel.
+# The @tar_native repo is materialized by the tar_native repository_rule;
+# nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["tar.bzl"])

@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "registry": "ghcr.io/phi9t",
+  "visibility": "private",
+  "privacy_policy": {
+    "our_host_identifiers_removed": true,
+    "rootfs_absolute_paths_allowed": true,
+    "upstream_vendor_binaries_and_build_metadata_preserved": true,
+    "older_versions_retained_private": true
+  },
+  "artifacts": [
+    {
+      "kind": "release",
+      "line": "cu129",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu129@sha256:7572668ffcea3064dba2e41e4a6ffc9637eec679f740c222ce3224cdda4d2bfe",
+      "tag": "privacy-491a15ec5647389b",
+      "verified_files": 25,
+      "files": {
+        "SHA256SUMS": "491a15ec5647389b748c1ac6f5901f671c0565fea8bb30d62a7db39e9f88d85d",
+        "provenance/pytorch-release-wheel-manifest.json": "65dc94be1849e202bbcfcfd4f745fcec0ea07e11a3ca4c97049327718a1e225a",
+        "provenance/release.json": "3a6487ad299b5d917625d69e8860a0a561b765ca4460484badb278a7f54a0a76",
+        "provenance/torch-runtime-deps-release-wheel-manifest.json": "8eaca8f81cb4da8b4d9842fd04ef2ad97fad8f4f9b41ad9d9b183921082399fc",
+        "provenance/torchaudio-release-wheel-manifest.json": "73a434813721d109f1e4a5663a3afd8e5fe3ebd02eec9c64b2f04fd305f421ba",
+        "provenance/torchvision-release-wheel-manifest.json": "222af78f4b27805ffdde0f5a2e537401081ec907c7f4980560289d43fe910a5a",
+        "provenance/triton-release-wheel-manifest.json": "2862d590f39ea0afe4ea3a03348d242ce99e729c633f4671ea2aa1c934470372",
+        "requirements.txt": "4663b64a8d3ae829a2fc1e1e7485fbcc489bc6a2ae9f11aa723a894023412514",
+        "sbom/cyclonedx.json": "ef5ef1cc2698570534d86f25929a160b447a7f4061ff2606e5a546ce1e1b5912",
+        "sbom/license-policy.json": "c119c46c5ef8e2e1510b960089d55f95a8730f942a996794cb9a74d86c45d6be",
+        "wheelhouse/Jinja2-3.1.6-py3-none-any.whl": "f70e083d035fa969038bb336592299ed0a3e2dfd6ef4b6593eaad53df41d18a4",
+        "wheelhouse/MarkupSafe-3.0.3-cp313-cp313-linux_x86_64.whl": "e953251711208fefab439cc919e0a468b0700d047e17fc0dd7c230402afb921b",
+        "wheelhouse/filelock-3.29.1-py3-none-any.whl": "5aff959914d6bb2fa25faf18840a67b2637b927506d0ee8ecdba3c2b7dcb06cb",
+        "wheelhouse/fsspec-2026.3.0-py3-none-any.whl": "54ace7ba3282b6cba592b94506390f7f2d059871e249f0884f634c5c2ed5ba6e",
+        "wheelhouse/mpmath-1.3.0-py3-none-any.whl": "f1887c8861f59d1f413fcaa3cebd042b0df554b28a701748d28fe4d6104a868d",
+        "wheelhouse/networkx-3.6.1-py3-none-any.whl": "ca3bda2ec99506348f868881f689db27c0905e81793020d7e4fc40628d76822f",
+        "wheelhouse/numpy-2.4.6-cp313-cp313-linux_x86_64.whl": "de35e03d6097ca2620fefc9408c7646ea57a4dbac31a4aafc9ae9b0ecfba4934",
+        "wheelhouse/pillow-12.2.0-cp313-cp313-linux_x86_64.whl": "59a80f8b49db06d9a2fe8b7f1f1cbc9c18e550d8a376cd7fb048cb42914fff07",
+        "wheelhouse/setuptools-79.0.1-py3-none-any.whl": "a749506a39d61a2840418e7be22bd84cfca99f4bdfd349af4847c431c9811d94",
+        "wheelhouse/sympy-1.14.0-py3-none-any.whl": "1b96f3c98d948b5e928b945727fda623199907350f690fea2515803f242c9025",
+        "wheelhouse/typing_extensions-4.15.0-py3-none-any.whl": "1c90dbc19bcc48c6a66eefe4b378db7a56669f59c43f4994ea77c7b981ac767b",
+        "wheels/torch-2.14.0+vaso.cu129.g3b1030d2-cp313-cp313-linux_x86_64.whl": "21efc46f3cf47b6b745e731e8780d67f52b81b708dabb84eeb87224f6c312f80",
+        "wheels/torchaudio-2.11.0+vaso.cu129.g3b1030d2-cp313-cp313-linux_x86_64.whl": "03d9f54eb0fe94efa68900549b00835152d44c28b67c24f818712796338728fe",
+        "wheels/torchvision-0.29.0+vaso.cu129.g3b1030d2-cp313-cp313-linux_x86_64.whl": "4e9e9a368fe61a342117873a358f26c469529e5c148279d6e50820fc2ce5a219",
+        "wheels/triton-3.8.0+vaso.cu129.g3b1030d2-cp313-cp313-linux_x86_64.whl": "4e2a5459ae5cb9ea2e5bdefc874b9905433221e1e2f0003766205da47bdf9f8f"
+      },
+      "profile": "torch",
+      "source_commit": "3b1030d262f7475fc9819fdaf9f46b45210d310e",
+      "base_qualification_report_sha256": "8c3d19761178bdacddb10b2a7d2a574f56f9ae087897ddf2edfa909ef922aa09",
+      "privacy_validation": {
+        "wheel_records_and_crc_verified": true,
+        "our_identity_findings": 0,
+        "upstream_wheel_payloads_preserved": true,
+        "local_mpi_metadata_redacted": true,
+        "native_code_and_symbol_sections_preserved": true,
+        "gpu_qualification_repeated": false
+      }
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu130@sha256:d252738bd004c3e80d8fff61f994c463380ace850037e0907365f171445c5987",
+      "tag": "privacy-326677d780eef57f",
+      "verified_files": 25,
+      "files": {
+        "SHA256SUMS": "326677d780eef57fdfcd8bb2f9dc65c6d3184cdbc723ce5b982e119570bbe989",
+        "provenance/pytorch-release-wheel-manifest.json": "e2e181ccb182e5f4eacfb34d92e6e50105961feb9c6ba06869077b54222b85d6",
+        "provenance/release.json": "5e55ef1987cf0aaec2c83c97e34236bae71b5fd7c56d5600ed7d776938acbee7",
+        "provenance/torch-runtime-deps-release-wheel-manifest.json": "8eaca8f81cb4da8b4d9842fd04ef2ad97fad8f4f9b41ad9d9b183921082399fc",
+        "provenance/torchaudio-release-wheel-manifest.json": "81422896e15302eb59f831bcf1798559be807d7f6eda028a3e31c484e6f1516e",
+        "provenance/torchvision-release-wheel-manifest.json": "8f4aa816b795b3e41112c86d7ab1e3dd38e705626be8381fbfee5a3dc6023cdf",
+        "provenance/triton-release-wheel-manifest.json": "2f86930692fc0be0611022ad138f4674e1db55201ed1bcf76609603e57a28b65",
+        "requirements.txt": "8b16c7965b67911b7cfc9ace027f289f0da6f42f87f716b50ca458231204e1d0",
+        "sbom/cyclonedx.json": "ee229e84c874a3853056d01f6fa1a4dd6564f3d55dd24cb0c4e0d771f3355c51",
+        "sbom/license-policy.json": "99d03adc0f0a8870220306ae838bba97810be6f38c13ca46ac017784174714c3",
+        "wheelhouse/Jinja2-3.1.6-py3-none-any.whl": "f70e083d035fa969038bb336592299ed0a3e2dfd6ef4b6593eaad53df41d18a4",
+        "wheelhouse/MarkupSafe-3.0.3-cp313-cp313-linux_x86_64.whl": "e953251711208fefab439cc919e0a468b0700d047e17fc0dd7c230402afb921b",
+        "wheelhouse/filelock-3.29.1-py3-none-any.whl": "5aff959914d6bb2fa25faf18840a67b2637b927506d0ee8ecdba3c2b7dcb06cb",
+        "wheelhouse/fsspec-2026.3.0-py3-none-any.whl": "54ace7ba3282b6cba592b94506390f7f2d059871e249f0884f634c5c2ed5ba6e",
+        "wheelhouse/mpmath-1.3.0-py3-none-any.whl": "f1887c8861f59d1f413fcaa3cebd042b0df554b28a701748d28fe4d6104a868d",
+        "wheelhouse/networkx-3.6.1-py3-none-any.whl": "ca3bda2ec99506348f868881f689db27c0905e81793020d7e4fc40628d76822f",
+        "wheelhouse/numpy-2.4.6-cp313-cp313-linux_x86_64.whl": "de35e03d6097ca2620fefc9408c7646ea57a4dbac31a4aafc9ae9b0ecfba4934",
+        "wheelhouse/pillow-12.2.0-cp313-cp313-linux_x86_64.whl": "59a80f8b49db06d9a2fe8b7f1f1cbc9c18e550d8a376cd7fb048cb42914fff07",
+        "wheelhouse/setuptools-79.0.1-py3-none-any.whl": "a749506a39d61a2840418e7be22bd84cfca99f4bdfd349af4847c431c9811d94",
+        "wheelhouse/sympy-1.14.0-py3-none-any.whl": "1b96f3c98d948b5e928b945727fda623199907350f690fea2515803f242c9025",
+        "wheelhouse/typing_extensions-4.15.0-py3-none-any.whl": "1c90dbc19bcc48c6a66eefe4b378db7a56669f59c43f4994ea77c7b981ac767b",
+        "wheels/torch-2.14.0+vaso.cu130.g3b1030d2-cp313-cp313-linux_x86_64.whl": "0f143954cc652b0b3407d8f871697dc0474bb4635ea300e975dab30c202edd48",
+        "wheels/torchaudio-2.11.0+vaso.cu130.g3b1030d2-cp313-cp313-linux_x86_64.whl": "7d947d7bd2a5a0c3a0cfcd89ae6df97200419e6254dd47f11fa998b524aa2edc",
+        "wheels/torchvision-0.29.0+vaso.cu130.g3b1030d2-cp313-cp313-linux_x86_64.whl": "41fc1c5b74244baf4bf9a42e2d2b7a70a10b0d958916dd25ec3f86745884fa28",
+        "wheels/triton-3.8.0+vaso.cu130.g3b1030d2-cp313-cp313-linux_x86_64.whl": "da52a273f059319c43222659112a0e1f66c5f6dd8d447b7573c7b268e92acb77"
+      },
+      "profile": "torch",
+      "source_commit": "3b1030d262f7475fc9819fdaf9f46b45210d310e",
+      "base_qualification_report_sha256": "3287721447d87023cc3402a8a92f7f0895e1d9b7e76968bfc7d6235a6b58e713",
+      "privacy_validation": {
+        "wheel_records_and_crc_verified": true,
+        "our_identity_findings": 0,
+        "upstream_wheel_payloads_preserved": true,
+        "local_mpi_metadata_redacted": true,
+        "native_code_and_symbol_sections_preserved": true,
+        "gpu_qualification_repeated": false
+      }
+    },
+    {
+      "kind": "release",
+      "line": "cu129",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu129@sha256:89ab1bec0bcdd22b1a4261161aa2c93a6aad877ef12022e684824716d567cdff",
+      "tag": "privacy-e78fa8a1f8051801",
+      "verified_files": 16,
+      "files": {
+        "SHA256SUMS": "e78fa8a1f80518011ca48d4dc4cedffc472afaf9e9023b328589635ae579fc23",
+        "provenance/jax-runtime-deps-release-wheel-manifest.json": "87028a69d3b134c2265d82c8257d15b57e5ea0652349dd24dc13c6beab902cc9",
+        "provenance/jaxlib-release-wheel-manifest.json": "d1909e063c653e9d8635b438bd2d8d39acb4b1d727e186e349b3a6daa1402a12",
+        "provenance/release.json": "2c8ad27e40432d293b6bf2be02177d6f8ff9040990047d016aa858ce8481bea9",
+        "requirements.txt": "fbf8fbcb5ed405295acc7974b9bc6e0274286a033c0d1b556485a1c40abb641a",
+        "sbom/cyclonedx.json": "cbb767bba1a0a6171839716c2b1008f938b9b2809b0a622938539135fb08c492",
+        "sbom/license-policy.json": "cb314434c2741915083a9f6703dddcfd82f90ac2e5777478c2f150866d52d9b9",
+        "wheelhouse/absl_py-1.4.0-py3-none-any.whl": "8c71d6a41e02dc16e14ba082678042a6f2f89a1e63e4a96b93e41aad628d0783",
+        "wheelhouse/ml_dtypes-0.5.1-cp313-cp313-linux_x86_64.whl": "2f401fc536c7629347c511482ac2f7c92f42c2d0aa8155347803aa76f25b8e27",
+        "wheelhouse/numpy-2.4.6-cp313-cp313-linux_x86_64.whl": "92ce79dd17f8f39b52c24e18b6ee1c9b9d13232f5bc48e5ed8a7d742760bf24f",
+        "wheelhouse/opt_einsum-3.4.0-py3-none-any.whl": "f097bc2fdc4512ea67317ddfdde58d9c7a5ce1aed125d5009c921c6f75435e90",
+        "wheelhouse/scipy-1.17.1-cp313-cp313-linux_x86_64.whl": "365e9e3201d2b54974d8fbf32f5d2b6e83a10a28559df7d8cdfb82d14ed2463e",
+        "wheels/jax-0.10.2.dev0+vaso.cu129.gd14e02a1-py3-none-any.whl": "10280da0b525e2ef79874087e0ec244fb141984512e7f8547668082986573aa9",
+        "wheels/jax_cuda12_pjrt-0.10.2.dev0+vaso.cu129.gd14e02a1-py3-none-manylinux_2_27_x86_64.whl": "49e5ccb20707502ac12ef077c3defb9a5ac09bb64a3a59d499e7261f7b004c41",
+        "wheels/jax_cuda12_plugin-0.10.2.dev0+vaso.cu129.gd14e02a1-cp313-cp313-manylinux_2_27_x86_64.whl": "dd8f66002c00c3de4ae4669a1e111e27035de450e178014aeb883373c6556bb6",
+        "wheels/jaxlib-0.10.2.dev0+vaso.cu129.gd14e02a1-cp313-cp313-manylinux_2_27_x86_64.whl": "c16dc87f44134a86a38c5e1b8dedc4ad8a984fb8759a9fa9766d7d7e6fc33ade"
+      },
+      "profile": "jax",
+      "source_commit": "d14e02a125a5e612b488bf326f1a509f0073db75",
+      "base_qualification_report_sha256": "6cc50ca49de7e91d37cd6e3d37b7c68c89deaafb5126396456b8ef2bcec135c8",
+      "privacy_validation": {
+        "wheel_records_and_crc_verified": true,
+        "our_identity_findings": 0,
+        "upstream_wheel_payloads_preserved": true,
+        "local_mpi_metadata_redacted": false,
+        "native_code_and_symbol_sections_preserved": true,
+        "gpu_qualification_repeated": false
+      }
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu130@sha256:e66f57112a13b16baa64ad608910f839216f014869ce077b8c44193d803cb661",
+      "tag": "privacy-723b1b582855f4bc",
+      "verified_files": 16,
+      "files": {
+        "SHA256SUMS": "723b1b582855f4bcff189199e3bb135d52c17e9218aeaff7b4748c693ae6c5e7",
+        "provenance/jax-runtime-deps-release-wheel-manifest.json": "dddf0889afea0bd58da0b66ab1cb368e73a34acaad4ffe75581553cec193d4cf",
+        "provenance/jaxlib-release-wheel-manifest.json": "65170f43b54a5b56742968ee7b0448b73d80941e12782a093ff556d094aa994b",
+        "provenance/release.json": "27b5c2d1843fdfcf2b445d81a5b551114c7c253396e52ab70c2fa81ab94a20d6",
+        "requirements.txt": "3e0de4a6c4bc97d8dc66409b2b45545cfc5dc7762b5fe16bde7ace59ba9592a8",
+        "sbom/cyclonedx.json": "f249e09d48509ea72f8c248a016b3b9237a7b914f1489ff6e3b5865eb0349364",
+        "sbom/license-policy.json": "bb35b9cd3f670894995e598253550f94a3d2ad2d20fd2dc11825eb1f8591d61b",
+        "wheelhouse/absl_py-1.4.0-py3-none-any.whl": "8c71d6a41e02dc16e14ba082678042a6f2f89a1e63e4a96b93e41aad628d0783",
+        "wheelhouse/ml_dtypes-0.5.1-cp313-cp313-linux_x86_64.whl": "2f401fc536c7629347c511482ac2f7c92f42c2d0aa8155347803aa76f25b8e27",
+        "wheelhouse/numpy-2.4.6-cp313-cp313-linux_x86_64.whl": "92ce79dd17f8f39b52c24e18b6ee1c9b9d13232f5bc48e5ed8a7d742760bf24f",
+        "wheelhouse/opt_einsum-3.4.0-py3-none-any.whl": "f097bc2fdc4512ea67317ddfdde58d9c7a5ce1aed125d5009c921c6f75435e90",
+        "wheelhouse/scipy-1.17.1-cp313-cp313-linux_x86_64.whl": "84a3a4638d4a3144506c195a04ea270494f6d0a2fc259faaed01e11b9d9ffad4",
+        "wheels/jax-0.10.2.dev0+vaso.cu130.gd14e02a1-py3-none-any.whl": "3778d104de315cab8b7aff994bf0d3c5ab0f426ccc23652fb31392756908b859",
+        "wheels/jax_cuda13_pjrt-0.10.2.dev0+vaso.cu130.gd14e02a1-py3-none-manylinux_2_27_x86_64.whl": "f60ca9db0752c5449e2b356ad1c733c8567f3d52103f17a65bc1844d8243396c",
+        "wheels/jax_cuda13_plugin-0.10.2.dev0+vaso.cu130.gd14e02a1-cp313-cp313-manylinux_2_27_x86_64.whl": "f94828038b3ac72eb5b641b277bff7b3bd3756cc633a24d305b1d0a523077bb2",
+        "wheels/jaxlib-0.10.2.dev0+vaso.cu130.gd14e02a1-cp313-cp313-manylinux_2_27_x86_64.whl": "248c6adb6e332b08ec30f42b45fe0f299e751de4b55591e6c607f3e0c4a198bd"
+      },
+      "profile": "jax",
+      "source_commit": "d14e02a125a5e612b488bf326f1a509f0073db75",
+      "base_qualification_report_sha256": "ac70252eb04dd40cdeeacad66387cd95ec8ce61d85460d15ee822d807770eaa7",
+      "privacy_validation": {
+        "wheel_records_and_crc_verified": true,
+        "our_identity_findings": 0,
+        "upstream_wheel_payloads_preserved": true,
+        "local_mpi_metadata_redacted": false,
+        "native_code_and_symbol_sections_preserved": true,
+        "gpu_qualification_repeated": false
+      }
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu129",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu129@sha256:a7633de4c73117a11c882eeb575ef9e8e63d7ebcc26644fb625163ebfae89ffe",
+      "tag": "c5f2fcb363e4",
+      "verified_files": 8,
+      "files": {
+        "rootfs-bundle.json": "2119f228c48d328510a54dbd68cb3c8a45b395717a21ccf39309f5b3b76d57d5",
+        "rootfs-cu129.json": "49f4c8a1e3d50dc35a5e390bca527d1c75dffab2db43579dc6a8e82a85ae328f",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0000": "6db8da013bb25c061e0fb53564f5172141d787ed640145a0dfe54f47ae376503",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0001": "76bc3270970f8108cbf3f1726ace669561cabfe915e60f153fce8aa84f64817f",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0002": "08674968082a618545630180dc608890772a8c7dcf668fbc7b3d4fee22d7fcb3",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0003": "a878934e78eba6ee9092ebe7664541a9b9be4c56c9338b6259754acecdb152b0",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0004": "4850146d64fdffc978ebc45e10d17aef5fd6c92c91d3cf629b32caae1e7b396a",
+        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0005": "fec1cfb917327b9e7c4f879e8b2dee41e02fb89a86ef5e1bdba2659c29ec7383"
+      },
+      "archive": "rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst",
+      "archive_sha256": "c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab",
+      "rootfs_manifest_digest": "sha256:2119f228c48d328510a54dbd68cb3c8a45b395717a21ccf39309f5b3b76d57d5",
+      "ecosystem_lock_sha256": "sha256:608ffaea32487ad2e1280470bc65119abcbab58c8eb39a65948c6d794038645d",
+      "split_parts": 6,
+      "layers": [
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0000",
+          "sha256": "6db8da013bb25c061e0fb53564f5172141d787ed640145a0dfe54f47ae376503",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0001",
+          "sha256": "76bc3270970f8108cbf3f1726ace669561cabfe915e60f153fce8aa84f64817f",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0002",
+          "sha256": "08674968082a618545630180dc608890772a8c7dcf668fbc7b3d4fee22d7fcb3",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0003",
+          "sha256": "a878934e78eba6ee9092ebe7664541a9b9be4c56c9338b6259754acecdb152b0",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0004",
+          "sha256": "4850146d64fdffc978ebc45e10d17aef5fd6c92c91d3cf629b32caae1e7b396a",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0005",
+          "sha256": "fec1cfb917327b9e7c4f879e8b2dee41e02fb89a86ef5e1bdba2659c29ec7383",
+          "size": 1266456878
+        }
+      ],
+      "privacy_validation": {
+        "entries_verified": 29155,
+        "changed_files": [
+          "rootfs-bundle.json",
+          "rootfs/etc/group",
+          "rootfs/etc/passwd",
+          "rootfs/etc/resolv.conf"
+        ],
+        "all_other_file_bytes_modes_and_links_preserved": true,
+        "vendor_binaries_preserved": true,
+        "our_identity_findings": 0,
+        "upstream_vendor_metadata_preserved": true,
+        "rule_false_positives_in_unchanged_vendor_comment": {
+          "rootfs/usr/include/rdma/bnxt_re-abi.h": 1
+        }
+      }
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:52e0367283a821e9efa5014c7271347dfa44f16bca4782374c56889d118ab8ba",
+      "tag": "dead00257b18",
+      "verified_files": 8,
+      "files": {
+        "rootfs-bundle.json": "afaf6d81c15a50e7940d116c29df64fbf54c1413f7ad7d12e06c7c142efe84d8",
+        "rootfs-cu130.json": "fe09af356a3524a42e0a46f16479b11635118a52c6617ddced5e1bc58adf2712",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0000": "e51428c109419e7bbfc20b3a73e65338e3d5ebea23d3f0e87f4857256f3e4cd8",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0001": "c2873d0fbe907212be49dbfc685b0c6997ff2218e17f6fe20990f924d22d21e7",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0002": "c1554cbe6ffa93c2a8b92c6ae8c83dbd4fa6f0181f419f1500cee2c473e003a5",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0003": "cc8bd2cdda28015e364ff2d3e7384ba36fbe21ec5a16d53ba3e0fb9557f391ca",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0004": "4db03dd2ecba43f7691c4a48d95bd6738d3b08b291b9f8fac44d7412d08dc0a4",
+        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0005": "db6e78539f5ace2a78da6e63df27b9660b7e0cb13b6d7a75c58e11384a508a9f"
+      },
+      "archive": "rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst",
+      "archive_sha256": "dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e",
+      "rootfs_manifest_digest": "sha256:afaf6d81c15a50e7940d116c29df64fbf54c1413f7ad7d12e06c7c142efe84d8",
+      "ecosystem_lock_sha256": "sha256:608ffaea32487ad2e1280470bc65119abcbab58c8eb39a65948c6d794038645d",
+      "split_parts": 6,
+      "layers": [
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0000",
+          "sha256": "e51428c109419e7bbfc20b3a73e65338e3d5ebea23d3f0e87f4857256f3e4cd8",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0001",
+          "sha256": "c2873d0fbe907212be49dbfc685b0c6997ff2218e17f6fe20990f924d22d21e7",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0002",
+          "sha256": "c1554cbe6ffa93c2a8b92c6ae8c83dbd4fa6f0181f419f1500cee2c473e003a5",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0003",
+          "sha256": "cc8bd2cdda28015e364ff2d3e7384ba36fbe21ec5a16d53ba3e0fb9557f391ca",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0004",
+          "sha256": "4db03dd2ecba43f7691c4a48d95bd6738d3b08b291b9f8fac44d7412d08dc0a4",
+          "size": 2000000000
+        },
+        {
+          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0005",
+          "sha256": "db6e78539f5ace2a78da6e63df27b9660b7e0cb13b6d7a75c58e11384a508a9f",
+          "size": 275953634
+        }
+      ],
+      "privacy_validation": {
+        "entries_verified": 29327,
+        "changed_files": [
+          "rootfs-bundle.json",
+          "rootfs/etc/group",
+          "rootfs/etc/passwd",
+          "rootfs/etc/resolv.conf"
+        ],
+        "all_other_file_bytes_modes_and_links_preserved": true,
+        "vendor_binaries_preserved": true,
+        "our_identity_findings": 0,
+        "upstream_vendor_metadata_preserved": true,
+        "rule_false_positives_in_unchanged_vendor_comment": {
+          "rootfs/usr/include/rdma/bnxt_re-abi.h": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+Third-party code vendored in this repository
+
+Each item below keeps its own licence. Nothing here is modified by Vaso.
+
+rust_pyo3_cargo/ (crates.io sources for the Rust PyO3 consumer)
+----------------------------------------------------------------
+Source: https://crates.io, vendored with `cargo vendor` at the versions in
+rust_pyo3_cargo/vendor-manifest.tsv, which pins every crate's sha256.
+vendor_pin_test.py fails if the tree drifts from that manifest or from
+the consumer's Cargo.lock.
+
+crate	version	licence
+aho-corasick	1.1.5	Unlicense OR MIT
+autocfg	1.5.1	Apache-2.0 OR MIT
+cfg-if	1.0.5	MIT OR Apache-2.0
+heck	0.5.0	MIT OR Apache-2.0
+indoc	2.0.7	MIT OR Apache-2.0
+itoa	1.0.18	MIT OR Apache-2.0
+libc	0.2.190	MIT OR Apache-2.0
+memchr	2.8.3	Unlicense OR MIT
+memmap2	0.9.5	MIT OR Apache-2.0
+memoffset	0.9.1	MIT
+once_cell	1.21.4	MIT OR Apache-2.0
+portable-atomic	1.15.0	Apache-2.0 OR MIT
+proc-macro2	1.0.107	MIT OR Apache-2.0
+pyo3	0.24.2	MIT OR Apache-2.0
+pyo3-build-config	0.24.2	MIT OR Apache-2.0
+pyo3-ffi	0.24.2	MIT OR Apache-2.0
+pyo3-macros	0.24.2	MIT OR Apache-2.0
+pyo3-macros-backend	0.24.2	MIT OR Apache-2.0
+quote	1.0.47	MIT OR Apache-2.0
+regex	1.11.1	MIT OR Apache-2.0
+regex-automata	0.4.18	MIT OR Apache-2.0
+regex-syntax	0.8.11	MIT OR Apache-2.0
+rustversion	1.0.23	MIT OR Apache-2.0
+ryu	1.0.23	Apache-2.0 OR BSL-1.0
+serde	1.0.217	MIT OR Apache-2.0
+serde_derive	1.0.217	MIT OR Apache-2.0
+serde_json	1.0.137	MIT OR Apache-2.0
+syn	2.0.119	MIT OR Apache-2.0
+target-lexicon	0.13.5	Apache-2.0 WITH LLVM-exception
+unicode-ident	1.0.26	(MIT OR Apache-2.0) AND Unicode-3.0
+unindent	0.2.4	MIT OR Apache-2.0
+
+gsplat_cuda/ (Bazel registry entry for gsplat)
+----------------------------------------------
+Upstream: https://github.com/nerfstudio-project/gsplat, tag v1.5.3 (Apache-2.0, per
+foundry/examples/consumers/gsplat_rasterizer/PROVENANCE.md).
+This directory holds only the registry metadata and the BUILD overlay; the
+source archive is fetched by URL and checked against the sha256 in
+gsplat_cuda/source.json and examples/consumers/bcr-manifest.tsv.

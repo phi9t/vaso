@@ -1,0 +1,195 @@
+load(":pytorch_action.bzl", "pytorch_action_prefix", "pytorch_token_flag")
+load("//native/common:native_output_path_query.bzl", "native_action_prefix_path")
+load("//native/common:release_wheel_action.bzl", "release_wheel_action")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+# Marks native/pytorch as a Bazel package so pytorch_native.bzl and plan.py are
+# loadable/consumable. The @pytorch_native repo (when wired) is materialized by
+# the pytorch_native repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_prefix_test.py",
+    "action_smoke_test.py",
+    "gates.py",
+    "gates_test.py",
+    "metadata_writer.py",
+    "plan.py",
+    "plan_test.py",
+    "pytorch-v2.14.0-2b3ec348-submodules.json",
+    "pytorch_action.bzl",
+    "pytorch_native.bzl",
+    "runtime_jobs_executor.py",
+    "synthetic_prefix_path.txt",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+    deps = ["//native/common:native_action_toolchain_py"],
+)
+
+pytorch_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+native_action_prefix_path(
+    name = "pytorch_action_prefix_path",
+    output_basename = "pytorch_action",
+    profile = "torch",
+    tags = ["manual"],
+)
+
+genrule(
+    name = "pytorch_action_output_probe",
+    outs = ["pytorch_action_output_probe.txt"],
+    cmd = "touch $@",
+)
+
+pytorch_action_prefix(
+    name = "pytorch_action",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    cpuinfo_prefix_file = "@cpuinfo_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    cudnn_prefix_file = "@cudnn_native//:prefix_path.txt",
+    cudss_prefix_file = "@cudss_native//:prefix_path.txt",
+    cusparselt_prefix_file = "@cusparselt_native//:prefix_path.txt",
+    execute = True,
+    fp16_prefix_file = "@fp16_native//:prefix_path.txt",
+    fxdiv_prefix_file = "@fxdiv_native//:prefix_path.txt",
+    hwloc_prefix_file = "@hwloc_native//:prefix_path.txt",
+    libevent_prefix_file = "@libevent_native//:prefix_path.txt",
+    libiconv_prefix_file = "@libiconv_native//:prefix_path.txt",
+    libpciaccess_prefix_file = "@libpciaccess_native//:prefix_path.txt",
+    libxml2_prefix_file = "@libxml2_215_native//:prefix_path.txt",
+    nccl_prefix_file = "@nccl_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    numactl_prefix_file = "@numactl_native//:prefix_path.txt",
+    nvshmem_prefix_file = "@nvshmem_native//:prefix_path.txt",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+    openmpi_prefix_file = "@openmpi_native//:prefix_path.txt",
+    pmix_prefix_file = "@pmix_native//:prefix_path.txt",
+    protobuf_prefix_file = "@protobuf_native//:prefix_path.txt",
+    psimd_prefix_file = "@psimd_native//:prefix_path.txt",
+    pthreadpool_prefix_file = "@pthreadpool_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_protobuf_prefix_file = "@py_protobuf_native//:prefix_path.txt",
+    py_pyyaml_prefix_file = "@py_pyyaml_native//:prefix_path.txt",
+    py_scikit_build_core_prefix_file = "@py_scikit_build_core_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_six_prefix_file = "@py_six_native//:prefix_path.txt",
+    py_typing_extensions_prefix_file = "@py_typing_extensions_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/pytorch.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/pytorch.plan.json",
+    }),
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@pytorch_v2_14_0_source_archive//file",
+    source_manifest = ":pytorch-v2.14.0-2b3ec348-submodules.json",
+    tags = ["manual"],
+    zstd_prefix_file = "//native/zstd:zstd_action_prefix",
+)
+
+release_wheel_action(
+    name = "pytorch_release_wheel",
+    input = ":pytorch_action",
+    profile = "torch",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "action_prefix_test",
+    srcs = ["action_prefix_test.py"],
+    args = [
+        "--repo-root",
+        "$(rootpath //:MODULE.bazel)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//native/common:BUILD.bazel",
+        "//native/common:plan_executor",
+        "//native/common:plan_executor.py",
+        "//native/common:plan_schema.py",
+        "//native/common:prefix_manifest.py",
+        "//native/common:toolchain_helper_files",
+        "//plans:committed_plan_files",
+        "//toolchains:toolchain_files",
+        "//tools:nested_bazel_fixture.py",
+        ":BUILD.bazel",
+        ":metadata_writer.py",
+        ":pytorch-v2.14.0-2b3ec348-submodules.json",
+        ":pytorch_action.bzl",
+        ":runtime_jobs_executor.py",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_BAZEL_OB",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "action_prefix_test.py",
+    precompile = "disabled",
+    size = "small",
+    timeout = "short",
+    tags = [
+        "external",
+        "no-cache",
+    ],
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":metadata_writer.py",
+        "//plans:keys.json",
+        "//plans:torch/cu130/pytorch.plan.json",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:dev.MODULE.bazel",
+        "//:native_overrides.json",
+        "//:py_torch_214_full_build_graph.json",
+        "//:py_torch_lean_nx_build_graph.json",
+        "//:run.sh",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":pytorch-v2.14.0-2b3ec348-submodules.json",
+        ":pytorch_action.bzl",
+        ":pytorch_native.bzl",
+    ],
+    deps = ["//native/common:native_action_toolchain_py"],
+    main = "plan_test.py",
+)
+
+py_test(
+    name = "gates_test",
+    srcs = [
+        "gates.py",
+        "gates_test.py",
+    ],
+    data = ["//tools:abi_parity.py"],
+    main = "gates_test.py",
+)

@@ -1,0 +1,236 @@
+load(":jaxlib_action.bzl", "jaxlib_action_prefix", "jaxlib_token_flag")
+load("//native/common:native_output_path_query.bzl", "native_action_prefix_path")
+load("//native/common:release_wheel_action.bzl", "release_wheel_action")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_driver_test.py",
+    "action_prefix_test.py",
+    "action_smoke_test.py",
+    "committed_plan_support.py",
+    "committed_plan_support_test.py",
+    "jaxlib_action.bzl",
+    "metadata_writer.py",
+    "nested_cache_manifest.bzl",
+    "nested_cache_manifest.py",
+    "nested_cache_manifest_test.py",
+    "nested_http_archives.json",
+    "plan.py",
+    "plan_test.py",
+    "runtime_jobs_executor.py",
+    "runtime_jobs_executor_test.py",
+    "synthetic_prefix_path.txt",
+    "synthetic_source_anchor.txt",
+    "upstream_pins.json",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+    deps = ["//native/common:native_action_toolchain_py"],
+)
+
+jaxlib_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+native_action_prefix_path(
+    name = "jaxlib_action_prefix_path",
+    output_basename = "jaxlib_action",
+    profile = "jax",
+    tags = ["manual"],
+)
+
+jaxlib_action_prefix(
+    name = "jaxlib_action_dry_run",
+    source_archive = ":synthetic_source_anchor.txt",
+    bazel_prefix_file = ":synthetic_prefix_path.txt",
+    cuda_prefix_file = ":synthetic_prefix_path.txt",
+    cudnn_prefix_file = ":synthetic_prefix_path.txt",
+    execute = False,
+    inputs = {
+        ":committed_plan_support.py": "native/jaxlib/committed_plan_support.py",
+        ":nested_http_archives.json": "native/jaxlib/nested_http_archives.json",
+        ":upstream_pins.json": "native/jaxlib/upstream_pins.json",
+    },
+    llvm_prefix_file = ":synthetic_prefix_path.txt",
+    nccl_prefix_file = ":synthetic_prefix_path.txt",
+    nested_cache_manifest = ":synthetic_source_anchor.txt",
+    nvshmem_prefix_file = ":synthetic_prefix_path.txt",
+    py_numpy_prefix_file = ":synthetic_prefix_path.txt",
+    py_pip_prefix_file = ":synthetic_prefix_path.txt",
+    py_setuptools_prefix_file = ":synthetic_prefix_path.txt",
+    py_wheel_prefix_file = ":synthetic_prefix_path.txt",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:jax/cu129/jaxlib.plan.json",
+        "//plans:release_line_cu130": "//plans:jax/cu130/jaxlib.plan.json",
+    }),
+    python_prefix_file = ":synthetic_prefix_path.txt",
+    python_venv_prefix_file = ":synthetic_prefix_path.txt",
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:jax/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:jax/cu130/rootfs.identity.json",
+    }),
+    synthetic_prefixes_for_dry_run = True,
+    xxd_standalone_prefix_file = ":synthetic_prefix_path.txt",
+)
+
+jaxlib_action_prefix(
+    name = "jaxlib_action",
+    source_archive = "@jax_v0_10_2_source_archive//file",
+    bazel_prefix_file = "@rootfs_bazel_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    cudnn_prefix_file = "@cudnn_native//:prefix_path.txt",
+    execute = True,
+    inputs = {
+        ":committed_plan_support.py": "native/jaxlib/committed_plan_support.py",
+        ":nested_http_archives.json": "native/jaxlib/nested_http_archives.json",
+        ":upstream_pins.json": "native/jaxlib/upstream_pins.json",
+    },
+    llvm_prefix_file = "@rootfs_llvm_23_native//:prefix_path.txt",
+    nccl_prefix_file = "@nccl_native//:prefix_path.txt",
+    nvshmem_prefix_file = "@nvshmem_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:jax/cu129/jaxlib.plan.json",
+        "//plans:release_line_cu130": "//plans:jax/cu130/jaxlib.plan.json",
+    }),
+    python_abi = "derived",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:jax/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:jax/cu130/rootfs.identity.json",
+    }),
+    xxd_standalone_prefix_file = "@xxd_standalone_native//:prefix_path.txt",
+)
+
+release_wheel_action(
+    name = "jaxlib_release_wheels",
+    input = ":jaxlib_action",
+    profile = "jax",
+    spack_lock = "//locks:jax.lock.json",
+    tags = ["manual"],
+    wheelhouse = True,
+)
+
+py_test(
+    name = "runtime_jobs_executor_test",
+    srcs = ["runtime_jobs_executor_test.py"],
+    data = ["runtime_jobs_executor.py"],
+)
+
+py_test(
+    name = "action_prefix_test",
+    srcs = ["action_prefix_test.py"],
+    args = [
+        "--repo-root",
+        "$(rootpath //:MODULE.bazel)",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//native/common:BUILD.bazel",
+        "//native/common:native_action_inputs.bzl",
+        "//native/common:plan_executor",
+        "//native/common:plan_executor.py",
+        "//native/common:plan_schema.py",
+        "//native/common:prefix_manifest.bzl",
+        "//native/common:prefix_manifest.py",
+        "//native/common:toolchain_helper_files",
+        "//plans:committed_plan_files",
+        "//tools:nested_bazel_fixture.py",
+        ":BUILD.bazel",
+        ":committed_plan_support.py",
+        ":jaxlib_action.bzl",
+        ":runtime_jobs_executor.py",
+        ":metadata_writer.py",
+        ":nested_http_archives.json",
+        ":upstream_pins.json",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_BAZEL_OB",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "action_prefix_test.py",
+    precompile = "disabled",
+    size = "small",
+    timeout = "short",
+    tags = [
+        "external",
+        "no-cache",
+    ],
+)
+
+py_test(
+    name = "nested_cache_manifest_test",
+    srcs = [
+        "nested_cache_manifest.py",
+        "nested_cache_manifest_test.py",
+    ],
+    main = "nested_cache_manifest_test.py",
+)
+
+py_test(
+    name = "committed_plan_support_test",
+    srcs = [
+        "committed_plan_support.py",
+        "committed_plan_support_test.py",
+    ],
+    main = "committed_plan_support_test.py",
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":jaxlib_action_dry_run",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "action_driver_test",
+    srcs = [
+        "action_driver.py",
+        "action_driver_test.py",
+    ],
+    data = [
+        ":upstream_pins.json",
+        "plan.py",
+    ],
+    deps = ["//native/common:native_action_toolchain_py"],
+    main = "action_driver_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:dev.MODULE.bazel",
+        "//:native_overrides.json",
+        "//:py_jax_0102_cu129_build_graph.json",
+        "//:py_jax_0102_cu130_build_graph.json",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":jaxlib_action.bzl",
+        ":upstream_pins.json",
+        "//tools:spack_to_bazel.py",
+    ],
+    deps = ["//native/common:native_action_toolchain_py"],
+    main = "plan_test.py",
+)

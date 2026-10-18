@@ -1,0 +1,15 @@
+module(name = "torch_artifact_downstream_smoke", version = "0.0.0")
+
+bazel_dep(name = "vaso_graph", version = "0.1.0")
+local_path_override(module_name = "vaso_graph", path = "{module_root}")
+{module_overrides}
+
+vaso_graph = use_extension("@vaso_graph//:extensions.bzl", "vaso_graph")
+vaso_graph.torch_artifact(
+    name = "torch",
+    line = "cu130",
+    sha256 = "{sha256}",
+    archive = "{archive}",
+)
+use_repo(vaso_graph, "vaso_torch_artifact_cu129", "vaso_torch_artifact_cu130")
+register_toolchains("@vaso_graph//toolchains:cuda_rootfs_toolchain")

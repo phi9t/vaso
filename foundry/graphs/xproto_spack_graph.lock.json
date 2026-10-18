@@ -1,0 +1,47 @@
+{
+  "packages": {
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    },
+    "spack_util_macros": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@util_macros_native//:lib",
+      "package": "util-macros",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/util-macros-1.20.2-xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "spack_hash": "xjy7uxzigehilbwvq4i3xhsuph4x3ad7",
+      "version": "1.20.2"
+    },
+    "spack_xproto": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/X11"
+      ],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@xproto_native//:lib",
+      "package": "xproto",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/xproto-7.0.31-6wuxlzyck5bj2wzadk2laiizaasu6tkg",
+      "spack_hash": "6wuxlzyck5bj2wzadk2laiizaasu6tkg",
+      "version": "7.0.31"
+    }
+  },
+  "root": "spack_xproto",
+  "schema_version": 1
+}

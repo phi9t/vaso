@@ -1,0 +1,217 @@
+{
+  "build": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/torchvision-cu129\"\nif [ \"$(cat \"$fixed_root/owner\" 2>/dev/null)\" != \"{work}\" ]; then\n  echo \"fixed torch build root $fixed_root is owned by another action\" >&2\n  exit 2\nfi\nset -euo pipefail; source \"$1\"; rm -rf \"{work}/wheelhouse\"; mkdir -p \"{work}/wheelhouse\"; python3 -m pip wheel --no-deps --no-build-isolation --no-index --no-cache-dir -w \"{work}/wheelhouse\" \"/vaso/build/torchvision-cu129/src\"; set -- \"{work}/wheelhouse\"/torchvision-*.whl; if [ \"$#\" -ne 1 ] || [ ! -f \"$1\" ]; then echo 'expected exactly one wheel matching torchvision-*.whl' >&2; exit 2; fi",
+      "build",
+      "{work}/torchvision-build-env.sh"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/torchvision-cu129\"\nrm -rf \"$fixed_root\"\nmkdir -p \"$fixed_root/src\"\nprintf \"%s\\n\" \"{work}\" > \"$fixed_root/owner\"\ncp -a \"{src}/.\" \"$fixed_root/src/\"\nenv_file=\"$1\"\nshift\nroot=\"$PWD\"\nabs_prefix() ( case \"$1\" in /*) printf \"%s\\n\" \"$1\" ;; *) printf \"%s/%s\\n\" \"$root\" \"$1\" ;; esac )\ntorch=\"$(abs_prefix \"$1\")\"\nshift\npython=\"$(abs_prefix \"$1\")\"\nshift\npython_venv=\"$(abs_prefix \"$1\")\"\nshift\npy_pip=\"$(abs_prefix \"$1\")\"\nshift\npy_setuptools=\"$(abs_prefix \"$1\")\"\nshift\npy_wheel=\"$(abs_prefix \"$1\")\"\nshift\npy_numpy=\"$(abs_prefix \"$1\")\"\nshift\npy_pillow=\"$(abs_prefix \"$1\")\"\nshift\npy_filelock=\"$(abs_prefix \"$1\")\"\nshift\ncuda=\"$(abs_prefix \"$1\")\"\nshift\nninja=\"$(abs_prefix \"$1\")\"\nshift\nlibjpeg_turbo=\"$(abs_prefix \"$1\")\"\nshift\nlibpng=\"$(abs_prefix \"$1\")\"\nshift\nzlib_ng=\"$(abs_prefix \"$1\")\"\nshift\ncompiler_prefix_map_flags=\"\"\ncuda_prefix_map_flags=\"\"\nfor logical_map_root in $torch $python $python_venv $py_pip $py_setuptools $py_wheel $py_numpy $py_pillow $py_filelock $cuda $ninja $libjpeg_turbo $libpng $zlib_ng; do\n  resolved_map_root=\"$(readlink -f \"$logical_map_root\" 2>/dev/null || printf \"%s\" \"$logical_map_root\")\"\n  for map_root in \"$logical_map_root\" \"$resolved_map_root\"; do\n    compiler_prefix_map_flags=\"$compiler_prefix_map_flags -ffile-prefix-map=$map_root=. -fdebug-prefix-map=$map_root=. -fmacro-prefix-map=$map_root=.\"\n    cuda_prefix_map_flags=\"$cuda_prefix_map_flags -Xcompiler=-ffile-prefix-map=$map_root=. -Xcompiler=-fdebug-prefix-map=$map_root=. -Xcompiler=-fmacro-prefix-map=$map_root=.\"\n  done\ndone\nmkdir -p \"$(dirname \"$env_file\")\" \"{work}/home\" \"{work}/pip-cache\"\ncat > \"$env_file\" <<EOF\nset -euo pipefail\nexport BUILD_VERSION=0.29.0\nexport PYTORCH_VERSION=2.14.0\nexport FORCE_CUDA=1\nexport TORCH_CUDA_ARCH_LIST=10.0\nexport TORCHVISION_USE_PNG=1\nexport TORCHVISION_USE_JPEG=1\nexport TORCHVISION_USE_WEBP=0\nexport TORCHVISION_USE_NVJPEG=1\nexport PYTHONHOME=\nexport PYTHONNOUSERSITE=1\nexport PYTHONDONTWRITEBYTECODE=1\nexport PIP_DISABLE_PIP_VERSION_CHECK=1\nexport PIP_NO_INDEX=1\nexport PIP_NO_INPUT=1\nexport CFLAGS=\"$CFLAGS $compiler_prefix_map_flags\"\nexport CXXFLAGS=\"$CXXFLAGS $compiler_prefix_map_flags\"\nexport CUDAFLAGS=\"$CUDAFLAGS $cuda_prefix_map_flags\"\nexport NVCC_FLAGS=\"$NVCC_FLAGS $cuda_prefix_map_flags\"\nexport CMAKE_C_COMPILER=\"$CC\"\nexport CMAKE_CXX_COMPILER=\"$CXX\"\nexport CUDA_HOME=\"$cuda\"\nexport CUDA_PATH=\"$cuda\"\nexport PYTHONPATH=\"$torch/lib/python3.13/site-packages:$py_pip/lib/python3.13/site-packages:$py_setuptools/lib/python3.13/site-packages:$py_wheel/lib/python3.13/site-packages:$py_numpy/lib/python3.13/site-packages:$py_pillow/lib/python3.13/site-packages:$py_filelock/lib/python3.13/site-packages:$python_venv/lib/python3.13/site-packages\"\nexport PATH=\"$python_venv/bin:$python/bin:$py_pip/bin:$py_wheel/bin:$ninja/bin:$cuda/bin:$libpng/bin:/usr/bin:/bin\"\nexport LD_LIBRARY_PATH=\"$torch/lib:$torch/lib/python3.13/site-packages/torch/lib:$cuda/lib64:$cuda/lib:$libjpeg_turbo/lib:$libjpeg_turbo/lib64:$libpng/lib:$libpng/lib64:$zlib_ng/lib:$zlib_ng/lib64\"\nexport LIBRARY_PATH=\"$cuda/lib64:$cuda/lib:$libjpeg_turbo/lib:$libjpeg_turbo/lib64:$libpng/lib:$libpng/lib64:$zlib_ng/lib:$zlib_ng/lib64\"\nexport TORCHVISION_INCLUDE=\"$libjpeg_turbo/include:$libpng/include:$zlib_ng/include\"\nexport TORCHVISION_LIBRARY=\"$libjpeg_turbo/lib:$libjpeg_turbo/lib64:$libpng/lib:$libpng/lib64:$zlib_ng/lib:$zlib_ng/lib64\"\nexport CMAKE_PREFIX_PATH=\"$torch:$python:$cuda:$ninja:$libjpeg_turbo:$libpng:$zlib_ng\"\nexport MAX_JOBS={jobs}\nexport CMAKE_BUILD_PARALLEL_LEVEL={jobs}\nexport MAX_CONCURRENCY={jobs}\nexport HOME=\"{work}/home\"\nexport PIP_CACHE_DIR=\"{work}/pip-cache\"\nEOF",
+      "configure",
+      "{work}/torchvision-build-env.sh",
+      "{prefix:torch}",
+      "{prefix:python}",
+      "{prefix:python-venv}",
+      "{prefix:py-pip}",
+      "{prefix:py-setuptools}",
+      "{prefix:py-wheel}",
+      "{prefix:py-numpy}",
+      "{prefix:py-pillow}",
+      "{prefix:py-filelock}",
+      "{prefix:cuda}",
+      "{prefix:ninja}",
+      "{prefix:libjpeg-turbo}",
+      "{prefix:libpng}",
+      "{prefix:zlib-ng}"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "deps": {
+    "cuda": {
+      "key": "manifest:@cuda_native//:prefix_manifest.json",
+      "label": "@cuda_native//:prefix_path.txt",
+      "manifest": "@cuda_native//:prefix_manifest.json"
+    },
+    "libjpeg-turbo": {
+      "key": "manifest:@libjpeg_turbo_native//:prefix_manifest.json",
+      "label": "@libjpeg_turbo_native//:prefix_path.txt",
+      "manifest": "@libjpeg_turbo_native//:prefix_manifest.json"
+    },
+    "libpng": {
+      "key": "manifest:@libpng_native//:prefix_manifest.json",
+      "label": "@libpng_native//:prefix_path.txt",
+      "manifest": "@libpng_native//:prefix_manifest.json"
+    },
+    "ninja": {
+      "key": "manifest:@ninja_native//:prefix_manifest.json",
+      "label": "@ninja_native//:prefix_path.txt",
+      "manifest": "@ninja_native//:prefix_manifest.json"
+    },
+    "py-filelock": {
+      "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+      "label": "@py_filelock_native//:prefix_path.txt",
+      "manifest": "@py_filelock_native//:prefix_manifest.json"
+    },
+    "py-numpy": {
+      "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+      "label": "@py_numpy_native//:prefix_path.txt",
+      "manifest": "@py_numpy_native//:prefix_manifest.json"
+    },
+    "py-pillow": {
+      "key": "manifest:@py_pillow_native//:prefix_manifest.json",
+      "label": "@py_pillow_native//:prefix_path.txt",
+      "manifest": "@py_pillow_native//:prefix_manifest.json"
+    },
+    "py-pip": {
+      "key": "manifest:@py_pip_native//:prefix_manifest.json",
+      "label": "@py_pip_native//:prefix_path.txt",
+      "manifest": "@py_pip_native//:prefix_manifest.json"
+    },
+    "py-setuptools": {
+      "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+      "label": "@py_setuptools_native//:prefix_path.txt",
+      "manifest": "@py_setuptools_native//:prefix_manifest.json"
+    },
+    "py-wheel": {
+      "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+      "label": "@py_wheel_native//:prefix_path.txt",
+      "manifest": "@py_wheel_native//:prefix_manifest.json"
+    },
+    "python": {
+      "key": "manifest:@python_313_native//:prefix_manifest.json",
+      "label": "@python_313_native//:prefix_path.txt",
+      "manifest": "@python_313_native//:prefix_manifest.json"
+    },
+    "python-venv": {
+      "key": "manifest:@python_venv_native//:prefix_manifest.json",
+      "label": "@python_venv_native//:prefix_path.txt",
+      "manifest": "@python_venv_native//:prefix_manifest.json"
+    },
+    "torch": {
+      "key": "action://native/pytorch:pytorch_action_prefix_manifest",
+      "label": "//native/pytorch:pytorch_action",
+      "manifest": "action://native/pytorch:pytorch_action_prefix_manifest"
+    },
+    "zlib-ng": {
+      "key": "manifest:@zlib_ng_native//:prefix_manifest.json",
+      "label": "@zlib_ng_native//:prefix_path.txt",
+      "manifest": "@zlib_ng_native//:prefix_manifest.json"
+    }
+  },
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:b4da8a872e7214455dc3bab2639a8508d8c8e979d7824bd2f1cd9a4c0ee59f3f",
+    "source_date_epoch": 1793577600
+  },
+  "gpu_archs": [
+    "sm_100"
+  ],
+  "inputs": [
+    {
+      "path": "native/torchvision/upstream_pins.json",
+      "sha256": "abab38d3a3d4e3cb3f94f24948ef78dac832d4cc97e3b0105b7a019b863c5625"
+    }
+  ],
+  "install": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nfixed_root=\"/vaso/build/torchvision-cu129\"\nif [ \"$(cat \"$fixed_root/owner\" 2>/dev/null)\" != \"{work}\" ]; then\n  echo \"fixed torch build root $fixed_root is owned by another action\" >&2\n  exit 2\nfi\nset -euo pipefail; source \"$1\"; set -- \"{work}/wheelhouse\"/torchvision-*.whl; if [ \"$#\" -ne 1 ] || [ ! -f \"$1\" ]; then echo 'expected exactly one wheel matching torchvision-*.whl' >&2; exit 2; fi; wheel=\"$1\"; python3 -m pip install --no-deps --ignore-installed --no-build-isolation --no-compile --no-warn-script-location --no-index --no-cache-dir --prefix \"{out}\" \"$wheel\"; python3 -c 'import pathlib, shutil, sys\nprefix = pathlib.Path(sys.argv[1])\nfor pyc in prefix.rglob(\"*.pyc\"):\n    if not pyc.is_symlink():\n        pyc.unlink()\nfor pycache in sorted(prefix.rglob(\"__pycache__\"), reverse=True):\n    if pycache.is_dir() and not pycache.is_symlink():\n        shutil.rmtree(pycache)\nfor direct_url in prefix.rglob(\"direct_url.json\"):\n    if direct_url.parent.name.endswith(\".dist-info\") and direct_url.is_file() and not direct_url.is_symlink():\n        direct_url.unlink()\n        record = direct_url.parent / \"RECORD\"\n        if record.is_file():\n            record.write_text(\"\".join(line for line in record.read_text(encoding=\"utf-8\").splitlines(True) if not line.split(\",\", 1)[0].endswith(\"/direct_url.json\")), encoding=\"utf-8\")\nbin_dir = prefix / \"bin\"\nif bin_dir.is_dir():\n    for script in sorted(bin_dir.iterdir()):\n        if script.is_symlink() or not script.is_file():\n            continue\n        data = script.read_bytes()\n        first, sep, rest = data.partition(b\"\\n\")\n        if not sep or not first.startswith(b\"#!\"):\n            continue\n        interp = first[2:].strip().split(maxsplit=1)[0]\n        name = pathlib.PurePosixPath(interp.decode(\"utf-8\", \"ignore\")).name\n        if name.startswith(\"python\"):\n            script.write_bytes(b\"#!/usr/bin/env python3\\n\" + rest)\n' \"{out}\"; mkdir -p \"$(dirname \"{wheel}\")\"; cp \"$wheel\" \"{wheel}\"\nrm -rf \"/vaso/build/torchvision-cu129\"\n",
+      "install",
+      "{work}/torchvision-build-env.sh"
+    ],
+    "cwd": ".",
+    "env": {}
+  },
+  "line": "cu129",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-12-9"
+        ],
+        "expect_stdout": "12.9.79-1",
+        "name": "dpkg-cuda-cudart-12-9"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    },
+    {
+      "kind": "wheel",
+      "path": "{wheel}"
+    }
+  ],
+  "package": {
+    "name": "py-torchvision",
+    "version": "0.29.0"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "24be57d922927d8a2ac2e8f076f07c3447ddf8f1d25ddbb7b65578f36c9ab8e3",
+      "strip_prefix": "vision-0.29.0",
+      "urls": [
+        "https://github.com/pytorch/vision/archive/refs/tags/v0.29.0.tar.gz"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@12.9.1",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu129/rootfs.identity.json",
+      "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+    }
+  }
+}

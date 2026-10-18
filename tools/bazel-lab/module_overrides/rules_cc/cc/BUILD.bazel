@@ -1,0 +1,8 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(name = "current_cc_toolchain")
+
+alias(
+    name = "toolchain_type",
+    actual = "@bazel_tools//tools/cpp:toolchain_type",
+)

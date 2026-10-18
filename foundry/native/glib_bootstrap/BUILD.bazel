@@ -1,0 +1,7 @@
+# Marks native/glib_bootstrap as a Bazel package so glib_bootstrap.bzl is
+# loadable from MODULE.bazel. The @glib_bootstrap_native repo is materialized
+# by the repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["glib_bootstrap.bzl"])

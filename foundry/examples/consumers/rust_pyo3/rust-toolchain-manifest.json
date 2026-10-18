@@ -1,0 +1,17 @@
+{
+  "cargo": {
+    "path": "/vaso/sources/rust/toolchains/rust-1.86.0-x86_64-unknown-linux-gnu/bin/cargo",
+    "sha256": "e0f7d6c8bec403352efe5567371126d439a2642ad5164dc36f41a54f48da4eab"
+  },
+  "rust": {
+    "archive": "/vaso/sources/rust/distdir/rust-1.86.0-x86_64-unknown-linux-gnu.tar.xz",
+    "archive_sha256": "6b448b3669e0c74f7f4b87da7da4868a552fcbba1f955032d8925ad2fffb3798",
+    "target": "x86_64-unknown-linux-gnu",
+    "version": "1.86.0"
+  },
+  "rustc": {
+    "path": "/vaso/sources/rust/toolchains/rust-1.86.0-x86_64-unknown-linux-gnu/bin/rustc",
+    "sha256": "daf6e73fb92c938dc287347e01c35f29da80616100a0ac5c7484c5c78ab2426a"
+  },
+  "stdlib_tree_sha256": "e6e6c25a6dbcaa9a2b5f41937dca27361add7a37c6b877c54271885684fba514"
+}

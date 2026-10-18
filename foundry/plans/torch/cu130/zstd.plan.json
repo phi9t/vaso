@@ -1,0 +1,120 @@
+{
+  "build": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nmake -C \"{src}/programs\" -j{jobs} VERBOSE=1 PREFIX=\"{out}\" HAVE_ZLIB=0 HAVE_LZMA=0 HAVE_LZ4=0"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nmake -C \"{src}/lib\" -j{jobs} VERBOSE=1 PREFIX=\"{out}\" install-pc install-includes install-shared install-static"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "deps": {},
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:60d3fd90dffa6eaaefab2ff2f82e8dcbd2c143961b3df2fc28d5981f42a6636c",
+    "source_date_epoch": 1751906416
+  },
+  "gpu_archs": [],
+  "inputs": [],
+  "install": {
+    "argv": [
+      "make",
+      "-C",
+      "{src}/programs",
+      "PREFIX={out}",
+      "HAVE_ZLIB=0",
+      "HAVE_LZMA=0",
+      "HAVE_LZ4=0",
+      "install"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "line": "cu130",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-13-0"
+        ],
+        "expect_stdout": "13.0.96-1",
+        "name": "dpkg-cuda-cudart-13-0"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    }
+  ],
+  "package": {
+    "name": "zstd",
+    "version": "1.5.7"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3",
+      "strip_prefix": "zstd-1.5.7",
+      "urls": [
+        "https://github.com/facebook/zstd/archive/v1.5.7.tar.gz"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@13.0.3",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu130/rootfs.identity.json",
+      "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+load(":settings.bzl", "string_flag")
+
+package(default_visibility = ["//visibility:public"])
+
+string_flag(
+    name = "flag",
+    build_setting_default = "OLD",
+)
+
+string_flag(
+    name = "jobs",
+    build_setting_default = "1",
+)
+
+string_flag(
+    name = "prefix_root",
+    build_setting_default = ".",
+)
+
+string_flag(
+    name = "seed",
+    build_setting_default = "plan-seed",
+)

@@ -1,0 +1,31 @@
+load(":zstd_action.bzl", "zstd_action_prefix")
+
+# Marks native/zstd as a Bazel package so zstd.bzl is loadable from
+# MODULE.bazel. The @zstd_native repo remains as a deprecated repository-rule
+# alias for repository-rule consumers until they move to action prefixes.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "zstd.bzl",
+    "zstd_action.bzl",
+])
+
+zstd_action_prefix(
+    name = "zstd_action_prefix",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/zstd.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/zstd.plan.json",
+    }),
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@zstd_action_archive//file",
+)
+
+filegroup(
+    name = "zstd_action_prefix_manifest",
+    srcs = [":zstd_action_prefix"],
+    output_group = "manifest",
+)
