@@ -1,0 +1,3 @@
+# Native perl repository_rule; nothing is built here directly.
+
+exports_files(["perl.bzl"])

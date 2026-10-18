@@ -1,0 +1,50 @@
+╭ AUTOLAND ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│RUNNING  pid 4242   HEARTBEAT  40s ago   ALIVE  busy 1xbazel 2xpython3   REFS  beef001 → cafe999 (2 lead commit(s) waiting)                                                       │
+│idle 20m0s / 45m  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  review in 3h20m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ OK  current conditions nominal                                                                                                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Loop Events ──────────────────────────────────────────────────────────────────────────────────╮╭ Messages ───────────────────────────────────────────────────────────────────────╮
+│  66 passed in 5.08s                                                                           ││2026-09-29T12:34Z  08-reseat-python-bound-natives.md  (TRAE)                     │
+│  VERIFY_PASSED                                                                                ││package-scoped re-seat is py-pathspec.                                           │
+│  MOVED lead-wip -> a000001                                                                    ││Verified prefix parity, kept the insula proof log, and left the target commit    │
+│13:07:00 LANDED vaso/landing -> a000001 (Executed 0 out of 28 tests: 28 tests pass. 66 passed  ││ready for the autoland loop.                                                     │
+│  in 5.08s)                                                                                    ││Next package remains queued for the same lane.                                   │
+│15:05:00 MOVED a000001 -> a000002: Commit fixture 02 - re-seat py-mpmath on Python 3.13        ││────────────────────────────────────────────────                                 │
+│  REBASED (detached) onto vaso/target -> a000002                                               ││2026-09-29T12:31Z  08-reseat-python-bound-natives.md  (TRAE)                     │
+│  Executed 0 out of 28 tests: 28 tests pass.                                                   ││package-scoped re-seat is py-mpmath.                                             │
+│  62 passed in 6.2s                                                                            ││Verified prefix parity, kept the insula proof log, and left the target commit    │
+│  VERIFY_PASSED                                                                                ││ready for the autoland loop.                                                     │
+│  MOVED lead-wip -> a000002                                                                    ││Next package remains queued for the same lane.                                   │
+│15:07:00 LANDED vaso/landing -> a000002 (Executed 0 out of 28 tests: 28 tests pass.)           ││────────────────────────────────────────────────                                 │
+│16:05:00 MOVED a000002 -> a000003: Commit fixture 03 - re-seat py-pathspec on Python 3.13      ││2026-09-29T12:28Z  08-reseat-python-bound-natives.md  (TRAE)                     │
+│  REBASED (detached) onto vaso/target -> a000003                                               ││package-scoped re-seat is py-jinja2.                                             │
+│  Executed 0 out of 28 tests: 28 tests pass.                                                   ││Verified prefix parity, kept the insula proof log, and left the target commit    │
+│  63 passed in 7.3s                                                                            ││ready for the autoland loop.                                                     │
+│  VERIFY_PASSED                                                                                │╰─────────────────────────────────────────────────────────────────────────────────╯
+│  MOVED lead-wip -> a000003                                                                    │╭ Follower Log Tail  20260929-1234.log  5m0s ago ─────────────────────────────────╮
+│16:07:00 LANDED vaso/landing -> a000003 (Executed 0 out of 28 tests: 28 tests pass.)           ││proof fixture line 01: checking installed prefix metadata                        │
+│17:05:00 MOVED a000003 -> a000004: Commit fixture 04 - re-seat py-pyyaml on Python 3.13        ││proof fixture line 02: checking installed prefix metadata                        │
+│  REBASED (detached) onto vaso/target -> a000004                                               ││proof fixture line 03: checking installed prefix metadata                        │
+│  Executed 0 out of 28 tests: 28 tests pass.                                                   ││proof fixture line 04: checking installed prefix metadata                        │
+│  64 passed in 8.4s                                                                            ││proof fixture line 05: checking installed prefix metadata                        │
+│  VERIFY_PASSED                                                                                ││INFO: proof step 06 completed with cached action reuse                           │
+│  MOVED lead-wip -> a000004                                                                    ││proof fixture line 07: checking installed prefix metadata                        │
+│17:07:00 LANDED vaso/landing -> a000004 (Executed 0 out of 28 tests: 28 tests pass.)           ││proof fixture line 08: checking installed prefix metadata                        │
+│18:05:00 MOVED a000004 -> a000005: Commit fixture 05 - re-seat py-cython on Python 3.13        ││proof fixture line 09: checking installed prefix metadata                        │
+│  REBASED (detached) onto vaso/target -> a000005                                               ││proof fixture line 10: checking installed prefix metadata                        │
+│  Executed 0 out of 28 tests: 28 tests pass.                                                   ││WARN: package fixture 11 emitted a long diagnostic line that should wrap inside  │
+│  65 passed in 9.5s                                                                            ││the follower log pane without pushing neighboring panels aro…                    │
+│  VERIFY_PASSED                                                                                │╰─────────────────────────────────────────────────────────────────────────────────╯
+│  MOVED lead-wip -> a000005                                                                    │╭ Recent Target Commits ──────────────────────────────────────────────────────────╮
+│18:07:00 LANDED vaso/landing -> a000005 (Executed 0 out of 28 tests: 28 tests pass.)           ││beef000      0s Commit fixture 01 - re-seat package shard on Python 3.13         │
+│── 2026-09-29 ──                                                                               ││beef001   36m0s Commit fixture 02 - re-seat package shard on Python 3.13         │
+│12:05:00 MOVED a000005 -> beef001: Commit fixture 40 - re-seat pytorch provider shard with an  ││beef002   1h12m Commit fixture 03 - re-seat package shard on Python 3.13         │
+│  intentionally long subject that should wrap cleanly instead of being cut off at the pane     ││beef003   1h48m Commit fixture 04 - re-seat package shard on Python 3.13         │
+│  edge                                                                                         ││beef004   2h24m Commit fixture 05 - re-seat package shard on Python 3.13         │
+│  REBASED (detached) onto vaso/target -> beef001                                               │╰─────────────────────────────────────────────────────────────────────────────────╯
+│  Executed 0 out of 28 tests: 27 tests pass, 1 fails.                                          │╭ Stats ──────────────────────────────────────────────────────────────────────────╮
+│  //native/pytorch:plan_test FAILED in 12.4s                                                   ││✓ lands (log): 5                                                                 │
+│  VERIFY_FAILED //native/pytorch:plan_test                                                     ││● Last land: 18h33m                                                              │
+│12:35:00 RED VERIFY_FAILED //native/pytorch:plan_test                                          ││● Last target commit: 12:40:00Z                                                  │
+╰───────────────────────────────────────────────────────────────────────────────────────────────╯╰─────────────────────────────────────────────────────────────────────────────────╯
+ q  quit   r  restart   ?  help   Tab  focus:events   j/k  scroll   PgUp/PgDn  page   G  bottom

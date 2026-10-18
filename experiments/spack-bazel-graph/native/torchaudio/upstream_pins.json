@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "pytorch": {
+    "version": "2.14.0"
+  },
+  "torchaudio": {
+    "version": "2.11.0",
+    "tag": "v2.11.0",
+    "source_url": "https://github.com/pytorch/audio/archive/refs/tags/v2.11.0.tar.gz",
+    "archive_sha256": "599ec24e7e1eef476ef21f0178e33da00e2434f930ba42e9cc20bf4002220486",
+    "torch_compatibility_note": "Upstream TorchAudio maintenance-mode README says TorchAudio 2.11 works with torch 2.11 and with every future torch release."
+  }
+}

@@ -1,0 +1,7 @@
+# Marks native/libmd as a Bazel package so libmd.bzl is loadable from
+# MODULE.bazel. The actual @libmd_native repo is materialized by the
+# libmd_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libmd.bzl"])

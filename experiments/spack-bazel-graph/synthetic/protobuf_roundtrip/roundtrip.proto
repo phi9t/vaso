@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package vaso.synthetic;
+
+message Nested {
+  string name = 1;
+  int32 score = 2;
+}
+
+message RoundTrip {
+  string label = 1;
+  repeated int32 values = 2;
+  Nested nested = 3;
+}

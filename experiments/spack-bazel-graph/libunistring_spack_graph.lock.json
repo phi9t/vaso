@@ -1,0 +1,40 @@
+{
+  "packages": {
+    "spack_libiconv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "charset",
+        "iconv"
+      ],
+      "native_prefix": "@libiconv_native//:lib",
+      "package": "libiconv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libiconv-1.18-l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "spack_hash": "l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "version": "1.18"
+    },
+    "spack_libunistring": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/unistring"
+      ],
+      "link_deps": [
+        "spack_libiconv"
+      ],
+      "link_libs": [
+        "unistring"
+      ],
+      "native_prefix": "@libunistring_native//:lib",
+      "package": "libunistring",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libunistring-1.4.2-omh4phdbb66asopo24cwzb462n5ghlmn",
+      "spack_hash": "omh4phdbb66asopo24cwzb462n5ghlmn",
+      "version": "1.4.2"
+    }
+  },
+  "root": "spack_libunistring",
+  "schema_version": 1
+}

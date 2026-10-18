@@ -1,0 +1,3 @@
+# Native OpenSSL repository_rule; nothing is built here directly.
+
+exports_files(["openssl.bzl"])

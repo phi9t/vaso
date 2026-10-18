@@ -1,0 +1,33 @@
+{
+  "packages": {
+    "spack_boost": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/boost"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "boost_atomic",
+        "boost_atomic-mt",
+        "boost_chrono",
+        "boost_chrono-mt",
+        "boost_container",
+        "boost_container-mt",
+        "boost_date_time",
+        "boost_date_time-mt",
+        "boost_exception",
+        "boost_exception-mt",
+        "boost_thread",
+        "boost_thread-mt"
+      ],
+      "native_prefix": "@boost_native//:lib",
+      "package": "boost",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/boost-1.90.0-lj7pfspuqvdq7i5bb563q4iz3eeor425",
+      "spack_hash": "lj7pfspuqvdq7i5bb563q4iz3eeor425",
+      "version": "1.90.0"
+    }
+  },
+  "root": "spack_boost",
+  "schema_version": 1
+}

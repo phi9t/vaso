@@ -1,0 +1,7 @@
+# Marks native/nvshmem as a Bazel package so nvshmem.bzl is loadable from
+# MODULE.bazel. The @nvshmem_native repo is materialized by the nvshmem_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["nvshmem.bzl"])

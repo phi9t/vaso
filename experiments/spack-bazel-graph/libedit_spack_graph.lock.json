@@ -1,0 +1,81 @@
+{
+  "packages": {
+    "spack_libedit": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/editline"
+      ],
+      "link_deps": [
+        "spack_ncurses"
+      ],
+      "link_libs": [
+        "edit"
+      ],
+      "native_prefix": "@libedit_native//:lib",
+      "package": "libedit",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libedit-3.1-20251016-rs5cjbifsr54ej2s6voieufpfjyw4dck",
+      "spack_hash": "rs5cjbifsr54ej2s6voieufpfjyw4dck",
+      "version": "3.1-20251016"
+    },
+    "spack_ncurses": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/ncurses",
+        "include/ncursesw"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "curses",
+        "form",
+        "form_g",
+        "formw",
+        "formw_g",
+        "menu",
+        "menu_g",
+        "menuw",
+        "menuw_g",
+        "ncurses",
+        "ncurses++",
+        "ncurses++_g",
+        "ncurses++w",
+        "ncurses++w_g",
+        "ncurses_g",
+        "ncursesw",
+        "ncursesw_g",
+        "panel",
+        "panel_g",
+        "panelw",
+        "panelw_g",
+        "tinfo",
+        "tinfo_g",
+        "tinfow",
+        "tinfow_g"
+      ],
+      "native_prefix": "@ncurses_native//:lib",
+      "package": "ncurses",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/ncurses-6.6-43optwvfncob7gw7kojtnqblmudi4nzv",
+      "spack_hash": "43optwvfncob7gw7kojtnqblmudi4nzv",
+      "version": "6.6"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    }
+  },
+  "root": "spack_libedit",
+  "schema_version": 1
+}

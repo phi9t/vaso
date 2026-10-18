@@ -1,0 +1,111 @@
+load(":torchvision_action.bzl", "torchvision_action_prefix", "torchvision_max_jobs_flag", "torchvision_token_flag")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_driver_test.py",
+    "action_smoke_test.py",
+    "plan.py",
+    "plan_test.py",
+    "synthetic_prefix_path.txt",
+    "synthetic_source_anchor.txt",
+    "torchvision_action.bzl",
+    "upstream_pins.json",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+)
+
+torchvision_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+torchvision_max_jobs_flag(
+    name = "max_jobs",
+    build_setting_default = 32,
+)
+
+torchvision_action_prefix(
+    name = "torchvision_action_dry_run",
+    torch_prefix = "//native/pytorch:pytorch_action_dry_run",
+    source_anchor = ":synthetic_source_anchor.txt",
+    source_files = ":synthetic_source_anchor.txt",
+    cuda_prefix_file = ":synthetic_prefix_path.txt",
+    execute = False,
+    libjpeg_turbo_prefix_file = ":synthetic_prefix_path.txt",
+    libpng_prefix_file = ":synthetic_prefix_path.txt",
+    ninja_prefix_file = ":synthetic_prefix_path.txt",
+    py_numpy_prefix_file = ":synthetic_prefix_path.txt",
+    py_pillow_prefix_file = ":synthetic_prefix_path.txt",
+    py_filelock_prefix_file = ":synthetic_prefix_path.txt",
+    py_pip_prefix_file = ":synthetic_prefix_path.txt",
+    py_setuptools_prefix_file = ":synthetic_prefix_path.txt",
+    py_wheel_prefix_file = ":synthetic_prefix_path.txt",
+    python_prefix_file = ":synthetic_prefix_path.txt",
+    python_venv_prefix_file = ":synthetic_prefix_path.txt",
+    synthetic_prefixes_for_dry_run = True,
+    zlib_ng_prefix_file = ":synthetic_prefix_path.txt",
+)
+
+torchvision_action_prefix(
+    name = "torchvision_action",
+    torch_prefix = "//native/pytorch:pytorch_action",
+    source_anchor = "@torchvision_v0_29_0_source//:setup.py",
+    source_files = "@torchvision_v0_29_0_source//:all_srcs",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    execute = True,
+    libjpeg_turbo_prefix_file = "@libjpeg_turbo_native//:prefix_path.txt",
+    libpng_prefix_file = "@libpng_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pillow_prefix_file = "@py_pillow_native//:prefix_path.txt",
+    py_filelock_prefix_file = "@py_filelock_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    tags = ["manual"],
+    zlib_ng_prefix_file = "@zlib_ng_native//:prefix_path.txt",
+)
+
+py_test(
+    name = "action_driver_test",
+    srcs = [
+        "action_driver.py",
+        "action_driver_test.py",
+    ],
+    main = "action_driver_test.py",
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":torchvision_action_dry_run",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:run.sh",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":torchvision_action.bzl",
+        ":upstream_pins.json",
+    ],
+    main = "plan_test.py",
+)

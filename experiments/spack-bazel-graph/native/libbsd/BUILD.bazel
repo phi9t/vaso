@@ -1,0 +1,7 @@
+# Marks native/libbsd as a Bazel package so libbsd.bzl is loadable from
+# MODULE.bazel. The actual @libbsd_native repo is materialized by the
+# libbsd_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libbsd.bzl"])

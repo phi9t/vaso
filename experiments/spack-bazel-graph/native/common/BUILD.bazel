@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "python_abi.bzl",
+    "rootfs_cuda_component.bzl",
+])

@@ -1,0 +1,19 @@
+load(":zlib_ng_action.bzl", "zlib_ng_action_prefix")
+
+# Marks native/zlib_ng as a Bazel package so zlib_ng.bzl is loadable from
+# MODULE.bazel. The actual @zlib_ng_native repo is materialized by the
+# zlib_ng_native repository_rule; the action pilot below is separate and is not
+# wired to consumers.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "zlib_ng.bzl",
+    "zlib_ng_action.bzl",
+])
+
+zlib_ng_action_prefix(
+    name = "zlib_ng_action_prefix",
+    configure = "@zlib_ng_action_src//:configure",
+    srcs = ["@zlib_ng_action_src//:all_srcs"],
+)

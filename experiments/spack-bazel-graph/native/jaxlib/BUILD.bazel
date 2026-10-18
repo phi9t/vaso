@@ -1,0 +1,131 @@
+load(":jaxlib_action.bzl", "jaxlib_action_prefix", "jaxlib_nested_prefetch", "jaxlib_token_flag")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_driver_test.py",
+    "action_smoke_test.py",
+    "jaxlib_action.bzl",
+    "plan.py",
+    "plan_test.py",
+    "synthetic_prefix_path.txt",
+    "synthetic_source_anchor.txt",
+    "upstream_pins.json",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+)
+
+jaxlib_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+jaxlib_action_prefix(
+    name = "jaxlib_action_dry_run",
+    source_anchor = ":synthetic_source_anchor.txt",
+    source_archive = ":synthetic_source_anchor.txt",
+    bazel_prefix_file = ":synthetic_prefix_path.txt",
+    cuda_prefix_file = ":synthetic_prefix_path.txt",
+    cudnn_prefix_file = ":synthetic_prefix_path.txt",
+    execute = False,
+    llvm_prefix_file = ":synthetic_prefix_path.txt",
+    nccl_prefix_file = ":synthetic_prefix_path.txt",
+    nvshmem_prefix_file = ":synthetic_prefix_path.txt",
+    py_numpy_prefix_file = ":synthetic_prefix_path.txt",
+    py_pip_prefix_file = ":synthetic_prefix_path.txt",
+    py_setuptools_prefix_file = ":synthetic_prefix_path.txt",
+    py_wheel_prefix_file = ":synthetic_prefix_path.txt",
+    python_prefix_file = ":synthetic_prefix_path.txt",
+    python_venv_prefix_file = ":synthetic_prefix_path.txt",
+    synthetic_prefixes_for_dry_run = True,
+    xxd_standalone_prefix_file = ":synthetic_prefix_path.txt",
+)
+
+jaxlib_action_prefix(
+    name = "jaxlib_action",
+    source_anchor = "@jax_v0_10_2_source//:WORKSPACE",
+    source_archive = "@jax_v0_10_2_source_archive//file",
+    bazel_prefix_file = "@rootfs_bazel_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    cudnn_prefix_file = "@cudnn_native//:prefix_path.txt",
+    execute = True,
+    llvm_prefix_file = "@rootfs_llvm_23_native//:prefix_path.txt",
+    nccl_prefix_file = "@nccl_native//:prefix_path.txt",
+    nvshmem_prefix_file = "@nvshmem_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_abi = "derived",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    xxd_standalone_prefix_file = "@xxd_standalone_native//:prefix_path.txt",
+)
+
+jaxlib_nested_prefetch(
+    name = "jaxlib_nested_prefetch",
+    source_anchor = "@jax_v0_10_2_source//:WORKSPACE",
+    source_archive = "@jax_v0_10_2_source_archive//file",
+    bazel_prefix_file = "@rootfs_bazel_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    cudnn_prefix_file = "@cudnn_native//:prefix_path.txt",
+    llvm_prefix_file = "@rootfs_llvm_23_native//:prefix_path.txt",
+    nccl_prefix_file = "@nccl_native//:prefix_path.txt",
+    nvshmem_prefix_file = "@nvshmem_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_82_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_abi = "derived",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    python_venv_prefix_file = "@python_venv_native//:prefix_path.txt",
+    xxd_standalone_prefix_file = "@xxd_standalone_native//:prefix_path.txt",
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":jaxlib_action_dry_run",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "action_driver_test",
+    srcs = [
+        "action_driver.py",
+        "action_driver_test.py",
+    ],
+    data = [
+        ":upstream_pins.json",
+        "plan.py",
+    ],
+    main = "action_driver_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:native_overrides.json",
+        "//:py_jax_0102_cu129_build_graph.json",
+        "//:py_jax_0102_cu130_build_graph.json",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":jaxlib_action.bzl",
+        ":upstream_pins.json",
+        "//tools:spack_to_bazel.py",
+    ],
+    main = "plan_test.py",
+)

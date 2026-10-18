@@ -1,0 +1,7 @@
+# Marks native/libunistring as a Bazel package so libunistring.bzl is loadable
+# from MODULE.bazel. The @libunistring_native repo is materialized by the
+# libunistring_native repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libunistring.bzl"])

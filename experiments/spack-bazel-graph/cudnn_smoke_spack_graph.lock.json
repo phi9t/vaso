@@ -1,0 +1,20 @@
+{
+  "packages": {
+    "spack_zlib_ng": {
+      "build": "spack",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "z"
+      ],
+      "package": "zlib-ng",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/zlib-ng-2.3.3-igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "spack_hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "version": "2.3.3"
+    }
+  },
+  "root": "spack_zlib_ng",
+  "schema_version": 1
+}
