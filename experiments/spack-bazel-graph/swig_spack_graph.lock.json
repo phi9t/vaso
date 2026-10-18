@@ -1,0 +1,65 @@
+{
+  "packages": {
+    "spack_pcre2": {
+      "build": "spack",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pcre2-16",
+        "pcre2-32",
+        "pcre2-8",
+        "pcre2-posix"
+      ],
+      "package": "pcre2",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pcre2-10.44-oill6xxc2orapxiicavzsvz2wvufa4cd",
+      "spack_hash": "oill6xxc2orapxiicavzsvz2wvufa4cd",
+      "version": "10.44"
+    },
+    "spack_pkgconf": {
+      "build": "spack",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "spack_hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "version": "2.5.1"
+    },
+    "spack_swig": {
+      "build": "spack",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_pcre2",
+        "spack_zlib_ng"
+      ],
+      "link_libs": [],
+      "package": "swig",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/swig-4.4.1-i2wn7calsggxstg5eolof5e3ert75pip",
+      "spack_hash": "i2wn7calsggxstg5eolof5e3ert75pip",
+      "version": "4.4.1"
+    },
+    "spack_zlib_ng": {
+      "build": "spack",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "z"
+      ],
+      "package": "zlib-ng",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/zlib-ng-2.3.3-igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "spack_hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "version": "2.3.3"
+    }
+  },
+  "root": "spack_swig",
+  "schema_version": 1
+}

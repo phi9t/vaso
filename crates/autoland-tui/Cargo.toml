@@ -1,0 +1,12 @@
+[package]
+name = "autoland-tui"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone: excluded from the root workspace (see the root Cargo.toml).
+[workspace]
+
+[dependencies]
+crossterm = "0.28"
+libc = "0.2"
+ratatui = "0.29"

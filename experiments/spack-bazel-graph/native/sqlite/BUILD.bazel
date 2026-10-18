@@ -1,0 +1,7 @@
+# Marks native/sqlite as a Bazel package so sqlite.bzl is loadable from
+# MODULE.bazel. The @sqlite_native repo is materialized by the sqlite_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["sqlite.bzl"])

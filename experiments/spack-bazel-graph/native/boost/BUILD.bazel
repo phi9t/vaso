@@ -1,0 +1,10 @@
+# Marks native/boost as a Bazel package so boost.bzl and the captured Spack
+# patch are loadable from MODULE.bazel. The @boost_native repo is materialized
+# by the boost_native repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "boost.bzl",
+    "bootstrap-compiler.patch",
+])

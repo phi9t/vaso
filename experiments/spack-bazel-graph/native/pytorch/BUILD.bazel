@@ -1,0 +1,161 @@
+load(":pytorch_action.bzl", "pytorch_action_prefix", "pytorch_max_jobs_flag", "pytorch_token_flag")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+
+# Marks native/pytorch as a Bazel package so pytorch_native.bzl and plan.py are
+# loadable/consumable. The @pytorch_native repo (when wired) is materialized by
+# the pytorch_native repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "BUILD.bazel",
+    "action_driver.py",
+    "action_smoke_test.py",
+    "gates.py",
+    "gates_test.py",
+    "plan.py",
+    "plan_test.py",
+    "pytorch-v2.14.0-2b3ec348-submodules.json",
+    "pytorch_action.bzl",
+    "pytorch_native.bzl",
+    "synthetic_prefix_path.txt",
+])
+
+py_binary(
+    name = "action_driver",
+    srcs = ["action_driver.py"],
+)
+
+pytorch_token_flag(
+    name = "token",
+    build_setting_default = "",
+)
+
+pytorch_max_jobs_flag(
+    name = "max_jobs",
+    build_setting_default = 96,
+)
+
+pytorch_action_prefix(
+    name = "pytorch_action_dry_run",
+    source_anchor = "@pytorch_v2_14_0_source//:setup.py",
+    source_archive = "@pytorch_v2_14_0_source_archive//file",
+    source_manifest = ":pytorch-v2.14.0-2b3ec348-submodules.json",
+    zstd_prefix_file = ":synthetic_prefix_path.txt",
+    build_version = "2.14.0",
+    cmake_prefix_file = ":synthetic_prefix_path.txt",
+    cpuinfo_prefix_file = ":synthetic_prefix_path.txt",
+    cuda_prefix_file = ":synthetic_prefix_path.txt",
+    cudnn_prefix_file = ":synthetic_prefix_path.txt",
+    cudss_prefix_file = ":synthetic_prefix_path.txt",
+    cusparselt_prefix_file = ":synthetic_prefix_path.txt",
+    execute = False,
+    fp16_prefix_file = ":synthetic_prefix_path.txt",
+    fxdiv_prefix_file = ":synthetic_prefix_path.txt",
+    nccl_prefix_file = ":synthetic_prefix_path.txt",
+    ninja_prefix_file = ":synthetic_prefix_path.txt",
+    numactl_prefix_file = ":synthetic_prefix_path.txt",
+    nvshmem_prefix_file = ":synthetic_prefix_path.txt",
+    openblas_prefix_file = ":synthetic_prefix_path.txt",
+    openmpi_prefix_file = ":synthetic_prefix_path.txt",
+    protobuf_prefix_file = ":synthetic_prefix_path.txt",
+    psimd_prefix_file = ":synthetic_prefix_path.txt",
+    pthreadpool_prefix_file = ":synthetic_prefix_path.txt",
+    py_numpy_prefix_file = ":synthetic_prefix_path.txt",
+    py_packaging_prefix_file = ":synthetic_prefix_path.txt",
+    py_pathspec_prefix_file = ":synthetic_prefix_path.txt",
+    py_pip_prefix_file = ":synthetic_prefix_path.txt",
+    py_protobuf_prefix_file = ":synthetic_prefix_path.txt",
+    py_pyyaml_prefix_file = ":synthetic_prefix_path.txt",
+    py_scikit_build_core_prefix_file = ":synthetic_prefix_path.txt",
+    py_setuptools_prefix_file = ":synthetic_prefix_path.txt",
+    py_six_prefix_file = ":synthetic_prefix_path.txt",
+    py_typing_extensions_prefix_file = ":synthetic_prefix_path.txt",
+    py_wheel_prefix_file = ":synthetic_prefix_path.txt",
+    python_prefix_file = ":synthetic_prefix_path.txt",
+    rootfs_cuda_bundle = True,
+    synthetic_prefixes_for_dry_run = True,
+    torch_cuda_arch_list = "10.0",
+)
+
+pytorch_action_prefix(
+    name = "pytorch_action",
+    source_anchor = "@pytorch_v2_14_0_source//:setup.py",
+    source_archive = "@pytorch_v2_14_0_source_archive//file",
+    source_manifest = ":pytorch-v2.14.0-2b3ec348-submodules.json",
+    zstd_prefix_file = "@zstd_native//:prefix_path.txt",
+    build_version = "2.14.0",
+    cmake_prefix_file = "@cmake_native//:prefix_path.txt",
+    cpuinfo_prefix_file = "@cpuinfo_native//:prefix_path.txt",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    cudnn_prefix_file = "@cudnn_native//:prefix_path.txt",
+    cudss_prefix_file = "@cudss_native//:prefix_path.txt",
+    cusparselt_prefix_file = "@cusparselt_native//:prefix_path.txt",
+    execute = True,
+    fp16_prefix_file = "@fp16_native//:prefix_path.txt",
+    fxdiv_prefix_file = "@fxdiv_native//:prefix_path.txt",
+    nccl_prefix_file = "@nccl_native//:prefix_path.txt",
+    ninja_prefix_file = "@ninja_native//:prefix_path.txt",
+    numactl_prefix_file = "@numactl_native//:prefix_path.txt",
+    nvshmem_prefix_file = "@nvshmem_native//:prefix_path.txt",
+    openblas_prefix_file = "@openblas_native//:prefix_path.txt",
+    openmpi_prefix_file = "@openmpi_native//:prefix_path.txt",
+    protobuf_prefix_file = "@protobuf_native//:prefix_path.txt",
+    psimd_prefix_file = "@psimd_native//:prefix_path.txt",
+    pthreadpool_prefix_file = "@pthreadpool_native//:prefix_path.txt",
+    py_numpy_prefix_file = "@py_numpy_native//:prefix_path.txt",
+    py_packaging_prefix_file = "@py_packaging_native//:prefix_path.txt",
+    py_pathspec_prefix_file = "@py_pathspec_native//:prefix_path.txt",
+    py_pip_prefix_file = "@py_pip_native//:prefix_path.txt",
+    py_protobuf_prefix_file = "@py_protobuf_native//:prefix_path.txt",
+    py_pyyaml_prefix_file = "@py_pyyaml_native//:prefix_path.txt",
+    py_scikit_build_core_prefix_file = "@py_scikit_build_core_native//:prefix_path.txt",
+    py_setuptools_prefix_file = "@py_setuptools_native//:prefix_path.txt",
+    py_six_prefix_file = "@py_six_native//:prefix_path.txt",
+    py_typing_extensions_prefix_file = "@py_typing_extensions_native//:prefix_path.txt",
+    py_wheel_prefix_file = "@py_wheel_native//:prefix_path.txt",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    rootfs_cuda_bundle = True,
+    tags = ["manual"],
+    torch_cuda_arch_list = "10.0",
+)
+
+py_test(
+    name = "action_smoke_test",
+    srcs = ["action_smoke_test.py"],
+    data = [
+        ":pytorch_action_dry_run",
+    ],
+    main = "action_smoke_test.py",
+)
+
+py_test(
+    name = "plan_test",
+    srcs = [
+        "plan.py",
+        "plan_test.py",
+    ],
+    data = [
+        "//:MODULE.bazel",
+        "//:native_overrides.json",
+        "//:py_torch_214_full_build_graph.json",
+        "//:py_torch_lean_nx_build_graph.json",
+        "//:run.sh",
+        ":BUILD.bazel",
+        ":action_driver.py",
+        ":pytorch-v2.14.0-2b3ec348-submodules.json",
+        ":pytorch_action.bzl",
+        ":pytorch_native.bzl",
+    ],
+    main = "plan_test.py",
+)
+
+py_test(
+    name = "gates_test",
+    srcs = [
+        "gates.py",
+        "gates_test.py",
+    ],
+    data = ["//tools:abi_parity.py"],
+    main = "gates_test.py",
+)

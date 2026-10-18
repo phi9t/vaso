@@ -1,0 +1,7 @@
+# Marks native/cudss as a Bazel package so cudss.bzl is loadable from
+# MODULE.bazel. The @cudss_native repo is materialized by the cudss_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["cudss.bzl"])

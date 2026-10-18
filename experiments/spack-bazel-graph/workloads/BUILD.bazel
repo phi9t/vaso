@@ -1,0 +1,26 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+py_test(
+    name = "criteria_test",
+    srcs = [
+        "__init__.py",
+        "criteria_test.py",
+        "run_workloads.py",
+        "w1_torch_train.py",
+        "w2_triton.py",
+        "w3_jax.py",
+        "w4_coresidence.py",
+        "w5_jax_model.py",
+    ],
+    data = [
+        "run_workloads.py",
+        "w1_torch_train.py",
+        "w2_triton.py",
+        "w3_jax.py",
+        "w4_coresidence.py",
+        "w5_jax_model.py",
+    ],
+    main = "criteria_test.py",
+)

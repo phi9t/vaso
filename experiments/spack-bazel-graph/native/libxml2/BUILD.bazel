@@ -1,0 +1,6 @@
+# Marks native/libxml2 as a Bazel package so libxml2.bzl is loadable from MODULE.bazel.
+# The actual @libxml2_native repo is materialized by the libxml2_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["libxml2.bzl"])

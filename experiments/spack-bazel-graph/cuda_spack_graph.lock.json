@@ -1,0 +1,226 @@
+{
+  "packages": {
+    "spack_berkeley_db": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@berkeley_db_native//:lib",
+      "package": "berkeley-db",
+      "prefix": "",
+      "spack_hash": "l2dhmcj7q3ci2vo5fmnzm55fjj2es3ol",
+      "version": "18.1.40"
+    },
+    "spack_bzip2": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@bzip2_native//:lib",
+      "package": "bzip2",
+      "prefix": "",
+      "spack_hash": "ul2vmsu5qyu2yo5zijsvb5ppw5s7hsrf",
+      "version": "1.0.8"
+    },
+    "spack_ca_certificates_mozilla": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@ca_certificates_mozilla_native//:lib",
+      "package": "ca-certificates-mozilla",
+      "prefix": "",
+      "spack_hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "version": "2026-03-19"
+    },
+    "spack_coreutils": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_openssl"
+      ],
+      "link_libs": [],
+      "native_prefix": "@coreutils_native//:lib",
+      "package": "coreutils",
+      "prefix": "",
+      "spack_hash": "dy4y5bq2aymjq3rfrashuoa6ldsmghhx",
+      "version": "9.10"
+    },
+    "spack_cuda": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@cuda_native//:lib",
+      "package": "cuda",
+      "prefix": "",
+      "spack_hash": "blugag5e3fsl4tfy3amengebp7noqmni",
+      "version": "12.9.1"
+    },
+    "spack_diffutils": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libiconv"
+      ],
+      "link_libs": [],
+      "native_prefix": "@diffutils_native//:lib",
+      "package": "diffutils",
+      "prefix": "",
+      "spack_hash": "5u2vizuxymb72i5qq5qr24s27xeylrz6",
+      "version": "3.12"
+    },
+    "spack_gdbm": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_readline"
+      ],
+      "link_libs": [],
+      "native_prefix": "@gdbm_native//:lib",
+      "package": "gdbm",
+      "prefix": "",
+      "spack_hash": "n5323hiqtoc2oeexkhzj4peb6oryjsv7",
+      "version": "1.26"
+    },
+    "spack_gzip": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@gzip_native//:lib",
+      "package": "gzip",
+      "prefix": "",
+      "spack_hash": "j5setuqzh7kvfbkg2c7kawqph7lnceui",
+      "version": "1.14"
+    },
+    "spack_less": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_ncurses"
+      ],
+      "link_libs": [],
+      "native_prefix": "@less_native//:lib",
+      "package": "less",
+      "prefix": "",
+      "spack_hash": "dcwntpnu3mjme4ptxzloe5zr76ykwlht",
+      "version": "692"
+    },
+    "spack_libiconv": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@libiconv_native//:lib",
+      "package": "libiconv",
+      "prefix": "",
+      "spack_hash": "c772leslxvswjh32kbc3x6wf7362uxuy",
+      "version": "1.18"
+    },
+    "spack_libxml2": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libiconv",
+        "spack_xz",
+        "spack_zlib_ng"
+      ],
+      "link_libs": [],
+      "native_prefix": "@libxml2_native//:lib",
+      "package": "libxml2",
+      "prefix": "",
+      "spack_hash": "lp67nrne6ntrdzr6y3jrkwzdyxpiuhqh",
+      "version": "2.13.9"
+    },
+    "spack_ncurses": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@ncurses_native//:lib",
+      "package": "ncurses",
+      "prefix": "",
+      "spack_hash": "anxucerxim6q3r4fpijczh5brrrrgguu",
+      "version": "6.6"
+    },
+    "spack_openssl": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_zlib_ng"
+      ],
+      "link_libs": [],
+      "native_prefix": "@openssl_native//:lib",
+      "package": "openssl",
+      "prefix": "",
+      "spack_hash": "lwcgy3jfcuhqrsw5jguvicmvqt5sf7hu",
+      "version": "3.6.1"
+    },
+    "spack_perl": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_berkeley_db",
+        "spack_bzip2",
+        "spack_gdbm",
+        "spack_less",
+        "spack_zlib_ng"
+      ],
+      "link_libs": [],
+      "native_prefix": "@perl_native//:lib",
+      "package": "perl",
+      "prefix": "",
+      "spack_hash": "vfzcblka2pknrcrdoqax4xtq6v2nwuax",
+      "version": "5.42.0"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "",
+      "spack_hash": "l5wuypa5jrurf4brssvnnjsbuodpgipn",
+      "version": "2.5.1"
+    },
+    "spack_readline": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_ncurses"
+      ],
+      "link_libs": [],
+      "native_prefix": "@readline_native//:lib",
+      "package": "readline",
+      "prefix": "",
+      "spack_hash": "uri6yvumvrnl4msmpx5ffi6cgxgywtq3",
+      "version": "8.3"
+    },
+    "spack_xz": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@xz_native//:lib",
+      "package": "xz",
+      "prefix": "",
+      "spack_hash": "malvvwrlxiquz5mvu3ouhooissqjxzj2",
+      "version": "5.8.3"
+    },
+    "spack_zlib_ng": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@zlib_ng_native//:lib",
+      "package": "zlib-ng",
+      "prefix": "",
+      "spack_hash": "igc2gy3rg5v7ihcwf2pbfc2rbg2cyj76",
+      "version": "2.3.3"
+    }
+  },
+  "root": "spack_cuda",
+  "schema_version": 1
+}

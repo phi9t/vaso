@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+# The smallest possible Bazel target: a genrule with no external deps. Building
+# it proves the insula can run Bazel end-to-end (analysis + a local action +
+# writing to the persisted output base). No toolchains, no network.
+genrule(
+    name = "touchstone",
+    outs = ["touchstone.txt"],
+    cmd = "echo vaso-insula-bootstrap-ok > $@",
+)

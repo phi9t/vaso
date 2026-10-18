@@ -1,0 +1,67 @@
+{
+  "packages": {
+    "spack_diffutils": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [
+        "spack_libiconv"
+      ],
+      "link_libs": [],
+      "native_prefix": "@diffutils_native//:lib",
+      "package": "diffutils",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/diffutils-3.12-2gbb2j56nzjeq2ejlhopq2twu4van7ii",
+      "spack_hash": "2gbb2j56nzjeq2ejlhopq2twu4van7ii",
+      "version": "3.12"
+    },
+    "spack_libiconv": {
+      "build": "native",
+      "include_dirs": [
+        "include"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "charset",
+        "iconv"
+      ],
+      "native_prefix": "@libiconv_native//:lib",
+      "package": "libiconv",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/libiconv-1.18-l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "spack_hash": "l4qa7mobxvahg6t6xwrzttegi7lkrf6x",
+      "version": "1.18"
+    },
+    "spack_nghttp2": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/nghttp2"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "nghttp2"
+      ],
+      "native_prefix": "@nghttp2_native//:lib",
+      "package": "nghttp2",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/nghttp2-1.67.1-k7c67knpxzjjblqhbtxq4s5h2cetusr3",
+      "spack_hash": "k7c67knpxzjjblqhbtxq4s5h2cetusr3",
+      "version": "1.67.1"
+    },
+    "spack_pkgconf": {
+      "build": "native",
+      "include_dirs": [
+        "include",
+        "include/pkgconf"
+      ],
+      "link_deps": [],
+      "link_libs": [
+        "pkgconf"
+      ],
+      "native_prefix": "@pkgconf_native//:lib",
+      "package": "pkgconf",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/pkgconf-2.5.1-kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "spack_hash": "kudvhugwerlucanwcfcryeofe7xc6w5j",
+      "version": "2.5.1"
+    }
+  },
+  "root": "spack_nghttp2",
+  "schema_version": 1
+}

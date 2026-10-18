@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_gzip": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@gzip_native//:lib",
+      "package": "gzip",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/gzip-1.14-2l3gqtpkkjscnkpxmzndm5b6scuj2kzt",
+      "spack_hash": "2l3gqtpkkjscnkpxmzndm5b6scuj2kzt",
+      "version": "1.14"
+    }
+  },
+  "root": "spack_gzip",
+  "schema_version": 1
+}

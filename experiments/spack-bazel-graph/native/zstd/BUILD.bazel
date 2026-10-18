@@ -1,0 +1,7 @@
+# Marks native/zstd as a Bazel package so zstd.bzl is loadable from
+# MODULE.bazel. The @zstd_native repo is materialized by the zstd_native
+# repository_rule; nothing is built here directly.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["zstd.bzl"])

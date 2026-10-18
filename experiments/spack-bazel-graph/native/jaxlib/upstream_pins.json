@@ -1,0 +1,37 @@
+{
+  "cuda_lines": {
+    "cu129": {
+      "cuda_major": "12",
+      "cuda_version": "12.9.1",
+      "plugin_wheel_prefix": "jax_cuda12_plugin",
+      "pjrt_wheel_prefix": "jax_cuda12_pjrt"
+    },
+    "cu130": {
+      "cuda_major": "13",
+      "cuda_version": "13.0.3",
+      "plugin_wheel_prefix": "jax_cuda13_plugin",
+      "pjrt_wheel_prefix": "jax_cuda13_pjrt"
+    }
+  },
+  "jax": {
+    "sdist_sha256": "bf77428a8c2e6904c4f46d5ab12aa5cfc6cad2179f07f7e4c0fc75ac86ef0639",
+    "version": "0.10.2"
+  },
+  "jaxlib": {
+    "bazel_version": "7.7.0",
+    "source_archive_sha256": "fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7",
+    "source_tag": "jax-v0.10.2",
+    "xla_commit": "5a9e73cbd92530cac2ac36f4736a774b2412afe2",
+    "version": "0.10.2"
+  },
+  "llvm": {
+    "selected_prefix": "/usr/lib/llvm-23",
+    "selected_source_archive_sha256": "c3f06997045e0f9aa43628616df3217f229aa43d478bd78bd445e2448637d4ef",
+    "selected_source_commit": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+    "selected_version": "23.0.0git",
+    "xla_patch_sha256": {
+      "b514740398.patch": "ec5f91ebffd137c946cc342e0f7e96fbdf293ab7a5220761ddef990fa2c24396",
+      "generated.patch": "3072a498ccea4daab771fb9ebf9ffde12ff5718f2761d26cfa69f5031f778de9"
+    }
+  }
+}

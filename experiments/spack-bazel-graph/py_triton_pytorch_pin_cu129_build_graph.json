@@ -1,0 +1,5280 @@
+{
+  "build_system_histogram": {
+    "autotools": 40,
+    "cmake": 3,
+    "generic": 15,
+    "makefile": 2,
+    "python_pip": 13
+  },
+  "n_nodes": 73,
+  "nodes": [
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": false,
+      "native_prefix": "@ca_certificates_mozilla_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "ca-certificates-mozilla",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+      "status": "native",
+      "topo_index": 0,
+      "version": "2026-03-19"
+    },
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "compiler-wrapper",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+      "status": "spack",
+      "topo_index": 1,
+      "version": "1.1.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": false,
+      "native_prefix": "@cuda_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "cuda",
+      "parameters": {
+        "allow-unsupported-compilers": false,
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "dev": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "hywmo6pajrjpidu3dj3ttuvuxojfp3rs",
+      "status": "native",
+      "topo_index": 2,
+      "version": "12.9.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gcc",
+      "parameters": {
+        "binutils": true,
+        "bootstrap": true,
+        "build_system": "autotools",
+        "build_type": "RelWithDebInfo",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "graphite": false,
+        "languages": [
+          "c",
+          "c++",
+          "fortran"
+        ],
+        "ldflags": [],
+        "ldlibs": [],
+        "libsanitizer": true,
+        "mold": false,
+        "nvptx": false,
+        "piclibs": false,
+        "profiled": false,
+        "strip": false
+      },
+      "prefix": "",
+      "spack_hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+      "status": "spack",
+      "topo_index": 3,
+      "version": "13.3.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [],
+      "is_toolchain": true,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "glibc",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+      "status": "spack",
+      "topo_index": 4,
+      "version": "2.39"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        }
+      ],
+      "is_toolchain": true,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "gcc-runtime",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+      "status": "spack",
+      "topo_index": 5,
+      "version": "13.3.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        }
+      ],
+      "is_toolchain": true,
+      "native_prefix": "@gmake_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "gmake",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "guile": false,
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+      "status": "native",
+      "topo_index": 6,
+      "version": "4.4.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@berkeley_db_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "berkeley-db",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxx": true,
+        "cxxflags": [],
+        "docs": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "26090f418891757af46ac3b89a9f43d6eb5989f7a3dce3d1cfc99fba547203b3",
+          "b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522"
+        ],
+        "stl": true
+      },
+      "prefix": "",
+      "spack_hash": "ptefsjt4v6aoungheb73n5wzq5axgihk",
+      "status": "native",
+      "topo_index": 7,
+      "version": "18.1.40"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libffi_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libffi",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "rdicqwsukqjmc5dqcvxkjqmmn2guu7tt",
+      "status": "native",
+      "topo_index": 8,
+      "version": "3.5.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libiconv_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libiconv",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ]
+      },
+      "prefix": "",
+      "spack_hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+      "status": "native",
+      "topo_index": 9,
+      "version": "1.18"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@diffutils_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "diffutils",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+      "status": "native",
+      "topo_index": 10,
+      "version": "3.12"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@bzip2_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "bzip2",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "debug": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "pic": false,
+        "shared": true
+      },
+      "prefix": "",
+      "spack_hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+      "status": "native",
+      "topo_index": 11,
+      "version": "1.0.8"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libmd_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libmd",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "v5r2ulrk4jbmbyocetxredbaxk4lorjw",
+      "status": "native",
+      "topo_index": 12,
+      "version": "1.1.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "v5r2ulrk4jbmbyocetxredbaxk4lorjw",
+          "name": "libmd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libbsd_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libbsd",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "bxakjc5gydirdki64c6itfa5zywi3fms",
+      "status": "native",
+      "topo_index": 13,
+      "version": "0.12.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "bxakjc5gydirdki64c6itfa5zywi3fms",
+          "name": "libbsd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@expat_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "expat",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libbsd": true
+      },
+      "prefix": "",
+      "spack_hash": "rvrh5t774xjni5bwfv2yhjll3pyxql7e",
+      "status": "native",
+      "topo_index": 14,
+      "version": "2.8.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libsigsegv_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libsigsegv",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "uisgswhqdkaydku26xvj64jpprzoiy6u",
+      "status": "native",
+      "topo_index": 15,
+      "version": "2.15"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libunistring_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libunistring",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "nzn7fbws2vtarknnasncjvepx46yak66",
+      "status": "native",
+      "topo_index": 16,
+      "version": "1.4.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "nzn7fbws2vtarknnasncjvepx46yak66",
+          "name": "libunistring"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libidn2_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libidn2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "gjqwey342aao6lcge4wobswmrkc3lylf",
+      "status": "native",
+      "topo_index": 17,
+      "version": "2.3.8"
+    },
+    {
+      "build_system": "cmake",
+      "deps": [],
+      "is_toolchain": false,
+      "native_prefix": "@rootfs_llvm_23_native//:lib",
+      "native_strategy": "cmake -G Ninja && ninja install (rules_foreign_cc/cmake)",
+      "package": "llvm",
+      "parameters": {
+        "build_system": "cmake",
+        "build_type": "Release",
+        "cflags": [],
+        "clang": true,
+        "compiler-rt": "runtime",
+        "cppflags": [],
+        "cuda": false,
+        "cxxflags": [],
+        "fflags": [],
+        "flang": false,
+        "generator": "ninja",
+        "gold": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "libcxx": "runtime",
+        "libomptarget": true,
+        "libomptarget_debug": false,
+        "libunwind": "runtime",
+        "link_llvm_dylib": false,
+        "lld": true,
+        "lldb": true,
+        "llvm_dylib": true,
+        "lua": true,
+        "mlir": true,
+        "offload": true,
+        "openmp": "runtime",
+        "polly": true,
+        "python": false,
+        "shlib_symbol_version": "none",
+        "split_dwarf": false,
+        "targets": [
+          "aarch64",
+          "amdgpu",
+          "nvptx",
+          "x86"
+        ],
+        "utils": false,
+        "version_suffix": "none",
+        "z3": false,
+        "zstd": false
+      },
+      "prefix": "",
+      "spack_hash": "7oh5izvkypaunhz5ow76352gpsxlttkl",
+      "status": "native",
+      "topo_index": 18,
+      "version": "23.0.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "uisgswhqdkaydku26xvj64jpprzoiy6u",
+          "name": "libsigsegv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@m4_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "m4",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "sigsegv": true
+      },
+      "prefix": "",
+      "spack_hash": "eqihkjqw4c47zr5qe5gic54uskbeo5rq",
+      "status": "native",
+      "topo_index": 19,
+      "version": "1.4.21"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "eqihkjqw4c47zr5qe5gic54uskbeo5rq",
+          "name": "m4"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@bison_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "bison",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "color": false,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "xsm5r2ottl36fzsakcbbsoqhcivfbnrt",
+      "status": "native",
+      "topo_index": 20,
+      "version": "3.8.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@pcre2_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "pcre2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "jit": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "multibyte": true,
+        "pic": true
+      },
+      "prefix": "",
+      "spack_hash": "gwrx4vndzllygc66sbxjwbntxylx6y2w",
+      "status": "native",
+      "topo_index": 21,
+      "version": "10.44"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@pkgconf_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "pkgconf",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+      "status": "native",
+      "topo_index": 22,
+      "version": "2.5.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@ncurses_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "ncurses",
+      "parameters": {
+        "abi": "none",
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "7a351bc4953a4ab70dabdbea31c8db0c03d40ce505335f3b6687180dde24c535"
+        ],
+        "symlinks": false,
+        "termlib": true
+      },
+      "prefix": "",
+      "spack_hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+      "status": "native",
+      "topo_index": 23,
+      "version": "6.6"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@less_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "less",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "l6f5ifmyyt4fn5kvvp4q5paiyqgpygp6",
+      "status": "native",
+      "topo_index": 24,
+      "version": "692"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libedit_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libedit",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "zwwolujrvulh2ib55edkmuxj6oa5bv35",
+      "status": "native",
+      "topo_index": 25,
+      "version": "3.1-20251016"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@nghttp2_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "nghttp2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "ombca25mruko4xh7r5p6gr4hdk62i3tf",
+      "status": "native",
+      "topo_index": 26,
+      "version": "1.67.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@readline_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "readline",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "21f0a03106dbe697337cd25c70eb0edbaa2bdb6d595b45f83285cdd35bac84de",
+          "72dee13601ce38f6746eb15239999a7c56f8e1ff5eb1ec8153a1f213e4acdb29",
+          "e27364396ba9f6debf7cbaaf1a669e2b2854241ae07f7eca74ca8a8ba0c97472"
+        ]
+      },
+      "prefix": "",
+      "spack_hash": "mqj6h4wdtghjulft57sy7feexjpvkywd",
+      "status": "native",
+      "topo_index": 27,
+      "version": "8.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "mqj6h4wdtghjulft57sy7feexjpvkywd",
+          "name": "readline"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@gdbm_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gdbm",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "sfyjbgvdze7ayr5wkvom5dgawfsc6yr5",
+      "status": "native",
+      "topo_index": 28,
+      "version": "1.26"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@util_linux_uuid_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "util-linux-uuid",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "zu7h7o2uwpeq25tycg7a76u4whvxxjyo",
+      "status": "native",
+      "topo_index": 29,
+      "version": "2.41"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@xz_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "xz",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "pic": false
+      },
+      "prefix": "",
+      "spack_hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+      "status": "native",
+      "topo_index": 30,
+      "version": "5.8.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@zlib_ng_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "zlib-ng",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "compat": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "new_strategies": true,
+        "opt": true,
+        "pic": true,
+        "shared": true
+      },
+      "prefix": "",
+      "spack_hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+      "status": "native",
+      "topo_index": 31,
+      "version": "2.3.3"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libxml2",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "pic": true,
+        "python": false,
+        "shared": true
+      },
+      "prefix": "",
+      "spack_hash": "cffk3nxgy7rvyipgkh75apfcgdo5bivw",
+      "status": "spack",
+      "topo_index": 32,
+      "version": "2.15.3"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ptefsjt4v6aoungheb73n5wzq5axgihk",
+          "name": "berkeley-db"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "sfyjbgvdze7ayr5wkvom5dgawfsc6yr5",
+          "name": "gdbm"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "l6f5ifmyyt4fn5kvvp4q5paiyqgpygp6",
+          "name": "less"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@perl_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "perl",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cpanm": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "opcode": true,
+        "open": true,
+        "shared": true,
+        "threads": true
+      },
+      "prefix": "",
+      "spack_hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+      "status": "native",
+      "topo_index": 33,
+      "version": "5.42.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "eqihkjqw4c47zr5qe5gic54uskbeo5rq",
+          "name": "m4"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@autoconf_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "autoconf",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "aqkysyfq5vb4gnahr6nfe5g7hvctkomn",
+      "status": "native",
+      "topo_index": 34,
+      "version": "2.72"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "aqkysyfq5vb4gnahr6nfe5g7hvctkomn",
+          "name": "autoconf"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@automake_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "automake",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "jjdskbuf7e4q322scc6retfgwskcvka2",
+      "status": "native",
+      "topo_index": 35,
+      "version": "1.18.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libxcrypt_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libxcrypt",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "obsolete_api": false
+      },
+      "prefix": "",
+      "spack_hash": "ydm6fjq4hg7lj4muic4azhnmyhaqj2vt",
+      "status": "native",
+      "topo_index": 36,
+      "version": "4.5.2"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "rqrucx6l7glresbjdrjgxiingvbp2rck",
+          "name": "ca-certificates-mozilla"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@openssl_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "openssl",
+      "parameters": {
+        "build_system": "generic",
+        "certs": "mozilla",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "docs": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "shared": true
+      },
+      "prefix": "",
+      "spack_hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+      "status": "native",
+      "topo_index": 37,
+      "version": "3.6.1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "ombca25mruko4xh7r5p6gr4hdk62i3tf",
+          "name": "nghttp2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@curl_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "curl",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "gssapi": false,
+        "ldap": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "libidn2": false,
+        "librtmp": false,
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "libssh": false,
+        "libssh2": false,
+        "nghttp2": true,
+        "tls": [
+          "openssl"
+        ]
+      },
+      "prefix": "",
+      "spack_hash": "6ewsl5fut5hwzetqx2g2waodvqluby5m",
+      "status": "native",
+      "topo_index": 38,
+      "version": "8.20.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6ewsl5fut5hwzetqx2g2waodvqluby5m",
+          "name": "curl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@cmake_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "cmake",
+      "parameters": {
+        "build_system": "generic",
+        "build_type": "Release",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "doc": false,
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "ncurses": true,
+        "ownlibs": true,
+        "qtgui": false
+      },
+      "prefix": "",
+      "spack_hash": "awieu3adj64kotmgvaqvrcz4n7wncihh",
+      "status": "native",
+      "topo_index": 39,
+      "version": "3.31.11"
+    },
+    {
+      "build_system": "cmake",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "awieu3adj64kotmgvaqvrcz4n7wncihh",
+          "name": "cmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@nlohmann_json_native//:lib",
+      "native_strategy": "cmake -G Ninja && ninja install (rules_foreign_cc/cmake)",
+      "package": "nlohmann-json",
+      "parameters": {
+        "build_system": "cmake",
+        "build_type": "Release",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "generator": "make",
+        "ipo": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "multiple_headers": true
+      },
+      "prefix": "",
+      "spack_hash": "lk5gyzimpsvdvbw3n6tuugini3purkov",
+      "status": "native",
+      "topo_index": 40,
+      "version": "3.11.3"
+    },
+    {
+      "build_system": "makefile",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@pigz_native//:lib",
+      "native_strategy": "make && make install (rules_foreign_cc/make)",
+      "package": "pigz",
+      "parameters": {
+        "build_system": "makefile",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "qjj7hz4tqjdnobutgni6lu3pbw27w7u2",
+      "status": "native",
+      "topo_index": 41,
+      "version": "2.8"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "mqj6h4wdtghjulft57sy7feexjpvkywd",
+          "name": "readline"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@sqlite_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "sqlite",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "column_metadata": true,
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "fts": true,
+        "ldflags": [],
+        "ldlibs": [],
+        "rtree": true
+      },
+      "prefix": "",
+      "spack_hash": "r663akcusxmklb2vvlzweno7k7az6c5b",
+      "status": "native",
+      "topo_index": 42,
+      "version": "3.53.1"
+    },
+    {
+      "build_system": "makefile",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@zstd_native//:lib",
+      "native_strategy": "make && make install (rules_foreign_cc/make)",
+      "package": "zstd",
+      "parameters": {
+        "build_system": "makefile",
+        "cflags": [],
+        "compression": [
+          "none"
+        ],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "libs": [
+          "shared",
+          "static"
+        ],
+        "programs": true
+      },
+      "prefix": "",
+      "spack_hash": "7s4icwsrnuon46x5h7rvz7elbxkvfvs2",
+      "status": "native",
+      "topo_index": 43,
+      "version": "1.5.7"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "7s4icwsrnuon46x5h7rvz7elbxkvfvs2",
+          "name": "zstd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@file_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "file",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "static": true
+      },
+      "prefix": "",
+      "spack_hash": "ktrf2j2d7djveqahql4khbpm43vbpu5t",
+      "status": "native",
+      "topo_index": 44,
+      "version": "5.46"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "qjj7hz4tqjdnobutgni6lu3pbw27w7u2",
+          "name": "pigz"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "7s4icwsrnuon46x5h7rvz7elbxkvfvs2",
+          "name": "zstd"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@tar_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "tar",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "zip": "pigz"
+      },
+      "prefix": "",
+      "spack_hash": "alaj4dgwyib6zbnb2ppzhvmtrzbd6u3d",
+      "status": "native",
+      "topo_index": 45,
+      "version": "1.35"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "cffk3nxgy7rvyipgkh75apfcgdo5bivw",
+          "name": "libxml2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "alaj4dgwyib6zbnb2ppzhvmtrzbd6u3d",
+          "name": "tar"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link",
+            "run"
+          ],
+          "hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+          "name": "xz"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@gettext_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "gettext",
+      "parameters": {
+        "build_system": "autotools",
+        "bzip2": true,
+        "cflags": [],
+        "cppflags": [],
+        "curses": true,
+        "cxxflags": [],
+        "fflags": [],
+        "git": true,
+        "ldflags": [],
+        "ldlibs": [],
+        "libunistring": false,
+        "libxml2": true,
+        "pic": true,
+        "shared": true,
+        "tar": true,
+        "xz": true
+      },
+      "prefix": "",
+      "spack_hash": "6hewpwshlpfybno5dfcfyqh4oe747ios",
+      "status": "native",
+      "topo_index": 46,
+      "version": "1.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "6hewpwshlpfybno5dfcfyqh4oe747ios",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@findutils_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "findutils",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "patches": [
+          "440b9543365b4692a2e6e0b5674809659846658d34d1dfc542c4397c8d668b92"
+        ]
+      },
+      "prefix": "",
+      "spack_hash": "f7fwa47filzj6zsvfxsr4cscrserbzsf",
+      "status": "native",
+      "topo_index": 47,
+      "version": "4.10.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xsm5r2ottl36fzsakcbbsoqhcivfbnrt",
+          "name": "bison"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "f7fwa47filzj6zsvfxsr4cscrserbzsf",
+          "name": "findutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6hewpwshlpfybno5dfcfyqh4oe747ios",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "zwwolujrvulh2ib55edkmuxj6oa5bv35",
+          "name": "libedit"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@krb5_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "krb5",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "shared": true
+      },
+      "prefix": "",
+      "spack_hash": "4ifprdh3ogoptimzvwa2kssgmiwgrc2z",
+      "status": "native",
+      "topo_index": 48,
+      "version": "1.22.2"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ktrf2j2d7djveqahql4khbpm43vbpu5t",
+          "name": "file"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "f7fwa47filzj6zsvfxsr4cscrserbzsf",
+          "name": "findutils"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "eqihkjqw4c47zr5qe5gic54uskbeo5rq",
+          "name": "m4"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@libtool_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "libtool",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "a5pmm2spcvfywwt3uhhlq32ccvnmn3xm",
+      "status": "native",
+      "topo_index": 49,
+      "version": "2.5.4"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "4ifprdh3ogoptimzvwa2kssgmiwgrc2z",
+          "name": "krb5"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "zwwolujrvulh2ib55edkmuxj6oa5bv35",
+          "name": "libedit"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "ydm6fjq4hg7lj4muic4azhnmyhaqj2vt",
+          "name": "libxcrypt"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@openssh_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "openssh",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "gssapi": true,
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "vjajvuwcp3zzqfljgs3ulxwzpfh5ajip",
+      "status": "native",
+      "topo_index": 50,
+      "version": "10.3p1"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "aqkysyfq5vb4gnahr6nfe5g7hvctkomn",
+          "name": "autoconf"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "jjdskbuf7e4q322scc6retfgwskcvka2",
+          "name": "automake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6ewsl5fut5hwzetqx2g2waodvqluby5m",
+          "name": "curl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "h7m5pjbhfqeobm7qzvrhtb7nikybns3r",
+          "name": "diffutils"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "rvrh5t774xjni5bwfv2yhjll3pyxql7e",
+          "name": "expat"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6hewpwshlpfybno5dfcfyqh4oe747ios",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "f4fltdkr27swpr5jv5jbmrpies2ayzht",
+          "name": "libiconv"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "gjqwey342aao6lcge4wobswmrkc3lylf",
+          "name": "libidn2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "a5pmm2spcvfywwt3uhhlq32ccvnmn3xm",
+          "name": "libtool"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "eqihkjqw4c47zr5qe5gic54uskbeo5rq",
+          "name": "m4"
+        },
+        {
+          "deptypes": [
+            "run"
+          ],
+          "hash": "vjajvuwcp3zzqfljgs3ulxwzpfh5ajip",
+          "name": "openssh"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "gwrx4vndzllygc66sbxjwbntxylx6y2w",
+          "name": "pcre2"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "24vj4t7lo5pwneznggiq5ggk4vw4ql26",
+          "name": "perl"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@git_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "git",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "man": true,
+        "nls": true,
+        "perl": true,
+        "subtree": true,
+        "tcltk": false
+      },
+      "prefix": "",
+      "spack_hash": "hmeurlfulytmwrm2amerlq4civyfhikr",
+      "status": "native",
+      "topo_index": 51,
+      "version": "2.53.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "e4fcgatg3eyyuyqsa7nvxh6nworadctw",
+          "name": "bzip2"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "rvrh5t774xjni5bwfv2yhjll3pyxql7e",
+          "name": "expat"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "sfyjbgvdze7ayr5wkvom5dgawfsc6yr5",
+          "name": "gdbm"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6hewpwshlpfybno5dfcfyqh4oe747ios",
+          "name": "gettext"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "rdicqwsukqjmc5dqcvxkjqmmn2guu7tt",
+          "name": "libffi"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "6m42t5orwuarmit434d5n4jdgygqkk44",
+          "name": "ncurses"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "hlucysykdbn2s2vrjsi6do3wrywxy4z5",
+          "name": "openssl"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bzxjz55p6s35ghmhqcoxg4an2wmke545",
+          "name": "pkgconf"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "mqj6h4wdtghjulft57sy7feexjpvkywd",
+          "name": "readline"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "r663akcusxmklb2vvlzweno7k7az6c5b",
+          "name": "sqlite"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "zu7h7o2uwpeq25tycg7a76u4whvxxjyo",
+          "name": "util-linux-uuid"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "abigyhcjxgszhvikw6n5ckdnusxc3jwd",
+          "name": "xz"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@python_313_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "python",
+      "parameters": {
+        "build_system": "generic",
+        "bz2": true,
+        "cflags": [],
+        "cppflags": [],
+        "ctypes": true,
+        "cxxflags": [],
+        "dbm": true,
+        "debug": false,
+        "fflags": [],
+        "freethreading": false,
+        "ldflags": [],
+        "ldlibs": [],
+        "libxml2": true,
+        "lzma": true,
+        "optimizations": false,
+        "pic": true,
+        "pyexpat": true,
+        "pythoncmd": true,
+        "readline": true,
+        "shared": true,
+        "sqlite3": true,
+        "ssl": true,
+        "static": false,
+        "tests": false,
+        "tkinter": false,
+        "uuid": true,
+        "zlib": true
+      },
+      "prefix": "",
+      "spack_hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+      "status": "native",
+      "topo_index": 52,
+      "version": "3.13.13"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@python_venv_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "python-venv",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+      "status": "native",
+      "topo_index": 53,
+      "version": "1.0"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_pip_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-pip",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+      "status": "native",
+      "topo_index": 54,
+      "version": "26.1.2"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_setuptools_82_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-setuptools",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "4544al7nzei2svikrshzary2vinn45xe",
+      "status": "native",
+      "topo_index": 55,
+      "version": "82.0.1"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_wheel_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "py-wheel",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+      "status": "native",
+      "topo_index": 56,
+      "version": "0.45.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_calver_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-calver",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "5gdphjuv5d54h6mhltjoqdiecxhiaoz6",
+      "status": "native",
+      "topo_index": 57,
+      "version": "2025.10.20"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_flit_core_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-flit-core",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "gdoef5yi6gtoud5bkn3scu73tzlmtdzq",
+      "status": "native",
+      "topo_index": 58,
+      "version": "3.12.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_lit_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-lit",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "m2fashamkcuvc6upzsf37rtgy5n4ebti",
+      "status": "native",
+      "topo_index": 59,
+      "version": "18.1.8"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "gdoef5yi6gtoud5bkn3scu73tzlmtdzq",
+          "name": "py-flit-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_packaging_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-packaging",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "ap3hah6fd57ibj7xhrntzxcurizywx5u",
+      "status": "native",
+      "topo_index": 60,
+      "version": "26.2"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "gdoef5yi6gtoud5bkn3scu73tzlmtdzq",
+          "name": "py-flit-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_pathspec_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-pathspec",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "ls7c5tgsqgdwnqgf4e6bi56gm7neemai",
+      "status": "native",
+      "topo_index": 61,
+      "version": "1.1.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "hmeurlfulytmwrm2amerlq4civyfhikr",
+          "name": "git"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ap3hah6fd57ibj7xhrntzxcurizywx5u",
+          "name": "py-packaging"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_setuptools_scm_9_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-setuptools-scm",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "toml": true
+      },
+      "prefix": "",
+      "spack_hash": "5unciry43qvv4sgtbduypwfouc4p3qo4",
+      "status": "native",
+      "topo_index": 62,
+      "version": "9.2.2"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5unciry43qvv4sgtbduypwfouc4p3qo4",
+          "name": "py-setuptools-scm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_pluggy_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-pluggy",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "grmxrusre7ld5k44auowaxkyxhohqonn",
+      "status": "native",
+      "topo_index": 63,
+      "version": "1.6.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "5gdphjuv5d54h6mhltjoqdiecxhiaoz6",
+          "name": "py-calver"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_trove_classifiers_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-trove-classifiers",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "totg6jnfosiwnzd32u7cbcytvpdmagze",
+      "status": "native",
+      "topo_index": 64,
+      "version": "2026.6.1.19"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ap3hah6fd57ibj7xhrntzxcurizywx5u",
+          "name": "py-packaging"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ls7c5tgsqgdwnqgf4e6bi56gm7neemai",
+          "name": "py-pathspec"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "grmxrusre7ld5k44auowaxkyxhohqonn",
+          "name": "py-pluggy"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "totg6jnfosiwnzd32u7cbcytvpdmagze",
+          "name": "py-trove-classifiers"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_hatchling_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-hatchling",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "ldcfzgin2vlaabjzulzmwlgdwwf2iw22",
+      "status": "native",
+      "topo_index": 65,
+      "version": "1.29.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ldcfzgin2vlaabjzulzmwlgdwwf2iw22",
+          "name": "py-hatchling"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "5unciry43qvv4sgtbduypwfouc4p3qo4",
+          "name": "py-setuptools-scm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_hatch_vcs_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-hatch-vcs",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "hjxk42lbbu6xys432ca65lhxjagrnvpc",
+      "status": "native",
+      "topo_index": 66,
+      "version": "0.5.0"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "hjxk42lbbu6xys432ca65lhxjagrnvpc",
+          "name": "py-hatch-vcs"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ldcfzgin2vlaabjzulzmwlgdwwf2iw22",
+          "name": "py-hatchling"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_filelock_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-filelock",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "k25hjysjr4jg3xzjffqy6xm4v4sfhkzt",
+      "status": "native",
+      "topo_index": 67,
+      "version": "3.29.1"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "awieu3adj64kotmgvaqvrcz4n7wncihh",
+          "name": "cmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "hjxk42lbbu6xys432ca65lhxjagrnvpc",
+          "name": "py-hatch-vcs"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ldcfzgin2vlaabjzulzmwlgdwwf2iw22",
+          "name": "py-hatchling"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ap3hah6fd57ibj7xhrntzxcurizywx5u",
+          "name": "py-packaging"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "ls7c5tgsqgdwnqgf4e6bi56gm7neemai",
+          "name": "py-pathspec"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_scikit_build_core_native//:lib",
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-scikit-build-core",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "pyproject": false
+      },
+      "prefix": "",
+      "spack_hash": "o7mgzxyovor2gzclkvopwquwjmnhtabo",
+      "status": "native",
+      "topo_index": 68,
+      "version": "1.0.0"
+    },
+    {
+      "build_system": "autotools",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "7spp7tl4zsvata2wyecppcvlgwm7brgk",
+          "name": "gmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@re2c_native//:lib",
+      "native_strategy": "configure && make && make install (rules_foreign_cc/configure_make)",
+      "package": "re2c",
+      "parameters": {
+        "build_system": "autotools",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "qeb5jdwuirreoi2zxqmopzwqkaabbxzf",
+      "status": "native",
+      "topo_index": 69,
+      "version": "4.4"
+    },
+    {
+      "build_system": "generic",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "qeb5jdwuirreoi2zxqmopzwqkaabbxzf",
+          "name": "re2c"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@ninja_native//:lib",
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "ninja",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": [],
+        "re2c": true
+      },
+      "prefix": "",
+      "spack_hash": "bfla2nxt6ll6lo3q3fppdonzsjazxqzs",
+      "status": "native",
+      "topo_index": 70,
+      "version": "1.13.2"
+    },
+    {
+      "build_system": "cmake",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "awieu3adj64kotmgvaqvrcz4n7wncihh",
+          "name": "cmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "ji3bwivwj7ivfgswayv5kknzao53onbw",
+          "name": "gcc"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "n4bz3xaczondnyedmcioz62swej5is2b",
+          "name": "gcc-runtime"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bfla2nxt6ll6lo3q3fppdonzsjazxqzs",
+          "name": "ninja"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "o7mgzxyovor2gzclkvopwquwjmnhtabo",
+          "name": "py-scikit-build-core"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        }
+      ],
+      "is_toolchain": false,
+      "native_prefix": "@py_pybind11_native//:lib",
+      "native_strategy": "cmake -G Ninja && ninja install (rules_foreign_cc/cmake)",
+      "package": "py-pybind11",
+      "parameters": {
+        "build_system": "cmake",
+        "build_type": "Release",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "generator": "ninja",
+        "ipo": true,
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "pn6frj7zi2bvregyuyegj67ezyrt6gyh",
+      "status": "native",
+      "topo_index": 71,
+      "version": "3.0.2"
+    },
+    {
+      "build_system": "python_pip",
+      "deps": [
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "awieu3adj64kotmgvaqvrcz4n7wncihh",
+          "name": "cmake"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "xg3dfnk6ehbrwwvkxzr2dlk6enfhrv56",
+          "name": "compiler-wrapper"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link",
+            "run"
+          ],
+          "hash": "hywmo6pajrjpidu3dj3ttuvuxojfp3rs",
+          "name": "cuda"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "kqvjw6yf6qyslmncyy57zipzg7ukuypw",
+          "name": "glibc"
+        },
+        {
+          "deptypes": [
+            "build",
+            "link"
+          ],
+          "hash": "7oh5izvkypaunhz5ow76352gpsxlttkl",
+          "name": "llvm"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bfla2nxt6ll6lo3q3fppdonzsjazxqzs",
+          "name": "ninja"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "lk5gyzimpsvdvbw3n6tuugini3purkov",
+          "name": "nlohmann-json"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "k25hjysjr4jg3xzjffqy6xm4v4sfhkzt",
+          "name": "py-filelock"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "m2fashamkcuvc6upzsf37rtgy5n4ebti",
+          "name": "py-lit"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "sc3kgksmvkl72426pp2a56yvs2yrlnhp",
+          "name": "py-pip"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "pn6frj7zi2bvregyuyegj67ezyrt6gyh",
+          "name": "py-pybind11"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "4544al7nzei2svikrshzary2vinn45xe",
+          "name": "py-setuptools"
+        },
+        {
+          "deptypes": [
+            "build"
+          ],
+          "hash": "bx5xhrlfm5ynhkqz6iu7sy52wrjnxa2r",
+          "name": "py-wheel"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "micqjwdjbkfwhcggzvsshifmka7h7z64",
+          "name": "python"
+        },
+        {
+          "deptypes": [
+            "build",
+            "run"
+          ],
+          "hash": "4wd5zbf6opf7he65hsne2a6evpwuq4o3",
+          "name": "python-venv"
+        },
+        {
+          "deptypes": [
+            "link"
+          ],
+          "hash": "iqevnckp6etjx5ij4wayh4bfidle3mvw",
+          "name": "zlib-ng"
+        }
+      ],
+      "is_toolchain": false,
+      "native_strategy": "pip wheel + install (py rules / captured setup.py)",
+      "package": "py-triton",
+      "parameters": {
+        "build_system": "python_pip",
+        "cflags": [],
+        "commit": "675c59878aa2280b31f722aaf42b825fcee21de8",
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "r6jwxvrqhxcj2e7aiyzakr7d6gxeycns",
+      "status": "spack",
+      "topo_index": 72,
+      "version": "3.8.0"
+    }
+  ],
+  "root": "py-triton",
+  "schema_version": 1,
+  "topological_order": [
+    "ca-certificates-mozilla",
+    "compiler-wrapper",
+    "cuda",
+    "gcc",
+    "glibc",
+    "gcc-runtime",
+    "gmake",
+    "berkeley-db",
+    "libffi",
+    "libiconv",
+    "diffutils",
+    "bzip2",
+    "libmd",
+    "libbsd",
+    "expat",
+    "libsigsegv",
+    "libunistring",
+    "libidn2",
+    "llvm",
+    "m4",
+    "bison",
+    "pcre2",
+    "pkgconf",
+    "ncurses",
+    "less",
+    "libedit",
+    "nghttp2",
+    "readline",
+    "gdbm",
+    "util-linux-uuid",
+    "xz",
+    "zlib-ng",
+    "libxml2",
+    "perl",
+    "autoconf",
+    "automake",
+    "libxcrypt",
+    "openssl",
+    "curl",
+    "cmake",
+    "nlohmann-json",
+    "pigz",
+    "sqlite",
+    "zstd",
+    "file",
+    "tar",
+    "gettext",
+    "findutils",
+    "krb5",
+    "libtool",
+    "openssh",
+    "git",
+    "python",
+    "python-venv",
+    "py-pip",
+    "py-setuptools",
+    "py-wheel",
+    "py-calver",
+    "py-flit-core",
+    "py-lit",
+    "py-packaging",
+    "py-pathspec",
+    "py-setuptools-scm",
+    "py-pluggy",
+    "py-trove-classifiers",
+    "py-hatchling",
+    "py-hatch-vcs",
+    "py-filelock",
+    "py-scikit-build-core",
+    "re2c",
+    "ninja",
+    "py-pybind11",
+    "py-triton"
+  ]
+}

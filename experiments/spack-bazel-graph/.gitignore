@@ -1,0 +1,9 @@
+# Bazel convenience symlinks + local build state (recreated each run).
+/bazel-*
+/.vaso/
+# Resolved module lock is environment-derived; regenerate rather than commit.
+/MODULE.bazel.lock
+# TLC scratch: error-trace dumps + on-disk state/fingerprint sets.
+formal/**/states/
+formal/**/*_TTrace_*.tla
+formal/**/*_TTrace_*.bin

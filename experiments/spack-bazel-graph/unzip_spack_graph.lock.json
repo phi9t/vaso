@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_unzip": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@unzip_native//:lib",
+      "package": "unzip",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/unzip-6.0-hd67fyk7ek2v67eovmlzusxulivkac47",
+      "spack_hash": "hd67fyk7ek2v67eovmlzusxulivkac47",
+      "version": "6.0"
+    }
+  },
+  "root": "spack_unzip",
+  "schema_version": 1
+}

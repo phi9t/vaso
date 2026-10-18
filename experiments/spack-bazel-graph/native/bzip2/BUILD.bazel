@@ -1,0 +1,6 @@
+# Marks native/bzip2 as a Bazel package so bzip2.bzl is loadable from MODULE.bazel.
+# The actual @bzip2_native repo is materialized by the bzip2_native repository_rule.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["bzip2.bzl"])

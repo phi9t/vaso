@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "spack_nasm": {
+      "build": "native",
+      "include_dirs": [],
+      "link_deps": [],
+      "link_libs": [],
+      "native_prefix": "@nasm_native//:lib",
+      "package": "nasm",
+      "prefix": "/vaso/cache/spack/opt/spack/linux-icelake/nasm-2.16.03-icn6aoixxxwx6yjt5d26fdjnvxt7cocy",
+      "spack_hash": "icn6aoixxxwx6yjt5d26fdjnvxt7cocy",
+      "version": "2.16.03"
+    }
+  },
+  "root": "spack_nasm",
+  "schema_version": 1
+}

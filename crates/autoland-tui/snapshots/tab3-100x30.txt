@@ -1,0 +1,30 @@
+╭ COCKPIT  vaso/target → vaso/landing ─────────────────────────────────────────────────────────────╮
+│1 Overview   2 TRAE   3 Workers   4 Outbox   5 Loop                                               │
+│RUNNING  pid 4242   HEARTBEAT  40s ago   ALIVE  busy 1xbazel 2xpython3   REFS  beef001 → cafe999  │
+│ Attention Queue                                                                                  │
+│RED 2026-09-29T12:35:00Z RED VERIFY_FAILED //native/pytorch:plan_test                             │
+│COMPACTED TRAE context compacted in the last 30 min                                               │
+│CONTEXT LOW context left 20% (used 80%)                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Workers ─────────────────────────────────────────────────────────────────────────────────────────╮
+│EXITED 0  traecli-tui 20260929T120000Z 1 commit(s)                                                │
+│RUNNING   native-pytorch-p2 20260929T130000Z 0 commit(s)                                          │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭ Worker Digest ───────────────────────────────────────────────────────────────────────────────────╮
+│traecli-tui / 20260929T120000Z                                                                    │
+│branch: vaso/autoland-tui                                                                         │
+│commit: Add cockpit data modules                                                                  │
+│                                                                                                  │
+│cmd rc=0: cargo test --offline | test result: ok                                                  │
+│turn done: in=1200 out=300                                                                        │
+│                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+ 1-5  tabs   s  send confirm   q  quit   r  restart   ?  help  enter digest  x stop

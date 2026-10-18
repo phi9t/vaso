@@ -1,0 +1,82 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+# The build-migration formal models + their TLC configs. Migration.tla is the
+# shared base module that MigrationGood INSTANCEs; MigrationBad is a
+# self-contained buggy variant. All must land in the same runfiles directory so
+# the shared base resolves.
+filegroup(
+    name = "migration_models",
+    srcs = [
+        "Migration.tla",
+        "MigrationBad.cfg",
+        "MigrationBad.tla",
+        "MigrationBadNoDepsGate.cfg",
+        "MigrationBadNoDepsGate.tla",
+        "MigrationGood.cfg",
+        "MigrationGood.tla",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+exports_files([
+    "Migration.tla",
+    "MigrationGood.tla",
+    "MigrationGood.cfg",
+    "MigrationBad.tla",
+    "MigrationBad.cfg",
+    "MigrationBadNoDepsGate.tla",
+    "MigrationBadNoDepsGate.cfg",
+])
+
+# Hermetic TLC model check for the Spack->native migration transaction contract.
+# Runs the Good/Bad pair with Bazel's own JDK ($(JAVA)) against the pinned
+# @tla2tools//jar: MigrationGood must complete cleanly (Inv + MigrationCompletes)
+# and MigrationBad must surface the TopologyImmutable/NativeDownwardClosed
+# violation. Tagged manual + local-only because it fetches the jar over the
+# network at repo-rule time (plain `bazel test //...` skips it). Run with:
+#   bazel test --config=formal //formal/build_migration:migration_tlc_test
+py_test(
+    name = "migration_tlc_test",
+    srcs = ["tlc_bazel_test.py"],
+    args = [
+        "$(JAVA)",
+        "$(location @tla2tools//jar)",
+    ],
+    data = [
+        ":migration_models",
+        "@bazel_tools//tools/jdk:current_java_runtime",
+        "@tla2tools//jar",
+    ],
+    main = "tlc_bazel_test.py",
+    tags = [
+        "local-only",
+        "manual",
+    ],
+    toolchains = ["@bazel_tools//tools/jdk:current_java_runtime"],
+    deps = ["@rules_python//python/runfiles"],
+)
+
+py_test(
+    name = "migration_hermetic_deps_tlc_test",
+    srcs = ["tlc_bazel_test.py"],
+    args = [
+        "$(JAVA)",
+        "$(location @tla2tools//jar)",
+        "--bad",
+        "MigrationBadNoDepsGate",
+    ],
+    data = [
+        ":migration_models",
+        "@bazel_tools//tools/jdk:current_java_runtime",
+        "@tla2tools//jar",
+    ],
+    main = "tlc_bazel_test.py",
+    tags = [
+        "local-only",
+        "manual",
+    ],
+    toolchains = ["@bazel_tools//tools/jdk:current_java_runtime"],
+    deps = ["@rules_python//python/runfiles"],
+)

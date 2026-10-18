@@ -1,0 +1,114 @@
+[2m  BAZEL_BIN=$HOME/.local/bin/bazel-9.2.0 \
+  VASO_ESTATE_ROOT="$VASO_ESTATE_ROOT" \
+  TMPDIR="$TMPDIR" \
+  VASO_BAZEL_OB="$VASO_BAZEL_OB" \
+  VASO_NATIVE=1 \
+  VASO_FORMAL=0 \
+  VASO_SKIP_CONSUMER_TESTS=1 \
+  VASO_SKIP_NATIVE_ABI_GATES=1 \
+  VASO_FORCE_FETCH_REPOS='@protobuf_native,@py_protobuf_native' \
+  VASO_EXTRA_TEST_TARGETS='//synthetic:protobuf_cpp_python_roundtrip' \
+  SPACK_ROOT_PKG='py-protobuf@4.21.12 ^protobuf@21.12 ^python@3.13.13+bz2+ctypes+dbm~debug+libxml2+lzma~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~static~tkinter+uuid+zlib' \
+  VASO_SPACK_TIMEOUT=2400 \
+  ./run.sh > "$log" 2>&1
+printf '%s\n' "$log"
+tail -n 180 "$log"
+
+◆ [0m[39m[49mThe focused run is still active with output going to the estate log. I’m checking the log tail so I can catch a fast BUILD/test failure without starting another Bazel invocation.
+
+[1m[38;5;2m◆[0m[39m[49m [1mRan[0m[39m[49m [38;2;205;214;244mlog[38;2;148;226;213m=[38;2;205;214;244m$[38;2;147;153;178m([38;2;137;180;250mls[38;2;147;153;178m -[38;2;235;160;172mt[38;2;166;227;161m $VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-[38;2;148;226;213m*[38;2;166;227;161m.log [38;2;148;226;213m|[38;2;166;227;161m [38;2;137;180;250mhead[38;2;147;153;178m -[38;2;235;160;172m1[38;2;147;153;178m)[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mecho[38;2;205;214;244m [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mtail[38;2;147;153;178m -[38;2;235;160;172mn[38;2;205;214;244m 120 [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"
+[2m[39m  └ [0m[39m[49m$VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-20260929T222706Z.log
+    a - ../obj_g/lib_tracechr.o
+[2m    … +117 lines (ctrl+o to expand)
+[0m[39m[49m    a - ../objects/wresize.o
+    ranlib ../lib/libncurses.a
+
+[2m◆ [3mI’m wondering if I should fix the repository rules to set the TMPDIR environment variable. It might not be the current focus, but it could be relevant. I think I need to check if run.sh actually sets the
+[0m[39m[49m  [2;3mTMPDIR with the [38;2;166;227;161m--setenv TMPDIR "/vaso/tmp"[39m line. I want to make sure everything is in order, so I’ll look into it carefully to find the right solution!
+
+[0;2m[39m[49m◆ [0m[39m[49mThe rerun is rebuilding native prerequisites from the hermetic graph again; the current tail shows [38;2;166;227;161mncurses[39m build output, still inside the insula. I’m letting it finish because it is the authoritative proof
+  path for this package slice.
+
+[1m◆ Waited for command[0;2m[39m[49m · set -euo pipefail
+export VASO_ESTATE_ROOT=$VASO_ESTATE_ROOT
+export TMPDIR="$VASO_ESTATE_ROOT/agents/trae/tmp"
+export VASO_BAZEL_OB="$VASO_ESTATE_ROOT/agents/trae/bazel-ob"
+mkdir -p "$TMPDIR" "$VASO_BAZEL_OB" "$VASO_ESTATE_ROOT/agents/trae/logs"
+log="$VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-$(date -u +%Y%m%dT%H%M%SZ).log"
+cd experiments/spack-bazel-graph
+env PATH=/usr/bin:/bin:$HOME/.local/bin \
+  BAZEL_BIN=$HOME/.local/bin/bazel-9.2.0 \
+  VASO_ESTATE_ROOT="$VASO_ESTATE_ROOT" \
+  TMPDIR="$TMPDIR" \
+  VASO_BAZEL_OB="$VASO_BAZEL_OB" \
+  VASO_NATIVE=1 \
+  VASO_FORMAL=0 \
+  VASO_SKIP_CONSUMER_TESTS=1 \
+  VASO_SKIP_NATIVE_ABI_GATES=1 \
+  VASO_FORCE_FETCH_REPOS='@protobuf_native,@py_protobuf_native' \
+  VASO_EXTRA_TEST_TARGETS='//synthetic:protobuf_cpp_python_roundtrip' \
+  SPACK_ROOT_PKG='py-protobuf@4.21.12 ^protobuf@21.12 ^python@3.13.13+bz2+ctypes+dbm~debug+libxml2+lzma~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~static~tkinter+uuid+zlib' \
+  VASO_SPACK_TIMEOUT=2400 \
+  ./run.sh > "$log" 2>&1
+printf '%s\n' "$log"
+tail -n 180 "$log"
+
+◆ [0m[39m[49mThe same proof is still active after another five minutes, so I’m going to sample the log once more and then keep waiting. This is still one active run on the estate output base, not repeated invocations.
+
+[1m[38;5;2m◆[0m[39m[49m [1mRan[0m[39m[49m [38;2;205;214;244mlog[38;2;148;226;213m=[38;2;205;214;244m$[38;2;147;153;178m([38;2;137;180;250mls[38;2;147;153;178m -[38;2;235;160;172mt[38;2;166;227;161m $VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-[38;2;148;226;213m*[38;2;166;227;161m.log [38;2;148;226;213m|[38;2;166;227;161m [38;2;137;180;250mhead[38;2;147;153;178m -[38;2;235;160;172m1[38;2;147;153;178m)[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mecho[38;2;205;214;244m [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mtail[38;2;147;153;178m -[38;2;235;160;172mn[38;2;205;214;244m 140 [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"
+[2m[39m  └ [0m[39m[49m$VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-20260929T222706Z.log
+    make --no-print-directory libzstd.so.1.5.7 BUILD_DIR=obj/conf_005e56322b7fa3fabd613dc88b9579ff CPPFLAGS="-DXXH_NAMESPACE=ZSTD_ -DDEBUGLEVEL=0 -DZSTD_LEGACY_SUPPORT=5 -DZSTD_MULTITHREAD " CFLAGS="-O3
+[2m    … +142 lines (ctrl+o to expand)
+[0m[39m[49m    cc -O3   -DXXH_NAMESPACE=ZSTD_ -DDEBUGLEVEL=0 -DZSTD_LEGACY_SUPPORT=5   -c -MMD -MP -o obj/conf_c19c0ee781314e81ae0f66a95611b3af/static/zdict.o /vaso/cache/bazel/output-base/external/
+    +zstd_native+zstd_native/src/lib//dictBuilder/zdict.c
+
+[2m◆ [0m[39m[49mThe proof is making steady progress through dependency providers and still compiling within [38;2;166;227;161m/vaso/cache/bazel/output-base[39m. I’m continuing to wait on the single active run.
+
+[1m◆ Waited for command[0;2m[39m[49m · set -euo pipefail
+export VASO_ESTATE_ROOT=$VASO_ESTATE_ROOT
+export TMPDIR="$VASO_ESTATE_ROOT/agents/trae/tmp"
+export VASO_BAZEL_OB="$VASO_ESTATE_ROOT/agents/trae/bazel-ob"
+mkdir -p "$TMPDIR" "$VASO_BAZEL_OB" "$VASO_ESTATE_ROOT/agents/trae/logs"
+log="$VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-$(date -u +%Y%m%dT%H%M%SZ).log"
+cd experiments/spack-bazel-graph
+env PATH=/usr/bin:/bin:$HOME/.local/bin \
+  BAZEL_BIN=$HOME/.local/bin/bazel-9.2.0 \
+  VASO_ESTATE_ROOT="$VASO_ESTATE_ROOT" \
+  TMPDIR="$TMPDIR" \
+  VASO_BAZEL_OB="$VASO_BAZEL_OB" \
+  VASO_NATIVE=1 \
+  VASO_FORMAL=0 \
+  VASO_SKIP_CONSUMER_TESTS=1 \
+  VASO_SKIP_NATIVE_ABI_GATES=1 \
+  VASO_FORCE_FETCH_REPOS='@protobuf_native,@py_protobuf_native' \
+  VASO_EXTRA_TEST_TARGETS='//synthetic:protobuf_cpp_python_roundtrip' \
+  SPACK_ROOT_PKG='py-protobuf@4.21.12 ^protobuf@21.12 ^python@3.13.13+bz2+ctypes+dbm~debug+libxml2+lzma~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~static~tkinter+uuid+zlib' \
+  VASO_SPACK_TIMEOUT=2400 \
+  ./run.sh > "$log" 2>&1
+printf '%s\n' "$log"
+tail -n 180 "$log"
+
+◆ [0m[39m[49mThe run has not completed yet; I’m sampling the tail again because this is a long insula graph rebuild and I need to distinguish progress from a stuck command.
+
+[1m[38;5;2m◆[0m[39m[49m [1mRan[0m[39m[49m [38;2;205;214;244mlog[38;2;148;226;213m=[38;2;205;214;244m$[38;2;147;153;178m([38;2;137;180;250mls[38;2;147;153;178m -[38;2;235;160;172mt[38;2;166;227;161m $VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-[38;2;148;226;213m*[38;2;166;227;161m.log [38;2;148;226;213m|[38;2;166;227;161m [38;2;137;180;250mhead[38;2;147;153;178m -[38;2;235;160;172m1[38;2;147;153;178m)[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mecho[38;2;205;214;244m [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"[38;2;148;226;213m;[38;2;205;214;244m [38;2;137;180;250mtail[38;2;147;153;178m -[38;2;235;160;172mn[38;2;205;214;244m 160 [38;2;166;227;161m"[38;2;243;139;168m$[38;2;205;214;244mlog[38;2;166;227;161m"
+[2m[39m  └ [0m[39m[49m$VASO_ESTATE_ROOT/agents/trae/logs/py-protobuf-roundtrip-focused-20260929T222706Z.log
+    ppport.h in cpan/Win32API-File is up-to-date
+[2m    … +162 lines (ctrl+o to expand)
+[0m[39m[49m    +bzip2_native\+bzip2_native/prefix/lib:/vaso/cache/bazel/output-base/external/\+zlib_ng_native\+zlib_ng_native/prefix/lib:/vaso/cache/bazel/output-base/external/\+berkeley_db_native\+berkeley_db_native/
+    prefix/lib ./miniperl -Ilib make_ext.pl lib/auto/Socket/Socket.so  MAKE="make" LIBPERL_A=libperl.so LINKTYPE=dynamic
+
+[2m◆ [3mI'm still compiling Perl, and it's taking a while. I think I might need to run [38;2;166;227;161mrun.sh[39m, which builds all the native overrides, including packages due to [38;2;166;227;161mspack_selfcheck[39m. It seems like that might fetch all
+[0m[39m[49m  [2;3mrepos too, but I need to let it run for now. I'm wondering if there could be a more targeted Bazel test within Insula after this phase, especially since we have [38;2;166;227;161mrun.sh[39m active. I'll keep this in mind!
+
+[0;2m[39m[49m◆ [0m[39m[49mThe proof is now building the native Perl dependency, still under the py-protobuf root’s hermetic graph. It is not stuck; the log is progressing through extension modules.
+
+[38;2;47;102;98m⋄[39m [1m[38;2;80;108;79mCompiling perl and testing options[0m[39m[49m [2m(3h 42m 10s • ↓ 221K tokens • [0;1m[39m[49mesc[0;2m[39m[49m to interrupt) · 1 shell running… · /ps to manage
+  └ [0;1m[38;5;6m[49m■ [39mFix py-protobuf roundtrip compiler issue inside insula
+[0;2m[39m[49m    ◻ [0m[39m[49mRun focused host/insula verification with estate output base
+[2m    ◻ [0m[39m[49mUpdate ticket evidence for py-protobuf
+[2m    ◻ [0m[39m[49mCommit package-scoped py-protobuf slice
+[2m    ◻ [0m[39m[49mRun relay dry-run, land if accepted, then continue next package
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[1m[38;5;15m[48;5;8m Evolve Spack-Bazel graph experiment [0m[39m[49m─
+[1m[38;2;166;227;161m❯[0m[39m[49m [2mExplain this codebase
+[0m[39m[49m─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  [38;2;246;226;183mGPT-5.5[2m[39m · [0m[38;2;242;181;144m[49mContext 55% left[2m[39m · [0m[38;2;171;223;167m[49m~/workspace/vaso[2m[39m · [0m[38;2;143;179;239m[49mvaso/insula-spack-bazel-graph[39m                                                                                     [38;5;1m☢ Full Access[39m · [1m←[0m[39m[49m for agents · [38;5;5mGoal blocked

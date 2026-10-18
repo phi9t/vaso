@@ -1,0 +1,34 @@
+{
+  "build_system_histogram": {
+    "generic": 1
+  },
+  "n_nodes": 1,
+  "nodes": [
+    {
+      "build_system": "generic",
+      "deps": [],
+      "is_toolchain": false,
+      "native_strategy": "package.py install() \u2014 needs a per-package recipe deep-dive",
+      "package": "cudnn",
+      "parameters": {
+        "build_system": "generic",
+        "cflags": [],
+        "cppflags": [],
+        "cxxflags": [],
+        "fflags": [],
+        "ldflags": [],
+        "ldlibs": []
+      },
+      "prefix": "",
+      "spack_hash": "ovppfem2oxv5f7dkzhssxz7bvqtnvqk6",
+      "status": "spack",
+      "topo_index": 0,
+      "version": "9.24.0.43-12"
+    }
+  ],
+  "root": "cudnn",
+  "schema_version": 1,
+  "topological_order": [
+    "cudnn"
+  ]
+}

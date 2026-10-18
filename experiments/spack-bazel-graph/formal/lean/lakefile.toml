@@ -1,0 +1,9 @@
+name = "AbiParity"
+version = "0.1.0"
+defaultTargets = ["AbiParity"]
+
+[leanOptions]
+relaxedAutoImplicit = false
+
+[[lean_lib]]
+name = "AbiParity"

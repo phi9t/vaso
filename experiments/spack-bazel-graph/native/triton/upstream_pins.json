@@ -1,0 +1,42 @@
+{
+  "pytorch": {
+    "version": "2.14.0",
+    "release_tag": "v2.14.0",
+    "commit": "2b3ec34829036a65cd9d1398ea72a0167dc37470"
+  },
+  "triton": {
+    "version": "3.8.0",
+    "commit": "675c59878aa2280b31f722aaf42b825fcee21de8",
+    "archive": "triton-675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz",
+    "archive_sha256": "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825",
+    "strip_prefix": "triton-675c59878aa2280b31f722aaf42b825fcee21de8",
+    "source_url": "https://github.com/triton-lang/triton/archive/675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz"
+  },
+  "llvm": {
+    "source_commit": "4611156032e1ebac68b2b8f6107b1475a7c60800",
+    "source_archive": "llvm-project-4611156032e1ebac68b2b8f6107b1475a7c60800.tar.gz",
+    "source_archive_sha256": "3d5f91c1d6eea1ee585af1f9ce4e5acc29cc4968edcfbb95681df51edfad0462",
+    "source_strip_prefix": "llvm-project-4611156032e1ebac68b2b8f6107b1475a7c60800",
+    "source_url": "https://github.com/llvm/llvm-project/archive/4611156032e1ebac68b2b8f6107b1475a7c60800.tar.gz",
+    "selected_source_commit": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+    "selected_source_archive": "llvm-project-35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz",
+    "selected_source_archive_sha256": "c3f06997045e0f9aa43628616df3217f229aa43d478bd78bd445e2448637d4ef",
+    "selected_version": "23.0.0git",
+    "selected_prefix": "/usr/lib/llvm-23",
+    "drift_patch": {
+      "path": "native/triton/patches/0001-llvm-35901313.patch",
+      "sha256": "8a0405802e0f45fae5aa9bd0a6921d81f16a1f50224a705a4f450fe7c03a90d3"
+    },
+    "build_info_commit": "1f126a6dea50d185c0781743a667390037ae88bd",
+    "published_build_info_commit": "1f126a6dea50d185c0781743a667390037ae88bd",
+    "build_info_repository": "triton-lang/llvm-project",
+    "build_number": 2,
+    "reuse_spack_llvm_20_1_8": false
+  },
+  "nlohmann_json": {
+    "version": "v3.11.3",
+    "source_url": "https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip",
+    "provider_status": "required-prefix-gap",
+    "reason": "Triton downloads include.zip unless JSON_SYSPATH is supplied; this build must consume a declared native prefix instead of fetching during execution."
+  }
+}
