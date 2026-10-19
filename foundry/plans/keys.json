@@ -1,0 +1,2627 @@
+{
+  "packages": {
+    "jax/cu129/py-jaxlib": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/jax/cu129/jaxlib.plan.json",
+          "sha256": "05c900fb42f1e46ea3fe0f3f727da4a8296329b9662256e99d420ea1de74aaa0"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:jax-jax-v0.10.2.tar.gz",
+          "sha256": "fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/upstream_pins.json",
+          "sha256": "2851495f1486e7a93f5f9f5cfe3a7be4c84291c880df78e891dfff88a11f573b"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/nested_http_archives.json",
+          "sha256": "78f6b0cbdd1474e36916fd4eb34002dae3144ee757600a1f897aaa4de5919254"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/committed_plan_support.py",
+          "sha256": "65f107e025da6a668ee31f06855f615f363bddb3ca2844729e69423c32371d40"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/jax/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "key": "manifest:@rootfs_bazel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_bazel_native//:prefix_path.txt",
+          "manifest": "@rootfs_bazel_native//:prefix_manifest.json",
+          "name": "bazel"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@cudnn_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudnn_native//:prefix_path.txt",
+          "manifest": "@cudnn_native//:prefix_manifest.json",
+          "name": "cudnn"
+        },
+        {
+          "key": "manifest:@rootfs_llvm_23_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_llvm_23_native//:prefix_path.txt",
+          "manifest": "@rootfs_llvm_23_native//:prefix_manifest.json",
+          "name": "llvm"
+        },
+        {
+          "key": "manifest:@nccl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nccl_native//:prefix_path.txt",
+          "manifest": "@nccl_native//:prefix_manifest.json",
+          "name": "nccl"
+        },
+        {
+          "key": "manifest:@nvshmem_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nvshmem_native//:prefix_path.txt",
+          "manifest": "@nvshmem_native//:prefix_manifest.json",
+          "name": "nvshmem"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_82_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_82_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_82_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "manifest:@xxd_standalone_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@xxd_standalone_native//:prefix_path.txt",
+          "manifest": "@xxd_standalone_native//:prefix_manifest.json",
+          "name": "xxd-standalone"
+        },
+        {
+          "kind": "executor",
+          "path": "native/jaxlib/runtime_jobs_executor.py",
+          "sha256": "eee37bedfb40652ad8bba4f84a94347eb07ce23b0104671748e8d7f8c40a4a53"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "archive_count": 155,
+          "distdir_manifest": "@jaxlib_nested_cache_manifest//:manifest.json",
+          "distdir_manifest_sha256": "ea79daf3da52f749be38827b9adf46b115469a40bb8120dc819b6b5d99e44c3a",
+          "kind": "nested-bazel",
+          "repository_cache_manifest": "@jaxlib_nested_cache_manifest//:manifest.json",
+          "repository_cache_manifest_sha256": "ea79daf3da52f749be38827b9adf46b115469a40bb8120dc819b6b5d99e44c3a"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/jaxlib/runtime_jobs_executor.py",
+            "--executor",
+            "native/common/plan_executor.py",
+            "--runtime-jobs-file",
+            "/vaso/lines/<line>/state/native/jaxlib_jobs.txt",
+            "--",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheelhouse>",
+            "--nested-cache-manifest",
+            "distdir=<nested-cache-manifest>",
+            "--nested-cache-manifest",
+            "repository_cache=<nested-cache-manifest>",
+            "--nested-distdir",
+            "<nested-distdir>",
+            "--nested-repository-cache",
+            "<nested-repository-cache>",
+            "--nested-disk-cache",
+            "<nested-disk-cache>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/jaxlib/jaxlib_action.bzl",
+          "sha256": "93f724f7673076ec23f4cc2dc71fb978b8ba764fe65843c4e3c13f7d85f930f9"
+        }
+      ],
+      "merkle_key": "c4d0157be16490b8cc27d90e1ef061428fe26c5d3f08c46c4e46b439080ac17a"
+    },
+    "jax/cu130/py-jaxlib": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/jax/cu130/jaxlib.plan.json",
+          "sha256": "911cd0f3ebbb3b38acf9b484628a7de06a9f63143865935ab88fb53e1b8d788e"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:jax-jax-v0.10.2.tar.gz",
+          "sha256": "fa7214ab31ed1cd418b4305807e9c4f3f175c783eeea40c28e0f77c3f4c24bc7"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/upstream_pins.json",
+          "sha256": "2851495f1486e7a93f5f9f5cfe3a7be4c84291c880df78e891dfff88a11f573b"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/nested_http_archives.json",
+          "sha256": "78f6b0cbdd1474e36916fd4eb34002dae3144ee757600a1f897aaa4de5919254"
+        },
+        {
+          "kind": "input",
+          "path": "native/jaxlib/committed_plan_support.py",
+          "sha256": "65f107e025da6a668ee31f06855f615f363bddb3ca2844729e69423c32371d40"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/jax/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "key": "manifest:@rootfs_bazel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_bazel_native//:prefix_path.txt",
+          "manifest": "@rootfs_bazel_native//:prefix_manifest.json",
+          "name": "bazel"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@cudnn_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudnn_native//:prefix_path.txt",
+          "manifest": "@cudnn_native//:prefix_manifest.json",
+          "name": "cudnn"
+        },
+        {
+          "key": "manifest:@rootfs_llvm_23_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_llvm_23_native//:prefix_path.txt",
+          "manifest": "@rootfs_llvm_23_native//:prefix_manifest.json",
+          "name": "llvm"
+        },
+        {
+          "key": "manifest:@nccl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nccl_native//:prefix_path.txt",
+          "manifest": "@nccl_native//:prefix_manifest.json",
+          "name": "nccl"
+        },
+        {
+          "key": "manifest:@nvshmem_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nvshmem_native//:prefix_path.txt",
+          "manifest": "@nvshmem_native//:prefix_manifest.json",
+          "name": "nvshmem"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_82_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_82_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_82_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "manifest:@xxd_standalone_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@xxd_standalone_native//:prefix_path.txt",
+          "manifest": "@xxd_standalone_native//:prefix_manifest.json",
+          "name": "xxd-standalone"
+        },
+        {
+          "kind": "executor",
+          "path": "native/jaxlib/runtime_jobs_executor.py",
+          "sha256": "eee37bedfb40652ad8bba4f84a94347eb07ce23b0104671748e8d7f8c40a4a53"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "archive_count": 155,
+          "distdir_manifest": "@jaxlib_nested_cache_manifest//:manifest.json",
+          "distdir_manifest_sha256": "ea79daf3da52f749be38827b9adf46b115469a40bb8120dc819b6b5d99e44c3a",
+          "kind": "nested-bazel",
+          "repository_cache_manifest": "@jaxlib_nested_cache_manifest//:manifest.json",
+          "repository_cache_manifest_sha256": "ea79daf3da52f749be38827b9adf46b115469a40bb8120dc819b6b5d99e44c3a"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/jaxlib/runtime_jobs_executor.py",
+            "--executor",
+            "native/common/plan_executor.py",
+            "--runtime-jobs-file",
+            "/vaso/lines/<line>/state/native/jaxlib_jobs.txt",
+            "--",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheelhouse>",
+            "--nested-cache-manifest",
+            "distdir=<nested-cache-manifest>",
+            "--nested-cache-manifest",
+            "repository_cache=<nested-cache-manifest>",
+            "--nested-distdir",
+            "<nested-distdir>",
+            "--nested-repository-cache",
+            "<nested-repository-cache>",
+            "--nested-disk-cache",
+            "<nested-disk-cache>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/jaxlib/jaxlib_action.bzl",
+          "sha256": "93f724f7673076ec23f4cc2dc71fb978b8ba764fe65843c4e3c13f7d85f930f9"
+        }
+      ],
+      "merkle_key": "20276f4b582df87631efe78c8fa53b923efa45eed3e859bcb52d859967cf24c9"
+    },
+    "torch/cu129/bzip2": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/bzip2.plan.json",
+          "sha256": "dc9ffd4d96ce75dfc24e1395de466a5d794fc496eb0e424a23fb81c42c351415"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:bzip2-1.0.8.tar.gz",
+          "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/bzip2/bzip2_action.bzl",
+          "sha256": "09bc96b24ee28b9e81471bbb2a1156d4dd94291235381d5026302702e192ab4a"
+        }
+      ],
+      "merkle_key": "1222fdc43a1dd5ecd3d386207862b2a216aa1faac42d0fa63c1cf13b4c6bc8ef"
+    },
+    "torch/cu129/py-torch": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/pytorch.plan.json",
+          "sha256": "b14c586726f279af82f0e56aac1bff7775db1471d3d78366394a6877a9fa9ba6"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:pytorch-v2.14.0.tar.gz",
+          "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a"
+        },
+        {
+          "kind": "input",
+          "path": "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+          "sha256": "c71a4e26005b95e4f1a5ebc9ff6f28a94ccf3f1739942b9882559487baf0ecc0"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "key": "manifest:@cmake_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cmake_native//:prefix_path.txt",
+          "manifest": "@cmake_native//:prefix_manifest.json",
+          "name": "cmake"
+        },
+        {
+          "key": "manifest:@cpuinfo_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cpuinfo_native//:prefix_path.txt",
+          "manifest": "@cpuinfo_native//:prefix_manifest.json",
+          "name": "cpuinfo"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@cudnn_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudnn_native//:prefix_path.txt",
+          "manifest": "@cudnn_native//:prefix_manifest.json",
+          "name": "cudnn"
+        },
+        {
+          "key": "manifest:@cudss_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudss_native//:prefix_path.txt",
+          "manifest": "@cudss_native//:prefix_manifest.json",
+          "name": "cudss"
+        },
+        {
+          "key": "manifest:@cusparselt_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cusparselt_native//:prefix_path.txt",
+          "manifest": "@cusparselt_native//:prefix_manifest.json",
+          "name": "cusparselt"
+        },
+        {
+          "key": "manifest:@fp16_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@fp16_native//:prefix_path.txt",
+          "manifest": "@fp16_native//:prefix_manifest.json",
+          "name": "fp16"
+        },
+        {
+          "key": "manifest:@fxdiv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@fxdiv_native//:prefix_path.txt",
+          "manifest": "@fxdiv_native//:prefix_manifest.json",
+          "name": "fxdiv"
+        },
+        {
+          "key": "manifest:@hwloc_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@hwloc_native//:prefix_path.txt",
+          "manifest": "@hwloc_native//:prefix_manifest.json",
+          "name": "hwloc"
+        },
+        {
+          "key": "manifest:@libevent_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libevent_native//:prefix_path.txt",
+          "manifest": "@libevent_native//:prefix_manifest.json",
+          "name": "libevent"
+        },
+        {
+          "key": "manifest:@libiconv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libiconv_native//:prefix_path.txt",
+          "manifest": "@libiconv_native//:prefix_manifest.json",
+          "name": "libiconv"
+        },
+        {
+          "key": "manifest:@libpciaccess_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libpciaccess_native//:prefix_path.txt",
+          "manifest": "@libpciaccess_native//:prefix_manifest.json",
+          "name": "libpciaccess"
+        },
+        {
+          "key": "manifest:@libxml2_215_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libxml2_215_native//:prefix_path.txt",
+          "manifest": "@libxml2_215_native//:prefix_manifest.json",
+          "name": "libxml2"
+        },
+        {
+          "key": "manifest:@nccl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nccl_native//:prefix_path.txt",
+          "manifest": "@nccl_native//:prefix_manifest.json",
+          "name": "nccl"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@numactl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@numactl_native//:prefix_path.txt",
+          "manifest": "@numactl_native//:prefix_manifest.json",
+          "name": "numactl"
+        },
+        {
+          "key": "manifest:@nvshmem_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nvshmem_native//:prefix_path.txt",
+          "manifest": "@nvshmem_native//:prefix_manifest.json",
+          "name": "nvshmem"
+        },
+        {
+          "key": "manifest:@openblas_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@openblas_native//:prefix_path.txt",
+          "manifest": "@openblas_native//:prefix_manifest.json",
+          "name": "openblas"
+        },
+        {
+          "key": "manifest:@openmpi_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@openmpi_native//:prefix_path.txt",
+          "manifest": "@openmpi_native//:prefix_manifest.json",
+          "name": "openmpi"
+        },
+        {
+          "key": "manifest:@pmix_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@pmix_native//:prefix_path.txt",
+          "manifest": "@pmix_native//:prefix_manifest.json",
+          "name": "pmix"
+        },
+        {
+          "key": "manifest:@protobuf_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@protobuf_native//:prefix_path.txt",
+          "manifest": "@protobuf_native//:prefix_manifest.json",
+          "name": "protobuf"
+        },
+        {
+          "key": "manifest:@psimd_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@psimd_native//:prefix_path.txt",
+          "manifest": "@psimd_native//:prefix_manifest.json",
+          "name": "psimd"
+        },
+        {
+          "key": "manifest:@pthreadpool_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@pthreadpool_native//:prefix_path.txt",
+          "manifest": "@pthreadpool_native//:prefix_manifest.json",
+          "name": "pthreadpool"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_packaging_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_packaging_native//:prefix_path.txt",
+          "manifest": "@py_packaging_native//:prefix_manifest.json",
+          "name": "py-packaging"
+        },
+        {
+          "key": "manifest:@py_pathspec_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pathspec_native//:prefix_path.txt",
+          "manifest": "@py_pathspec_native//:prefix_manifest.json",
+          "name": "py-pathspec"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_protobuf_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_protobuf_native//:prefix_path.txt",
+          "manifest": "@py_protobuf_native//:prefix_manifest.json",
+          "name": "py-protobuf"
+        },
+        {
+          "key": "manifest:@py_pyyaml_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pyyaml_native//:prefix_path.txt",
+          "manifest": "@py_pyyaml_native//:prefix_manifest.json",
+          "name": "py-pyyaml"
+        },
+        {
+          "key": "manifest:@py_scikit_build_core_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_scikit_build_core_native//:prefix_path.txt",
+          "manifest": "@py_scikit_build_core_native//:prefix_manifest.json",
+          "name": "py-scikit-build-core"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_six_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_six_native//:prefix_path.txt",
+          "manifest": "@py_six_native//:prefix_manifest.json",
+          "name": "py-six"
+        },
+        {
+          "key": "manifest:@py_typing_extensions_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_typing_extensions_native//:prefix_path.txt",
+          "manifest": "@py_typing_extensions_native//:prefix_manifest.json",
+          "name": "py-typing-extensions"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "5667a512a40785b95484d51b6fddc481e6efd3ca29486a401f4771cd0c504523",
+          "kind": "dep",
+          "label": "//native/zstd:zstd_action_prefix",
+          "manifest": "action://native/zstd:zstd_action_prefix_manifest",
+          "name": "zstd",
+          "package_key": "torch/cu129/zstd"
+        },
+        {
+          "kind": "executor",
+          "path": "native/pytorch/runtime_jobs_executor.py",
+          "sha256": "5a2be7f38e2a6c56d288959cb45c1bf0c9bbb4b63a48e815f3c1bc638088383d"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/pytorch/runtime_jobs_executor.py",
+            "--executor",
+            "native/common/plan_executor.py",
+            "--runtime-jobs-file",
+            "<runtime-jobs-file>",
+            "--zstd-prefix",
+            "<zstd-prefix>",
+            "--",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/pytorch/pytorch_action.bzl",
+          "sha256": "02ffcacf90620048fbafd359aae79eb1b48e3e79ac18399741f38f9e66a7f0ce"
+        }
+      ],
+      "merkle_key": "82271c241ca34e9bddc6c7dc634be28357fcbb4107c7f06543122b22d0834cf3"
+    },
+    "torch/cu129/py-torchaudio": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/torchaudio.plan.json",
+          "sha256": "27e053a25eb6b634b2b28af47e6a8c0e35053205ffc76a1c5cc0115b98f8d533"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:audio-2.11.0.tar.gz",
+          "sha256": "599ec24e7e1eef476ef21f0178e33da00e2434f930ba42e9cc20bf4002220486"
+        },
+        {
+          "kind": "input",
+          "path": "native/torchaudio/upstream_pins.json",
+          "sha256": "ffe517edc81de8a3b955eac5a4ee58ef5a6cc50fa4592329c06af506f22aec24"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "82271c241ca34e9bddc6c7dc634be28357fcbb4107c7f06543122b22d0834cf3",
+          "kind": "dep",
+          "label": "//native/pytorch:pytorch_action",
+          "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
+          "name": "torch",
+          "package_key": "torch/cu129/py-torch"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/torchaudio/torchaudio_action.bzl",
+          "sha256": "5a5bbc9f7e5e6019f99d1e1451fe8000847add91b3362eb45a5f89b09ab85a57"
+        }
+      ],
+      "merkle_key": "b70f60989c0f577cf46fea2ac8bbeaea9c0749f96284bcf5a488c3ec16c9d6b7"
+    },
+    "torch/cu129/py-torchvision": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/torchvision.plan.json",
+          "sha256": "45495602eecddcd7411db184876671fe95e921ff054a10ce47adefe9650574a7"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:vision-0.29.0.tar.gz",
+          "sha256": "24be57d922927d8a2ac2e8f076f07c3447ddf8f1d25ddbb7b65578f36c9ab8e3"
+        },
+        {
+          "kind": "input",
+          "path": "native/torchvision/upstream_pins.json",
+          "sha256": "abab38d3a3d4e3cb3f94f24948ef78dac832d4cc97e3b0105b7a019b863c5625"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@libjpeg_turbo_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libjpeg_turbo_native//:prefix_path.txt",
+          "manifest": "@libjpeg_turbo_native//:prefix_manifest.json",
+          "name": "libjpeg-turbo"
+        },
+        {
+          "key": "manifest:@libpng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libpng_native//:prefix_path.txt",
+          "manifest": "@libpng_native//:prefix_manifest.json",
+          "name": "libpng"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_pillow_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pillow_native//:prefix_path.txt",
+          "manifest": "@py_pillow_native//:prefix_manifest.json",
+          "name": "py-pillow"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "82271c241ca34e9bddc6c7dc634be28357fcbb4107c7f06543122b22d0834cf3",
+          "kind": "dep",
+          "label": "//native/pytorch:pytorch_action",
+          "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
+          "name": "torch",
+          "package_key": "torch/cu129/py-torch"
+        },
+        {
+          "key": "manifest:@zlib_ng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@zlib_ng_native//:prefix_path.txt",
+          "manifest": "@zlib_ng_native//:prefix_manifest.json",
+          "name": "zlib-ng"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/torchvision/torchvision_action.bzl",
+          "sha256": "171105939391eff2514bdde2531322a623095d3cacd694254db734e7e6e69cda"
+        }
+      ],
+      "merkle_key": "2b960f9d14eb57b0070b2146147913a552628c7458c493471d114db0a8aba9d8"
+    },
+    "torch/cu129/py-triton": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/triton.plan.json",
+          "sha256": "c7e4fa763b6b18d725daac0af8bfb82153e1f3ba92f9ff8be5007cab8d4ae590"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:triton-675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz",
+          "sha256": "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825"
+        },
+        {
+          "kind": "patch",
+          "path": "native/triton/patches/0001-llvm-35901313.patch",
+          "sha256": "771dbaa52dbcaebff26f47684cacdb1edf237d900c8a418b11f9c2793397ce7f"
+        },
+        {
+          "kind": "input",
+          "path": "native/triton/upstream_pins.json",
+          "sha256": "9a47acb2f5312b0aa2bb1648523d7c67a2888c6b75691fd919d487dae2024b65"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "key": "manifest:@cmake_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cmake_native//:prefix_path.txt",
+          "manifest": "@cmake_native//:prefix_manifest.json",
+          "name": "cmake"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@rootfs_llvm_23_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_llvm_23_native//:prefix_path.txt",
+          "manifest": "@rootfs_llvm_23_native//:prefix_manifest.json",
+          "name": "llvm"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@nlohmann_json_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nlohmann_json_native//:prefix_path.txt",
+          "manifest": "@nlohmann_json_native//:prefix_manifest.json",
+          "name": "nlohmann_json"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_lit_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_lit_native//:prefix_path.txt",
+          "manifest": "@py_lit_native//:prefix_manifest.json",
+          "name": "py-lit"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_pybind11_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pybind11_native//:prefix_path.txt",
+          "manifest": "@py_pybind11_native//:prefix_manifest.json",
+          "name": "py-pybind11"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "manifest:@zlib_ng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@zlib_ng_native//:prefix_path.txt",
+          "manifest": "@zlib_ng_native//:prefix_manifest.json",
+          "name": "zlib_ng"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--patch",
+            "<patch>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/triton/triton_action.bzl",
+          "sha256": "fa4cff85f96e39d80888752e8b4a8dcd67689468cc114a904add38f97095a748"
+        }
+      ],
+      "merkle_key": "df2e3cb21492cfe3bc9b0131292198ae70c0b4ab1f156e01b9dbee63ab9cad27"
+    },
+    "torch/cu129/xz": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/xz.plan.json",
+          "sha256": "bb5d5a6d0ab61074d3ca914ba0237f1818fdaaeb18b7165e81c1c90f0e0cbcce"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:xz-5.8.3.tar.gz",
+          "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/xz/xz_action.bzl",
+          "sha256": "cfd4d69d95c61507bcb6d839ce419c8dd26d4cd8e136a474e713fc0c77f53973"
+        }
+      ],
+      "merkle_key": "bb14c3b2f7c7c3b2435ef1e7d2631598ef5f071eac5a4855195c6075f52888b5"
+    },
+    "torch/cu129/zlib-ng": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/zlib_ng.plan.json",
+          "sha256": "92461accd78712f705e4a49cea59faefc398720b2e4cb67ab736d7810dc2fc5c"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:zlib-ng-2.3.3.tar.gz",
+          "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/zlib_ng/zlib_ng_action.bzl",
+          "sha256": "e315d793b449db37d563dc57ca65e12bbbc8d7b28a8523399f249aae86015b4c"
+        }
+      ],
+      "merkle_key": "ef198ab90bfe29703eca4c9897f1adbd6c7a556a1779329629520099a796dc72"
+    },
+    "torch/cu129/zstd": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu129/zstd.plan.json",
+          "sha256": "2f075377d1d9ff04574cefa4f08a79ea3bd839ff4b37afdc4142b1aee0121e81"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:zstd-1.5.7.tar.gz",
+          "sha256": "37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu129/rootfs.identity.json",
+          "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/zstd/zstd_action.bzl",
+          "sha256": "e0135f6d1791b0b91a4743b77d869a8b3dd5690478e3150e64e1ae2e31f8d4e1"
+        }
+      ],
+      "merkle_key": "5667a512a40785b95484d51b6fddc481e6efd3ca29486a401f4771cd0c504523"
+    },
+    "torch/cu130/bzip2": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/bzip2.plan.json",
+          "sha256": "ce612ac8058da9cde1b34e2235539526d3a2762d9066dc760b18b5fe6bf501a4"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:bzip2-1.0.8.tar.gz",
+          "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/bzip2/bzip2_action.bzl",
+          "sha256": "09bc96b24ee28b9e81471bbb2a1156d4dd94291235381d5026302702e192ab4a"
+        }
+      ],
+      "merkle_key": "11413ff723968ce0d549de1e61c697d429c524be1631f71b66e16fda44175e38"
+    },
+    "torch/cu130/py-torch": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/pytorch.plan.json",
+          "sha256": "5168de38dba17630d3f0caacfe1157f187b59843dab3385780cc70cfea9867cf"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:pytorch-v2.14.0.tar.gz",
+          "sha256": "62dedab65c9d7dda7cbb6edaad07d325ad193014496e5da4540a5c074cd8a50a"
+        },
+        {
+          "kind": "input",
+          "path": "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+          "sha256": "c71a4e26005b95e4f1a5ebc9ff6f28a94ccf3f1739942b9882559487baf0ecc0"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "key": "manifest:@cmake_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cmake_native//:prefix_path.txt",
+          "manifest": "@cmake_native//:prefix_manifest.json",
+          "name": "cmake"
+        },
+        {
+          "key": "manifest:@cpuinfo_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cpuinfo_native//:prefix_path.txt",
+          "manifest": "@cpuinfo_native//:prefix_manifest.json",
+          "name": "cpuinfo"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@cudnn_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudnn_native//:prefix_path.txt",
+          "manifest": "@cudnn_native//:prefix_manifest.json",
+          "name": "cudnn"
+        },
+        {
+          "key": "manifest:@cudss_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cudss_native//:prefix_path.txt",
+          "manifest": "@cudss_native//:prefix_manifest.json",
+          "name": "cudss"
+        },
+        {
+          "key": "manifest:@cusparselt_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cusparselt_native//:prefix_path.txt",
+          "manifest": "@cusparselt_native//:prefix_manifest.json",
+          "name": "cusparselt"
+        },
+        {
+          "key": "manifest:@fp16_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@fp16_native//:prefix_path.txt",
+          "manifest": "@fp16_native//:prefix_manifest.json",
+          "name": "fp16"
+        },
+        {
+          "key": "manifest:@fxdiv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@fxdiv_native//:prefix_path.txt",
+          "manifest": "@fxdiv_native//:prefix_manifest.json",
+          "name": "fxdiv"
+        },
+        {
+          "key": "manifest:@hwloc_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@hwloc_native//:prefix_path.txt",
+          "manifest": "@hwloc_native//:prefix_manifest.json",
+          "name": "hwloc"
+        },
+        {
+          "key": "manifest:@libevent_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libevent_native//:prefix_path.txt",
+          "manifest": "@libevent_native//:prefix_manifest.json",
+          "name": "libevent"
+        },
+        {
+          "key": "manifest:@libiconv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libiconv_native//:prefix_path.txt",
+          "manifest": "@libiconv_native//:prefix_manifest.json",
+          "name": "libiconv"
+        },
+        {
+          "key": "manifest:@libpciaccess_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libpciaccess_native//:prefix_path.txt",
+          "manifest": "@libpciaccess_native//:prefix_manifest.json",
+          "name": "libpciaccess"
+        },
+        {
+          "key": "manifest:@libxml2_215_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libxml2_215_native//:prefix_path.txt",
+          "manifest": "@libxml2_215_native//:prefix_manifest.json",
+          "name": "libxml2"
+        },
+        {
+          "key": "manifest:@nccl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nccl_native//:prefix_path.txt",
+          "manifest": "@nccl_native//:prefix_manifest.json",
+          "name": "nccl"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@numactl_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@numactl_native//:prefix_path.txt",
+          "manifest": "@numactl_native//:prefix_manifest.json",
+          "name": "numactl"
+        },
+        {
+          "key": "manifest:@nvshmem_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nvshmem_native//:prefix_path.txt",
+          "manifest": "@nvshmem_native//:prefix_manifest.json",
+          "name": "nvshmem"
+        },
+        {
+          "key": "manifest:@openblas_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@openblas_native//:prefix_path.txt",
+          "manifest": "@openblas_native//:prefix_manifest.json",
+          "name": "openblas"
+        },
+        {
+          "key": "manifest:@openmpi_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@openmpi_native//:prefix_path.txt",
+          "manifest": "@openmpi_native//:prefix_manifest.json",
+          "name": "openmpi"
+        },
+        {
+          "key": "manifest:@pmix_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@pmix_native//:prefix_path.txt",
+          "manifest": "@pmix_native//:prefix_manifest.json",
+          "name": "pmix"
+        },
+        {
+          "key": "manifest:@protobuf_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@protobuf_native//:prefix_path.txt",
+          "manifest": "@protobuf_native//:prefix_manifest.json",
+          "name": "protobuf"
+        },
+        {
+          "key": "manifest:@psimd_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@psimd_native//:prefix_path.txt",
+          "manifest": "@psimd_native//:prefix_manifest.json",
+          "name": "psimd"
+        },
+        {
+          "key": "manifest:@pthreadpool_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@pthreadpool_native//:prefix_path.txt",
+          "manifest": "@pthreadpool_native//:prefix_manifest.json",
+          "name": "pthreadpool"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_packaging_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_packaging_native//:prefix_path.txt",
+          "manifest": "@py_packaging_native//:prefix_manifest.json",
+          "name": "py-packaging"
+        },
+        {
+          "key": "manifest:@py_pathspec_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pathspec_native//:prefix_path.txt",
+          "manifest": "@py_pathspec_native//:prefix_manifest.json",
+          "name": "py-pathspec"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_protobuf_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_protobuf_native//:prefix_path.txt",
+          "manifest": "@py_protobuf_native//:prefix_manifest.json",
+          "name": "py-protobuf"
+        },
+        {
+          "key": "manifest:@py_pyyaml_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pyyaml_native//:prefix_path.txt",
+          "manifest": "@py_pyyaml_native//:prefix_manifest.json",
+          "name": "py-pyyaml"
+        },
+        {
+          "key": "manifest:@py_scikit_build_core_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_scikit_build_core_native//:prefix_path.txt",
+          "manifest": "@py_scikit_build_core_native//:prefix_manifest.json",
+          "name": "py-scikit-build-core"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_six_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_six_native//:prefix_path.txt",
+          "manifest": "@py_six_native//:prefix_manifest.json",
+          "name": "py-six"
+        },
+        {
+          "key": "manifest:@py_typing_extensions_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_typing_extensions_native//:prefix_path.txt",
+          "manifest": "@py_typing_extensions_native//:prefix_manifest.json",
+          "name": "py-typing-extensions"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "cfcd7d9c9b0a9785bf6d6f85abbc546f0aa29cacd7f341aa4cad3234741dae12",
+          "kind": "dep",
+          "label": "//native/zstd:zstd_action_prefix",
+          "manifest": "action://native/zstd:zstd_action_prefix_manifest",
+          "name": "zstd",
+          "package_key": "torch/cu130/zstd"
+        },
+        {
+          "kind": "executor",
+          "path": "native/pytorch/runtime_jobs_executor.py",
+          "sha256": "5a2be7f38e2a6c56d288959cb45c1bf0c9bbb4b63a48e815f3c1bc638088383d"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/pytorch/runtime_jobs_executor.py",
+            "--executor",
+            "native/common/plan_executor.py",
+            "--runtime-jobs-file",
+            "<runtime-jobs-file>",
+            "--zstd-prefix",
+            "<zstd-prefix>",
+            "--",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/pytorch/pytorch_action.bzl",
+          "sha256": "02ffcacf90620048fbafd359aae79eb1b48e3e79ac18399741f38f9e66a7f0ce"
+        }
+      ],
+      "merkle_key": "9fe1a0ce69c454be2599d19137952155be7c140f389d301e1abe40074fe953d1"
+    },
+    "torch/cu130/py-torchaudio": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/torchaudio.plan.json",
+          "sha256": "28ffaaabdf66398c8fee83cfc15090a4686b0efcc17733faa490784bddc81cda"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:audio-2.11.0.tar.gz",
+          "sha256": "599ec24e7e1eef476ef21f0178e33da00e2434f930ba42e9cc20bf4002220486"
+        },
+        {
+          "kind": "input",
+          "path": "native/torchaudio/upstream_pins.json",
+          "sha256": "ffe517edc81de8a3b955eac5a4ee58ef5a6cc50fa4592329c06af506f22aec24"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "9fe1a0ce69c454be2599d19137952155be7c140f389d301e1abe40074fe953d1",
+          "kind": "dep",
+          "label": "//native/pytorch:pytorch_action",
+          "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
+          "name": "torch",
+          "package_key": "torch/cu130/py-torch"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/torchaudio/torchaudio_action.bzl",
+          "sha256": "5a5bbc9f7e5e6019f99d1e1451fe8000847add91b3362eb45a5f89b09ab85a57"
+        }
+      ],
+      "merkle_key": "667d587cdeff9b0afecef532608ceec31683b14d8469ce65f6caeffb24f5a391"
+    },
+    "torch/cu130/py-torchvision": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/torchvision.plan.json",
+          "sha256": "2af84f0e9e2b4620f2e501fc2768ea762032a633ed070516438d5ed2015cea31"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:vision-0.29.0.tar.gz",
+          "sha256": "24be57d922927d8a2ac2e8f076f07c3447ddf8f1d25ddbb7b65578f36c9ab8e3"
+        },
+        {
+          "kind": "input",
+          "path": "native/torchvision/upstream_pins.json",
+          "sha256": "abab38d3a3d4e3cb3f94f24948ef78dac832d4cc97e3b0105b7a019b863c5625"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@libjpeg_turbo_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libjpeg_turbo_native//:prefix_path.txt",
+          "manifest": "@libjpeg_turbo_native//:prefix_manifest.json",
+          "name": "libjpeg-turbo"
+        },
+        {
+          "key": "manifest:@libpng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@libpng_native//:prefix_path.txt",
+          "manifest": "@libpng_native//:prefix_manifest.json",
+          "name": "libpng"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_numpy_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_numpy_native//:prefix_path.txt",
+          "manifest": "@py_numpy_native//:prefix_manifest.json",
+          "name": "py-numpy"
+        },
+        {
+          "key": "manifest:@py_pillow_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pillow_native//:prefix_path.txt",
+          "manifest": "@py_pillow_native//:prefix_manifest.json",
+          "name": "py-pillow"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "9fe1a0ce69c454be2599d19137952155be7c140f389d301e1abe40074fe953d1",
+          "kind": "dep",
+          "label": "//native/pytorch:pytorch_action",
+          "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
+          "name": "torch",
+          "package_key": "torch/cu130/py-torch"
+        },
+        {
+          "key": "manifest:@zlib_ng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@zlib_ng_native//:prefix_path.txt",
+          "manifest": "@zlib_ng_native//:prefix_manifest.json",
+          "name": "zlib-ng"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/torchvision/torchvision_action.bzl",
+          "sha256": "171105939391eff2514bdde2531322a623095d3cacd694254db734e7e6e69cda"
+        }
+      ],
+      "merkle_key": "869319a6c978760ce0b5b84e747980efc6e4fb3774a0fc8a9689af36e3cda827"
+    },
+    "torch/cu130/py-triton": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/triton.plan.json",
+          "sha256": "e6a2274fa85aea122c53accfe4061036be67d92e8760c59d217b5242edb22c4c"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:triton-675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz",
+          "sha256": "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825"
+        },
+        {
+          "kind": "patch",
+          "path": "native/triton/patches/0001-llvm-35901313.patch",
+          "sha256": "771dbaa52dbcaebff26f47684cacdb1edf237d900c8a418b11f9c2793397ce7f"
+        },
+        {
+          "kind": "input",
+          "path": "native/triton/upstream_pins.json",
+          "sha256": "9a47acb2f5312b0aa2bb1648523d7c67a2888c6b75691fd919d487dae2024b65"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "key": "manifest:@cmake_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cmake_native//:prefix_path.txt",
+          "manifest": "@cmake_native//:prefix_manifest.json",
+          "name": "cmake"
+        },
+        {
+          "key": "manifest:@cuda_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@cuda_native//:prefix_path.txt",
+          "manifest": "@cuda_native//:prefix_manifest.json",
+          "name": "cuda"
+        },
+        {
+          "key": "manifest:@rootfs_llvm_23_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@rootfs_llvm_23_native//:prefix_path.txt",
+          "manifest": "@rootfs_llvm_23_native//:prefix_manifest.json",
+          "name": "llvm"
+        },
+        {
+          "key": "manifest:@ninja_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@ninja_native//:prefix_path.txt",
+          "manifest": "@ninja_native//:prefix_manifest.json",
+          "name": "ninja"
+        },
+        {
+          "key": "manifest:@nlohmann_json_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@nlohmann_json_native//:prefix_path.txt",
+          "manifest": "@nlohmann_json_native//:prefix_manifest.json",
+          "name": "nlohmann_json"
+        },
+        {
+          "key": "manifest:@py_filelock_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_filelock_native//:prefix_path.txt",
+          "manifest": "@py_filelock_native//:prefix_manifest.json",
+          "name": "py-filelock"
+        },
+        {
+          "key": "manifest:@py_lit_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_lit_native//:prefix_path.txt",
+          "manifest": "@py_lit_native//:prefix_manifest.json",
+          "name": "py-lit"
+        },
+        {
+          "key": "manifest:@py_pip_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pip_native//:prefix_path.txt",
+          "manifest": "@py_pip_native//:prefix_manifest.json",
+          "name": "py-pip"
+        },
+        {
+          "key": "manifest:@py_pybind11_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_pybind11_native//:prefix_path.txt",
+          "manifest": "@py_pybind11_native//:prefix_manifest.json",
+          "name": "py-pybind11"
+        },
+        {
+          "key": "manifest:@py_setuptools_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_setuptools_native//:prefix_path.txt",
+          "manifest": "@py_setuptools_native//:prefix_manifest.json",
+          "name": "py-setuptools"
+        },
+        {
+          "key": "manifest:@py_wheel_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@py_wheel_native//:prefix_path.txt",
+          "manifest": "@py_wheel_native//:prefix_manifest.json",
+          "name": "py-wheel"
+        },
+        {
+          "key": "manifest:@python_313_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_313_native//:prefix_path.txt",
+          "manifest": "@python_313_native//:prefix_manifest.json",
+          "name": "python"
+        },
+        {
+          "key": "manifest:@python_venv_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@python_venv_native//:prefix_path.txt",
+          "manifest": "@python_venv_native//:prefix_manifest.json",
+          "name": "python-venv"
+        },
+        {
+          "key": "manifest:@zlib_ng_native//:prefix_manifest.json",
+          "kind": "dep",
+          "label": "@zlib_ng_native//:prefix_path.txt",
+          "manifest": "@zlib_ng_native//:prefix_manifest.json",
+          "name": "zlib_ng"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>",
+            "--wheel-out",
+            "<wheel>",
+            "--patch",
+            "<patch>",
+            "--dep-prefix",
+            "<dependency-prefixes>",
+            "--input",
+            "<declared-inputs>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/triton/triton_action.bzl",
+          "sha256": "fa4cff85f96e39d80888752e8b4a8dcd67689468cc114a904add38f97095a748"
+        }
+      ],
+      "merkle_key": "19fb5fc7fe8ca0c9c9110b671eec565ced1bfcb5eae583236754faf142ae03fa"
+    },
+    "torch/cu130/xz": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/xz.plan.json",
+          "sha256": "44a089e8af42aa02d37be2010b2f3349f64c6681011f5e766b71f6b0f50813f1"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:xz-5.8.3.tar.gz",
+          "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/xz/xz_action.bzl",
+          "sha256": "cfd4d69d95c61507bcb6d839ce419c8dd26d4cd8e136a474e713fc0c77f53973"
+        }
+      ],
+      "merkle_key": "a9732600f585a9cb5153a3bb420e10ab8ebf0e65f367ed664d9e3cb5fa225b29"
+    },
+    "torch/cu130/zlib-ng": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/zlib_ng.plan.json",
+          "sha256": "ce8d0a0029802760a09278f1d15dc60fb57c63241b93851224f3164ec0222033"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:zlib-ng-2.3.3.tar.gz",
+          "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/zlib_ng/zlib_ng_action.bzl",
+          "sha256": "e315d793b449db37d563dc57ca65e12bbbc8d7b28a8523399f249aae86015b4c"
+        }
+      ],
+      "merkle_key": "c5b0f703462b54866429949bf322e99e5a1b83370c6ef4a8f492fd94b769e05e"
+    },
+    "torch/cu130/zstd": {
+      "inputs": [
+        {
+          "kind": "plan",
+          "path": "plans/torch/cu130/zstd.plan.json",
+          "sha256": "61a933b0356960e867fc854b5dfec6e737b17d1578b27ca56d9f8672160e8a46"
+        },
+        {
+          "kind": "schema",
+          "path": "plans/schema/v1.json",
+          "sha256": "3b61e1801ac2d07ef138c56a6fda6a46cc4567dc8eb93b2eccea5adf0108fbef"
+        },
+        {
+          "kind": "source",
+          "name": "main",
+          "path": "source:zstd-1.5.7.tar.gz",
+          "sha256": "37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_executor.py",
+          "sha256": "62851cef30da4e1e555d42dce2f1cded8c4bf37900dc47be4465a67cc15a6dcc"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/plan_schema.py",
+          "sha256": "1f58bc25108a3b590c9ce7523bb05205d43903d6793b12d33046db22593210b7"
+        },
+        {
+          "kind": "rootfs",
+          "path": "plans/torch/cu130/rootfs.identity.json",
+          "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+        },
+        {
+          "kind": "executor",
+          "path": "native/common/prefix_manifest.py",
+          "sha256": "26b1e308ca4d87813c3468e5a88970b156cb9df11be4c9953b494073f79bc3df"
+        },
+        {
+          "argv": [
+            "python3",
+            "native/common/plan_executor.py",
+            "--plan",
+            "<plan>",
+            "--schema",
+            "plans/schema/v1.json",
+            "--source-archive",
+            "main=<source-archive>",
+            "--rootfs-identity",
+            "<rootfs-identity>",
+            "--prefix-out",
+            "<prefix>"
+          ],
+          "env": {
+            "LC_ALL": "C",
+            "PATH": "/usr/bin:/bin",
+            "PYTHONHASHSEED": "0",
+            "VASO_ACTION_RESERVED_CPUS": "4"
+          },
+          "kind": "action-wrapper",
+          "path": "native/common/committed_plan_prefix.bzl",
+          "sha256": "e0fc145fa39222193ef0f0429ba40cff5b2bb4abb2e8453af4ff06377f6b5042"
+        },
+        {
+          "kind": "action-wrapper",
+          "path": "native/zstd/zstd_action.bzl",
+          "sha256": "e0135f6d1791b0b91a4743b77d869a8b3dd5690478e3150e64e1ae2e31f8d4e1"
+        }
+      ],
+      "merkle_key": "cfcd7d9c9b0a9785bf6d6f85abbc546f0aa29cacd7f341aa4cad3234741dae12"
+    }
+  },
+  "schema": 1
+}

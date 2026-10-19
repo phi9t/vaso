@@ -1,0 +1,31 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "cpp_srcs",
+    srcs = glob(
+        ["gsplat/cuda/csrc/*.cpp"],
+        exclude = ["gsplat/cuda/ext.cpp"],
+    ),
+)
+
+filegroup(
+    name = "cuda_srcs",
+    srcs = glob(["gsplat/cuda/csrc/*.cu"]),
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob([
+        "gsplat/cuda/csrc/*.cuh",
+        "gsplat/cuda/csrc/*.h",
+        "gsplat/cuda/include/*.cuh",
+        "gsplat/cuda/include/*.h",
+    ]),
+    includes = [
+        "gsplat/cuda/csrc",
+        "gsplat/cuda/include",
+    ],
+    deps = ["@glm//:glm"],
+)

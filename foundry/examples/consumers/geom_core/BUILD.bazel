@@ -1,0 +1,106 @@
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@vaso_graph//torch:defs.bzl", "vaso_libtorch_cc_binary", "vaso_libtorch_cc_test", "vaso_torch_profile_cc_library", "vaso_torch_profile_cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "consumer_geom_core_files",
+    srcs = [
+        "BUILD.bazel",
+        "calibration.proto",
+        "camera.cc",
+        "camera.h",
+        "camera_test.cc",
+        "geometry.cc",
+        "geometry.h",
+        "geometry_test.cc",
+        "libtorch_cli.cc",
+        "protobuf_coexistence_test.cc",
+    ],
+)
+
+proto_library(
+    name = "calibration_proto",
+    srcs = ["calibration.proto"],
+)
+
+cc_proto_library(
+    name = "calibration_cc_proto",
+    deps = [":calibration_proto"],
+)
+
+vaso_torch_profile_cc_library(
+    name = "geom_core",
+    srcs = [
+        "camera.cc",
+        "geometry.cc",
+    ],
+    hdrs = [
+        "camera.h",
+        "geometry.h",
+    ],
+    deps = [
+        ":calibration_cc_proto",
+        "@abseil-cpp//absl/status",
+        "@abseil-cpp//absl/status:statusor",
+        "@eigen//:eigen",
+        "@vaso_zstd//:lib",
+    ],
+)
+
+vaso_torch_profile_cc_test(
+    name = "geometry_test",
+    srcs = ["geometry_test.cc"],
+    tags = ["insula-only"],
+    deps = [
+        ":geom_core",
+        "@googletest//:gtest_main",
+    ],
+)
+
+vaso_torch_profile_cc_test(
+    name = "camera_test",
+    srcs = ["camera_test.cc"],
+    tags = ["insula-only"],
+    deps = [
+        ":geom_core",
+        "@googletest//:gtest_main",
+    ],
+)
+
+vaso_libtorch_cc_binary(
+    name = "libtorch_cli",
+    srcs = ["libtorch_cli.cc"],
+    tags = ["insula-only"],
+    deps = [":geom_core"],
+)
+
+vaso_libtorch_cc_test(
+    name = "libtorch_cli_cpu_test",
+    srcs = ["libtorch_cli.cc"],
+    tags = ["insula-only"],
+    deps = [":geom_core"],
+)
+
+vaso_libtorch_cc_test(
+    name = "libtorch_cli_cuda_test",
+    srcs = ["libtorch_cli.cc"],
+    args = ["--device=cuda"],
+    tags = [
+        "insula-only",
+        "requires-gpu",
+    ],
+    deps = [":geom_core"],
+)
+
+vaso_libtorch_cc_test(
+    name = "protobuf_coexistence_test",
+    srcs = ["protobuf_coexistence_test.cc"],
+    tags = ["insula-only"],
+    deps = [
+        ":calibration_cc_proto",
+        "@googletest//:gtest_main",
+    ],
+)

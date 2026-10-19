@@ -1,0 +1,66 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "consumer_python_consumers_files",
+    srcs = [
+        "BUILD.bazel",
+        "__init__.py",
+        "jax_se3.py",
+        "reference.py",
+        "reference_math_test.py",
+        "release_checks.py",
+        "run_release_verifier.sh",
+        "torch_se3.py",
+        "triton_se3.py",
+        "verify_jax.py",
+        "verify_torch.py",
+    ],
+)
+
+py_library(
+    name = "python_consumers",
+    srcs = [
+        "__init__.py",
+        "jax_se3.py",
+        "reference.py",
+        "release_checks.py",
+        "torch_se3.py",
+        "triton_se3.py",
+        "verify_jax.py",
+        "verify_torch.py",
+    ],
+    imports = ["."],
+)
+
+py_test(
+    name = "reference_math_test",
+    srcs = ["reference_math_test.py"],
+    deps = [":python_consumers"],
+)
+
+sh_test(
+    name = "torch_release_verifier",
+    srcs = ["run_release_verifier.sh"],
+    args = ["torch"],
+    data = [":python_consumers"],
+    tags = [
+        "insula-only",
+        "manual",
+        "requires-gpu",
+    ],
+)
+
+sh_test(
+    name = "jax_release_verifier",
+    srcs = ["run_release_verifier.sh"],
+    args = ["jax"],
+    data = [":python_consumers"],
+    tags = [
+        "insula-only",
+        "manual",
+        "requires-gpu",
+    ],
+)

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/bom-1.5.schema.json#vaso-subset",
+  "type": "object",
+  "required": [
+    "bomFormat",
+    "specVersion",
+    "version",
+    "metadata",
+    "components"
+  ],
+  "properties": {
+    "bomFormat": {
+      "const": "CycloneDX"
+    },
+    "specVersion": {
+      "const": "1.5"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "component",
+        "properties"
+      ]
+    },
+    "components": {
+      "type": "array"
+    }
+  }
+}

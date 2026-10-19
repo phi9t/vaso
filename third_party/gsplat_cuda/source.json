@@ -1,0 +1,9 @@
+{
+  "integrity": "sha256-iiRCi46iznw+EPz1qiDiD+UDuDKcltt5f06rcDcpqsM=",
+  "overlay": {
+    "BUILD.bazel": "sha256-jAuZ49NFm76cK4XphVICQTE5jPNAvzWtS1OlkRiFpc0=",
+    "MODULE.bazel": "sha256-IIJs3NK86a6fgN+SZTEkTsXHH2ad9YrdwdLG+/5LE4g="
+  },
+  "strip_prefix": "gsplat-1.5.3",
+  "url": "https://github.com/nerfstudio-project/gsplat/archive/refs/tags/v1.5.3.tar.gz"
+}

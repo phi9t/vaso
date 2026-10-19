@@ -1,31 +1,35 @@
-# Issue tracker: Local Markdown
+# Local effort records
 
-Issues and specs for this repo live as markdown files in `.scratch/`.
+Use `.scratch/<effort>/` when work needs durable intent, coordination, or a
+handoff. A trivial edit does not need a ticket tree. `spec.md` records the
+outcome, scope, authority, and acceptance; `issues/NN-<slug>.md` holds individual
+issues when useful. Keep research and historical evidence outside active policy.
 
-## Conventions
+An issue has a `Status:` line near the top. Common states are `open`, `claimed`,
+`blocked`, `ready-for-review`, and `resolved`; the complete existing vocabulary
+and required evidence fields are owned by `foundry/tools/tracker_lint.py`.
+Dependencies use `Blocked by: NN, NN`. Preserve existing records and statuses.
 
-- One feature per directory: `.scratch/<feature-slug>/`
-- The spec is `.scratch/<feature-slug>/spec.md`
-- Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` — never a single combined tickets file
-- Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
-- Comments and conversation history append to the bottom of the file under a `## Comments` heading
+For coordinated work, use the ledger commands rather than editing generated
+status/evidence blocks:
 
-## When a skill says "publish to the issue tracker"
+```sh
+python3 tools/agents/relay.py ticket set .scratch/<effort>/issues/01-example.md --status claimed
+python3 tools/agents/relay.py ticket note .scratch/<effort>/issues/01-example.md --evidence 'command and observed result'
+```
 
-Create a new file under `.scratch/<feature-slug>/` (creating the directory if needed).
+The append-only `ledger.jsonl` renders the status and bounded
+`Evidence (ledger)` section. Free-form discussion can append under `Comments`.
+A map/frontier and lead/follower handoff are optional tools for efforts that
+need them, not prerequisites for exploration.
 
-## When a skill says "fetch the relevant ticket"
+Validate the intended scope with:
 
-Read the file at the referenced path. The user will normally pass the path or the issue number directly.
+```sh
+python3 -B foundry/tools/tracker_lint.py --tracker-root .scratch \
+  --allowlist foundry/tools/tracker_lint_allowlist.txt
+```
 
-## Wayfinding operations
-
-Used by `/wayfinder`. The **map** is a file with one **child** file per ticket.
-
-- **Map**: `.scratch/<effort>/map.md` — the Notes / Decisions-so-far / Fog body.
-- **Child ticket**: `.scratch/<effort>/issues/NN-<slug>.md`, numbered from `01`, with the question in the body. A `Type:` line records the ticket type (`research`/`prototype`/`grilling`/`task`); a `Status:` line records `open`/`claimed`/`resolved`.
-- **Blocking**: a `Blocked by: NN, NN` line near the top. A ticket is unblocked when every file it lists is `resolved`.
-- **Frontier**: scan `.scratch/<effort>/issues/` for files that are open, unblocked, and unclaimed; first by number wins.
-- **Create**: set `Status: open` before the ticket is claimed.
-- **Claim**: set `Status: claimed` and save before any work.
-- **Resolve**: append the answer under an `## Answer` heading, set `Status: resolved`, then append a context pointer (gist + link) to the map's Decisions-so-far in `map.md`.
+Missing roots and accidental empty scans fail. `--allow-empty` applies only to
+an explicitly intended existing empty directory. Historical allowlists retain
+reasons and are checked for stale entries.

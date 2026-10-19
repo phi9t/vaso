@@ -1,0 +1,116 @@
+{
+  "build": {
+    "argv": [
+      "make",
+      "-j{jobs}"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "{src}/configure",
+      "--prefix={out}",
+      "--enable-shared",
+      "--enable-static",
+      "--disable-nls"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "deps": {},
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:ad4e41fe8ed8f23f9661afc838974fe13216d5da04e35a8727a5519b8881e53b",
+    "source_date_epoch": 1765899264
+  },
+  "gpu_archs": [],
+  "inputs": [],
+  "install": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nmake install\nfind \"{out}\" -name '*.la' -delete\npython3 - \"{out}/lib/pkgconfig/liblzma.pc\" <<'PY'\nfrom pathlib import Path\nimport sys\n\npath = Path(sys.argv[1])\nrewritten = []\nfor line in path.read_text(encoding='utf-8').splitlines(keepends=True):\n    newline = '\\n' if line.endswith('\\n') else ''\n    body = line[:-1] if newline else line\n    if body.startswith('exec_prefix='):\n        line = 'exec_prefix=$\\173prefix\\175' + newline\n    elif body.startswith('libdir='):\n        line = 'libdir=$\\173prefix\\175/lib' + newline\n    elif body.startswith('includedir='):\n        line = 'includedir=$\\173prefix\\175/include' + newline\n    rewritten.append(line)\npath.write_text(''.join(rewritten), encoding='utf-8')\nPY\nfind \"{out}/bin\" \"{out}/lib\" -type f -print0 | LC_ALL=C sort -z | while IFS= read -r -d '' f; do\n  description=\"$(file -b -- \"$f\")\"\n  case \"$description\" in\n    *ELF*)\n      case \"$f\" in\n        \"{out}/bin/\"*)\n          if [[ -n \"$(patchelf --print-rpath \"$f\" 2>/dev/null || true)\" ]]; then\n            patchelf --set-rpath '$ORIGIN/../lib' \"$f\"\n          fi\n          strip --strip-all \"$f\"\n          ;;\n        \"{out}/lib/\"*)\n          if [[ -n \"$(patchelf --print-rpath \"$f\" 2>/dev/null || true)\" ]]; then\n            patchelf --set-rpath '$ORIGIN' \"$f\"\n          fi\n          strip --strip-debug \"$f\"\n          ;;\n        *) strip --strip-debug \"$f\" ;;\n      esac\n      ;;\n    *ar\\ archive*) strip --strip-debug \"$f\" ;;\n  esac\ndone"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "line": "cu130",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-13-0"
+        ],
+        "expect_stdout": "13.0.96-1",
+        "name": "dpkg-cuda-cudart-13-0"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    }
+  ],
+  "package": {
+    "name": "xz",
+    "version": "5.8.3"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+      "strip_prefix": "xz-5.8.3",
+      "urls": [
+        "https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@13.0.3",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu130/rootfs.identity.json",
+      "sha256": "d200e4d02cb3fad05bbbc47596e5b4467d436276c4b9c84c8a7b4644e297e90b"
+    }
+  }
+}

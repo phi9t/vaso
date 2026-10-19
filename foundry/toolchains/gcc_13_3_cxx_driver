@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${VASO_IN_INSULA:-0}" != "1" ]]; then
+  echo "vaso rootfs C++ toolchain selected outside the insula" >&2
+  exit 125
+fi
+
+rootfs_manifest="${VASO_ROOTFS_BUNDLE_MANIFEST:-}"
+if [[ "$rootfs_manifest" != "/run/vaso/rootfs-bundle.json" || ! -r "$rootfs_manifest" ]]; then
+  echo "VASO_ROOTFS_BUNDLE_MANIFEST must point at /run/vaso/rootfs-bundle.json" >&2
+  exit 125
+fi
+
+prefix_map_flags=()
+if [[ -n "${PWD:-}" ]]; then
+  prefix_map_flags+=(
+    "-ffile-prefix-map=$PWD=."
+    "-fdebug-prefix-map=$PWD=."
+    "-fmacro-prefix-map=$PWD=."
+  )
+fi
+
+exec /usr/bin/g++ "${prefix_map_flags[@]}" "$@"

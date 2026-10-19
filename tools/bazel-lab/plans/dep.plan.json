@@ -1,0 +1,46 @@
+{
+  "build": {
+    "argv": [
+      "make",
+      "all"
+    ],
+    "env": {
+      "CFLAGS": "-O2"
+    }
+  },
+  "configure": {
+    "argv": [
+      "make",
+      "configure"
+    ],
+    "env": {
+      "LC_ALL": "C"
+    }
+  },
+  "determinism": {
+    "prefix_maps": [
+      "{work}=.",
+      "{out}=."
+    ],
+    "seed": "dep-plan-seed",
+    "source_date_epoch": "2026-10-06T00:00:00Z"
+  },
+  "install": {
+    "argv": [
+      "make",
+      "install"
+    ]
+  },
+  "name": "dep-prefix",
+  "schema": 1,
+  "source": {
+    "files": [
+      "pkg/dep.c"
+    ],
+    "patches": []
+  },
+  "toolchain": {
+    "cc": "toolchain:host_gcc",
+    "identity": "host-gcc-wrapper"
+  }
+}

@@ -1,0 +1,74 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("@vaso_graph//native/common:extension_action.bzl", "vaso_torch_extension")
+
+package(default_visibility = ["//visibility:public"])
+
+_TORCH_ARTIFACT_DATA = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "@vaso_torch_artifact_cu129//:prefix",
+        "@vaso_torch_artifact_cu129//:prefix_path.txt",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "@vaso_torch_artifact_cu130//:prefix",
+        "@vaso_torch_artifact_cu130//:prefix_path.txt",
+    ],
+})
+
+_TORCH_ARTIFACT_PREFIX_ARG = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu129//:prefix_path.txt)",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu130//:prefix_path.txt)",
+    ],
+})
+
+filegroup(
+    name = "consumer_gsplat_rasterizer_files",
+    srcs = [
+        "BUILD.bazel",
+        "PROVENANCE.md",
+        "run_wheel_test.sh",
+        "tests/generate_reference_image.py",
+        "tests/gsplat_rasterizer_test.py",
+        "tests/reference_image.pt",
+        "vaso_gsplat_rasterizer/__init__.py",
+        "vaso_gsplat_rasterizer/bindings.cpp",
+    ],
+)
+
+vaso_torch_extension(
+    name = "gsplat_rasterizer",
+    srcs = [
+        "vaso_gsplat_rasterizer/bindings.cpp",
+        "@gsplat_cuda//:cpp_srcs",
+    ],
+    cuda_srcs = ["@gsplat_cuda//:cuda_srcs"],
+    deps = ["@gsplat_cuda//:headers"],
+    extra_cuda_flags = [
+        "--expt-relaxed-constexpr",
+        "-diag-suppress=20012,20013,20015",
+    ],
+    package = "vaso-gsplat-rasterizer",
+    profile = "torch",
+    py_srcs = ["vaso_gsplat_rasterizer/__init__.py"],
+    version = "0.1.0",
+)
+
+sh_test(
+    name = "gsplat_rasterizer_cuda_test",
+    srcs = ["run_wheel_test.sh"],
+    args = [
+        "--device=cuda",
+        "--python=$(VASO_PYTHON_PREFIX)/bin/python3.13",
+    ] + _TORCH_ARTIFACT_PREFIX_ARG,
+    data = [
+        ":gsplat_rasterizer",
+        "tests/gsplat_rasterizer_test.py",
+        "tests/reference_image.pt",
+    ] + _TORCH_ARTIFACT_DATA,
+    tags = [
+        "insula-only",
+        "requires-gpu",
+    ],
+)

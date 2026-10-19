@@ -1,0 +1,4 @@
+module(
+    name = "rust_pyo3_cargo",
+    version = "0.24.2",
+)

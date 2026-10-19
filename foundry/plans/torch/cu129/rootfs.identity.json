@@ -1,0 +1,636 @@
+{
+  "apt": {
+    "packages": {
+      "adduser": "3.137ubuntu1",
+      "apt": "2.8.3",
+      "base-files": "13ubuntu10.2",
+      "base-passwd": "3.6.3build1",
+      "bash": "5.2.21-2ubuntu4",
+      "binutils": "2.42-4ubuntu2.5",
+      "binutils-common": "2.42-4ubuntu2.5",
+      "binutils-x86-64-linux-gnu": "2.42-4ubuntu2.5",
+      "bsdutils": "1:2.39.3-9ubuntu6.3",
+      "build-essential": "12.10ubuntu1",
+      "bzip2": "1.0.8-5.1ubuntu0.1",
+      "ca-certificates": "20260601~24.04.1",
+      "cmake": "3.28.3-1build7",
+      "cmake-data": "3.28.3-1build7",
+      "coreutils": "9.4-3ubuntu6",
+      "cpp": "4:13.2.0-7ubuntu1",
+      "cpp-13": "13.3.0-6ubuntu2~24.04.1",
+      "cpp-13-x86-64-linux-gnu": "13.3.0-6ubuntu2~24.04.1",
+      "cpp-x86-64-linux-gnu": "4:13.2.0-7ubuntu1",
+      "cuda-cccl-12-9": "12.9.27-1",
+      "cuda-command-line-tools-12-9": "12.9.1-1",
+      "cuda-compat-12-9": "575.57.08-0ubuntu1",
+      "cuda-compiler-12-9": "12.9.1-1",
+      "cuda-crt-12-9": "12.9.86-1",
+      "cuda-cudart-12-9": "12.9.79-1",
+      "cuda-cudart-dev-12-9": "12.9.79-1",
+      "cuda-cuobjdump-12-9": "12.9.82-1",
+      "cuda-cupti-12-9": "12.9.79-1",
+      "cuda-cupti-dev-12-9": "12.9.79-1",
+      "cuda-cuxxfilt-12-9": "12.9.82-1",
+      "cuda-driver-dev-12-9": "12.9.79-1",
+      "cuda-gdb-12-9": "12.9.79-1",
+      "cuda-libraries-12-9": "12.9.1-1",
+      "cuda-libraries-dev-12-9": "12.9.1-1",
+      "cuda-minimal-build-12-9": "12.9.1-1",
+      "cuda-nsight-compute-12-9": "12.9.1-1",
+      "cuda-nvcc-12-9": "12.9.86-1",
+      "cuda-nvdisasm-12-9": "12.9.88-1",
+      "cuda-nvml-dev-12-9": "12.9.79-1",
+      "cuda-nvprof-12-9": "12.9.79-1",
+      "cuda-nvprune-12-9": "12.9.82-1",
+      "cuda-nvrtc-12-9": "12.9.86-1",
+      "cuda-nvrtc-dev-12-9": "12.9.86-1",
+      "cuda-nvtx-12-9": "12.9.79-1",
+      "cuda-nvvm-12-9": "12.9.86-1",
+      "cuda-opencl-12-9": "12.9.19-1",
+      "cuda-profiler-api-12-9": "12.9.79-1",
+      "cuda-sandbox-dev-12-9": "12.9.19-1",
+      "cuda-sanitizer-12-9": "12.9.79-1",
+      "cuda-toolkit-12-9-config-common": "12.9.79-1",
+      "cuda-toolkit-12-config-common": "12.9.79-1",
+      "cuda-toolkit-config-common": "12.9.79-1",
+      "curl": "8.5.0-2ubuntu10.15",
+      "dash": "0.5.12-6ubuntu5",
+      "debconf": "1.5.86ubuntu1",
+      "debianutils": "5.17build1",
+      "diffutils": "1:3.10-1build1",
+      "dirmngr": "2.4.4-2ubuntu17.3",
+      "dpkg": "1.22.6ubuntu6.1",
+      "dpkg-dev": "1.22.6ubuntu6.1",
+      "e2fsprogs": "1.47.0-2.4~exp1ubuntu4.1",
+      "file": "1:5.45-3build1",
+      "findutils": "4.9.0-5build1",
+      "g++": "4:13.2.0-7ubuntu1",
+      "g++-13": "13.3.0-6ubuntu2~24.04.1",
+      "g++-13-x86-64-linux-gnu": "13.3.0-6ubuntu2~24.04.1",
+      "g++-x86-64-linux-gnu": "4:13.2.0-7ubuntu1",
+      "gcc": "4:13.2.0-7ubuntu1",
+      "gcc-13": "13.3.0-6ubuntu2~24.04.1",
+      "gcc-13-base": "13.3.0-6ubuntu2~24.04.1",
+      "gcc-13-x86-64-linux-gnu": "13.3.0-6ubuntu2~24.04.1",
+      "gcc-14-base": "14.2.0-4ubuntu2~24.04.1",
+      "gcc-x86-64-linux-gnu": "4:13.2.0-7ubuntu1",
+      "gfortran": "4:13.2.0-7ubuntu1",
+      "gfortran-13": "13.3.0-6ubuntu2~24.04.1",
+      "gfortran-13-x86-64-linux-gnu": "13.3.0-6ubuntu2~24.04.1",
+      "gfortran-x86-64-linux-gnu": "4:13.2.0-7ubuntu1",
+      "git": "1:2.43.0-1ubuntu7.3",
+      "git-man": "1:2.43.0-1ubuntu7.3",
+      "gnupg": "2.4.4-2ubuntu17.3",
+      "gnupg-utils": "2.4.4-2ubuntu17.3",
+      "gnupg2": "2.4.4-2ubuntu17.3",
+      "gpg": "2.4.4-2ubuntu17.3",
+      "gpg-agent": "2.4.4-2ubuntu17.3",
+      "gpgconf": "2.4.4-2ubuntu17.3",
+      "gpgsm": "2.4.4-2ubuntu17.3",
+      "gpgv": "2.4.4-2ubuntu17.3",
+      "grep": "3.11-4build1",
+      "gzip": "1.12-1ubuntu3.1",
+      "hostname": "3.23+nmu2ubuntu2",
+      "init-system-helpers": "1.66ubuntu1",
+      "keyboxd": "2.4.4-2ubuntu17.3",
+      "libacl1": "2.3.2-1build1.1",
+      "libapt-pkg6.0t64": "2.8.3",
+      "libarchive13t64": "3.7.2-2ubuntu0.8",
+      "libasan8": "14.2.0-4ubuntu2~24.04.1",
+      "libassuan0": "2.5.6-1build1",
+      "libatomic1": "14.2.0-4ubuntu2~24.04.1",
+      "libattr1": "1:2.5.2-1build1.1",
+      "libaudit-common": "1:3.1.2-2.1build1.1",
+      "libaudit1": "1:3.1.2-2.1build1.1",
+      "libbinutils": "2.42-4ubuntu2.5",
+      "libblkid1": "2.39.3-9ubuntu6.3",
+      "libbrotli1": "1.1.0-2build2",
+      "libbz2-1.0": "1.0.8-5.1ubuntu0.1",
+      "libc-bin": "2.39-0ubuntu8.5",
+      "libc-dev-bin": "2.39-0ubuntu8.5",
+      "libc6": "2.39-0ubuntu8.5",
+      "libc6-dev": "2.39-0ubuntu8.5",
+      "libcap-ng0": "0.8.4-2build2",
+      "libcap2": "1:2.66-5ubuntu2.2",
+      "libcc1-0": "14.2.0-4ubuntu2~24.04.1",
+      "libcom-err2": "1.47.0-2.4~exp1ubuntu4.1",
+      "libcrypt-dev": "1:4.4.36-4build1",
+      "libcrypt1": "1:4.4.36-4build1",
+      "libctf-nobfd0": "2.42-4ubuntu2.5",
+      "libctf0": "2.42-4ubuntu2.5",
+      "libcublas-12-9": "12.9.1.4-1",
+      "libcublas-dev-12-9": "12.9.1.4-1",
+      "libcufft-12-9": "11.4.1.4-1",
+      "libcufft-dev-12-9": "11.4.1.4-1",
+      "libcufile-12-9": "1.14.1.1-1",
+      "libcufile-dev-12-9": "1.14.1.1-1",
+      "libcurand-12-9": "10.3.10.19-1",
+      "libcurand-dev-12-9": "10.3.10.19-1",
+      "libcurl3t64-gnutls": "8.5.0-2ubuntu10.15",
+      "libcurl4t64": "8.5.0-2ubuntu10.15",
+      "libcusolver-12-9": "11.7.5.82-1",
+      "libcusolver-dev-12-9": "11.7.5.82-1",
+      "libcusparse-12-9": "12.5.10.65-1",
+      "libcusparse-dev-12-9": "12.5.10.65-1",
+      "libdb5.3t64": "5.3.28+dfsg2-7",
+      "libdebconfclient0": "0.271ubuntu3",
+      "libdpkg-perl": "1.22.6ubuntu6.1",
+      "liberror-perl": "0.17029-2",
+      "libexpat1": "2.6.1-2ubuntu0.6",
+      "libext2fs2t64": "1.47.0-2.4~exp1ubuntu4.1",
+      "libffi8": "3.4.6-1build1",
+      "libgcc-13-dev": "13.3.0-6ubuntu2~24.04.1",
+      "libgcc-s1": "14.2.0-4ubuntu2~24.04.1",
+      "libgcrypt20": "1.10.3-2build1",
+      "libgdbm-compat4t64": "1.23-5.1build1",
+      "libgdbm6t64": "1.23-5.1build1",
+      "libgfortran-13-dev": "13.3.0-6ubuntu2~24.04.1",
+      "libgfortran5": "14.2.0-4ubuntu2~24.04.1",
+      "libgmp10": "2:6.3.0+dfsg-2ubuntu6.1",
+      "libgnutls30t64": "3.8.3-1.1ubuntu3.4",
+      "libgomp1": "14.2.0-4ubuntu2~24.04.1",
+      "libgpg-error0": "1.47-3build2.1",
+      "libgprofng0": "2.42-4ubuntu2.5",
+      "libgssapi-krb5-2": "1.20.1-6ubuntu2.10",
+      "libhogweed6t64": "3.9.1-2.2build1.1",
+      "libhwasan0": "14.2.0-4ubuntu2~24.04.1",
+      "libicu74": "74.2-1ubuntu3.1",
+      "libidn2-0": "2.3.7-2build1.1",
+      "libisl23": "0.26-3build1.1",
+      "libitm1": "14.2.0-4ubuntu2~24.04.1",
+      "libjansson4": "2.14-2build2",
+      "libjsoncpp25": "1.9.5-6build1",
+      "libk5crypto3": "1.20.1-6ubuntu2.10",
+      "libkeyutils1": "1.6.3-3build1",
+      "libkrb5-3": "1.20.1-6ubuntu2.10",
+      "libkrb5support0": "1.20.1-6ubuntu2.10",
+      "libksba8": "1.6.6-1build1",
+      "libldap2": "2.6.7+dfsg-1~exp1ubuntu8.2",
+      "liblsan0": "14.2.0-4ubuntu2~24.04.1",
+      "liblz4-1": "1.9.4-1build1.1",
+      "liblzma5": "5.6.1+really5.4.5-1ubuntu0.3",
+      "libmagic-mgc": "1:5.45-3build1",
+      "libmagic1t64": "1:5.45-3build1",
+      "libmd0": "1.1.0-2build1.1",
+      "libmount1": "2.39.3-9ubuntu6.3",
+      "libmpc3": "1.3.1-1build1.1",
+      "libmpfr6": "4.2.1-1build1.1",
+      "libncursesw6": "6.4+20240113-1ubuntu2",
+      "libnettle8t64": "3.9.1-2.2build1.1",
+      "libnghttp2-14": "1.59.0-1ubuntu0.4",
+      "libnpp-12-9": "12.4.1.87-1",
+      "libnpp-dev-12-9": "12.4.1.87-1",
+      "libnpth0t64": "1.6-3.1build1",
+      "libnvfatbin-12-9": "12.9.82-1",
+      "libnvfatbin-dev-12-9": "12.9.82-1",
+      "libnvjitlink-12-9": "12.9.86-1",
+      "libnvjitlink-dev-12-9": "12.9.86-1",
+      "libnvjpeg-12-9": "12.4.0.76-1",
+      "libnvjpeg-dev-12-9": "12.4.0.76-1",
+      "libp11-kit0": "0.25.3-4ubuntu2.1",
+      "libpam-modules": "1.5.3-5ubuntu5.4",
+      "libpam-modules-bin": "1.5.3-5ubuntu5.4",
+      "libpam-runtime": "1.5.3-5ubuntu5.4",
+      "libpam0g": "1.5.3-5ubuntu5.4",
+      "libpcre2-8-0": "10.42-4ubuntu2.1",
+      "libperl5.38t64": "5.38.2-3.2ubuntu0.1",
+      "libpkgconf3": "1.8.1-2build1",
+      "libproc2-0": "2:4.0.4-4ubuntu3.2",
+      "libpsl5t64": "0.21.2-1.1build1",
+      "libpython3-stdlib": "3.12.3-0ubuntu2.1",
+      "libpython3.12-minimal": "3.12.3-1ubuntu0.17",
+      "libpython3.12-stdlib": "3.12.3-1ubuntu0.17",
+      "libquadmath0": "14.2.0-4ubuntu2~24.04.1",
+      "libreadline8t64": "8.2-4build1",
+      "librhash0": "1.4.3-3build1",
+      "librtmp1": "2.4+20151223.gitfa8646d.1-2build7",
+      "libsasl2-2": "2.1.28+dfsg1-5ubuntu3.1",
+      "libsasl2-modules-db": "2.1.28+dfsg1-5ubuntu3.1",
+      "libseccomp2": "2.5.5-1ubuntu3.1",
+      "libselinux1": "3.5-2ubuntu2.1",
+      "libsemanage-common": "3.5-1build5",
+      "libsemanage2": "3.5-1build5",
+      "libsepol2": "3.5-2build1",
+      "libsframe1": "2.42-4ubuntu2.5",
+      "libsmartcols1": "2.39.3-9ubuntu6.3",
+      "libsqlite3-0": "3.45.1-1ubuntu2.3",
+      "libss2": "1.47.0-2.4~exp1ubuntu4.1",
+      "libssh-4": "0.10.6-2ubuntu0.5",
+      "libssl3t64": "3.0.13-0ubuntu3.5",
+      "libstdc++-13-dev": "13.3.0-6ubuntu2~24.04.1",
+      "libstdc++6": "14.2.0-4ubuntu2~24.04.1",
+      "libsystemd0": "255.4-1ubuntu8.8",
+      "libtasn1-6": "4.19.0-3ubuntu0.24.04.1",
+      "libtinfo6": "6.4+20240113-1ubuntu2",
+      "libtsan2": "14.2.0-4ubuntu2~24.04.1",
+      "libubsan1": "14.2.0-4ubuntu2~24.04.1",
+      "libudev1": "255.4-1ubuntu8.8",
+      "libunistring5": "1.1-2build1.1",
+      "libuuid1": "2.39.3-9ubuntu6.3",
+      "libuv1t64": "1.48.0-1.1build1",
+      "libxml2": "2.9.14+dfsg-1.3ubuntu3.9",
+      "libxxhash0": "0.8.2-2build1",
+      "libzstd1": "1.5.5+dfsg2-2build1.1",
+      "linux-libc-dev": "6.8.0-64.67",
+      "login": "1:4.13+dfsg1-4ubuntu3.2",
+      "logsave": "1.47.0-2.4~exp1ubuntu4.1",
+      "lto-disabled-list": "47",
+      "make": "4.3-4.1build2",
+      "mawk": "1.3.4.20240123-1build1",
+      "media-types": "10.1.0",
+      "mount": "2.39.3-9ubuntu6.3",
+      "ncurses-base": "6.4+20240113-1ubuntu2",
+      "ncurses-bin": "6.4+20240113-1ubuntu2",
+      "netbase": "6.4",
+      "ninja-build": "1.11.1-2",
+      "nsight-compute-2025.2.1": "2025.2.1.3-1",
+      "openssl": "3.0.13-0ubuntu3.5",
+      "passwd": "1:4.13+dfsg1-4ubuntu3.2",
+      "patch": "2.7.6-7build3",
+      "patchelf": "0.18.0-1.1build1",
+      "perl": "5.38.2-3.2ubuntu0.1",
+      "perl-base": "5.38.2-3.2ubuntu0.1",
+      "perl-modules-5.38": "5.38.2-3.2ubuntu0.1",
+      "pinentry-curses": "1.2.1-3ubuntu5",
+      "pkg-config": "1.8.1-2build1",
+      "pkgconf": "1.8.1-2build1",
+      "pkgconf-bin": "1.8.1-2build1",
+      "procps": "2:4.0.4-4ubuntu3.2",
+      "python3": "3.12.3-0ubuntu2.1",
+      "python3-minimal": "3.12.3-0ubuntu2.1",
+      "python3-pip-whl": "24.0+dfsg-1ubuntu1.3",
+      "python3-setuptools-whl": "68.1.2-2ubuntu1.2",
+      "python3-venv": "3.12.3-0ubuntu2.1",
+      "python3.12": "3.12.3-1ubuntu0.17",
+      "python3.12-minimal": "3.12.3-1ubuntu0.17",
+      "python3.12-venv": "3.12.3-1ubuntu0.17",
+      "readline-common": "8.2-4build1",
+      "rpcsvc-proto": "1.4.2-0ubuntu7",
+      "sed": "4.9-2build1",
+      "sensible-utils": "0.0.22",
+      "sysvinit-utils": "3.08-6ubuntu3",
+      "tar": "1.35+dfsg-3build1",
+      "tzdata": "2026c-0ubuntu0.24.04.1",
+      "ubuntu-keyring": "2023.11.28.1",
+      "unminimize": "0.2.1",
+      "unzip": "6.0-28ubuntu4.1",
+      "util-linux": "2.39.3-9ubuntu6.3",
+      "xz-utils": "5.6.1+really5.4.5-1ubuntu0.3",
+      "zip": "3.0-13ubuntu0.2",
+      "zlib1g": "1:1.3.dfsg-3.1ubuntu2.1"
+    },
+    "snapshot": "20261001T000000Z",
+    "unresolved": false
+  },
+  "base_image": {
+    "digest": "sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+    "image_id": "sha256:eecafe98c3e152dda62a8a2370b9776a3dc83d6043d7341dabeb6dc4a031d8ea",
+    "reference": "nvidia/cuda:12.9.1-devel-ubuntu24.04@sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+    "repository": "nvidia/cuda",
+    "sha256": "020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+    "tag": "12.9.1-devel-ubuntu24.04",
+    "ubuntu_version": "24.04"
+  },
+  "components": {
+    "cuda_toolkit": {
+      "install_layout": {
+        "bin": "/usr/local/cuda/bin",
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "nvidia-cuda-devel-base-image"
+      },
+      "source": {
+        "digest": "sha256:020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+        "kind": "docker_base",
+        "sha256": "020bc241a628776338f4d4053fed4c38f6f7f3d7eb5919fecb8de313bb8ba47c",
+        "tag": "12.9.1-devel-ubuntu24.04"
+      },
+      "verify": {
+        "expect": {
+          "components": {
+            "cuda_cccl": "12.9.27",
+            "cuda_cudart": "12.9.79",
+            "cuda_cuobjdump": "12.9.82",
+            "cuda_cupti": "12.9.79",
+            "cuda_cuxxfilt": "12.9.82",
+            "cuda_nvcc": "12.9.86",
+            "cuda_nvdisasm": "12.9.88",
+            "cuda_nvml_dev": "12.9.79",
+            "cuda_nvrtc": "12.9.86",
+            "cuda_nvtx": "12.9.79",
+            "cuda_profiler_api": "12.9.79",
+            "cuda_sanitizer_api": "12.9.79",
+            "libcublas": "12.9.1.4",
+            "libcufft": "11.4.1.4",
+            "libcufile": "1.14.1.1",
+            "libcurand": "10.3.10.19",
+            "libcusolver": "11.7.5.82",
+            "libcusparse": "12.5.10.65",
+            "libnvfatbin": "12.9.82",
+            "libnvjitlink": "12.9.86"
+          },
+          "cuda_api": "12.9",
+          "nvcc": "12.9.86",
+          "version": "12.9.1"
+        },
+        "how": "headers, sonames and nvcc --version"
+      },
+      "version": "12.9.1"
+    },
+    "cudnn": {
+      "install_layout": {
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "torch-ci-layout"
+      },
+      "source": {
+        "kind": "redist",
+        "manifest": "https://developer.download.nvidia.com/compute/cudnn/redist/redistrib_9.24.0.json",
+        "sha256": "7dea7fc8436fdd65cb22cd6634e5a2834e4a8508217abea5286c15affa9a80a0",
+        "url": "https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-9.24.0.43_cuda12-archive.tar.xz"
+      },
+      "verify": {
+        "expect": {
+          "runtime_version": 92400,
+          "version": "9.24.0.43"
+        },
+        "how": "header CUDNN_* macros and cudnnGetVersion"
+      },
+      "version": "9.24.0.43"
+    },
+    "cudss": {
+      "install_layout": {
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "torch-ci-layout"
+      },
+      "source": {
+        "kind": "redist",
+        "manifest": "https://developer.download.nvidia.com/compute/cudss/redist/redistrib_0.7.1.json",
+        "sha256": "946571d9ea164f948e402dd97a14541cb90fbec800336cfa7ae644af5937632f",
+        "url": "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.7.1.4_cuda12-archive.tar.xz"
+      },
+      "verify": {
+        "expect": {
+          "runtime_version": 701,
+          "version": "0.7.1.4"
+        },
+        "how": "header CUDSS_VERSION and cudssGetVersion"
+      },
+      "version": "0.7.1.4"
+    },
+    "cusparselt": {
+      "install_layout": {
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "torch-ci-layout"
+      },
+      "source": {
+        "kind": "redist",
+        "manifest": "https://developer.download.nvidia.com/compute/cusparselt/redist/redistrib_0.8.1.json",
+        "sha256": "b34272e683e9f798435af05dc124657d1444cd0e13802c3d2f3152e31cd898a3",
+        "url": "https://developer.download.nvidia.com/compute/cusparselt/redist/libcusparse_lt/linux-x86_64/libcusparse_lt-linux-x86_64-0.8.1.1_cuda12-archive.tar.xz"
+      },
+      "verify": {
+        "expect": {
+          "runtime_version": 801,
+          "version": "0.8.1.1"
+        },
+        "how": "header CUSPARSELT_VERSION and cusparseLtGetVersion"
+      },
+      "version": "0.8.1.1"
+    },
+    "nccl": {
+      "install_layout": {
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "torch-ci-layout"
+      },
+      "source": {
+        "build": "make -j src.build against this line's nvcc (as torch CI)",
+        "commit": "73cf112295c33aee2b895f329f592f2a9b4b0f97",
+        "kind": "git",
+        "tag": "v2.30.7-1",
+        "url": "https://github.com/NVIDIA/nccl.git"
+      },
+      "verify": {
+        "expect": {
+          "runtime_version": 23007,
+          "version": "2.30.7"
+        },
+        "how": "header NCCL_* macros and ncclGetVersion"
+      },
+      "version": "2.30.7"
+    },
+    "nvshmem": {
+      "install_layout": {
+        "include": "/usr/local/cuda/include",
+        "lib": "/usr/local/cuda/lib64",
+        "prefix": "/usr/local/cuda",
+        "style": "torch-ci-layout"
+      },
+      "source": {
+        "kind": "redist",
+        "manifest": "https://developer.download.nvidia.com/compute/nvshmem/redist/redistrib_3.4.5.json",
+        "sha256": "058cbaddc4ff8646b8d1bd9322e93c90eae54c86e1ac8922f20d8a55a7fa8b7e",
+        "url": "https://developer.download.nvidia.com/compute/nvshmem/redist/libnvshmem/linux-x86_64/libnvshmem-linux-x86_64-3.4.5_cuda12-archive.tar.xz"
+      },
+      "verify": {
+        "expect": {
+          "version": "3.4.5"
+        },
+        "how": "header NVSHMEM_MAJOR/MINOR/PATCH and nvshmemx_vendor_get_version_info"
+      },
+      "version": "3.4.5"
+    },
+    "tensorrt": {
+      "install_layout": {
+        "include": "/usr/include/x86_64-linux-gnu",
+        "lib": "/usr/lib/x86_64-linux-gnu",
+        "packages_held": true,
+        "style": "ubuntu2404-nvidia-apt"
+      },
+      "source": {
+        "kind": "apt",
+        "package": "tensorrt=11.1.0.106-1+cuda12.9",
+        "packages": [
+          {
+            "package": "tensorrt=11.1.0.106-1+cuda12.9",
+            "sha256": "8eac0f661014480ca93db0b6163ef9e3bca7de5ec8fab7d7c24f8c987f6c047f",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer11=11.1.0.106-1+cuda12.9",
+            "sha256": "e1a0d4e11d8b3c7b72e44b1b3cd1ab943aab41f43b11f667ad5afda91cf1b6ca",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-plugin11=11.1.0.106-1+cuda12.9",
+            "sha256": "9a98bc3d6f5270dfc1bccf4a1f7d038e2a19e98141022d9b7d4682c431a2d16b",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-vc-plugin11=11.1.0.106-1+cuda12.9",
+            "sha256": "37d93d45de46f91d537a87d56d1d10f7dd9fdc35521b9c687a144f0f5607fb8a",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-lean11=11.1.0.106-1+cuda12.9",
+            "sha256": "a77e462a3de15c8587f03a338762c0d1e31989a2b334de0ac4a1040078e07ee5",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-dispatch11=11.1.0.106-1+cuda12.9",
+            "sha256": "3c034a3ab5b757e0a8e949712914c7f84a61f8f92adeb24d9191ffd0402e5d88",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvonnxparsers11=11.1.0.106-1+cuda12.9",
+            "sha256": "9ca4754f3565b61c08d48ec52f96417888670d0bafbb103ce7d59ed74f1f9a35",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-bin=11.1.0.106-1+cuda12.9",
+            "sha256": "1d6ab43edece55c481668cd172cfc3f2160f34ad2f3c4f0d263fe332ed0b16ab",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-bin_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "e06b53607462711dbf54e95c8d893c959160b7d61ba565fbbac00ca4bd42bb53",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-lean-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "29adef0dcec1ad4f3f98cd2e3a70ffb32c7e3ea57c7aaa857c068b157186c65e",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-lean-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-plugin-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "53a25417926f06c3c8a4480e4e0d0e7b45f19f9ffe44784cb2b8ebf96a6fc866",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-vc-plugin-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "06f13074bf01e4b3e20a87d050c0788120d76a3f85009781cef4c4d1f85984ee",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-vc-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-dispatch-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "d2b25c81a9782d0acd7e6e29460c1f690757bb7c5f510ae576163524c0a55c89",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-dispatch-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvonnxparsers-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "45d9201698b4494c604ecbff0088deccd023f6da0afdd5f058482e9c6ef3d8af",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvonnxparsers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-win-builder-resource11=11.1.0.106-1+cuda12.9",
+            "sha256": "79fad3391eb7bbc351c2568f73a1fa4a586a570e8f0e003b08fd554d0fd7388e",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-win-builder-resource11_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "python3-libnvinfer-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "5105aa9ac328ba9c6abfbfee600ee2192a594de3f387d6a3e49ed564fa3ba659",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-headers-python-plugin-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "00a9fe47fe6053cae6636816e874fd28d342b6fc9e989ce8b4c3b0d155fb830d",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-python-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-headers-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "41aaa8c90590ae23374221e7feac8e2ee6666c09a2d0bce9fd7463fa0adef297",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-safe-headers-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "95deddc41006a440bf5598f3da5f8c135f9ba063efd17aba08b66443fc37efa7",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-safe-headers-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "libnvinfer-headers-plugin-dev=11.1.0.106-1+cuda12.9",
+            "sha256": "1a859ec454cb33cf09ff89fb1ab743d3ff8d6973ece0023e3fa131cc84a5eefc",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/libnvinfer-headers-plugin-dev_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "python3-libnvinfer=11.1.0.106-1+cuda12.9",
+            "sha256": "40d332aacfa6f3f61c5d927741a0d0545e12a05a3ca55a9ed2bf3e85bc12b9f2",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "python3-libnvinfer-lean=11.1.0.106-1+cuda12.9",
+            "sha256": "532341714a90eff2c81b6bdc3cdbab1f8249adbb8df2c8616d5647752b91b36a",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-lean_11.1.0.106-1+cuda12.9_amd64.deb"
+          },
+          {
+            "package": "python3-libnvinfer-dispatch=11.1.0.106-1+cuda12.9",
+            "sha256": "3551e049d54b48c5fc8a97b15b1ebd5cbb6f789fe226f455d95cd128e0825ff1",
+            "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/python3-libnvinfer-dispatch_11.1.0.106-1+cuda12.9_amd64.deb"
+          }
+        ],
+        "repo": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/",
+        "sha256": "8eac0f661014480ca93db0b6163ef9e3bca7de5ec8fab7d7c24f8c987f6c047f",
+        "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/tensorrt_11.1.0.106-1+cuda12.9_amd64.deb"
+      },
+      "verify": {
+        "expect": {
+          "runtime_version": [
+            11,
+            1,
+            0
+          ],
+          "version": "11.1.0.106"
+        },
+        "how": "dpkg package versions, NvInferVersion.h macros and getInferLibVersion"
+      },
+      "version": "11.1.0.106"
+    }
+  },
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-12-9"
+        ],
+        "expect_stdout": "12.9.79-1",
+        "name": "dpkg-cuda-cudart-12-9"
+      }
+    ]
+  },
+  "runtime_driver": {
+    "bind_libs": [
+      "/run/nvidia-driver/lib/libcuda.so.1",
+      "/run/nvidia-driver/lib/libnvidia-ml.so.1"
+    ],
+    "minimum_version": "575.57.08",
+    "rootfs_policy": "absent outside /usr/local/cuda/lib64/stubs"
+  }
+}

@@ -1,0 +1,19 @@
+load(":host_c_toolchain.bzl", "host_c_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(name = "c_toolchain_type")
+
+exports_files(["gcc_driver.sh"])
+
+host_c_toolchain(
+    name = "host_c_tools",
+    cc = "gcc",
+    driver = ":gcc_driver.sh",
+)
+
+toolchain(
+    name = "host_gcc_toolchain",
+    toolchain = ":host_c_tools",
+    toolchain_type = ":c_toolchain_type",
+)

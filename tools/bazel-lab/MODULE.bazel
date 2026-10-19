@@ -1,0 +1,20 @@
+module(name = "bazel_lab", version = "0.0.0")
+
+register_toolchains("//toolchains:host_gcc_toolchain")
+
+local_path_override(module_name = "apple_support", path = "module_overrides/apple_support")
+local_path_override(module_name = "buildozer", path = "module_overrides/buildozer")
+local_path_override(module_name = "platforms", path = "module_overrides/platforms")
+local_path_override(module_name = "protobuf", path = "module_overrides/protobuf")
+local_path_override(module_name = "rules_cc", path = "module_overrides/rules_cc")
+local_path_override(module_name = "rules_java", path = "module_overrides/rules_java")
+local_path_override(module_name = "rules_license", path = "module_overrides/rules_license")
+local_path_override(module_name = "rules_python", path = "module_overrides/rules_python")
+local_path_override(module_name = "rules_shell", path = "module_overrides/rules_shell")
+local_path_override(module_name = "zlib", path = "module_overrides/zlib")
+
+lab_generated_repo = use_repo_rule("//repo_rules:generated_repo.bzl", "lab_generated_repo")
+lab_generated_repo(name = "generated_dep")
+
+lab_content_repo = use_repo_rule("//repo_rules:generated_repo.bzl", "lab_content_repo")
+lab_content_repo(name = "generated_content_dep")

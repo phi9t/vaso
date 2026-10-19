@@ -1,0 +1,65 @@
+{
+  "entries": [
+    {
+      "path": "foundry/native/common/plan_executor.py",
+      "pattern": "dot-estate-literal",
+      "reason": "detects forbidden estate paths inside committed native plans",
+      "text": "tokens.update({\"/vaso/lines/\", \"/.vaso-estate\", \"bazel-out/\"})"
+    },
+    {
+      "path": "foundry/native/common/prefix_manifest.bzl",
+      "pattern": "dot-estate-literal",
+      "reason": "sanitizes prefix manifests by rejecting host estate path tokens",
+      "text": "\".vaso-estate\","
+    },
+    {
+      "path": "foundry/native/common/repair_wheel.py",
+      "pattern": "dot-estate-literal",
+      "reason": "redacts host estate paths from repaired wheel metadata",
+      "text": "b\".vaso-estate\","
+    },
+    {
+      "path": "foundry/native/common/repair_wheel_test.py",
+      "pattern": "dot-estate-literal",
+      "reason": "asserts repaired wheels no longer contain host estate paths",
+      "text": "self.assertNotIn(b\".vaso-estate\", data)"
+    },
+    {
+      "path": "foundry/tools/relocatability_guard.py",
+      "pattern": "dot-estate-literal",
+      "reason": "guards release artifacts against embedded host estate paths",
+      "text": "b\".vaso-estate\","
+    },
+    {
+      "path": "tools/agents/traecli_worker_test.py",
+      "pattern": "home-estate-default",
+      "reason": "asserts the worker command guard flags unsafe legacy Bazel paths in observed command logs",
+      "text": "assert flagged('\"$HOME/.vaso-estate/opt-vaso/bin/bazel-real\" --batch build //:x')"
+    },
+    {
+      "path": "tools/agents/trace_digest.py",
+      "pattern": "dot-estate-literal",
+      "reason": "classifies trace paths under agent estate storage",
+      "text": "if \"agents\" in path.parts or \".vaso-estate\" in str(path):"
+    },
+    {
+      "path": "foundry/examples/consumers/rust_pyo3/package_wheel.py",
+      "pattern": "dot-estate-literal",
+      "reason": "leak scan: rejects wheels that embed estate paths",
+      "text": "b\".vaso-estate\","
+    },
+    {
+      "path": "foundry/examples/consumers/rust_pyo3/rust_pyo3_verifier.py",
+      "pattern": "dot-estate-literal",
+      "reason": "leak scan: rejects wheels that embed estate paths",
+      "text": "for marker in (b\"<data-volume>/\", b\"/workspace/\", b\"/vaso-bazel-ob/\", b\"output-base\", b\".vaso-estate\"):"
+    },
+    {
+      "path": "foundry/tools/leak_sweep_test.py",
+      "pattern": "dot-estate-literal",
+      "reason": "leak sweep fixture asserts the forbidden estate token is reported",
+      "text": "self.assertIn((\"a.txt\", \"/.vaso-estate\"), hit_pairs)"
+    }
+  ],
+  "schema_version": 1
+}

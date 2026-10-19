@@ -1,37 +1,16 @@
-# Worker Brief: <effort> / <tickets>
+# Worker brief: <effort>
 
-You are a headless traecli worker. Nobody will answer questions mid-run. When
-you're blocked, write the question under the ticket's `## Comments`, commit
-it, and stop.
+Use this template for an explicitly requested bounded worker run.
 
-## Context
+- Outcome and acceptance: <observable result>
+- Owned worktree/branch and paths: <scope; one writer>
+- Relevant references: <product contracts and effort spec>
+- Inputs: <pinned input locations and identities>
+- Authority: <allowed edits, commands, commits, integration; do not infer more>
+- State: <owned TMPDIR, estate, output base, resource limits>
+- Verification: <commands and required observations>
+- Stop condition: <completion or missing decision/input>
+- Handoff: <commit/files, observed results, evidence paths, unresolved items>
 
-- Repo and worktree: `<worktree>` on branch `<worker-branch>`. It is yours
-  alone. Don't touch other worktrees or the primary checkout.
-- Read first: `CONSTITUTION.md`, `docs/agents/agentic-engineering.md`,
-  `<effort spec>`, and the tickets below.
-- Inputs (pinned, read-only): `$VASO_AGENT_IO_ROOT/inputs/…`
-
-## Tickets (in order)
-
-1. `<ticket path>`: <one-line goal>. Verifier: `<command>`.
-
-## Rules
-
-- Commit explicit paths (`git add <paths>`), one commit per ticket slice,
-  imperative subject. Never `git add -A`, `--amend`, `rebase`, `reset --hard`,
-  `push` or `merge`.
-- Disk I/O: `TMPDIR` and `$VASO_BAZEL_OB` are already pinned. Every Bazel
-  command uses `--output_base="$VASO_BAZEL_OB"`. Never write under `/tmp` or
-  `/var/tmp`. There is no network: use the pinned inputs.
-- Tests before behavior changes (a red test first), and keep existing guards
-  green. Record evidence (commands, trimmed output, `date -u` timestamps) under
-  each ticket's `## Comments`.
-- Don't mark a ticket resolved: set `Status: ready-for-review`. The lead
-  resolves it.
-
-## Stop condition
-
-Stop when every ticket above is committed and ready for review, or when you're
-blocked. Your last message lists each commit (sha and subject), the verifier
-results, and open questions.
+Preserve existing work and fixed live-build inputs. Report failed prerequisites
+accurately. Record coordinated issue status/evidence through the tracker ledger.

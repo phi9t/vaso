@@ -1,0 +1,1538 @@
+{
+  "archive_count": 155,
+  "archives": [
+    {
+      "filename": "76de13802d1c1b286b21694734d87f1683767b8f.zip",
+      "name": "XNNPACK",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "894fecbdc472f194f3d69652b4bae3a8636e9ea6cbd16515b16d33d24d9aa480",
+      "strip_prefix": "XNNPACK-76de13802d1c1b286b21694734d87f1683767b8f",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/XNNPACK/archive/76de13802d1c1b286b21694734d87f1683767b8f.zip",
+        "https://github.com/google/XNNPACK/archive/76de13802d1c1b286b21694734d87f1683767b8f.zip"
+      ]
+    },
+    {
+      "filename": "bazel_features-v1.25.0.tar.gz",
+      "name": "bazel_features",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4fd9922d464686820ffd8fcefa28ccffa147f7cdc6b6ac0d8b07fde565c65d66",
+      "strip_prefix": "bazel_features-1.25.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazel-contrib/bazel_features/releases/download/v1.25.0/bazel_features-v1.25.0.tar.gz",
+        "https://github.com/bazel-contrib/bazel_features/releases/download/v1.25.0/bazel_features-v1.25.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "bazel-gazelle-v0.37.0.tar.gz",
+      "name": "bazel_gazelle",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "d76bf7a60fd8b050444090dfa2837a4eaf9829e1165618ee35dceca5cbdf58d5",
+      "urls": [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "bazel-skylib-1.7.1.tar.gz",
+      "name": "bazel_skylib",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "bc283cdfcd526a52c3201279cda4bc298652efa898b10b4db0837dc51652756f",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "8c717f8258cd5f6c7a45b97d974292755852b658.tar.gz",
+      "name": "bazel_toolchains",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "294cdd859e57fcaf101d4301978c408c88683fbc46fbc1a3829da92afbea55fb",
+      "strip_prefix": "bazel-toolchains-8c717f8258cd5f6c7a45b97d974292755852b658",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/bazel-toolchains/archive/8c717f8258cd5f6c7a45b97d974292755852b658.tar.gz",
+        "https://github.com/bazelbuild/bazel-toolchains/archive/8c717f8258cd5f6c7a45b97d974292755852b658.tar.gz"
+      ]
+    },
+    {
+      "filename": "c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
+      "name": "boringssl",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "9dc53f851107eaf87b391136d13b815df97ec8f76dadb487b58b2fc45e624d2c",
+      "strip_prefix": "boringssl-c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
+        "https://github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz"
+      ]
+    },
+    {
+      "filename": "apple_support.1.24.5.tar.gz",
+      "name": "build_bazel_apple_support",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "1ae6fcf983cff3edab717636f91ad0efff2e5ba75607fdddddfd6ad0dbdfaf10",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/apple_support/releases/download/1.24.5/apple_support.1.24.5.tar.gz",
+        "https://github.com/bazelbuild/apple_support/releases/download/1.24.5/apple_support.1.24.5.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_apple.3.5.1.tar.gz",
+      "name": "build_bazel_rules_apple",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "b4df908ec14868369021182ab191dbd1f40830c9b300650d5dc389e0b9266c8d",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_apple/releases/download/3.5.1/rules_apple.3.5.1.tar.gz",
+        "https://github.com/bazelbuild/rules_apple/releases/download/3.5.1/rules_apple.3.5.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_swift.1.18.0.tar.gz",
+      "name": "build_bazel_rules_swift",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "bb01097c7c7a1407f8ad49a1a0b1960655cf823c26ad2782d0b7d15b323838e2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_swift/releases/download/1.18.0/rules_swift.1.18.0.tar.gz",
+        "https://github.com/bazelbuild/rules_swift/releases/download/1.18.0/rules_swift.1.18.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.2.1.zip",
+      "name": "com_envoyproxy_protoc_gen_validate",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "ab51e978326b87e06be7a12fc6496f3ff6586339043557dbbd31f622332a5d45",
+      "strip_prefix": "protoc-gen-validate-1.2.1",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/bufbuild/protoc-gen-validate/archive/refs/tags/v1.2.1.zip",
+        "https://github.com/bufbuild/protoc-gen-validate/archive/refs/tags/v1.2.1.zip"
+      ]
+    },
+    {
+      "filename": "3a472e524827f72d1ad621c4983dd5af54c46776.tar.gz",
+      "name": "com_github_cncf_xds",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "dc305e20c9fa80822322271b50aa2ffa917bf4fd3973bcec52bfc28dc32c5927",
+      "strip_prefix": "xds-3a472e524827f72d1ad621c4983dd5af54c46776",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/cncf/xds/archive/3a472e524827f72d1ad621c4983dd5af54c46776.tar.gz",
+        "https://github.com/cncf/xds/archive/3a472e524827f72d1ad621c4983dd5af54c46776.tar.gz"
+      ]
+    },
+    {
+      "filename": "v23.5.26.tar.gz",
+      "name": "com_github_google_flatbuffers",
+      "rule_class": "//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "1cce06b17cddd896b6d73cc047e36a254fb8df4d7ea18a46acf16c4c0cd3f3f3",
+      "strip_prefix": "flatbuffers-23.5.26",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/flatbuffers/archive/v23.5.26.tar.gz",
+        "https://github.com/google/flatbuffers/archive/v23.5.26.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.78.0.tar.gz",
+      "name": "com_github_grpc_grpc",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "e2ace790a5f2d0f83259d1390a816a33b013ea34df2e86084d927e58daa4c5d9",
+      "strip_prefix": "grpc-1.78.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/grpc/grpc/archive/refs/tags/v1.78.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/refs/tags/v1.78.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "255c84dadd029fd8ad25c5efb5933e47beaa00c7.tar.gz",
+      "name": "com_google_absl",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "87e91fb785a2d0233f4599317afd576b7736e6732d557bdcdfdc11990bd333ef",
+      "strip_prefix": "abseil-cpp-255c84dadd029fd8ad25c5efb5933e47beaa00c7",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/abseil/abseil-cpp/archive/255c84dadd029fd8ad25c5efb5933e47beaa00c7.tar.gz",
+        "https://github.com/abseil/abseil-cpp/archive/255c84dadd029fd8ad25c5efb5933e47beaa00c7.tar.gz"
+      ]
+    },
+    {
+      "filename": "f7547e29ccaed7b64ef4f7495ecfff1c9f6f3d03.tar.gz",
+      "name": "com_google_benchmark",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "552ca3d4d1af4beeb1907980f7096315aa24150d6baf5ac1e5ad90f04846c670",
+      "strip_prefix": "benchmark-f7547e29ccaed7b64ef4f7495ecfff1c9f6f3d03",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/benchmark/archive/f7547e29ccaed7b64ef4f7495ecfff1c9f6f3d03.tar.gz",
+        "https://github.com/google/benchmark/archive/f7547e29ccaed7b64ef4f7495ecfff1c9f6f3d03.tar.gz"
+      ]
+    },
+    {
+      "filename": "fe8ba054ad4f7eca946c2d14a63c3f07c0b586a0.tar.gz",
+      "name": "com_google_googleapis",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "0513f0f40af63bd05dc789cacc334ab6cec27cc89db596557cb2dfe8919463e4",
+      "strip_prefix": "googleapis-fe8ba054ad4f7eca946c2d14a63c3f07c0b586a0",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/googleapis/googleapis/archive/fe8ba054ad4f7eca946c2d14a63c3f07c0b586a0.tar.gz",
+        "https://github.com/googleapis/googleapis/archive/fe8ba054ad4f7eca946c2d14a63c3f07c0b586a0.tar.gz"
+      ]
+    },
+    {
+      "filename": "28e9d1f26771c6517c3b4be10254887673c940189.zip",
+      "name": "com_google_googletest",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f253ca1a07262f8efde8328e4b2c68979e40ddfcfc001f70d1d5f612c7de2974",
+      "strip_prefix": "googletest-28e9d1f26771c6517c3b4be10254887673c94018",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/googletest/archive/28e9d1f26771c6517c3b4be10254887673c940189.zip",
+        "https://github.com/google/googletest/archive/28e9d1f26771c6517c3b4be10254887673c940189.zip"
+      ]
+    },
+    {
+      "filename": "1.3.0.tar.gz",
+      "name": "com_google_highway",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "07b3c1ba2c1096878a85a31a5b9b3757427af963b1141ca904db2f9f4afe0bc2",
+      "strip_prefix": "highway-1.3.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/highway/archive/refs/tags/1.3.0.tar.gz",
+        "https://github.com/google/highway/archive/refs/tags/1.3.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "v6.31.1.zip",
+      "name": "com_google_protobuf",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "6e09bbc950ba60c3a7b30280210cd285af8d7d8ed5e0a6ed101c72aff22e8d88",
+      "strip_prefix": "protobuf-6.31.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/protocolbuffers/protobuf/archive/refs/tags/v6.31.1.zip",
+        "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v6.31.1.zip"
+      ]
+    },
+    {
+      "filename": "927f5d53caf8111721e734cf24724686bb745f55.tar.gz",
+      "name": "com_googlesource_code_re2",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "8635bc46ac8d73974b4198229805287c8d620245f2081af155d7d96d4988a3a5",
+      "strip_prefix": "re2-927f5d53caf8111721e734cf24724686bb745f55",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/re2/archive/927f5d53caf8111721e734cf24724686bb745f55.tar.gz",
+        "https://github.com/google/re2/archive/927f5d53caf8111721e734cf24724686bb745f55.tar.gz"
+      ]
+    },
+    {
+      "filename": "8a9210069b5a37dd89ed118a783945502a30a4ae.zip",
+      "name": "cpuinfo",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "c0254ce97f7abc778dd2df0aaca1e0506dba1cd514fdb9fe88c07849393f8ef4",
+      "strip_prefix": "cpuinfo-8a9210069b5a37dd89ed118a783945502a30a4ae",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pytorch/cpuinfo/archive/8a9210069b5a37dd89ed118a783945502a30a4ae.zip",
+        "https://github.com/pytorch/cpuinfo/archive/8a9210069b5a37dd89ed118a783945502a30a4ae.zip"
+      ]
+    },
+    {
+      "filename": "v1.22.1.zip",
+      "name": "cudnn_frontend_archive",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4abb1568ad8d27a99fe987193be6c8bf71980beade115fe11bd27ef5e2c23e45",
+      "strip_prefix": "cudnn-frontend-1.22.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/NVIDIA/cudnn-frontend/archive/refs/tags/v1.22.1.zip",
+        "https://github.com/NVIDIA/cudnn-frontend/archive/refs/tags/v1.22.1.zip"
+      ]
+    },
+    {
+      "filename": "curl-8.11.0.tar.gz",
+      "name": "curl",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f",
+      "strip_prefix": "curl-8.11.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/curl.se/download/curl-8.11.0.tar.gz",
+        "https://curl.se/download/curl-8.11.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.1.tar.gz",
+      "name": "dlpack",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "2e3b94b55825c240cc58e6721e15b449978cbae21a2a4caa23058b0157ee2fb3",
+      "strip_prefix": "dlpack-1.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/dmlc/dlpack/archive/refs/tags/v1.1.tar.gz",
+        "https://github.com/dmlc/dlpack/archive/refs/tags/v1.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "ducc-aa46a4c21e440b3d416c16eca3c96df19c74f316.tar.gz",
+      "name": "ducc",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "077cf4bd0bd7eddaa6649a024285fff96e2662c5e6f2fb6ed5c5771f9de093f3",
+      "strip_prefix": "ducc-aa46a4c21e440b3d416c16eca3c96df19c74f316",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/gitlab.mpcdf.mpg.de/mtr/ducc/-/archive/aa46a4c21e440b3d416c16eca3c96df19c74f316/ducc-aa46a4c21e440b3d416c16eca3c96df19c74f316.tar.gz",
+        "https://gitlab.mpcdf.mpg.de/mtr/ducc/-/archive/aa46a4c21e440b3d416c16eca3c96df19c74f316/ducc-aa46a4c21e440b3d416c16eca3c96df19c74f316.tar.gz"
+      ]
+    },
+    {
+      "filename": "eigen-ea13a98decd497a8c5588fb5de71b57bcf10d864.tar.gz",
+      "name": "eigen_archive",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "35c6126e246585d9cf6600b65471582c2701aae64b784a6fd19168a90cfc841e",
+      "strip_prefix": "eigen-ea13a98decd497a8c5588fb5de71b57bcf10d864",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/gitlab.com/libeigen/eigen/-/archive/ea13a98decd497a8c5588fb5de71b57bcf10d864/eigen-ea13a98decd497a8c5588fb5de71b57bcf10d864.tar.gz",
+        "https://gitlab.com/libeigen/eigen/-/archive/ea13a98decd497a8c5588fb5de71b57bcf10d864/eigen-ea13a98decd497a8c5588fb5de71b57bcf10d864.tar.gz"
+      ]
+    },
+    {
+      "filename": "4de3c74cf21a9958c1cf26d8993c55c6e0d28b49.tar.gz",
+      "name": "envoy_api",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "cd8b49614408b43bd45d90e3e98d69e24eea632ff42ac3bfb8bca68bc31e377f",
+      "strip_prefix": "data-plane-api-4de3c74cf21a9958c1cf26d8993c55c6e0d28b49",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/envoyproxy/data-plane-api/archive/4de3c74cf21a9958c1cf26d8993c55c6e0d28b49.tar.gz",
+        "https://github.com/envoyproxy/data-plane-api/archive/4de3c74cf21a9958c1cf26d8993c55c6e0d28b49.tar.gz"
+      ]
+    },
+    {
+      "filename": "0d859a811870d10f53a594927d0d0b97573ad06d.tar.gz",
+      "name": "farmhash_archive",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "18392cf0736e1d62ecbb8d695c31496b6507859e8c75541d7ad0ba092dc52115",
+      "strip_prefix": "farmhash-0d859a811870d10f53a594927d0d0b97573ad06d",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/farmhash/archive/0d859a811870d10f53a594927d0d0b97573ad06d.tar.gz",
+        "https://github.com/google/farmhash/archive/0d859a811870d10f53a594927d0d0b97573ad06d.tar.gz"
+      ]
+    },
+    {
+      "filename": "8.1.1.tar.gz",
+      "name": "fmt",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "3d794d3cf67633b34b2771eb9f073bde87e846e0d395d254df7b211ef1ec7346",
+      "strip_prefix": "fmt-8.1.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz",
+        "https://github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "54cbae0d3a67fa890b4c3d9ee162b7860315e341.tar.gz",
+      "name": "gloo",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "61089361dbdbc9d6f75e297148369b13f615a3e6b78de1be56cce74ca2f64940",
+      "strip_prefix": "gloo-54cbae0d3a67fa890b4c3d9ee162b7860315e341",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/facebookincubator/gloo/archive/54cbae0d3a67fa890b4c3d9ee162b7860315e341.tar.gz",
+        "https://github.com/facebookincubator/gloo/archive/54cbae0d3a67fa890b4c3d9ee162b7860315e341.tar.gz"
+      ]
+    },
+    {
+      "filename": "go1.22.5.linux-amd64.tar.gz",
+      "name": "go_sdk_linux_amd64",
+      "rule_class": "@io_bazel_rules_go//go/private:sdk.bzl%go_download_sdk",
+      "sha256": "904b924d435eaea086515bc63235b192ea441bd8c9b198c507e85009e6e4c7f0",
+      "strip_prefix": "go",
+      "urls": [
+        "https://dl.google.com/go/go1.22.5.linux-amd64.tar.gz"
+      ]
+    },
+    {
+      "filename": "v2.35.0.tar.gz",
+      "name": "google_cloud_cpp",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "81ea28cf9e5bb032d356b0187409f30b1035f8ea5b530675ea248c8a6c0070aa",
+      "strip_prefix": "google-cloud-cpp-2.35.0",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/googleapis/google-cloud-cpp/archive/refs/tags/v2.35.0.tar.gz",
+        "https://github.com/googleapis/google-cloud-cpp/archive/refs/tags/v2.35.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "c13d28517a4db259d738ea4886b1f00352a3cc33.tar.gz",
+      "name": "highwayhash",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "c0e2b9931fbcce3bfbcd7999c3c114f404ac0f8b89775a5bbccbcaa501868e58",
+      "strip_prefix": "highwayhash-c13d28517a4db259d738ea4886b1f00352a3cc33",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/highwayhash/archive/c13d28517a4db259d738ea4886b1f00352a3cc33.tar.gz",
+        "https://github.com/google/highwayhash/archive/c13d28517a4db259d738ea4886b1f00352a3cc33.tar.gz"
+      ]
+    },
+    {
+      "filename": "hwloc-2.7.1.tar.gz",
+      "name": "hwloc",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4cb0a781ed980b03ad8c48beb57407aa67c4b908e45722954b9730379bc7f6d5",
+      "strip_prefix": "hwloc-2.7.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/download.open-mpi.org/release/hwloc/v2.7/hwloc-2.7.1.tar.gz",
+        "https://download.open-mpi.org/release/hwloc/v2.7/hwloc-2.7.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "2cce6cab8ff2c15f9da858ea0b68646a8d62aef2.tar.gz",
+      "name": "implib_so",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4ef3089969d57a5b60bb41b8212c478eaa15c56941f86d4bf5e7f98a3afd24e8",
+      "strip_prefix": "Implib.so-2cce6cab8ff2c15f9da858ea0b68646a8d62aef2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/yugr/Implib.so/archive/2cce6cab8ff2c15f9da858ea0b68646a8d62aef2.tar.gz",
+        "https://github.com/yugr/Implib.so/archive/2cce6cab8ff2c15f9da858ea0b68646a8d62aef2.tar.gz"
+      ]
+    },
+    {
+      "filename": "308b05b2419edb5c8ee0471b67a40403df940149.tar.gz",
+      "name": "io_bazel_rules_closure",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "5b00383d08dd71f28503736db0500b6fb4dda47489ff5fc6bed42557c07c6ba9",
+      "strip_prefix": "rules_closure-308b05b2419edb5c8ee0471b67a40403df940149",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_closure/archive/308b05b2419edb5c8ee0471b67a40403df940149.tar.gz",
+        "https://github.com/bazelbuild/rules_closure/archive/308b05b2419edb5c8ee0471b67a40403df940149.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_go-v0.34.0.zip",
+      "name": "io_bazel_rules_go",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "16e9fca53ed6bd4ff4ad76facc9b7b651a89db1689a2877d6fd7b82aa824e366",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_go/releases/download/v0.34.0/rules_go-v0.34.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.34.0/rules_go-v0.34.0.zip"
+      ]
+    },
+    {
+      "filename": "1.9.5.tar.gz",
+      "name": "jsoncpp_git",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2",
+      "strip_prefix": "jsoncpp-1.9.5",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz",
+        "https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz"
+      ]
+    },
+    {
+      "filename": "35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz",
+      "name": "llvm-raw",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "c3f06997045e0f9aa43628616df3217f229aa43d478bd78bd445e2448637d4ef",
+      "strip_prefix": "llvm-project-35901313800ea6e6cbeb9226e51c7c4b29bfc40e",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/llvm/llvm-project/archive/35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz",
+        "https://github.com/llvm/llvm-project/archive/35901313800ea6e6cbeb9226e51c7c4b29bfc40e.tar.gz"
+      ]
+    },
+    {
+      "filename": "ml_dtypes-00d98cd92ade342fef589c0470379abb27baebe9.tar.gz",
+      "name": "ml_dtypes_py",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f6e5880666661351e6cd084ac4178ddc4dabcde7e9a73722981c0d1500cf5937",
+      "strip_prefix": "ml_dtypes-00d98cd92ade342fef589c0470379abb27baebe9",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/jax-ml/ml_dtypes/archive/00d98cd92ade342fef589c0470379abb27baebe9/ml_dtypes-00d98cd92ade342fef589c0470379abb27baebe9.tar.gz",
+        "https://github.com/jax-ml/ml_dtypes/archive/00d98cd92ade342fef589c0470379abb27baebe9/ml_dtypes-00d98cd92ade342fef589c0470379abb27baebe9.tar.gz"
+      ]
+    },
+    {
+      "filename": "25efb0f7a4cd00ed82bafb8b1a6285fc50d297ed.tar.gz",
+      "name": "mpitrampoline",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "5a36656205c472bdb639bffebb0f014523b32dda0c2cbedd9ce7abfc9e879e84",
+      "strip_prefix": "MPItrampoline-25efb0f7a4cd00ed82bafb8b1a6285fc50d297ed",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/eschnett/mpitrampoline/archive/25efb0f7a4cd00ed82bafb8b1a6285fc50d297ed.tar.gz",
+        "https://github.com/eschnett/mpitrampoline/archive/25efb0f7a4cd00ed82bafb8b1a6285fc50d297ed.tar.gz"
+      ]
+    },
+    {
+      "filename": "30f12ae6650ecec86042053d522d9af585f269b0.tar.gz",
+      "name": "nanobind",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "8948a72b93ddf3846e1fb894ddf825794138c65f23e76f1138f5e20a73cf7b10",
+      "strip_prefix": "nanobind-30f12ae6650ecec86042053d522d9af585f269b0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/wjakob/nanobind/archive/30f12ae6650ecec86042053d522d9af585f269b0.tar.gz",
+        "https://github.com/wjakob/nanobind/archive/30f12ae6650ecec86042053d522d9af585f269b0.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.5.7.zip",
+      "name": "net_zstd",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "7897bc5d620580d9b7cd3539c44b59d78f3657d33663fe97a145e07b4ebd69a4",
+      "strip_prefix": "zstd-1.5.7/lib",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/facebook/zstd/archive/v1.5.7.zip",
+        "https://github.com/facebook/zstd/archive/v1.5.7.zip"
+      ]
+    },
+    {
+      "filename": "nvshmem_src_3.1.7-1.txz",
+      "name": "nvshmem",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "2146ff231d9aadd2b11f324c142582f89e3804775877735dc507b4dfd70c788b",
+      "strip_prefix": "nvshmem_src",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/developer.download.nvidia.com/compute/redist/nvshmem/3.1.7/source/nvshmem_src_3.1.7-1.txz",
+        "https://developer.download.nvidia.com/compute/redist/nvshmem/3.1.7/source/nvshmem_src_3.1.7-1.txz"
+      ]
+    },
+    {
+      "filename": "v3.5.0.tar.gz",
+      "name": "nvtx_archive",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f244c5eec33f9769123a755dda1e9b80339345ab278cf9542ff34677c88804b5",
+      "strip_prefix": "NVTX-3.5.0/c/include",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/NVIDIA/NVTX/archive/refs/tags/v3.5.0.tar.gz",
+        "https://github.com/NVIDIA/NVTX/archive/refs/tags/v3.5.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "v3.7.3.tar.gz",
+      "name": "onednn",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "071f289dc961b43a3b7c8cbe8a305290a7c5d308ec4b2f586397749abdc88296",
+      "strip_prefix": "oneDNN-3.7.3",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/oneapi-src/oneDNN/archive/refs/tags/v3.7.3.tar.gz",
+        "https://github.com/oneapi-src/oneDNN/archive/refs/tags/v3.7.3.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.1.0.tar.gz",
+      "name": "org_brotli",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "e720a6ca29428b803f4ad165371771f5398faba397edf6778837a18599ea13ff",
+      "strip_prefix": "brotli-1.1.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz",
+        "https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "platforms-0.0.11.tar.gz",
+      "name": "platforms",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "29742e87275809b5e598dc2f04d86960cc7a55b3067d97221c9abbc9926bff0f",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/platforms/releases/download/0.0.11/platforms-0.0.11.tar.gz",
+        "https://github.com/bazelbuild/platforms/releases/download/0.0.11/platforms-0.0.11.tar.gz"
+      ]
+    },
+    {
+      "filename": "pybind11-v2.13.6.tar.gz",
+      "name": "pybind11",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "e08cb87f4773da97fa7b5f035de8763abc656d87d5773e62f6da0587d1f0ec20",
+      "strip_prefix": "pybind11-2.13.6",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11/archive/v2.13.6.tar.gz",
+        "https://github.com/pybind/pybind11/archive/v2.13.6.tar.gz"
+      ]
+    },
+    {
+      "filename": "pybind11_bazel-v2.13.6.tar.gz",
+      "name": "pybind11_bazel",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "cae680670bfa6e82703c03f2a3c995408cdcbf43616d7bdd198ef45d3c327731",
+      "strip_prefix": "pybind11_bazel-2.13.6",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/pybind/pybind11_bazel/archive/v2.13.6.tar.gz",
+        "https://github.com/pybind/pybind11_bazel/archive/v2.13.6.tar.gz"
+      ]
+    },
+    {
+      "filename": "build-1.2.1-py3-none-any.whl",
+      "name": "pypi__build",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4",
+      "urls": [
+        "https://files.pythonhosted.org/packages/e2/03/f3c8ba0a6b6e30d7d18c40faab90807c9bb5e9a1e3b2fe2008af624a9c97/build-1.2.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "click-8.1.7-py3-none-any.whl",
+      "name": "pypi__click",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28",
+      "urls": [
+        "https://files.pythonhosted.org/packages/00/2e/d53fa4befbf2cfa713304affc7ca780ce4fc1fd8710527771b58311a3229/click-8.1.7-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "colorama-0.4.6-py2.py3-none-any.whl",
+      "name": "pypi__colorama",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+      "urls": [
+        "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "importlib_metadata-7.1.0-py3-none-any.whl",
+      "name": "pypi__importlib_metadata",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "30962b96c0c223483ed6cc7280e7f0199feb01a0e40cfae4d4450fc6fab1f570",
+      "urls": [
+        "https://files.pythonhosted.org/packages/2d/0a/679461c511447ffaf176567d5c496d1de27cbe34a87df6677d7171b2fbd4/importlib_metadata-7.1.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "installer-0.7.0-py3-none-any.whl",
+      "name": "pypi__installer",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "05d1933f0a5ba7d8d6296bb6d5018e7c94fa473ceb10cf198a92ccea19c27b53",
+      "urls": [
+        "https://files.pythonhosted.org/packages/e5/ca/1172b6638d52f2d6caa2dd262ec4c811ba59eee96d54a7701930726bce18/installer-0.7.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "more_itertools-10.2.0-py3-none-any.whl",
+      "name": "pypi__more_itertools",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "686b06abe565edfab151cb8fd385a05651e1fdf8f0a14191e4439283421f8684",
+      "urls": [
+        "https://files.pythonhosted.org/packages/50/e2/8e10e465ee3987bb7c9ab69efb91d867d93959095f4807db102d07995d94/more_itertools-10.2.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "packaging-24.2-py3-none-any.whl",
+      "name": "pypi__packaging",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759",
+      "urls": [
+        "https://files.pythonhosted.org/packages/88/ef/eb23f262cca3c0c4eb7ab1933c3b1f03d021f2c48f54763065b6f0e321be/packaging-24.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pep517-0.13.1-py3-none-any.whl",
+      "name": "pypi__pep517",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "31b206f67165b3536dd577c5c3f1518e8fbaf38cbc57efff8369a392feff1721",
+      "urls": [
+        "https://files.pythonhosted.org/packages/25/6e/ca4a5434eb0e502210f591b97537d322546e4833dcb4d470a48c375c5540/pep517-0.13.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pip-24.3.1-py3-none-any.whl",
+      "name": "pypi__pip",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "3790624780082365f47549d032f3770eeb2b1e8bd1f7b2e02dace1afa361b4ed",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pip_tools-7.4.1-py3-none-any.whl",
+      "name": "pypi__pip_tools",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "4c690e5fbae2f21e87843e89c26191f0d9454f362d8acdbd695716493ec8b3a9",
+      "urls": [
+        "https://files.pythonhosted.org/packages/0d/dc/38f4ce065e92c66f058ea7a368a9c5de4e702272b479c0992059f7693941/pip_tools-7.4.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pyproject_hooks-1.1.0-py3-none-any.whl",
+      "name": "pypi__pyproject_hooks",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "7ceeefe9aec63a1064c18d939bdc3adf2d8aa1988a510afec15151578b232aa2",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ae/f3/431b9d5fe7d14af7a32340792ef43b8a714e7726f1d7b69cc4e8e7a3f1d7/pyproject_hooks-1.1.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "setuptools-78.1.1-py3-none-any.whl",
+      "name": "pypi__setuptools",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "c3a9c4211ff4c309edb8b8c4f1cbfa7ae324c4ba9f91ff254e3d305b9fd54561",
+      "urls": [
+        "https://files.pythonhosted.org/packages/90/99/158ad0609729111163fc1f674a5a42f2605371a4cf036d0441070e2f7455/setuptools-78.1.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "tomli-2.0.1-py3-none-any.whl",
+      "name": "pypi__tomli",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
+      "urls": [
+        "https://files.pythonhosted.org/packages/97/75/10a9ebee3fd790d20926a90a2547f0bf78f371b2f13aa822c759680ca7b9/tomli-2.0.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "wheel-0.43.0-py3-none-any.whl",
+      "name": "pypi__wheel",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "55c570405f142630c6b9f72fe09d9b67cf1477fcf543ae5b8dcb1f5b7377da81",
+      "urls": [
+        "https://files.pythonhosted.org/packages/7d/cd/d7460c9a869b16c3dd4e1e403cce337df165368c71d6af229a74699622ce/wheel-0.43.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "zipp-3.18.2-py3-none-any.whl",
+      "name": "pypi__zipp",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "dce197b859eb796242b0622af1b8beb0a722d52aa2f57133ead08edd5bf5374e",
+      "urls": [
+        "https://files.pythonhosted.org/packages/da/55/a03fd7240714916507e1fcf7ae355bd9d9ed2e6db492595f1a67f61681be/zipp-3.18.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "absl_py-2.4.0-py3-none-any.whl",
+      "name": "pypi_lock_absl_py",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "88476fd881ca8aab94ffa78b7b6c632a782ab3ba1cd19c9bd423abc4fb4cd28d",
+      "urls": [
+        "https://files.pythonhosted.org/packages/18/a6/907a406bb7d359e6a63f99c313846d9eec4f7e6f7437809e03aa00fa3074/absl_py-2.4.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "astunparse-1.6.3-py2.py3-none-any.whl",
+      "name": "pypi_lock_astunparse",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "c2652417f2c8b5bb325c885ae329bdf3f86424075c4fd1a128674bc6fba4b8e8",
+      "urls": [
+        "https://files.pythonhosted.org/packages/2b/03/13dde6512ad7b4557eb792fbcf0c653af6076b81e5941d36ec61f7ce6028/astunparse-1.6.3-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "attrs-26.1.0-py3-none-any.whl",
+      "name": "pypi_lock_attrs",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+      "urls": [
+        "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "auditwheel-6.6.0-py3-none-any.whl",
+      "name": "pypi_lock_auditwheel",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "3e8479856ca582625b5457204cbb62d1614d3bc7e760ee307c04c34c912ebcad",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b0/c2/bb8ba1cec816fa356e19da83c59bfd4ac34dba1ae41eb7622c18f4b1d48d/auditwheel-6.6.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "build-1.5.0-py3-none-any.whl",
+      "name": "pypi_lock_build",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f",
+      "urls": [
+        "https://files.pythonhosted.org/packages/0d/fe/6bea5c9162869c5beba5d9c8abbed835ec85bf1ec1fba05a3822325c45f3/build-1.5.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "certifi-2026.5.20-py3-none-any.whl",
+      "name": "pypi_lock_certifi",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897",
+      "urls": [
+        "https://files.pythonhosted.org/packages/59/8c/57e832b7af6d7c5abe66eb3fbe3a3a32f4d11ea23a1aa7131371035be991/certifi-2026.5.20-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "charset_normalizer-3.4.7-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_charset_normalizer",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "e044c39e41b92c845bc815e5ae4230804e8e7bc29e399b0437d64222d92809dd",
+      "urls": [
+        "https://files.pythonhosted.org/packages/fa/07/330e3a0dda4c404d6da83b327270906e9654a24f6c546dc886a0eb0ffb23/charset_normalizer-3.4.7-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "cloudpickle-3.1.2-py3-none-any.whl",
+      "name": "pypi_lock_cloudpickle",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a",
+      "urls": [
+        "https://files.pythonhosted.org/packages/88/39/799be3f2f0f38cc727ee3b4f1445fe6d5e4133064ec2e4115069418a5bb6/cloudpickle-3.1.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "contourpy-1.3.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_contourpy",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "4debd64f124ca62069f313a9cb86656ff087786016d76927ae2cf37846b006c9",
+      "urls": [
+        "https://files.pythonhosted.org/packages/4b/32/e0f13a1c5b0f8572d0ec6ae2f6c677b7991fafd95da523159c19eff0696a/contourpy-1.3.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "cycler-0.12.1-py3-none-any.whl",
+      "name": "pypi_lock_cycler",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30",
+      "urls": [
+        "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "etils-1.14.0-py3-none-any.whl",
+      "name": "pypi_lock_etils",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "b5df7341f54dbe1405a4450b2741207b4a8c279780402b45f87202b94dfc52b4",
+      "urls": [
+        "https://files.pythonhosted.org/packages/5a/3d/589663aeeacd59bb2f3e8596bfd3e81cf0fb18d70bb433199041f469771b/etils-1.14.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "execnet-2.1.2-py3-none-any.whl",
+      "name": "pypi_lock_execnet",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "67fba928dd5a544b783f6056f449e5e3931a5c378b128bc18501f7ea79e296ec",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ab/84/02fc1827e8cdded4aa65baef11296a9bbe595c474f0d6d758af082d849fd/execnet-2.1.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "filelock-3.29.0-py3-none-any.whl",
+      "name": "pypi_lock_filelock",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "96f5f6344709aa1572bbf631c640e4ebeeb519e08da902c39a001882f30ac258",
+      "urls": [
+        "https://files.pythonhosted.org/packages/81/47/dd9a212ef6e343a6857485ffe25bba537304f1913bdbed446a23f7f592e1/filelock-3.29.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+      "name": "pypi_lock_flatbuffers",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+      "urls": [
+        "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "fonttools-4.63.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "pypi_lock_fonttools",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "22135da48a348785c5e2d5d2d9d6bec5ed44adacbaeb9db12d9493bf6c6bfa68",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ce/36/0b805d8c485f872f65a509cbe3b58a5d0d17bee855333b54a150c79d3061/fonttools-4.63.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "fsspec-2026.4.0-py3-none-any.whl",
+      "name": "pypi_lock_fsspec",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "11ef7bb35dab8a394fde6e608221d5cf3e8499401c249bebaeaad760a1a8dec2",
+      "urls": [
+        "https://files.pythonhosted.org/packages/d5/0c/043d5e551459da400957a1395e0febbf771446ff34291afcbe3d8be2a279/fsspec-2026.4.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "gast-0.7.0-py3-none-any.whl",
+      "name": "pypi_lock_gast",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "99cbf1365633a74099f69c59bd650476b96baa5ef196fec88032b00b31ba36f7",
+      "urls": [
+        "https://files.pythonhosted.org/packages/1d/33/f1c6a276de27b7d7339a34749cc33fa87f077f921969c47185d34a887ae2/gast-0.7.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "google_pasta-0.2.0-py3-none-any.whl",
+      "name": "pypi_lock_google_pasta",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "b32482794a366b5366a32c92a9a9201b107821889935a02b3e51f6b432ea84ed",
+      "urls": [
+        "https://files.pythonhosted.org/packages/a3/de/c648ef6835192e6e2cc03f40b19eeda4382c49b5bafb43d88b931c4c74ac/google_pasta-0.2.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "grpcio-1.80.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "pypi_lock_grpcio",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "873ff5d17d68992ef6605330127425d2fc4e77e612fa3c3e0ed4e668685e3140",
+      "urls": [
+        "https://files.pythonhosted.org/packages/9b/e2/da1506ecea1f34a5e365964644b35edef53803052b763ca214ba3870c856/grpcio-1.80.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "h5py-3.14.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "name": "pypi_lock_h5py",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "d90e6445ab7c146d7f7981b11895d70bc1dd91278a4f9f9028bc0c95e4a53f13",
+      "urls": [
+        "https://files.pythonhosted.org/packages/e7/ec/86f59025306dcc6deee5fda54d980d077075b8d9889aac80f158bd585f1b/h5py-3.14.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "hypothesis-6.142.1-py3-none-any.whl",
+      "name": "pypi_lock_hypothesis",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "95a7d38fcc58e697e3020665adcb951c630cdbc8065e4b4474949e486b06bd6d",
+      "urls": [
+        "https://files.pythonhosted.org/packages/55/16/2c8023ea706dd3ef155b1ffe531cd7672271cd9c70fbbbafba614b218679/hypothesis-6.142.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "idna-3.15-py3-none-any.whl",
+      "name": "pypi_lock_idna",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8",
+      "urls": [
+        "https://files.pythonhosted.org/packages/d2/23/408243171aa9aaba178d3e2559159c24c1171a641aa83b67bdd3394ead8e/idna-3.15-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "iniconfig-2.3.0-py3-none-any.whl",
+      "name": "pypi_lock_iniconfig",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12",
+      "urls": [
+        "https://files.pythonhosted.org/packages/cb/b1/3846dd7f199d53cb17f49cba7e651e9ce294d8497c8c150530ed11865bb8/iniconfig-2.3.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "jaxlib-0.10.1-cp313-cp313-manylinux_2_27_x86_64.whl",
+      "name": "pypi_lock_jaxlib",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "bb073a1224e659e01e8d32d47c000edb52ec2aa8ba97ec22b2228b3a46e5c167",
+      "urls": [
+        "https://files.pythonhosted.org/packages/20/1d/69a0ba52fb546261e71a7209378ee6059950e9c088a2a18355e01509f474/jaxlib-0.10.1-cp313-cp313-manylinux_2_27_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "keras-3.14.1-py3-none-any.whl",
+      "name": "pypi_lock_keras",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "ebd2c14d2af3c9de18083604d408483996407fc7d2f9ebd1d565961f96608c29",
+      "urls": [
+        "https://files.pythonhosted.org/packages/02/03/184267c1d09783dd070f1ddfd0d4beb7503139dfc7bd75b422867cf282fd/keras-3.14.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "kiwisolver-1.5.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "pypi_lock_kiwisolver",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "332b4f0145c30b5f5ad9374881133e5aa64320428a57c2c2b61e9d891a51c2f3",
+      "urls": [
+        "https://files.pythonhosted.org/packages/2b/0a/7b98e1e119878a27ba8618ca1e18b14f992ff1eda40f47bccccf4de44121/kiwisolver-1.5.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "libclang-18.1.1-py2.py3-none-manylinux2010_x86_64.whl",
+      "name": "pypi_lock_libclang",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "c533091d8a3bbf7460a00cb6c1a71da93bffe148f172c7d03b1c31fbf8aa2a0b",
+      "urls": [
+        "https://files.pythonhosted.org/packages/1d/fc/716c1e62e512ef1c160e7984a73a5fc7df45166f2ff3f254e71c58076f7c/libclang-18.1.1-py2.py3-none-manylinux2010_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "libtpu-0.0.41-cp313-cp313-manylinux_2_31_x86_64.whl",
+      "name": "pypi_lock_libtpu",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "5dd67e594cefb67f4272efb5a3fa38cf9206b7dd1ab5fbd559001809f8b9dddb",
+      "urls": [
+        "https://files.pythonhosted.org/packages/3c/6e/16eee4b4c3a642cef091f8aafea7797edc3d20f224ea265ae05dceba31b0/libtpu-0.0.41-cp313-cp313-manylinux_2_31_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "markdown_it_py-4.2.0-py3-none-any.whl",
+      "name": "pypi_lock_markdown_it_py",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b3/81/4da04ced5a082363ecfa159c010d200ecbd959ae410c10c0264a38cac0f5/markdown_it_py-4.2.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "matplotlib-3.10.9-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "pypi_lock_matplotlib",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "8f3bcac1ca5ed000a6f4337d47ba67dfddf37ed6a46c15fd7f014997f7bf865f",
+      "urls": [
+        "https://files.pythonhosted.org/packages/8a/17/4402d0d14ccf1dfc70932600b68097fbbf9c898a4871d2cbbe79c7801a32/matplotlib-3.10.9-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "mdurl-0.1.2-py3-none-any.whl",
+      "name": "pypi_lock_mdurl",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "ml_dtypes-0.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_ml_dtypes",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "533ce891ba774eabf607172254f2e7260ba5f57bdd64030c9a4fcfbd99815d0d",
+      "urls": [
+        "https://files.pythonhosted.org/packages/eb/33/40cd74219417e78b97c47802037cf2d87b91973e18bb968a7da48a96ea44/ml_dtypes-0.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "mpmath-1.3.0-py3-none-any.whl",
+      "name": "pypi_lock_mpmath",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "urls": [
+        "https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "namex-0.1.0-py3-none-any.whl",
+      "name": "pypi_lock_namex",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "e2012a474502f1e2251267062aae3114611f07df4224b6e06334c57b0f2ce87c",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b2/bc/465daf1de06409cdd4532082806770ee0d8d7df434da79c76564d0f69741/namex-0.1.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "numpy-2.1.3-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "name": "pypi_lock_numpy",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "5641516794ca9e5f8a4d17bb45446998c6554704d888f86df9b200e66bdcce56",
+      "urls": [
+        "https://files.pythonhosted.org/packages/70/50/73f9a5aa0810cdccda9c1d20be3cbe4a4d6ea6bfd6931464a44c95eef731/numpy-2.1.3-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "numpy_typing_compat-20251206.2.1-py3-none-any.whl",
+      "name": "pypi_lock_numpy_typing_compat",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "703ae61be7877ab0af562298776b89eae609a3985414d92011a39a42350b42e1",
+      "urls": [
+        "https://files.pythonhosted.org/packages/0c/9b/0dac9b64740cb7404f03a43d7c0fcadc7c095656c1f49a2609c3545b7fd2/numpy_typing_compat-20251206.2.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "opt_einsum-3.4.0-py3-none-any.whl",
+      "name": "pypi_lock_opt_einsum",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "69bb92469f86a1565195ece4ac0323943e83477171b91d24c35afe028a90d7cd",
+      "urls": [
+        "https://files.pythonhosted.org/packages/23/cd/066e86230ae37ed0be70aae89aabf03ca8d9f39c8aea0dec8029455b5540/opt_einsum-3.4.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "optree-0.19.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_optree",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "9dde5b756946c1f1458aeab248a7a9b0c01bb06b5787de9f06d52ad38b745557",
+      "urls": [
+        "https://files.pythonhosted.org/packages/68/b5/8a2427bbe4ee59e2ce26a14125728e3b48c7030c80984ba07d0e5d804d37/optree-0.19.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "optype-0.17.1-py3-none-any.whl",
+      "name": "pypi_lock_optype",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "82f2508ca31cb21e53a41648482d890fe1f5c6cb153720551af41161555adaf1",
+      "urls": [
+        "https://files.pythonhosted.org/packages/2f/d4/c6a2b043e33f0dd012486dcebe0593585588d400175d22aad42049c88321/optype-0.17.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "packaging-26.2-py3-none-any.whl",
+      "name": "pypi_lock_packaging",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e",
+      "urls": [
+        "https://files.pythonhosted.org/packages/df/b2/87e62e8c3e2f4b32e5fe99e0b86d576da1312593b39f47d8ceef365e95ed/packaging-26.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pillow-12.2.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_pillow",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "eedf4b74eda2b5a4b2b2fb4c006d6295df3bf29e459e198c90ea48e130dc75c3",
+      "urls": [
+        "https://files.pythonhosted.org/packages/67/ee/21d4e8536afd1a328f01b359b4d3997b291ffd35a237c877b331c1c3b71c/pillow-12.2.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "pluggy-1.6.0-py3-none-any.whl",
+      "name": "pypi_lock_pluggy",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+      "urls": [
+        "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "portpicker-1.6.0-py3-none-any.whl",
+      "name": "pypi_lock_portpicker",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "b2787a41404cf7edbe29b07b9e0ed863b09f2665dcc01c1eb0c2261c1e7d0755",
+      "urls": [
+        "https://files.pythonhosted.org/packages/32/2d/440e4d7041fff89f28f483733eb617127aa866135c2dc719e05893f089e1/portpicker-1.6.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "protobuf-7.35.0-cp310-abi3-manylinux2014_x86_64.whl",
+      "name": "pypi_lock_protobuf",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "6c0f98f10c8a05ea30f8993dfef2de093d27b490fdae78bb60c8343795d55011",
+      "urls": [
+        "https://files.pythonhosted.org/packages/70/5b/6baf9008817964454055ff3fe65f1de0b5f1e26c80c82f7fb108b7cd4ea3/protobuf-7.35.0-cp310-abi3-manylinux2014_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_psutil",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "076a2d2f923fd4821644f5ba89f059523da90dc9014e85f8e45a5774ca5bc6f9",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b5/70/5d8df3b09e25bce090399cf48e452d25c935ab72dad19406c77f4e828045/psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "pyelftools-0.32-py3-none-any.whl",
+      "name": "pypi_lock_pyelftools",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "013df952a006db5e138b1edf6d8a68ecc50630adbd0d83a2d41e7f846163d738",
+      "urls": [
+        "https://files.pythonhosted.org/packages/af/43/700932c4f0638c3421177144a2e86448c0d75dbaee2c7936bda3f9fd0878/pyelftools-0.32-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pygments-2.20.0-py3-none-any.whl",
+      "name": "pypi_lock_pygments",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176",
+      "urls": [
+        "https://files.pythonhosted.org/packages/f4/7e/a72dd26f3b0f4f2bf1dd8923c85f7ceb43172af56d63c7383eb62b332364/pygments-2.20.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pyparsing-3.3.2-py3-none-any.whl",
+      "name": "pypi_lock_pyparsing",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d",
+      "urls": [
+        "https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pyproject_hooks-1.2.0-py3-none-any.whl",
+      "name": "pypi_lock_pyproject_hooks",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913",
+      "urls": [
+        "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pytest-8.4.2-py3-none-any.whl",
+      "name": "pypi_lock_pytest",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+      "urls": [
+        "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "pytest_xdist-3.8.0-py3-none-any.whl",
+      "name": "pypi_lock_pytest_xdist",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "202ca578cfeb7370784a8c33d6d05bc6e13b4f25b5053c30a152269fd10f0b88",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ca/31/d4e37e9e550c2b92a9cbc2e4d0b7420a27224968580b5a447f420847c975/pytest_xdist-3.8.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "name": "pypi_lock_python_dateutil",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427",
+      "urls": [
+        "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "requests-2.34.2-py3-none-any.whl",
+      "name": "pypi_lock_requests",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "urls": [
+        "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "rich-15.0.0-py3-none-any.whl",
+      "name": "pypi_lock_rich",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+      "urls": [
+        "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "scipy-1.17.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_scipy",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "581b2264fc0aa555f3f435a5944da7504ea3a065d7029ad60e7c3d1ae09c5464",
+      "urls": [
+        "https://files.pythonhosted.org/packages/f5/5f/f17563f28ff03c7b6799c50d01d5d856a1d55f2676f537ca8d28c7f627cd/scipy-1.17.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "scipy_stubs-1.17.1.4-py3-none-any.whl",
+      "name": "pypi_lock_scipy_stubs",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "e6e5c390fb864745bc3d5f591de81f5cb4f84403857d4f660acb5b6339956f5b",
+      "urls": [
+        "https://files.pythonhosted.org/packages/92/f8/334aa5a7a482ea89cb14d92f6a4d9ffa1e193e733144d4d14c7ffcb33583/scipy_stubs-1.17.1.4-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "setuptools-82.0.1-py3-none-any.whl",
+      "name": "pypi_lock_setuptools",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "a59e362652f08dcd477c78bb6e7bd9d80a7995bc73ce773050228a348ce2e5bb",
+      "urls": [
+        "https://files.pythonhosted.org/packages/9d/76/f789f7a86709c6b087c5a2f52f911838cad707cc613162401badc665acfe/setuptools-82.0.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "six-1.17.0-py2.py3-none-any.whl",
+      "name": "pypi_lock_six",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274",
+      "urls": [
+        "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "sortedcontainers-2.4.0-py2.py3-none-any.whl",
+      "name": "pypi_lock_sortedcontainers",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0",
+      "urls": [
+        "https://files.pythonhosted.org/packages/32/46/9cb0e58b2deb7f82b84065f37f3bffeb12413f947f9388e4cac22c4621ce/sortedcontainers-2.4.0-py2.py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "tensorflow-2.21.0-cp313-cp313-manylinux_2_27_x86_64.whl",
+      "name": "pypi_lock_tensorflow",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "e9d8da8dcab9650efb45f032ba70af2f016f907e6e0c6bda29dd101bba945406",
+      "urls": [
+        "https://files.pythonhosted.org/packages/86/6c/10d075ffc09754c7f10e749ba3c9d46dd809fb007990c7f788128044180c/tensorflow-2.21.0-cp313-cp313-manylinux_2_27_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "tensorstore-0.1.84-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pypi_lock_tensorstore",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "8ea53a851ea86aad3d99c14a790c85468d6324be14c7ac211f1f0265e8fab707",
+      "urls": [
+        "https://files.pythonhosted.org/packages/5e/c6/82669e70cef67c803852285ba6f59d7e3d102983c0ab4be8269c14756677/tensorstore-0.1.84-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "termcolor-3.3.0-py3-none-any.whl",
+      "name": "pypi_lock_termcolor",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "cf642efadaf0a8ebbbf4bc7a31cec2f9b5f21a9f726f4ccbb08192c9c26f43a5",
+      "urls": [
+        "https://files.pythonhosted.org/packages/33/d1/8bb87d21e9aeb323cc03034f5eaf2c8f69841e40e4853c2627edf8111ed3/termcolor-3.3.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "typing_extensions-4.15.0-py3-none-any.whl",
+      "name": "pypi_lock_typing_extensions",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548",
+      "urls": [
+        "https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "urllib3-2.7.0-py3-none-any.whl",
+      "name": "pypi_lock_urllib3",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897",
+      "urls": [
+        "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "wheel-0.47.0-py3-none-any.whl",
+      "name": "pypi_lock_wheel",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced",
+      "urls": [
+        "https://files.pythonhosted.org/packages/87/1b/9e33c09813d65e248f7f773119148a612516a4bea93e9c6f545f78455b7c/wheel-0.47.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "wrapt-2.1.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+      "name": "pypi_lock_wrapt",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "bbac24d879aa22998e87f6b3f481a5216311e7d53c7db87f189a7a0266dafffb",
+      "urls": [
+        "https://files.pythonhosted.org/packages/03/a9/5b7d6a16fd6533fed2756900fc8fc923f678179aea62ada6d65c92718c00/wrapt-2.1.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "zipp-4.1.0-py3-none-any.whl",
+      "name": "pypi_lock_zipp",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f",
+      "urls": [
+        "https://files.pythonhosted.org/packages/3a/13/547360d81e6d88d58492968ffda9f9542854f11310ee556fef14260cc886/zipp-4.1.0-py3-none-any.whl"
+      ]
+    },
+    {
+      "filename": "zstandard-0.25.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "pypi_lock_zstandard",
+      "rule_class": "@rules_python//python/private/pypi:whl_library.bzl%whl_library",
+      "sha256": "8e735494da3db08694d26480f1493ad2cf86e99bdd53e8e9771b2752a5c0246a",
+      "urls": [
+        "https://files.pythonhosted.org/packages/63/4b/e3678b4e776db00f9f7b2fe58e547e8928ef32727d7a1ff01dea010f3f13/zstandard-0.25.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ]
+    },
+    {
+      "filename": "cpython-3.13.11+20251209-x86_64-unknown-linux-gnu-install_only.tar.gz",
+      "name": "python_3_13_x86_64-unknown-linux-gnu",
+      "rule_class": "@@rules_python//python/private:python_repository.bzl%python_repository",
+      "sha256": "1ffa06d714a44aea14c0c54c30656413e5955a6c92074b4b3cb4351dcc28b63b",
+      "strip_prefix": "python",
+      "urls": [
+        "https://github.com/astral-sh/python-build-standalone/releases/download/20251209/cpython-3.13.11+20251209-x86_64-unknown-linux-gnu-install_only.tar.gz"
+      ]
+    },
+    {
+      "filename": "raft-v26.02.00.tar.gz",
+      "name": "raft",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "b4c005c70d9e1281a65dc30dc39051d1e4e713130da1fa0b76df832064674b59",
+      "strip_prefix": "raft-26.02.00",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/rapidsai/raft/archive/refs/tags/v26.02.00.tar.gz",
+        "https://github.com/rapidsai/raft/archive/refs/tags/v26.02.00.tar.gz"
+      ]
+    },
+    {
+      "filename": "v0.2.3.tar.gz",
+      "name": "rapids_logger",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "36578b337993cdbc7f4c52e5d871289628ac408f3a6028ab4e73a64fcdaa9412",
+      "strip_prefix": "rapids-logger-0.2.3",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/rapidsai/rapids-logger/archive/refs/tags/v0.2.3.tar.gz",
+        "https://github.com/rapidsai/rapids-logger/archive/refs/tags/v0.2.3.tar.gz"
+      ]
+    },
+    {
+      "filename": "9f2744dc23e81d84c02f6f51244e9e9bb9802d57.tar.gz",
+      "name": "riegeli",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f63337f63f794ba9dc7dd281b20af3d036dfe0c1a5a4b7b8dc20b39f7e323b97",
+      "strip_prefix": "riegeli-9f2744dc23e81d84c02f6f51244e9e9bb9802d57",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/riegeli/archive/9f2744dc23e81d84c02f6f51244e9e9bb9802d57.tar.gz",
+        "https://github.com/google/riegeli/archive/9f2744dc23e81d84c02f6f51244e9e9bb9802d57.tar.gz"
+      ]
+    },
+    {
+      "filename": "rmm-v26.02.00.tar.gz",
+      "name": "rmm",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "f7460ec9f177d79e8a709b7011cd11392059bcbd906336f4f5b90ef2b5547683",
+      "strip_prefix": "rmm-26.02.00",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/rapidsai/rmm/archive/refs/tags/v26.02.00.tar.gz",
+        "https://github.com/rapidsai/rmm/archive/refs/tags/v26.02.00.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.3.0.tar.gz",
+      "name": "robin_map",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "a8424ad3b0affd4c57ed26f0f3d8a29604f0e1f2ef2089f497f614b1c94c7236",
+      "strip_prefix": "robin-map-1.3.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/Tessil/robin-map/archive/refs/tags/v1.3.0.tar.gz",
+        "https://github.com/Tessil/robin-map/archive/refs/tags/v1.3.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "0.1.0.tar.gz",
+      "name": "rules_cc",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4b12149a041ddfb8306a8fd0e904e39d673552ce82e4296e96fac9cbf0780e59",
+      "strip_prefix": "rules_cc-0.1.0",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_cc/archive/refs/tags/0.1.0.tar.gz",
+        "https://github.com/bazelbuild/rules_cc/archive/refs/tags/0.1.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_java-8.7.0.tar.gz",
+      "name": "rules_java",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "5449ed36d61269579dd9f4b0e532cd131840f285b389b3795ae8b4d717387dd8",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/bazelbuild/rules_java/releases/download/8.7.0/rules_java-8.7.0.tar.gz",
+        "https://github.com/bazelbuild/rules_java/releases/download/8.7.0/rules_java-8.7.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_license-0.0.7.tar.gz",
+      "name": "rules_license",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4531deccb913639c30e5c7512a054d5d875698daeb75d8cf90f284375fe7c360",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_license/releases/download/0.0.7/rules_license-0.0.7.tar.gz",
+        "https://github.com/bazelbuild/rules_license/releases/download/0.0.7/rules_license-0.0.7.tar.gz"
+      ]
+    },
+    {
+      "filename": "cad1047facbac4fb3c1124da68bf2cb36c7eb9ac.tar.gz",
+      "name": "rules_ml_toolchain",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "40963e4bc262dfa9a43146f610140af0068b023ace8f3c50f1705a7b50de0830",
+      "strip_prefix": "rules_ml_toolchain-cad1047facbac4fb3c1124da68bf2cb36c7eb9ac",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google-ml-infra/rules_ml_toolchain/archive/cad1047facbac4fb3c1124da68bf2cb36c7eb9ac.tar.gz",
+        "https://github.com/google-ml-infra/rules_ml_toolchain/archive/cad1047facbac4fb3c1124da68bf2cb36c7eb9ac.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_pkg-0.7.1.tar.gz",
+      "name": "rules_pkg",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "451e08a4d78988c06fa3f9306ec813b836b1d076d0f055595444ba4ff22b867f",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz"
+      ]
+    },
+    {
+      "filename": "7.0.2.tar.gz",
+      "name": "rules_proto",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "0e5c64a2599a6e26c6a03d6162242d231ecc0de219534c38cb4402171def21e8",
+      "strip_prefix": "rules_proto-7.0.2",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/bazelbuild/rules_proto/archive/refs/tags/7.0.2.tar.gz",
+        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/7.0.2.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_python-1.8.5.tar.gz",
+      "name": "rules_python",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "8964aa1e7525fea5244ba737458694a057ada1be96a92998a41caa1983562d00",
+      "strip_prefix": "rules_python-1.8.5",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_python/releases/download/1.8.5/rules_python-1.8.5.tar.gz",
+        "https://github.com/bazelbuild/rules_python/releases/download/1.8.5/rules_python-1.8.5.tar.gz"
+      ]
+    },
+    {
+      "filename": "rules_shell-v0.3.0.tar.gz",
+      "name": "rules_shell",
+      "rule_class": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+      "sha256": "d8cd4a3a91fc1dc68d4c7d6b655f09def109f7186437e3f50a9b60ab436a0c53",
+      "strip_prefix": "rules_shell-0.3.0",
+      "urls": [
+        "https://storage.googleapis.com/grpc-bazel-mirror/github.com/bazelbuild/rules_shell/releases/download/v0.3.0/rules_shell-v0.3.0.tar.gz",
+        "https://github.com/bazelbuild/rules_shell/releases/download/v0.3.0/rules_shell-v0.3.0.tar.gz"
+      ]
+    },
+    {
+      "filename": "37c773938bca4bc0d56b8cf50ef42c91c75510e2.zip",
+      "name": "shardy",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "4a8a40018669573393f5a3f4c285ae5876fe1f9221f2815c45f09a9a00f9b61c",
+      "strip_prefix": "shardy-37c773938bca4bc0d56b8cf50ef42c91c75510e2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/openxla/shardy/archive/37c773938bca4bc0d56b8cf50ef42c91c75510e2.zip",
+        "https://github.com/openxla/shardy/archive/37c773938bca4bc0d56b8cf50ef42c91c75510e2.zip"
+      ]
+    },
+    {
+      "filename": "bba574d26d63dccd9d47e95b0e039b38cd0fb0de.zip",
+      "name": "slinky",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "35649e12cefd1d0cb02f0e5dea9b012cf8ebd6db0315065b5a43fccb3009a552",
+      "strip_prefix": "slinky-bba574d26d63dccd9d47e95b0e039b38cd0fb0de",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/dsharlet/slinky/archive/bba574d26d63dccd9d47e95b0e039b38cd0fb0de.zip",
+        "https://github.com/dsharlet/slinky/archive/bba574d26d63dccd9d47e95b0e039b38cd0fb0de.zip"
+      ]
+    },
+    {
+      "filename": "1.2.2.tar.gz",
+      "name": "snappy",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "90f74bc1fbf78a6c56b3c4a082a05103b3a56bb17bca1a27e052ea11723292dc",
+      "strip_prefix": "snappy-1.2.2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz",
+        "https://github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz"
+      ]
+    },
+    {
+      "filename": "v1.15.2.tar.gz",
+      "name": "spdlog",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "7a80896357f3e8e920e85e92633b14ba0f229c506e6f978578bdc35ba09e9a5d",
+      "strip_prefix": "spdlog-1.15.2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/gabime/spdlog/archive/refs/tags/v1.15.2.tar.gz",
+        "https://github.com/gabime/spdlog/archive/refs/tags/v1.15.2.tar.gz"
+      ]
+    },
+    {
+      "filename": "e6f81ebd06b3509f2c7fa6175430aadbd4d724ca.zip",
+      "name": "stablehlo",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "ea872e1d496797e6ab1c9c1d0947d1469b4f3797c04aeeefd2c9bbdeb0dfa631",
+      "strip_prefix": "stablehlo-e6f81ebd06b3509f2c7fa6175430aadbd4d724ca",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/openxla/stablehlo/archive/e6f81ebd06b3509f2c7fa6175430aadbd4d724ca.zip",
+        "https://github.com/openxla/stablehlo/archive/e6f81ebd06b3509f2c7fa6175430aadbd4d724ca.zip"
+      ]
+    },
+    {
+      "filename": "609ced5e3f04e55234115524eb734822331a37d7.tar.gz",
+      "name": "triton",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "979b9f9fd6a1dc6a69de20f60357c9b9dc0cbfba3b1169280c75351b592e8b05",
+      "strip_prefix": "triton-609ced5e3f04e55234115524eb734822331a37d7",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/triton-lang/triton/archive/609ced5e3f04e55234115524eb734822331a37d7.tar.gz",
+        "https://github.com/triton-lang/triton/archive/609ced5e3f04e55234115524eb734822331a37d7.tar.gz"
+      ]
+    },
+    {
+      "filename": "5a9e73cbd92530cac2ac36f4736a774b2412afe2.tar.gz",
+      "name": "xla",
+      "rule_class": "//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "08a52210a04cd68d38f6201d56273d04ac0f8b4e0da9f72677c74a48cc637422",
+      "strip_prefix": "xla-5a9e73cbd92530cac2ac36f4736a774b2412afe2",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/openxla/xla/archive/5a9e73cbd92530cac2ac36f4736a774b2412afe2.tar.gz",
+        "https://github.com/openxla/xla/archive/5a9e73cbd92530cac2ac36f4736a774b2412afe2.tar.gz"
+      ]
+    },
+    {
+      "filename": "zlib-1.3.1.tar.gz",
+      "name": "zlib",
+      "rule_class": "@@xla//third_party:repo.bzl%_tf_http_archive",
+      "sha256": "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
+      "strip_prefix": "zlib-1.3.1",
+      "urls": [
+        "https://storage.googleapis.com/mirror.tensorflow.org/zlib.net/zlib-1.3.1.tar.gz",
+        "https://zlib.net/zlib-1.3.1.tar.gz"
+      ]
+    }
+  ],
+  "distdir": "/vaso/sources/jax/distdir",
+  "generated_from": "Pinned nested Bazel archive closure plus CPython 3.13 Linux x86_64 wheels verified against JAX v0.10.2 build/requirements_lock_3_13.txt (sha256:428fecda26d771915e497eb9109c31bb080883ac7ab8dd50487d9ccd5e4c1621)",
+  "jaxlib_version": "0.10.2",
+  "package": "py-jaxlib",
+  "repository_cache": "/vaso/cache/bazel/repository-cache",
+  "schema_version": 1
+}

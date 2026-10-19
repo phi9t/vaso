@@ -1,0 +1,24 @@
+package(default_visibility = ["//visibility:public"])
+
+toolchain(
+    name = "consumer_default_test_toolchain",
+    toolchain = "@bazel_tools//tools/test:empty_toolchain",
+    toolchain_type = "@bazel_tools//tools/test:default_test_toolchain_type",
+)
+
+filegroup(
+    name = "consumer_harness_files",
+    srcs = [
+        ".bazelrc",
+        "MODULE.bazel",
+        "bcr-manifest.tsv",
+        "run.sh",
+        "//examples/consumers/cutlass_gemm:consumer_cutlass_gemm_files",
+        "//examples/consumers/gsplat_rasterizer:consumer_gsplat_rasterizer_files",
+        "//examples/consumers/hello_cc:consumer_hello_files",
+        "//examples/consumers/nvshmem_ep:consumer_nvshmem_ep_files",
+        "//examples/consumers/python_consumers:consumer_python_consumers_files",
+        "//examples/consumers/rust_pyo3:consumer_rust_pyo3_files",
+        "//examples/consumers/voxel_scatter:consumer_voxel_scatter_files",
+    ],
+)

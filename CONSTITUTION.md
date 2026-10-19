@@ -1,3 +1,6 @@
+> Historical general guidance and attribution. Current repository instructions
+> are in `AGENTS.md`; this file remains as a compatibility root marker.
+
 <!-- Clanker Constitution v2026.08.11 | https://github.com/kenn-io/constitution -->
 # Clanker Constitution
 
@@ -29,6 +32,7 @@ more specific repository instructions override these defaults.
 - Never amend a commit unless explicitly requested.
 - Resolve exact targets before destructive actions and prefer recoverable operations.
 - When corrected or told to stop, stop mutating state. Inspect and report the current state before attempting recovery.
+- Public GitHub publication in this repository follows `docs/agents/publication.md`: publish a sanitized snapshot branch, not private source history.
 
 ## 5. Verify reality
 - Test behavior and contracts, not source text, configuration tautologies, or mocked versions of the same logic.

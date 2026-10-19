@@ -1,0 +1,2 @@
+# no_spack_guard enforcement baseline
+# Format: <rule><TAB><path><TAB><count>

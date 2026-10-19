@@ -1,0 +1,52 @@
+# Root package: exposes repository-level files and holds
+# the synthetic consumer entry alias.
+exports_files([
+    ".bazelrc",
+    "MODULE.bazel",
+    "MODULE.bazel.lock",
+    "dev.MODULE.bazel",
+    "migration_ledger.json",
+    "native/feature_manifest.json",
+    "native_overrides.json",
+    "rootfs/build_rootfs.sh",
+    "rootfs/build_rootfs_test.py",
+    "rootfs/cuda_ecosystem.lock.json",
+    "rootfs/cuda_ecosystem_lock_test.py",
+    "rootfs/llvm_rootfs_cache.py",
+    "rootfs/llvm_rootfs_cache_test.py",
+    "rootfs/resolve_apt_lock.py",
+    "rootfs/resolve_apt_lock_test.py",
+    "rootfs/verify_cuda_ecosystem.py",
+    "rootfs/verify_cuda_ecosystem_test.py",
+    "run.sh",
+])
+
+filegroup(
+    name = "py_jax_0102_cu129_build_graph.json",
+    srcs = ["//graphs:py_jax_0102_cu129_build_graph.json"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "py_jax_0102_cu130_build_graph.json",
+    srcs = ["//graphs:py_jax_0102_cu130_build_graph.json"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "py_torch_214_full_build_graph.json",
+    srcs = ["//graphs:py_torch_214_full_build_graph.json"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "py_torch_lean_nx_build_graph.json",
+    srcs = ["//graphs:py_torch_lean_nx_build_graph.json"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "recipe_docs",
+    srcs = glob(["docs/recipes/*.md"]),
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,31 @@
+load(":xz_action.bzl", "xz_action_prefix")
+
+# Marks native/xz as a Bazel package so xz.bzl is loadable from MODULE.bazel.
+# The @xz_native repo remains as a deprecated repository-rule alias for
+# repository-rule consumers until they move to action prefixes.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "xz.bzl",
+    "xz_action.bzl",
+])
+
+xz_action_prefix(
+    name = "xz_action_prefix",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/xz.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/xz.plan.json",
+    }),
+    rootfs_identity = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/rootfs.identity.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/rootfs.identity.json",
+    }),
+    source_archive = "@xz_action_archive//file",
+)
+
+filegroup(
+    name = "xz_action_prefix_manifest",
+    srcs = [":xz_action_prefix"],
+    output_group = "manifest",
+)

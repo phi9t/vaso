@@ -1,7 +1,7 @@
 # Lead State: <effort>
 
-The current lead maintains this file. It is everything another agent needs to
-take over as lead. See `docs/agents/cross-agent-collaboration.md`.
+Optional continuity record for efforts using a lead/execution-owner split.
+Record enough for another agent to take over. See `docs/agents/cross-agent-collaboration.md`.
 
 ## Topology
 
@@ -22,7 +22,7 @@ take over as lead. See `docs/agents/cross-agent-collaboration.md`.
 ## Watch command
 
 ```sh
-scripts/agents/relay.py watch --follower <checkout> --target <branch> \
+tools/agents/relay.py watch --follower <checkout> --target <branch> \
   --tracker .scratch/<effort> --handoff .scratch/<effort>/<follower>-handoff.md \
   --follower-pid <pid> --busy-cmd '<probe>'
 ```

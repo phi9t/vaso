@@ -1,0 +1,41 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "consumer_hello_files",
+    srcs = [
+        "BUILD.bazel",
+        "hello.cc",
+        "hello_lib.cc",
+        "hello_lib.h",
+        "hello_test.cc",
+    ],
+)
+
+cc_library(
+    name = "hello_lib",
+    srcs = ["hello_lib.cc"],
+    hdrs = ["hello_lib.h"],
+    tags = ["insula-only"],
+    deps = ["@abseil-cpp//absl/strings"],
+)
+
+cc_binary(
+    name = "hello_cc",
+    srcs = ["hello.cc"],
+    tags = ["insula-only"],
+    deps = [":hello_lib"],
+)
+
+cc_test(
+    name = "hello_cc_test",
+    srcs = ["hello_test.cc"],
+    tags = ["insula-only"],
+    deps = [
+        ":hello_lib",
+        "@googletest//:gtest_main",
+    ],
+)

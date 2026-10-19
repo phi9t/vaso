@@ -1,0 +1,4 @@
+# Path globs removed from public snapshots.
+foundry/extensions/torch_accel
+foundry/extensions/torch_accel/**
+foundry/tools/torch_accel*

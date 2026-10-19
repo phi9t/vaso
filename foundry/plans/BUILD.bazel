@@ -1,0 +1,72 @@
+package(default_visibility = ["//visibility:public"])
+
+config_setting(
+    name = "release_line_cu129",
+    flag_values = {"//native/common:release_line": "cu129"},
+)
+
+config_setting(
+    name = "release_line_cu130",
+    flag_values = {"//native/common:release_line": "cu130"},
+)
+
+exports_files([
+    "jax/cu129/jaxlib.plan.json",
+    "jax/cu129/rootfs.identity.json",
+    "jax/cu130/jaxlib.plan.json",
+    "jax/cu130/rootfs.identity.json",
+    "keys.json",
+    "native-inputs.json",
+    "schema/v1.json",
+    "torch/cu129/bzip2.plan.json",
+    "torch/cu129/rootfs.identity.json",
+    "torch/cu129/torch-artifact.json",
+    "torch/cu129/pytorch.plan.json",
+    "torch/cu129/torchaudio.plan.json",
+    "torch/cu129/torchvision.plan.json",
+    "torch/cu129/triton.plan.json",
+    "torch/cu129/xz.plan.json",
+    "torch/cu129/zstd.plan.json",
+    "torch/cu129/zlib_ng.plan.json",
+    "torch/cu130/bzip2.plan.json",
+    "torch/cu130/rootfs.identity.json",
+    "torch/cu130/torch-artifact.json",
+    "torch/cu130/pytorch.plan.json",
+    "torch/cu130/torchaudio.plan.json",
+    "torch/cu130/torchvision.plan.json",
+    "torch/cu130/triton.plan.json",
+    "torch/cu130/xz.plan.json",
+    "torch/cu130/zstd.plan.json",
+    "torch/cu130/zlib_ng.plan.json",
+])
+
+filegroup(
+    name = "committed_plan_files",
+    srcs = [
+        "jax/cu129/jaxlib.plan.json",
+        "jax/cu129/rootfs.identity.json",
+        "jax/cu130/jaxlib.plan.json",
+        "jax/cu130/rootfs.identity.json",
+        "schema/v1.json",
+        "torch/cu129/bzip2.plan.json",
+        "torch/cu129/rootfs.identity.json",
+        "torch/cu129/torch-artifact.json",
+        "torch/cu129/pytorch.plan.json",
+        "torch/cu129/torchaudio.plan.json",
+        "torch/cu129/torchvision.plan.json",
+        "torch/cu129/triton.plan.json",
+        "torch/cu129/xz.plan.json",
+        "torch/cu129/zstd.plan.json",
+        "torch/cu129/zlib_ng.plan.json",
+        "torch/cu130/bzip2.plan.json",
+        "torch/cu130/rootfs.identity.json",
+        "torch/cu130/torch-artifact.json",
+        "torch/cu130/pytorch.plan.json",
+        "torch/cu130/torchaudio.plan.json",
+        "torch/cu130/torchvision.plan.json",
+        "torch/cu130/triton.plan.json",
+        "torch/cu130/xz.plan.json",
+        "torch/cu130/zstd.plan.json",
+        "torch/cu130/zlib_ng.plan.json",
+    ],
+)

@@ -1,0 +1,24 @@
+startup --max_idle_secs=900
+
+common --incompatible_autoload_externally=cc_library,cc_binary,cc_test
+
+common:vaso_rootfs --registry=file:///vaso/sources/bcr/registry/current
+common:vaso_rootfs --lockfile_mode=off
+common:vaso_rootfs --repository_disable_download
+common:vaso_rootfs --action_env=VASO_IN_INSULA=1
+common:vaso_rootfs --action_env=VASO_ROOTFS_BUNDLE_MANIFEST=/run/vaso/rootfs-bundle.json
+common:vaso_rootfs --repo_env=VASO_IN_INSULA=1
+common:vaso_rootfs --repo_env=VASO_ROOTFS_BUNDLE_MANIFEST=/run/vaso/rootfs-bundle.json
+
+build:vaso_rootfs --platforms=@vaso_graph//toolchains:torch_rootfs_platform
+build:vaso_rootfs --extra_toolchains=@vaso_graph//toolchains:gcc_13_3_toolchain
+build:vaso_rootfs --extra_toolchains=@vaso_graph//toolchains:cuda_rootfs_toolchain
+
+common:vaso_torch_rootfs --config=vaso_rootfs
+build:vaso_torch_rootfs --platforms=@vaso_graph//toolchains:torch_rootfs_platform
+build:vaso_torch_rootfs --extra_toolchains=@vaso_graph//toolchains:gcc_13_3_toolchain
+build:vaso_torch_rootfs --extra_toolchains=@vaso_graph//toolchains:cuda_rootfs_toolchain
+
+common:vaso_jax_rootfs --config=vaso_rootfs
+build:vaso_jax_rootfs --platforms=@vaso_graph//toolchains:jax_rootfs_platform
+build:vaso_jax_rootfs --extra_toolchains=@vaso_graph//toolchains:clang_23_toolchain

@@ -1,3 +1,7 @@
+> Historical design/reference. Current product contracts are in the root
+> `docs/architecture.md` and module READMEs. Procedures below describe their
+> original effort and are not active agent instructions.
+
 # Vaso bwrap Rootfs Container Infrastructure Design
 
 **Status:** Draft design record
@@ -1056,7 +1060,7 @@ and writes `bwrap-plan.json`, `stdout.log`, `stderr.log`, `result.json`, and a
 small machine-readable validation report under `/vaso/runs/<run-id>/validation/`.
 
 The first implementation should include a fixture repo, mounted at
-`/workspace/vaso-fixtures` or generated under `/vaso/tmp/fixtures`, containing
+`/workspace/vaso-smoke` or generated under `/vaso/tmp/fixtures`, containing
 small C++, Rust, Go, and Python sources plus Bazel targets. Fixture sources
 should be boring and deterministic: compile one function, run one binary, and
 emit a known string or JSON value. The goal is to verify the substrate, not the
@@ -1100,9 +1104,9 @@ Bazel fixture targets:
 Required commands:
 
 ```bash
-vaso bazel --repo vaso-fixtures -- build //cpp:hello_cpp //rust:hello_rust //go:hello_go //python:hello_python
-vaso bazel --repo vaso-fixtures -- test //cpp:hello_cpp_test //rust:hello_rust_test //go:hello_go_test //python:hello_python_test
-vaso bazel --repo vaso-fixtures -- run //integration:all
+vaso bazel --repo vaso-smoke -- build //cpp:hello_cpp //rust:hello_rust //go:hello_go //python:hello_python
+vaso bazel --repo vaso-smoke -- test //cpp:hello_cpp_test //rust:hello_rust_test //go:hello_go_test //python:hello_python_test
+vaso bazel --repo vaso-smoke -- run //integration:all
 ```
 
 Tier 1 records:
@@ -1163,8 +1167,8 @@ same method uv will effectively rely on.
 Required online commands:
 
 ```bash
-vaso uv --repo vaso-fixtures -- sync --locked
-vaso run --repo vaso-fixtures -- python - <<'PY'
+vaso uv --repo vaso-smoke -- sync --locked
+vaso run --repo vaso-smoke -- python - <<'PY'
 import json
 import torch
 
@@ -1179,7 +1183,7 @@ if torch.cuda.is_available():
     result["cuda_sum"] = float((x @ x).sum().item())
 print(json.dumps(result, sort_keys=True))
 PY
-vaso run --repo vaso-fixtures -- python - <<'PY'
+vaso run --repo vaso-smoke -- python - <<'PY'
 import importlib.util
 import json
 

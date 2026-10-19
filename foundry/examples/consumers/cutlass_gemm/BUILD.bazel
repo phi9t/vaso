@@ -1,0 +1,79 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("@vaso_graph//native/common:extension_action.bzl", "vaso_torch_extension")
+
+package(default_visibility = ["//visibility:public"])
+
+_TORCH_ARTIFACT_DATA = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "@vaso_torch_artifact_cu129//:prefix",
+        "@vaso_torch_artifact_cu129//:prefix_path.txt",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "@vaso_torch_artifact_cu130//:prefix",
+        "@vaso_torch_artifact_cu130//:prefix_path.txt",
+    ],
+})
+
+_TORCH_ARTIFACT_PREFIX_ARG = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu129//:prefix_path.txt)",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu130//:prefix_path.txt)",
+    ],
+})
+
+filegroup(
+    name = "consumer_cutlass_gemm_files",
+    srcs = [
+        "BUILD.bazel",
+        "README.md",
+        "run_wheel_test.sh",
+        "tests/cutlass_gemm_test.py",
+        "vaso_cutlass_gemm/__init__.py",
+        "vaso_cutlass_gemm/cutlass_gemm.cpp",
+        "vaso_cutlass_gemm/cutlass_gemm_kernel.cu",
+    ],
+)
+
+vaso_torch_extension(
+    name = "cutlass_gemm",
+    srcs = ["vaso_cutlass_gemm/cutlass_gemm.cpp"],
+    cuda_srcs = ["vaso_cutlass_gemm/cutlass_gemm_kernel.cu"],
+    deps = ["@cutlass//:cutlass"],
+    package = "vaso-cutlass-gemm",
+    profile = "torch",
+    py_srcs = ["vaso_cutlass_gemm/__init__.py"],
+    version = "0.1.0",
+)
+
+sh_test(
+    name = "cutlass_gemm_cpu_test",
+    srcs = ["run_wheel_test.sh"],
+    args = [
+        "--device=cpu",
+        "--python=$(VASO_PYTHON_PREFIX)/bin/python3.13",
+    ] + _TORCH_ARTIFACT_PREFIX_ARG,
+    data = [
+        ":cutlass_gemm",
+        "tests/cutlass_gemm_test.py",
+    ] + _TORCH_ARTIFACT_DATA,
+    tags = ["insula-only"],
+)
+
+sh_test(
+    name = "cutlass_gemm_cuda_test",
+    srcs = ["run_wheel_test.sh"],
+    args = [
+        "--device=cuda",
+        "--python=$(VASO_PYTHON_PREFIX)/bin/python3.13",
+    ] + _TORCH_ARTIFACT_PREFIX_ARG,
+    data = [
+        ":cutlass_gemm",
+        "tests/cutlass_gemm_test.py",
+    ] + _TORCH_ARTIFACT_DATA,
+    tags = [
+        "insula-only",
+        "requires-gpu",
+    ],
+)

@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "torch": {
+      "features": {
+        "pytorch.cuda": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_CUDA"
+          ],
+          "verifier_ids": [
+            "W1a",
+            "W1b",
+            "W2a"
+          ]
+        },
+        "pytorch.cudnn": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_CUDNN"
+          ],
+          "verifier_ids": [
+            "W6f",
+            "W6g"
+          ]
+        },
+        "pytorch.nccl": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_NCCL",
+            "pytorch:USE_SYSTEM_NCCL"
+          ],
+          "verifier_ids": [
+            "W1c",
+            "W1d"
+          ]
+        },
+        "pytorch.distributed": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_DISTRIBUTED"
+          ],
+          "verifier_ids": [
+            "W1c",
+            "W1d",
+            "W6h",
+            "W6i",
+            "W6j"
+          ]
+        },
+        "pytorch.gloo": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_GLOO"
+          ],
+          "verifier_ids": [
+            "W6h"
+          ]
+        },
+        "pytorch.mpi": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_MPI"
+          ],
+          "verifier_ids": [
+            "W6i"
+          ]
+        },
+        "pytorch.tensorpipe_rpc": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_TENSORPIPE",
+            "pytorch:USE_RPC"
+          ],
+          "verifier_ids": [
+            "W6j"
+          ]
+        },
+        "pytorch.numa": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_NUMA"
+          ],
+          "verifier_ids": [
+            "W6p"
+          ]
+        },
+        "pytorch.openmp": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_OPENMP"
+          ],
+          "verifier_ids": [
+            "W6p"
+          ]
+        },
+        "pytorch.fbgemm": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_FBGEMM"
+          ],
+          "verifier_ids": [
+            "W6k"
+          ]
+        },
+        "pytorch.qnnpack": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_QNNPACK"
+          ],
+          "verifier_ids": [
+            "W6l"
+          ]
+        },
+        "pytorch.xnnpack": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_XNNPACK",
+            "pytorch:USE_SYSTEM_CPUINFO",
+            "pytorch:USE_SYSTEM_FXDIV",
+            "pytorch:USE_SYSTEM_PSIMD",
+            "pytorch:USE_SYSTEM_PTHREADPOOL"
+          ],
+          "verifier_ids": [
+            "W6m"
+          ]
+        },
+        "pytorch.nnpack": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_NNPACK"
+          ],
+          "verifier_ids": [
+            "W6n"
+          ]
+        },
+        "pytorch.openblas": {
+          "status": "verified",
+          "flags": [
+            "pytorch:BLAS"
+          ],
+          "verifier_ids": [
+            "W6o"
+          ]
+        },
+        "pytorch.kineto": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_KINETO"
+          ],
+          "verifier_ids": [
+            "W6d"
+          ]
+        },
+        "pytorch.flash_attention": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_FLASH_ATTENTION"
+          ],
+          "verifier_ids": [
+            "W1b"
+          ]
+        },
+        "pytorch.mem_eff_attention": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_MEM_EFF_ATTENTION"
+          ],
+          "verifier_ids": [
+            "W6e"
+          ]
+        },
+        "pytorch.cusparselt": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_CUSPARSELT"
+          ],
+          "verifier_ids": [
+            "W6a"
+          ]
+        },
+        "pytorch.cudss": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_CUDSS"
+          ],
+          "verifier_ids": [
+            "W6b"
+          ]
+        },
+        "pytorch.nvshmem": {
+          "status": "verified",
+          "flags": [
+            "pytorch:USE_NVSHMEM"
+          ],
+          "verifier_ids": [
+            "W6c"
+          ]
+        },
+        "pytorch.mkl": {
+          "status": "off",
+          "flags": [
+            "pytorch:USE_MKL"
+          ],
+          "verifier_ids": [],
+          "reason": "FC-D1: MKL stays off."
+        },
+        "pytorch.mkldnn": {
+          "status": "off",
+          "flags": [
+            "pytorch:USE_MKLDNN"
+          ],
+          "verifier_ids": [],
+          "reason": "FC-D1: oneDNN/MKLDNN stays off."
+        },
+        "pytorch.magma": {
+          "status": "off",
+          "flags": [
+            "pytorch:USE_MAGMA"
+          ],
+          "verifier_ids": [],
+          "reason": "FC-D1: MAGMA stays off."
+        },
+        "torchvision.cuda": {
+          "status": "verified",
+          "flags": [
+            "torchvision:TORCHVISION_USE_NVJPEG"
+          ],
+          "verifier_ids": [
+            "W6r",
+            "W6s"
+          ]
+        },
+        "torchvision.png": {
+          "status": "verified",
+          "flags": [
+            "torchvision:TORCHVISION_USE_PNG"
+          ],
+          "verifier_ids": [
+            "W6q"
+          ]
+        },
+        "torchvision.jpeg": {
+          "status": "verified",
+          "flags": [
+            "torchvision:TORCHVISION_USE_JPEG"
+          ],
+          "verifier_ids": [
+            "W6q"
+          ]
+        },
+        "torchvision.webp": {
+          "status": "off",
+          "flags": [
+            "torchvision:TORCHVISION_USE_WEBP"
+          ],
+          "verifier_ids": [],
+          "reason": "FC-D1: WebP stays off."
+        },
+        "torchaudio.cuda": {
+          "status": "verified",
+          "flags": [
+            "torchaudio:USE_CUDA"
+          ],
+          "verifier_ids": [
+            "W6t",
+            "W6u",
+            "W6v"
+          ]
+        },
+        "torchaudio.rnnt": {
+          "status": "verified",
+          "flags": [
+            "torchaudio:BUILD_RNNT"
+          ],
+          "verifier_ids": [
+            "W6t"
+          ]
+        },
+        "torchaudio.forced_align": {
+          "status": "verified",
+          "flags": [
+            "torchaudio:BUILD_ALIGN"
+          ],
+          "verifier_ids": [
+            "W6u"
+          ]
+        },
+        "torchaudio.cuda_ctc_decoder": {
+          "status": "verified",
+          "flags": [
+            "torchaudio:BUILD_CUDA_CTC_DECODER"
+          ],
+          "verifier_ids": [
+            "W6v"
+          ]
+        },
+        "triton.proton": {
+          "status": "verified",
+          "flags": [],
+          "verifier_ids": [
+            "W6w"
+          ]
+        }
+      }
+    },
+    "jax": {
+      "features": {
+        "jax.wheel": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:wheel:jax"
+          ],
+          "verifier_ids": [
+            "W3a"
+          ]
+        },
+        "jaxlib.wheel": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:wheel:jaxlib"
+          ],
+          "verifier_ids": [
+            "W3a",
+            "W5c"
+          ]
+        },
+        "jaxlib.cuda_plugin": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:wheel:jax-cuda-plugin",
+            "jaxlib:cuda",
+            "jaxlib:cudnn"
+          ],
+          "verifier_ids": [
+            "W3a",
+            "W5d"
+          ]
+        },
+        "jaxlib.cuda_pjrt": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:wheel:jax-cuda-pjrt",
+            "jaxlib:nccl"
+          ],
+          "verifier_ids": [
+            "W3b",
+            "W5a"
+          ]
+        },
+        "jaxlib.blackwell": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:sm_100"
+          ],
+          "verifier_ids": [
+            "W3a",
+            "W5e"
+          ]
+        },
+        "jaxlib.clang_cuda": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:clang_cuda"
+          ],
+          "verifier_ids": [
+            "W3a"
+          ]
+        },
+        "jaxlib.nvshmem": {
+          "status": "verified",
+          "jaxlib_features": [
+            "jaxlib:nvshmem"
+          ],
+          "verifier_ids": [
+            "W5g"
+          ]
+        }
+      }
+    }
+  }
+}

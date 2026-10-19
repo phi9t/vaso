@@ -1,3 +1,7 @@
+> Historical design/reference. Current product contracts are in the root
+> `docs/architecture.md` and module READMEs. Procedures below describe their
+> original effort and are not active agent instructions.
+
 # Vaso Rootfs Validation Slice Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

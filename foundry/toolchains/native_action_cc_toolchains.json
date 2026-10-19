@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "toolchains": {
+    "vaso-rootfs-clang-23": {
+      "cc": "/usr/lib/llvm-23/bin/clang",
+      "cflags": "",
+      "cxx": "/usr/lib/llvm-23/bin/clang++",
+      "cxxflags": "",
+      "cudaflags": "",
+      "family": "clang",
+      "nvcc_flags": "-forward-unknown-to-host-compiler"
+    },
+    "vaso-rootfs-gcc-13.3": {
+      "cc": "/usr/bin/gcc",
+      "cflags": "",
+      "cxx": "/usr/bin/g++",
+      "cxxflags": "",
+      "cudaflags": "",
+      "family": "gcc",
+      "nvcc_flags": "-forward-unknown-to-host-compiler"
+    }
+  }
+}

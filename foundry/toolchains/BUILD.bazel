@@ -1,0 +1,348 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_toolchain")
+load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_python//python:py_runtime.bzl", "py_runtime")
+load("@rules_python//python:py_runtime_pair.bzl", "py_runtime_pair")
+load(":cc_toolchain_config.bzl", "rootfs_cc_toolchain_config")
+load(":cuda_toolchain.bzl", "cuda_toolchain_info")
+load(":python_toolchain.bzl", "python_prefix_file", "python_toolchain_info")
+load(":resolution_probe.bzl", "rootfs_toolchain_probe")
+load(":rootfs_cc_builtin_includes.bzl", "ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_BY_LINE")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "clang_23_cc_driver",
+    "clang_23_cxx_driver",
+    "gcc_13_3_cc_driver",
+    "gcc_13_3_cxx_driver",
+    "native_action_cc_toolchains.json",
+    "native_action_consumer_families.json",
+])
+
+filegroup(
+    name = "native_action_consumer_families",
+    srcs = ["native_action_consumer_families.json"],
+)
+
+filegroup(
+    name = "native_action_cc_toolchains",
+    srcs = ["native_action_cc_toolchains.json"],
+)
+
+filegroup(
+    name = "toolchain_files",
+    srcs = [
+        "BUILD.bazel",
+        "cc_toolchain_config.bzl",
+        "clang_23_cc_driver",
+        "clang_23_cxx_driver",
+        "cuda_toolchain.bzl",
+        "gcc_13_3_cc_driver",
+        "gcc_13_3_cxx_driver",
+        "native_action_cc_toolchains.json",
+        "native_action_consumer_families.json",
+        "python_toolchain.bzl",
+        "resolution_probe.bzl",
+        "rootfs_cc_builtin_include_probe.py",
+        "rootfs_cc_builtin_include_probe_test.py",
+        "rootfs_cc_builtin_includes.bzl",
+        "rootfs_cc_compile_probe.cc",
+    ],
+)
+
+constraint_setting(
+    name = "cc_family",
+    default_constraint_value = ":cc_family_unselected",
+)
+
+constraint_value(
+    name = "cc_family_unselected",
+    constraint_setting = ":cc_family",
+)
+
+constraint_value(
+    name = "cc_family_gcc_13_3",
+    constraint_setting = ":cc_family",
+)
+
+constraint_value(
+    name = "cc_family_clang_23",
+    constraint_setting = ":cc_family",
+)
+
+constraint_setting(
+    name = "python_runtime",
+    default_constraint_value = ":python_runtime_unselected",
+)
+
+constraint_value(
+    name = "python_runtime_unselected",
+    constraint_setting = ":python_runtime",
+)
+
+constraint_value(
+    name = "python_runtime_3_13_13",
+    constraint_setting = ":python_runtime",
+)
+
+constraint_setting(
+    name = "cuda_sdk",
+    default_constraint_value = ":cuda_sdk_unselected",
+)
+
+constraint_value(
+    name = "cuda_sdk_unselected",
+    constraint_setting = ":cuda_sdk",
+)
+
+constraint_value(
+    name = "cuda_sdk_rootfs",
+    constraint_setting = ":cuda_sdk",
+)
+
+platform(
+    name = "torch_rootfs_platform",
+    constraint_values = [
+        ":cc_family_gcc_13_3",
+        ":cuda_sdk_rootfs",
+        ":python_runtime_3_13_13",
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+platform(
+    name = "jax_rootfs_platform",
+    constraint_values = [
+        ":cc_family_clang_23",
+        ":cuda_sdk_rootfs",
+        ":python_runtime_3_13_13",
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+filegroup(name = "empty_toolchain_files")
+
+filegroup(
+    name = "gcc_13_3_driver_files",
+    srcs = [
+        "gcc_13_3_cc_driver",
+        "gcc_13_3_cxx_driver",
+    ],
+)
+
+filegroup(
+    name = "clang_23_driver_files",
+    srcs = [
+        "clang_23_cc_driver",
+        "clang_23_cxx_driver",
+    ],
+)
+
+rootfs_cc_toolchain_config(
+    name = "gcc_13_3_config",
+    abi_libc_version = "glibc",
+    abi_version = "gcc-13.3",
+    ar = "/usr/bin/ar",
+    builtin_include_directories_by_line = {
+        line: ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_BY_LINE[line]["gcc_13_3"]
+        for line in ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_BY_LINE
+    },
+    cc = "/usr/bin/gcc",
+    cc_driver = ":gcc_13_3_cc_driver",
+    compiler = "gcc-13.3",
+    cpp = "/usr/bin/cpp",
+    cxx = "/usr/bin/g++",
+    cxx_driver = ":gcc_13_3_cxx_driver",
+    dwp = "/usr/bin/dwp",
+    gcov = "/usr/bin/gcov",
+    ld = "/usr/bin/ld",
+    llvm_cov = "/usr/bin/false",
+    llvm_profdata = "/usr/bin/false",
+    nm = "/usr/bin/nm",
+    objcopy = "/usr/bin/objcopy",
+    objdump = "/usr/bin/objdump",
+    strip = "/usr/bin/strip",
+    toolchain_identifier = "vaso-rootfs-gcc-13.3",
+)
+
+cc_toolchain(
+    name = "gcc_13_3_cc_toolchain",
+    all_files = ":empty_toolchain_files",
+    ar_files = ":empty_toolchain_files",
+    compiler_files = ":gcc_13_3_driver_files",
+    dwp_files = ":empty_toolchain_files",
+    linker_files = ":gcc_13_3_driver_files",
+    objcopy_files = ":empty_toolchain_files",
+    strip_files = ":empty_toolchain_files",
+    supports_param_files = True,
+    toolchain_config = ":gcc_13_3_config",
+    toolchain_identifier = "vaso-rootfs-gcc-13.3",
+)
+
+toolchain(
+    name = "gcc_13_3_toolchain",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        ":cc_family_gcc_13_3",
+    ],
+    toolchain = ":gcc_13_3_cc_toolchain",
+    toolchain_type = "@rules_cc//cc:toolchain_type",
+)
+
+rootfs_cc_toolchain_config(
+    name = "clang_23_config",
+    abi_libc_version = "glibc",
+    abi_version = "clang-23",
+    ar = "/usr/lib/llvm-23/bin/llvm-ar",
+    builtin_include_directories_by_line = {
+        line: ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_BY_LINE[line]["clang_23"]
+        for line in ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_BY_LINE
+    },
+    cc = "/usr/lib/llvm-23/bin/clang",
+    cc_driver = ":clang_23_cc_driver",
+    compiler = "clang-23",
+    cpp = "/usr/lib/llvm-23/bin/clang-cpp",
+    cxx = "/usr/lib/llvm-23/bin/clang++",
+    cxx_driver = ":clang_23_cxx_driver",
+    dwp = "/usr/lib/llvm-23/bin/llvm-dwp",
+    gcov = "/usr/lib/llvm-23/bin/llvm-cov",
+    ld = "/usr/lib/llvm-23/bin/ld.lld",
+    llvm_cov = "/usr/lib/llvm-23/bin/llvm-cov",
+    llvm_profdata = "/usr/lib/llvm-23/bin/llvm-profdata",
+    nm = "/usr/lib/llvm-23/bin/llvm-nm",
+    objcopy = "/usr/lib/llvm-23/bin/llvm-objcopy",
+    objdump = "/usr/lib/llvm-23/bin/llvm-objdump",
+    strip = "/usr/lib/llvm-23/bin/llvm-strip",
+    toolchain_identifier = "vaso-rootfs-clang-23",
+)
+
+cc_toolchain(
+    name = "clang_23_cc_toolchain",
+    all_files = ":empty_toolchain_files",
+    ar_files = ":empty_toolchain_files",
+    compiler_files = ":clang_23_driver_files",
+    dwp_files = ":empty_toolchain_files",
+    linker_files = ":clang_23_driver_files",
+    objcopy_files = ":empty_toolchain_files",
+    strip_files = ":empty_toolchain_files",
+    supports_param_files = True,
+    toolchain_config = ":clang_23_config",
+    toolchain_identifier = "vaso-rootfs-clang-23",
+)
+
+toolchain(
+    name = "clang_23_toolchain",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        ":cc_family_clang_23",
+    ],
+    toolchain = ":clang_23_cc_toolchain",
+    toolchain_type = "@rules_cc//cc:toolchain_type",
+)
+
+python_prefix_file(
+    name = "python_313_interpreter",
+    path = "prefix/bin/python3.13",
+    prefix = "@python_313_native//:prefix",
+)
+
+py_runtime(
+    name = "python_313_runtime",
+    files = ["@python_313_native//:prefix"],
+    interpreter = ":python_313_interpreter",
+    interpreter_version_info = {
+        "major": "3",
+        "minor": "13",
+        "micro": "13",
+    },
+    python_version = "PY3",
+)
+
+py_runtime_pair(
+    name = "python_313_runtime_pair",
+    py3_runtime = ":python_313_runtime",
+)
+
+toolchain(
+    name = "python_313_toolchain",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        ":python_runtime_3_13_13",
+    ],
+    toolchain = ":python_313_runtime_pair",
+    toolchain_type = "@rules_python//python:toolchain_type",
+)
+
+toolchain_type(name = "python_toolchain_info_type")
+
+python_toolchain_info(
+    name = "python_313_info",
+    python_prefix_file = "@python_313_native//:prefix_path.txt",
+    version = "3.13.13",
+)
+
+toolchain(
+    name = "python_313_info_toolchain",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        ":python_runtime_3_13_13",
+    ],
+    toolchain = ":python_313_info",
+    toolchain_type = ":python_toolchain_info_type",
+)
+
+toolchain_type(name = "cuda_toolchain_type")
+
+cuda_toolchain_info(
+    name = "cuda_rootfs_info",
+    cuda_home = "/usr/local/cuda",
+    cuda_arch_list = "10.0+PTX",
+    cuda_prefix_file = "@cuda_native//:prefix_path.txt",
+    nvcc = "/usr/local/cuda/bin/nvcc",
+)
+
+toolchain(
+    name = "cuda_rootfs_toolchain",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        ":cuda_sdk_rootfs",
+    ],
+    toolchain = ":cuda_rootfs_info",
+    toolchain_type = ":cuda_toolchain_type",
+)
+
+rootfs_toolchain_probe(name = "rootfs_toolchain_probe")
+
+cc_binary(
+    name = "rootfs_cc_compile_probe",
+    srcs = ["rootfs_cc_compile_probe.cc"],
+    tags = ["manual"],
+)
+
+py_test(
+    name = "rootfs_cc_builtin_include_probe_test",
+    srcs = ["rootfs_cc_builtin_include_probe_test.py"],
+    data = [
+        "rootfs_cc_builtin_include_probe.py",
+        "rootfs_cc_builtin_includes.bzl",
+    ],
+    main = "rootfs_cc_builtin_include_probe_test.py",
+    tags = ["insula-only"],
+)

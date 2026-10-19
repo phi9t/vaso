@@ -1,0 +1,115 @@
+{
+  "build": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nmake -f Makefile-libbz2_so -j{jobs} CFLAGS=\"-fpic -fPIC -Wall -Winline -O2 -D_FILE_OFFSET_BITS=64\"\nmake -j{jobs} CFLAGS=\"-Wall -Winline -O2 -D_FILE_OFFSET_BITS=64\""
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "configure": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nsed -i 's/^CC=gcc$/CC ?= gcc/' Makefile\nsed -i 's/^CC=gcc$/CC ?= gcc/' Makefile-libbz2_so"
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "deps": {},
+  "determinism": {
+    "prefix_map": {
+      "{out}": ".",
+      "{work}": "."
+    },
+    "seed": "sha256:c2d5411bb6f3357772d41022ae34d1950f432e330e4e6408b25e47e28a11b327",
+    "source_date_epoch": 1595891929
+  },
+  "gpu_archs": [],
+  "inputs": [],
+  "install": {
+    "argv": [
+      "bash",
+      "-c",
+      "set -euo pipefail\nmake install PREFIX=\"{out}\"\ninstall -m 0755 bzip2-shared \"{out}/bin/bzip2\"\ninstall -m 0644 libbz2.so.1.0.8 \"{out}/lib/libbz2.so.1.0.8\"\ncd \"{out}/lib\"\nln -sfn libbz2.so.1.0.8 libbz2.so\nln -sfn libbz2.so.1.0.8 libbz2.so.1\nln -sfn libbz2.so.1.0.8 libbz2.so.1.0\ncd \"{out}/bin\"\nln -sfn bzip2 bunzip2\nln -sfn bzip2 bzcat\nln -sfn bzgrep bzegrep\nln -sfn bzgrep bzfgrep\nln -sfn bzmore bzless\nln -sfn bzdiff bzcmp\nmkdir -p \"{out}/lib/pkgconfig\"\n{\n  printf 'prefix={out}\\n'\n  printf 'exec_prefix=$\\173prefix\\175\\n'\n  printf 'libdir=$\\173exec_prefix\\175/lib\\n'\n  printf 'includedir=$\\173prefix\\175/include\\n'\n  printf '\\n'\n  printf 'Name: bzip2\\n'\n  printf 'Description: Lossless, block-sorting data compression\\n'\n  printf 'Version: 1.0.8\\n'\n  printf 'Libs: -L$\\173libdir\\175 -lbz2\\n'\n  printf 'Cflags: -I$\\173includedir\\175\\n'\n} > \"{out}/lib/pkgconfig/bzip2.pc\""
+    ],
+    "cwd": "{src}",
+    "env": {}
+  },
+  "line": "cu129",
+  "live_checks": {
+    "commands": [
+      {
+        "argv": [
+          "gcc",
+          "-dumpfullversion"
+        ],
+        "expect_stdout": "13.3.0",
+        "name": "gcc-dumpfullversion"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "gcc-13"
+        ],
+        "expect_stdout": "13.3.0-6ubuntu2~24.04.1",
+        "name": "dpkg-gcc-13"
+      },
+      {
+        "argv": [
+          "dpkg-query",
+          "-W",
+          "-f=${Version}",
+          "cuda-cudart-12-9"
+        ],
+        "expect_stdout": "12.9.79-1",
+        "name": "dpkg-cuda-cudart-12-9"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "kind": "prefix",
+      "path": "{out}"
+    }
+  ],
+  "package": {
+    "name": "bzip2",
+    "version": "1.0.8"
+  },
+  "profile": "torch",
+  "schema": 1,
+  "sources": [
+    {
+      "archive": "{source_archive}",
+      "name": "main",
+      "patches": [],
+      "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+      "strip_prefix": "bzip2-1.0.8",
+      "urls": [
+        "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+      ]
+    }
+  ],
+  "toolchain": {
+    "cc": "toolchain:gcc_13_3",
+    "cuda": "rootfs:cuda@12.9.1",
+    "cxx": "toolchain:gcc_13_3",
+    "env": {
+      "CC": "/usr/bin/gcc",
+      "CFLAGS": "",
+      "CUDAFLAGS": "",
+      "CXX": "/usr/bin/g++",
+      "CXXFLAGS": "",
+      "NVCC_FLAGS": "-forward-unknown-to-host-compiler"
+    },
+    "python": "python_313_native",
+    "rootfs_identity": {
+      "label": "//plans:torch/cu129/rootfs.identity.json",
+      "sha256": "90923da03e3a0ad517b0c5a538f96f11b109909373a870b78b7661890b2eb23c"
+    }
+  }
+}

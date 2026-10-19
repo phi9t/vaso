@@ -1,0 +1,12 @@
+load("@vaso_graph//native/common:extension_action.bzl", "vaso_torch_extension")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "extension.cpp",
+])
+
+vaso_torch_extension(
+    name = "fixture_extension",
+    srcs = ["extension.cpp"],
+)

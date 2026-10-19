@@ -1,0 +1,472 @@
+{
+  "$defs": {
+    "dep": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "manifest": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "key"
+      ],
+      "type": "object"
+    },
+    "input": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "live_check_command": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "expect_stdout": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "argv",
+        "expect_stdout"
+      ],
+      "type": "object"
+    },
+    "live_checks": {
+      "additionalProperties": false,
+      "properties": {
+        "commands": {
+          "items": {
+            "$ref": "#/$defs/live_check_command"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "commands"
+      ],
+      "type": "object"
+    },
+    "manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "nested_archive": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "urls": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "sha256",
+        "urls"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "prefix",
+            "wheel"
+          ]
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "path"
+      ],
+      "type": "object"
+    },
+    "patch": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "phase": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "env": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "cwd",
+        "argv",
+        "env"
+      ],
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "archive": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "patches": {
+          "items": {
+            "$ref": "#/$defs/patch"
+          },
+          "type": "array"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "strip_prefix": {
+          "type": "string"
+        },
+        "urls": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "archive",
+        "patches",
+        "sha256",
+        "strip_prefix",
+        "urls"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "build": {
+      "$ref": "#/$defs/phase"
+    },
+    "configure": {
+      "$ref": "#/$defs/phase"
+    },
+    "deps": {
+      "additionalProperties": {
+        "$ref": "#/$defs/dep"
+      },
+      "type": "object"
+    },
+    "determinism": {
+      "additionalProperties": false,
+      "properties": {
+        "prefix_map": {
+          "additionalProperties": {
+            "const": "."
+          },
+          "propertyNames": {
+            "enum": [
+              "{work}",
+              "{out}"
+            ]
+          },
+          "type": "object"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "source_date_epoch": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "prefix_map",
+        "seed",
+        "source_date_epoch"
+      ],
+      "type": "object"
+    },
+    "gpu_archs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "#/$defs/input"
+      },
+      "type": "array"
+    },
+    "install": {
+      "$ref": "#/$defs/phase"
+    },
+    "line": {
+      "enum": [
+        "cu129",
+        "cu130"
+      ]
+    },
+    "live_checks": {
+      "$ref": "#/$defs/live_checks"
+    },
+    "nested_bazel": {
+      "additionalProperties": false,
+      "properties": {
+        "archives": {
+          "items": {
+            "$ref": "#/$defs/nested_archive"
+          },
+          "type": "array"
+        },
+        "build_py_args": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "distdir_manifest": {
+          "$ref": "#/$defs/manifest"
+        },
+        "repository_cache_manifest": {
+          "$ref": "#/$defs/manifest"
+        }
+      },
+      "required": [
+        "archives",
+        "build_py_args",
+        "distdir_manifest",
+        "repository_cache_manifest"
+      ],
+      "type": "object"
+    },
+    "outputs": {
+      "items": {
+        "$ref": "#/$defs/output"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "package": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "profile": {
+      "enum": [
+        "jax",
+        "torch"
+      ]
+    },
+    "schema": {
+      "const": 1
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "toolchain": {
+      "additionalProperties": false,
+      "properties": {
+        "cc": {
+          "type": "string"
+        },
+        "cuda": {
+          "type": "string"
+        },
+        "cxx": {
+          "type": "string"
+        },
+        "env": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "properties": {
+            "CC": {
+              "type": "string"
+            },
+            "CFLAGS": {
+              "type": "string"
+            },
+            "CUDAFLAGS": {
+              "type": "string"
+            },
+            "CXX": {
+              "type": "string"
+            },
+            "CXXFLAGS": {
+              "type": "string"
+            },
+            "NVCC_FLAGS": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "CC",
+            "CXX",
+            "CFLAGS",
+            "CXXFLAGS",
+            "CUDAFLAGS",
+            "NVCC_FLAGS"
+          ],
+          "type": "object"
+        },
+        "python": {
+          "type": "string"
+        },
+        "rootfs_identity": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "sha256"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "cc",
+        "cuda",
+        "cxx",
+        "env",
+        "python",
+        "rootfs_identity"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "profile",
+    "line",
+    "package",
+    "sources",
+    "toolchain",
+    "deps",
+    "configure",
+    "build",
+    "install",
+    "outputs",
+    "inputs",
+    "gpu_archs",
+    "determinism",
+    "live_checks"
+  ],
+  "type": "object",
+  "x-allowed-placeholders": [
+    "cuda_home",
+    "jobs",
+    "nested_build_py_args",
+    "nested_disk_cache",
+    "nested_distdir",
+    "nested_repository_cache",
+    "out",
+    "pcfiledir",
+    "prefix_map_flags",
+    "rootfs_identity",
+    "seed",
+    "source_archive",
+    "source_date_epoch",
+    "src",
+    "wheel",
+    "work"
+  ]
+}

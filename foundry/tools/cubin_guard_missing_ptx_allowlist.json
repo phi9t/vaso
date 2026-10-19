@@ -1,0 +1,6 @@
+[
+  {
+    "path_pattern": "torch/lib/libtorch_nvshmem.so",
+    "reason": "relocatable device code plus device link: nvlink emits cubin only; future-arch JIT is not available for NVSHMEM kernels"
+  }
+]

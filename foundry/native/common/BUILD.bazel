@@ -1,0 +1,408 @@
+load(":build_settings.bzl", "native_action_string_flag", "release_cuda_line", "release_git_sha")
+load(":extension_action.bzl", "torch_extension_rootfs_prefix_fixture", "torch_extension_test_provider", "vaso_torch_extension_for_test")
+load(":runtime_wheelhouse_action.bzl", "runtime_wheelhouse_action")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "torch_extension_rootfs_platform",
+    constraint_values = [
+        "//toolchains:cc_family_gcc_13_3",
+        "//toolchains:cuda_sdk_rootfs",
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+)
+
+exports_files([
+    "build_settings.bzl",
+    "committed_plan_prefix.bzl",
+    "extension_action.bzl",
+    "extension_builder.py",
+    "extension_info.bzl",
+    "native_action_inputs.bzl",
+    "native_action_toolchain.bzl",
+    "native_action_toolchain.py",
+    "native_output_path_query.bzl",
+    "plan_executor.py",
+    "plan_schema.py",
+    "prefix_manifest.bzl",
+    "prefix_manifest.py",
+    "python_abi.bzl",
+    "repair_wheel.py",
+    "release_wheel_action.bzl",
+    "release_wheel.py",
+    "rootfs_cuda_component.bzl",
+    "runtime_wheelhouse.py",
+    "runtime_wheelhouse_action.bzl",
+    "runtime_wheelhouse_test.py",
+    "torch_artifact.bzl",
+    "torch_artifact_missing.bzl",
+    "torch_artifact_provider.bzl",
+])
+
+filegroup(
+    name = "toolchain_helper_files",
+    srcs = [
+        "build_settings.bzl",
+        "native_action_toolchain.bzl",
+        "native_action_toolchain.py",
+    ],
+)
+
+py_library(
+    name = "native_action_toolchain_py",
+    srcs = ["native_action_toolchain.py"],
+    data = [
+        "//toolchains:native_action_cc_toolchains",
+        "//toolchains:native_action_consumer_families",
+    ],
+)
+
+py_test(
+    name = "native_action_toolchain_test",
+    srcs = [
+        "native_action_toolchain_test.py",
+    ],
+    data = [
+        ":BUILD.bazel",
+        ":build_settings.bzl",
+        ":native_action_toolchain.bzl",
+        "//tools:nested_bazel_fixture.py",
+    ],
+    deps = [":native_action_toolchain_py"],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_REAL",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "native_action_toolchain_test.py",
+)
+
+py_test(
+    name = "native_action_inputs_test",
+    srcs = [
+        "native_action_inputs_test.py",
+    ],
+    data = [
+        ":build_settings.bzl",
+        ":native_action_inputs.bzl",
+        "//tools:nested_bazel_fixture.py",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "native_action_inputs_test.py",
+)
+
+py_test(
+    name = "prefix_manifest_test",
+    srcs = ["prefix_manifest_test.py"],
+    data = [":prefix_manifest.bzl"],
+    main = "prefix_manifest_test.py",
+)
+
+py_test(
+    name = "prefix_manifest_action_test",
+    srcs = [
+        "prefix_manifest.py",
+        "prefix_manifest_action_test.py",
+    ],
+    main = "prefix_manifest_action_test.py",
+)
+
+py_binary(
+    name = "plan_executor",
+    srcs = [
+        "plan_executor.py",
+        "plan_schema.py",
+    ],
+    main = "plan_executor.py",
+)
+
+py_binary(
+    name = "repair_wheel",
+    srcs = [
+        "repair_wheel.py",
+        "release_wheel.py",
+    ],
+    main = "repair_wheel.py",
+)
+
+py_binary(
+    name = "runtime_wheelhouse",
+    srcs = [
+        "release_wheel.py",
+        "repair_wheel.py",
+        "runtime_wheelhouse.py",
+    ],
+    main = "runtime_wheelhouse.py",
+)
+
+runtime_wheelhouse_action(
+    name = "torch_runtime_release_wheelhouse",
+    prefix_files = [
+        "@py_filelock_native//:prefix_path.txt",
+        "@py_fsspec_native//:prefix_path.txt",
+        "@py_jinja2_native//:prefix_path.txt",
+        "@py_markupsafe_native//:prefix_path.txt",
+        "@py_mpmath_native//:prefix_path.txt",
+        "@py_networkx_native//:prefix_path.txt",
+        "@py_numpy_native//:prefix_path.txt",
+        "@py_pillow_native//:prefix_path.txt",
+        "@py_setuptools_native//:prefix_path.txt",
+        "@py_sympy_native//:prefix_path.txt",
+        "@py_typing_extensions_native//:prefix_path.txt",
+    ],
+    prefix_trees = [
+        "@py_filelock_native//:prefix",
+        "@py_fsspec_native//:prefix",
+        "@py_jinja2_native//:prefix",
+        "@py_markupsafe_native//:prefix",
+        "@py_mpmath_native//:prefix",
+        "@py_networkx_native//:prefix",
+        "@py_numpy_native//:prefix",
+        "@py_pillow_native//:prefix",
+        "@py_setuptools_native//:prefix",
+        "@py_sympy_native//:prefix",
+        "@py_typing_extensions_native//:prefix",
+    ],
+    tags = ["manual"],
+)
+
+runtime_wheelhouse_action(
+    name = "jax_runtime_release_wheelhouse",
+    prefix_files = [
+        "@py_absl_py_native//:prefix_path.txt",
+        "@py_ml_dtypes_native//:prefix_path.txt",
+        "@py_numpy_native//:prefix_path.txt",
+        "@py_opt_einsum_native//:prefix_path.txt",
+        "@py_scipy_native//:prefix_path.txt",
+    ],
+    prefix_trees = [
+        "@py_absl_py_native//:prefix",
+        "@py_ml_dtypes_native//:prefix",
+        "@py_numpy_native//:prefix",
+        "@py_opt_einsum_native//:prefix",
+        "@py_scipy_native//:prefix",
+    ],
+    provider_prefix_files = [
+        "@openblas_native//:prefix_path.txt",
+    ],
+    provider_prefix_trees = [
+        "@openblas_native//:prefix",
+    ],
+    tags = ["manual"],
+)
+
+release_cuda_line(
+    name = "release_line",
+    build_setting_default = "cu130",
+)
+
+release_git_sha(
+    name = "release_git_sha",
+    build_setting_default = "unknown",
+)
+
+native_action_string_flag(
+    name = "source_date_epoch",
+    build_setting_default = "0",
+)
+
+native_action_string_flag(
+    name = "deterministic_seed",
+    build_setting_default = "unknown",
+)
+
+native_action_string_flag(
+    name = "deterministic_prefix_map_roots",
+    build_setting_default = "",
+)
+
+native_action_string_flag(
+    name = "native_action_cuda_home",
+    build_setting_default = "",
+)
+
+py_test(
+    name = "plan_executor_test",
+    srcs = [
+        "plan_executor.py",
+        "plan_executor_test.py",
+        "plan_schema.py",
+    ],
+    main = "plan_executor_test.py",
+)
+
+py_test(
+    name = "repair_wheel_unit_test",
+    srcs = [
+        "repair_wheel.py",
+        "repair_wheel_test.py",
+        "release_wheel.py",
+    ],
+    main = "repair_wheel_test.py",
+)
+
+py_test(
+    name = "extension_builder_unit_test",
+    srcs = [
+        "extension_builder.py",
+        "extension_builder_test.py",
+    ],
+    main = "extension_builder_test.py",
+)
+
+py_test(
+    name = "runtime_wheelhouse_unit_test",
+    srcs = [
+        "release_wheel.py",
+        "repair_wheel.py",
+        "runtime_wheelhouse.py",
+        "runtime_wheelhouse_test.py",
+    ],
+    main = "runtime_wheelhouse_test.py",
+)
+
+py_test(
+    name = "release_wheel_action_test",
+    srcs = ["release_wheel_action_test.py"],
+    data = [
+        "//tools:nested_bazel_fixture.py",
+        "//native/jaxlib:BUILD.bazel",
+        "//native/pytorch:BUILD.bazel",
+        "//native/torchaudio:BUILD.bazel",
+        "//native/torchvision:BUILD.bazel",
+        "//native/triton:BUILD.bazel",
+        ":native_action_toolchain.bzl",
+        ":release_wheel_action.bzl",
+        ":runtime_wheelhouse_action.bzl",
+    ],
+    main = "release_wheel_action_test.py",
+)
+
+py_test(
+    name = "extension_action_test",
+    srcs = ["extension_action_test.py"],
+    data = [
+        "//native/common:BUILD.bazel",
+        "//:MODULE.bazel",
+        "//native/common:build_settings.bzl",
+        "//native/common:extension_action.bzl",
+        "//native/common:extension_builder.py",
+        "//native/common:extension_info.bzl",
+        "//native/common:release_wheel_action.bzl",
+        "//native/common:repair_wheel.py",
+        "//native/common:release_wheel.py",
+        "//native/pytorch:pytorch_action.bzl",
+        "//plans:torch/cu130/pytorch.plan.json",
+        "//plans:keys.json",
+        "//tools:nested_bazel_fixture.py",
+    ],
+    args = [
+        "--repo-root",
+        "$(rootpath //:MODULE.bazel)",
+    ],
+    env_inherit = [
+        "BAZEL",
+        "BAZEL_BIN",
+        "BAZEL_REAL",
+        "VASO_ESTATE_ROOT",
+    ],
+    main = "extension_action_test.py",
+    precompile = "disabled",
+    size = "small",
+    timeout = "short",
+    tags = [
+        "external",
+        "no-cache",
+    ],
+)
+
+torch_extension_test_provider(
+    name = "fixture_torch_provider",
+    plan = select({
+        "//plans:release_line_cu129": "//plans:torch/cu129/pytorch.plan.json",
+        "//plans:release_line_cu130": "//plans:torch/cu130/pytorch.plan.json",
+    }),
+    tags = ["manual"],
+)
+
+torch_extension_rootfs_prefix_fixture(
+    name = "torch_extension_cuda_rootfs",
+    component = "cuda",
+    required_headers = ["cuda.h"],
+    required_libs = ["libcudart.so"],
+    tags = ["manual"],
+)
+
+torch_extension_rootfs_prefix_fixture(
+    name = "torch_extension_nccl_rootfs",
+    component = "nccl",
+    required_headers = ["nccl.h"],
+    required_libs = ["libnccl.so"],
+    tags = ["manual"],
+)
+
+torch_extension_rootfs_prefix_fixture(
+    name = "torch_extension_nvshmem_rootfs",
+    component = "nvshmem",
+    required_headers = [
+        "nvshmem.h",
+        "nvshmemx.h",
+        "non_abi/nvshmem_version.h",
+    ],
+    required_libs = [
+        "libnvshmem_host.so.3",
+        "libnvshmem_device.a",
+        "nvshmem_bootstrap_uid.so",
+    ],
+    tags = ["manual"],
+)
+
+alias(
+    name = "fixture_cuda_rootfs",
+    actual = ":torch_extension_cuda_rootfs",
+    tags = ["manual"],
+)
+
+alias(
+    name = "fixture_nccl_rootfs",
+    actual = ":torch_extension_nccl_rootfs",
+    tags = ["manual"],
+)
+
+alias(
+    name = "fixture_nvshmem_rootfs",
+    actual = ":torch_extension_nvshmem_rootfs",
+    tags = ["manual"],
+)
+
+vaso_torch_extension_for_test(
+    name = "fixture_extension",
+    srcs = ["fixtures/torch_extension/fixture.cpp"],
+    cuda_srcs = ["fixtures/torch_extension/fixture_kernel.cu"],
+    cuda_prefix_manifest = ":fixture_cuda_rootfs",
+    nccl_prefix_manifest = ":fixture_nccl_rootfs",
+    nvshmem_prefix_manifest = ":fixture_nvshmem_rootfs",
+    extra_cxx_flags = ["-DVASO_FIXTURE_EXTRA_CXX_FLAG"],
+    extra_cuda_flags = ["--expt-relaxed-constexpr"],
+    profile = "torch",
+    py_srcs = ["fixtures/torch_extension/__init__.py"],
+    rdc = True,
+    torch_prefix = ":fixture_torch_provider",
+    uses_nvshmem = True,
+    version = "0.1.0",
+    tags = ["manual"],
+)
+
+alias(
+    name = "fixture_extension_release",
+    actual = ":fixture_extension",
+    tags = ["manual"],
+)

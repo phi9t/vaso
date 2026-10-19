@@ -1,0 +1,65 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("@vaso_graph//native/common:extension_action.bzl", "vaso_torch_extension")
+
+package(default_visibility = ["//visibility:public"])
+
+_TORCH_ARTIFACT_DATA = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "@vaso_torch_artifact_cu129//:prefix",
+        "@vaso_torch_artifact_cu129//:prefix_path.txt",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "@vaso_torch_artifact_cu130//:prefix",
+        "@vaso_torch_artifact_cu130//:prefix_path.txt",
+    ],
+})
+
+_TORCH_ARTIFACT_PREFIX_ARG = select({
+    "@vaso_graph//plans:release_line_cu129": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu129//:prefix_path.txt)",
+    ],
+    "@vaso_graph//plans:release_line_cu130": [
+        "--torch-prefix-file=$(rootpath @vaso_torch_artifact_cu130//:prefix_path.txt)",
+    ],
+})
+
+filegroup(
+    name = "consumer_nvshmem_ep_files",
+    srcs = [
+        "BUILD.bazel",
+        "PROVENANCE.md",
+        "run_wheel_test.sh",
+        "tests/nvshmem_ep_test.py",
+        "vaso_nvshmem_ep/__init__.py",
+        "vaso_nvshmem_ep/nvshmem_ep.cpp",
+        "vaso_nvshmem_ep/nvshmem_ep_kernel.cu",
+    ],
+)
+
+vaso_torch_extension(
+    name = "nvshmem_ep",
+    srcs = ["vaso_nvshmem_ep/nvshmem_ep.cpp"],
+    cuda_srcs = ["vaso_nvshmem_ep/nvshmem_ep_kernel.cu"],
+    package = "vaso-nvshmem-ep",
+    profile = "torch",
+    py_srcs = ["vaso_nvshmem_ep/__init__.py"],
+    rdc = True,
+    uses_nvshmem = True,
+    version = "0.1.0",
+)
+
+sh_test(
+    name = "nvshmem_ep_cuda_test",
+    srcs = ["run_wheel_test.sh"],
+    args = [
+        "--python=$(VASO_PYTHON_PREFIX)/bin/python3.13",
+    ] + _TORCH_ARTIFACT_PREFIX_ARG,
+    data = [
+        ":nvshmem_ep",
+        "tests/nvshmem_ep_test.py",
+    ] + _TORCH_ARTIFACT_DATA,
+    tags = [
+        "insula-only",
+        "requires-gpu",
+    ],
+)

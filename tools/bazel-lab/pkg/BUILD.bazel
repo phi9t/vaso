@@ -1,0 +1,180 @@
+load("//rules:lab_rules.bzl", "lab_action")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "dep.txt",
+    "mutable_dep.txt",
+    "runtime_jobs.txt",
+])
+
+lab_action(
+    name = "dep_prefix",
+    mode = "simple",
+    plan = "//plans:dep.plan.json",
+    srcs = ["dep.c"],
+)
+
+lab_action(
+    name = "native_with_dep",
+    dep = ":dep_prefix",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e1_bad_driver_input",
+    extra_inputs = [
+        "//drivers:bad_driver.sh",
+        "//planners:bad_planner.py",
+    ],
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e1_fixed_committed_plan",
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e2_bad_default_env",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    read_env = "FOO",
+    srcs = ["pkg.c"],
+    use_default_shell_env = True,
+)
+
+lab_action(
+    name = "e2_fixed_explicit_env",
+    env = {"LC_ALL": "C"},
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    read_env = "FOO",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e3_bad_seed_setting",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    seed = "//settings:seed",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e3_fixed_plan_seed",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e4_bad_path_dep",
+    dep_path = "pkg/mutable_dep.txt",
+    mode = "simple",
+    no_sandbox = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e4_fixed_declared_dep",
+    dep = ":mutable_dep.txt",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e6_good_cache_stable",
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e6_bad_prefix_map_arg",
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    prefix_root = "//settings:prefix_root",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e6_fixed_runtime_prefix_map",
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    runtime_prefix_map = True,
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e7_bad_persistent_workdir",
+    flag = "//settings:flag",
+    mode = "make",
+    no_sandbox = True,
+    persistent_work_dir = "{outdir}/e7_bad_shared_work",
+    srcs = ["workdir_main.c"],
+)
+
+lab_action(
+    name = "e7_fixed_fresh_workdir",
+    flag = "//settings:flag",
+    mode = "make",
+    srcs = ["workdir_main.c"],
+)
+
+lab_action(
+    name = "e8_bad_jobs_arg",
+    jobs = "//settings:jobs",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e8_fixed_unkeyed_jobs",
+    job_file = "pkg/runtime_jobs.txt",
+    mode = "simple",
+    no_sandbox = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e9_full_n1",
+    dep = ":dep.txt",
+    env = {"LC_ALL": "C"},
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)
+
+lab_action(
+    name = "e9_bad_default_env",
+    mode = "simple",
+    plan = "//plans:native.plan.json",
+    read_env = "FOO",
+    srcs = ["pkg.c"],
+    use_default_shell_env = True,
+)
+
+lab_action(
+    name = "e11_repo_manifest_input",
+    dep = "@generated_content_dep//:content.txt",
+    mode = "simple",
+    observe_execution = True,
+    plan = "//plans:native.plan.json",
+    srcs = ["pkg.c"],
+)

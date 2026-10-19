@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "families": {
+    "Triton": "gcc",
+    "audio": "gcc",
+    "jax": "clang",
+    "jaxlib": "clang",
+    "pytorch": "gcc",
+    "torch": "gcc",
+    "torchaudio": "gcc",
+    "torchvision": "gcc",
+    "triton": "gcc",
+    "vision": "gcc",
+    "xla": "clang"
+  }
+}

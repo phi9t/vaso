@@ -11,6 +11,16 @@ dependencies = []
 [project.scripts]
 vaso = "vaso.cli:main"
 
+[tool.setuptools.packages.find]
+where = ["insula/execution"]
+include = ["vaso*"]
+
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+# Tests sit beside the code they cover (x_test.py). The foundry/ tests run under
+# Bazel, not here. Compatibility paths are excluded to collect each test once.
+# third_party/ is vendored code: only its own pin check is a
+# test path, so the crates' bundled Python tests are never collected.
+testpaths = ["insula/execution", "tools", "harness/packaging_test.py", "harness/smoke", "scripts/release", "third_party/rust_pyo3_cargo/vendor_pin_test.py"]
+python_files = ["*_test.py", "test_*.py"]
+addopts = ["--import-mode=importlib"]
+pythonpath = ["insula/execution"]

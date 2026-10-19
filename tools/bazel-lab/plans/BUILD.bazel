@@ -1,0 +1,7 @@
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "dep.plan.json",
+    "keys.json",
+    "native.plan.json",
+])

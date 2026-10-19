@@ -1,17 +1,35 @@
-<!-- ultron-agentic-workflow:start -->
-## Agentic engineering workflow
+# Working in Vaso
 
-**Mandatory:** Read and follow `CONSTITUTION.md` before acting. Before planning,
-building, fixing, or changing code, read and follow
-`docs/agents/agentic-engineering.md`. Direct user instructions and more specific
-repository guidance take precedence.
-<!-- ultron-agentic-workflow:end -->
+Choose the exploration, implementation, and verification approach that fits
+the requested outcome. Carry authorized work through to a verified result.
+Use judgment for reversible choices; reuse authority already granted.
 
-## Cross-agent collaboration
+## Product and code map
 
-When two agents work one effort concurrently (for example, one owns the insula
-checkout and another plans, builds guards and integrates), follow
-`docs/agents/cross-agent-collaboration.md`. One writer per working tree, the
-target branch moves only by fast-forward, and the tracker is the message bus.
-The machinery is `scripts/agents/relay.py` (`watch`, `rebase`,
-`sync-tracker`, `manifest`, `land`).
+- `insula/`: rootfs, execution, and estate projection. Tools, toolchains, and
+  dependencies used by a process must be under its rootfs.
+- `foundry/`: hermetic Bazel builds of PyTorch, JAX, Triton, and dependencies,
+  executed inside insula. Spack recipes/graphs are adaptation references;
+  automating adaptation is optional.
+- `tools/`: development coordination, CI, Bazel experiments, and publication.
+- `docs/architecture.md` and `GLOSSARY.md`: module interfaces and data ownership.
+- `docs/development.md`: coding conventions and verification commands.
+
+Read references relevant to the change. Skills are available methods; there
+is no required skill sequence or universal planning/review ceremony.
+
+## Constraints when applicable
+
+- Preserve existing work and coordinate one writer per working tree. Keep a
+  checkout fixed while a live build uses it. Shared execution/integration:
+  `docs/agents/cross-agent-collaboration.md`.
+- Native inputs, toolchains, locks, or build arguments:
+  `docs/agents/build-stability.md`. A native rebuild needs an intentional
+  source/version, toolchain, or flags change.
+- Public publication: `docs/agents/publication.md`. Publish sanitized snapshots,
+  never private source history, with user authority for publication.
+- Coordinated work needing a durable handoff: `.scratch/<effort>/`;
+  `docs/agents/issue-tracker.md` documents the tracker and ledger.
+
+Report what was verified and any material limits. Keep current contracts in
+product docs and code; keep incident history out of the default instructions.
