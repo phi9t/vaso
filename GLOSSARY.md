@@ -15,6 +15,10 @@ organization is recorded in `docs/architecture.md`.
 | CUDA line | A selected CUDA ecosystem version family, independently of the build profile. |
 | Adaptation | Expressing a reference package recipe and dependency graph as build definitions. |
 | Artifact | An identified build output, such as an install prefix or wheel. |
+| Release candidate | An immutable selection of source, rootfs bundles, wheels, and build inputs proposed for qualification together. |
+| Vaso release | One named, immutable set of compatible components and the required evidence supporting its use within the declared support boundary. |
+| Qualification attempt | One recorded verification of a release candidate under identified execution conditions, retaining its outcome independently of later attempts. |
+| Promotion | Acceptance of a release candidate as a named release after its required evidence satisfies the release policy. |
 
 Spack supplies reference recipes and graph information. Automating adaptation
 is outside the required product surface.
