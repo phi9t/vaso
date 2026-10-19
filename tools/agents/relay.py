@@ -568,7 +568,9 @@ def fs_type(path: Path) -> str:
         if len(fields) < 3:
             continue
         mount = fields[1].replace("\\040", " ")
-        if (str(target) == mount or str(target).startswith(mount.rstrip("/") + "/")) and len(mount) > len(best):
+        # Later entries at the same mountpoint cover earlier mounts. Insula
+        # creates mountpoints on tmpfs before binding their disk-backed estate.
+        if (str(target) == mount or str(target).startswith(mount.rstrip("/") + "/")) and len(mount) >= len(best):
             best, kind = mount, fields[2]
     return kind
 

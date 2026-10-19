@@ -249,7 +249,7 @@ insula_prepare_release_context() {
     echo "release run dir already exists: $run_host" >&2
     return 2
   fi
-  mkdir -p "$run_host/home" "$run_host/tmp" "$run_host/cache"
+  mkdir -p "$estate/agents/leases" "$run_host/home" "$run_host/tmp" "$run_host/cache"
 
   INSULA_RELEASE_RUN_HOST="$run_host"
   INSULA_RELEASE_RUN_SB="/run/vaso/run"
@@ -258,7 +258,8 @@ insula_prepare_release_context() {
   INSULA_RELEASE_VENV_SB="$INSULA_RELEASE_RUN_SB/venv"
   INSULA_RELEASE_REQUIREMENTS_SB="$(insula_release_requirements "$release_host" "$run_host")" || return $?
   INSULA_RELEASE_EXPECT_IMPORTS="$(insula_release_expected_imports "$release_host")" || return $?
-  INSULA_RELEASE_PYTHON_PREFIX_HOST="${INSULA_RELEASE_PYTHON_PREFIX_HOST:-$estate/vaso/lines/$line/cache/bazel/output-base/external/+python_native+python_313_native/prefix}"
+  local python_prefix_override="${INSULA_RELEASE_PYTHON_PREFIX_HOST:-}"
+  INSULA_RELEASE_PYTHON_PREFIX_HOST="${python_prefix_override:-$estate/vaso/lines/$line/cache/bazel/output-base/external/+python_native+python_313_native/prefix}"
   INSULA_RELEASE_PYTHON_PREFIX_SB="/opt/vaso/python"
   INSULA_RELEASE_PYTHON_SB="/usr/bin/python3"
   INSULA_PREFLIGHT_LAYOUT="release"
@@ -266,9 +267,13 @@ insula_prepare_release_context() {
   if [[ "${VASO_IN_INSULA:-}" == "1" ]]; then
     INSULA_DRIVER_LIB_DIRS=(/run/nvidia-driver/lib)
   fi
-  local use_native_python=0
-  if [[ -x "$INSULA_RELEASE_PYTHON_PREFIX_HOST/bin/python3" ]]; then
+  local use_native_python=0 use_release_python=0
+  if [[ -z "$python_prefix_override" && -x "$rootfs$INSULA_RELEASE_PYTHON_PREFIX_SB/bin/python3" ]]; then
+    use_release_python=1
+    INSULA_RELEASE_PYTHON_SB="$INSULA_RELEASE_PYTHON_PREFIX_SB/bin/python3"
+  elif [[ -x "$INSULA_RELEASE_PYTHON_PREFIX_HOST/bin/python3" ]]; then
     use_native_python=1
+    use_release_python=1
     INSULA_RELEASE_PYTHON_SB="$INSULA_RELEASE_PYTHON_PREFIX_SB/bin/python3"
   fi
   export INSULA_RELEASE_RUN_HOST INSULA_RELEASE_RUN_SB INSULA_RELEASE_DIR_HOST INSULA_RELEASE_DIR_SB
@@ -319,7 +324,7 @@ insula_prepare_release_context() {
   INSULA_CHDIR=/workspace/experiment
   local release_path="$INSULA_RELEASE_VENV_SB/bin:/usr/local/cuda/bin:/usr/bin:/bin"
   local release_ld="/run/nvidia-driver/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib"
-  if [[ "$use_native_python" == "1" ]]; then
+  if [[ "$use_release_python" == "1" ]]; then
     release_path="$INSULA_RELEASE_VENV_SB/bin:$INSULA_RELEASE_PYTHON_PREFIX_SB/bin:/usr/local/cuda/bin:/usr/bin:/bin"
     release_ld="/run/nvidia-driver/lib:$INSULA_RELEASE_PYTHON_PREFIX_SB/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib"
   fi

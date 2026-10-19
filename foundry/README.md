@@ -67,6 +67,29 @@ calls the generic launcher. Existing `../scripts/insula/insula.sh` callers
 retain a compatibility adapter. Generic insula commands require neither a
 build profile nor a package lock.
 
+## Deploy published wheels
+
+`../tools/publish/published-artifacts.json` pins the private GHCR wheel releases
+and rootfs bundles by digest. Pull them with `artifact_store.py`, unpack the
+bundle into a new estate's `rootfs-lines/<line>`, and run:
+
+```sh
+export VASO_ESTATE_ROOT=/path/to/fresh-estate
+foundry/insula.sh --line cu129 --release "$VASO_ESTATE_ROOT/downloads/release-torch-cu129" \
+  --gpus 1 -- python3 -c \
+  'import torch, triton; assert torch.cuda.is_available(); print(torch.__version__, triton.__version__)'
+```
+
+The release runner uses the bundled `/opt/vaso/python` interpreter, creates a
+new venv, and installs the release's hashed requirements offline. It creates
+lease state on the fresh estate. A published deployment requires no Bazel
+output base, source-build prefixes, or host Python packages. GPU driver/device
+projections remain explicit runtime inputs. Use a separate release directory
+and venv for the JAX profile.
+
+The committed [deployment verification report](../tools/publish/fresh-estate-verification.json)
+records the tested artifact digests and single-GPU checks on both CUDA lines.
+
 ## Module and data ownership
 
 | Path | Contract |

@@ -481,12 +481,15 @@ insula_prepare_context() {
     --bind "$ESTATE_ROOT/home/kvothe" /home/kvothe
     --ro-bind "$workspace" /workspace/vaso
   )
+  if [[ -d "$rootfs/opt/vaso" ]]; then
+    INSULA_BIND_ARGS+=(--ro-bind "$rootfs/opt/vaso" /opt/vaso)
+  fi
   ROOTFS_MANIFEST_BIND=()
   if [[ -f "$rootfs/../rootfs-bundle.json" ]]; then
     ROOTFS_MANIFEST_BIND=(--ro-bind "$(readlink -f "$rootfs/../rootfs-bundle.json")" /run/vaso/rootfs-bundle.json)
   fi
   INSULA_ENV_ARGS=(
-    --setenv PATH /usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin
+    --setenv PATH /opt/vaso/compat-bin:/opt/vaso/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin
     --setenv HOME /home/kvothe
     --setenv TMPDIR /tmp
     --setenv VASO_IN_INSULA 1

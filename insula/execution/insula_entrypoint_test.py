@@ -764,8 +764,30 @@ def test_release_run_renders_consumer_bindings_without_build_prefixes(tmp_path: 
             assert argv[index + 2] != "/vaso"
 
 
+def test_release_run_uses_bundled_python_without_build_prefix(tmp_path: Path) -> None:
+    estate, release = _make_fake_release_estate(tmp_path)
+    bundled = estate / "rootfs-lines/cu129/rootfs/opt/vaso/python/bin/python3"
+    old_build = estate / "vaso/lines/cu129/cache/bazel/output-base/external/+python_native+python_313_native/prefix/bin/python3"
+    for python in (bundled, old_build):
+        python.parent.mkdir(parents=True)
+        python.write_text("#!/bin/sh\n")
+        python.chmod(0o755)
+    result = subprocess.run([
+        str(INSULA_SH), "--line", "cu129", "--release", str(release),
+        "--print-argv", "--", "python3", "-V",
+    ], env={**os.environ, "VASO_ESTATE_ROOT": str(estate), "INSULA_RELEASE_RUN_ID": "bundled-python"},
+        cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    argv = json.loads(result.stdout)
+    assert not any("/cache/bazel/" in arg for arg in argv)
+    pairs = {argv[i + 1]: argv[i + 2] for i, token in enumerate(argv) if token == "--setenv"}
+    assert "/opt/vaso/python/bin" in pairs["PATH"].split(":")
+    assert "/opt/vaso/python/lib" in pairs["LD_LIBRARY_PATH"].split(":")
+
+
 def test_release_run_preflights_release_layout_with_bound_driver_dir(tmp_path: Path) -> None:
     estate, release = _make_fake_release_estate(tmp_path)
+    (estate / "agents" / "leases").rmdir()
     log = tmp_path / "bwrap-log.jsonl"
     doctor_log = tmp_path / "doctor-args.json"
     bwrap = tmp_path / "fake-bwrap.sh"
@@ -827,6 +849,7 @@ def test_release_run_preflights_release_layout_with_bound_driver_dir(tmp_path: P
 
     assert result.returncode == 0, result.stderr
     doctor_args = json.loads(doctor_log.read_text(encoding="utf-8"))
+    assert (estate / "agents" / "leases").is_dir()
     assert "--layout" in doctor_args
     assert doctor_args[doctor_args.index("--layout") + 1] == "release"
     assert "--driver-lib-dir" in doctor_args

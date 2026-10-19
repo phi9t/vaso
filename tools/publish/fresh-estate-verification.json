@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "result": "passed",
+  "scope": "single-GPU deployment smoke tests, not full release requalification",
+  "acquisition": {
+    "registry": "ghcr.io/phi9t",
+    "fresh_estate": true,
+    "all_six_artifacts_pulled_by_digest": true,
+    "all_downloaded_files_and_rootfs_archives_hash_verified": true,
+    "runtime_manifest_files_verified": [
+      {
+        "line": "cu129",
+        "runtime_files_verified": 2931,
+        "rootfs_manifest_digest": "sha256:9601c5c89235b072a7b1a90de1cdcee21ae3bfcc5a0921c29d7d508e3598d976",
+        "release_python_manifest_sha256": "2eba2f8d0b198793d26c1449940b1d2744668bfd8915d611e238e85d9598f6b3",
+        "build_output_base_absent": true
+      },
+      {
+        "line": "cu130",
+        "runtime_files_verified": 2931,
+        "rootfs_manifest_digest": "sha256:7856e1fa3d988f928e771e688c6b53e7b8751c204fc6558ff59d682e70c8fd84",
+        "release_python_manifest_sha256": "7cab84ec19965847dbc239a5b8a965383bafca9f0b404147c1ee611f00b6ef22",
+        "build_output_base_absent": true
+      }
+    ],
+    "prior_estate_runtime_or_cache_inputs_used": false,
+    "source_checkout": "tracked files only; ignored worktrees and build outputs absent"
+  },
+  "artifacts": [
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "torch",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu129@sha256:7572668ffcea3064dba2e41e4a6ffc9637eec679f740c222ce3224cdda4d2bfe"
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "torch",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu130@sha256:d252738bd004c3e80d8fff61f994c463380ace850037e0907365f171445c5987"
+    },
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "jax",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu129@sha256:89ab1bec0bcdd22b1a4261161aa2c93a6aad877ef12022e684824716d567cdff"
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "jax",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu130@sha256:e66f57112a13b16baa64ad608910f839216f014869ce077b8c44193d803cb661"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu129",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu129@sha256:e8095b10e3eda2732bcdd29a516864020b21724e53198ea96efaa605bdeb34ca"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:c8cd1486aef1e7b9be0f01eb2e44d82d7c8dea912bc4562b499f7c03caa6234c"
+    }
+  ],
+  "checks": [
+    {
+      "line": "cu129",
+      "torch": "2.14.0",
+      "triton": "3.8.0",
+      "python": "3.13.13",
+      "cuda": "12.9",
+      "cuda_available": true,
+      "gpu_matmul_and_autograd": "passed",
+      "torch_compile": "passed",
+      "triton_jit_kernel": "passed",
+      "build_output_base_absent": true,
+      "network_isolated": true,
+      "module_paths": [
+        "/run/vaso/run/venv/lib/python3.13/site-packages/torch/__init__.py",
+        "/run/vaso/run/venv/lib/python3.13/site-packages/triton/__init__.py"
+      ]
+    },
+    {
+      "line": "cu129",
+      "jax": "0.10.2.dev0+selfbuilt",
+      "jaxlib": "0.10.2.dev0+selfbuilt",
+      "python": "3.13.13",
+      "gpu_backend": "gpu",
+      "gpu_jit_matmul_and_grad": "passed",
+      "pallas_triton_gpu_kernel": "passed",
+      "build_output_base_absent": true,
+      "module_paths": [
+        "/run/vaso/run/venv/lib/python3.13/site-packages/jax/__init__.py",
+        "/run/vaso/run/venv/lib/python3.13/site-packages/jaxlib/__init__.py"
+      ]
+    },
+    {
+      "line": "cu130",
+      "torch": "2.14.0",
+      "triton": "3.8.0",
+      "python": "3.13.13",
+      "cuda": "13.0",
+      "cuda_available": true,
+      "gpu_matmul_and_autograd": "passed",
+      "torch_compile": "passed",
+      "triton_jit_kernel": "passed",
+      "build_output_base_absent": true,
+      "network_isolated": true,
+      "module_paths": [
+        "/run/vaso/run/venv/lib/python3.13/site-packages/torch/__init__.py",
+        "/run/vaso/run/venv/lib/python3.13/site-packages/triton/__init__.py"
+      ]
+    },
+    {
+      "line": "cu130",
+      "jax": "0.10.2.dev0+selfbuilt",
+      "jaxlib": "0.10.2.dev0+selfbuilt",
+      "python": "3.13.13",
+      "gpu_backend": "gpu",
+      "gpu_jit_matmul_and_grad": "passed",
+      "pallas_triton_gpu_kernel": "passed",
+      "build_output_base_absent": true,
+      "module_paths": [
+        "/run/vaso/run/venv/lib/python3.13/site-packages/jax/__init__.py",
+        "/run/vaso/run/venv/lib/python3.13/site-packages/jaxlib/__init__.py"
+      ]
+    }
+  ],
+  "regressions": {
+    "pytest_passed_inside_insula": 319,
+    "pytest_skipped": 2,
+    "collected_test_ids": 321,
+    "native_build_inputs": "unchanged"
+  }
+}

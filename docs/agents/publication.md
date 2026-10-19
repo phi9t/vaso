@@ -125,6 +125,32 @@ export GHCR_TOKEN=...
 tools/publish/artifact_store.py push-rootfs --line cu129
 ```
 
+Rootfs bundles paired with the CPython 3.13 wheels must contain the qualified
+Python 3.13.13 runtime. Copy its native install prefix into the new rootfs at
+`/opt/vaso/python`. Inside insula, mount that copy writable and the original
+provider output base read-only at `/vaso-bazel-ob`, then run:
+
+```sh
+python3 insula/rootfs/release_python.py \
+  --qualified-prefix /vaso-bazel-ob/external/+python_native+python_313_native/prefix
+```
+
+This copies the interpreter's native shared-library closure and makes its ELF
+search paths relative to the bundled prefix. It writes
+`/opt/vaso/release-python.json` with installed file hashes. Record that manifest's
+hash and Python version in the bundle manifest's `release_python` entry.
+Validate native module imports and ELF dependency resolution in a new insula
+with the provider output base absent before publishing. Vendor CUDA binaries
+retain their bytes. Native build plans and their selected toolchains are
+separate from this deployment runtime addition.
+
+An already prepared archive can be published with
+`push-rootfs --line cu129 --bundle /path/to/rootfs-cu129-<sha256>.tar.zst`.
+The archive's sidecar and `rootfs-bundle.json` must sit beside it. Verify a new
+estate by pulling the published digests, unpacking the rootfs bundles, and
+running the wheel releases through `foundry/insula.sh --release` without
+interpreter or build-prefix overrides.
+
 Pull and verify by tag or digest:
 
 ```sh

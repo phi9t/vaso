@@ -174,142 +174,149 @@
     {
       "kind": "rootfs",
       "line": "cu129",
-      "reference": "ghcr.io/phi9t/vaso-rootfs-cu129@sha256:a7633de4c73117a11c882eeb575ef9e8e63d7ebcc26644fb625163ebfae89ffe",
-      "tag": "c5f2fcb363e4",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu129@sha256:e8095b10e3eda2732bcdd29a516864020b21724e53198ea96efaa605bdeb34ca",
+      "tag": "ce76fa948700",
       "verified_files": 8,
       "files": {
-        "rootfs-bundle.json": "2119f228c48d328510a54dbd68cb3c8a45b395717a21ccf39309f5b3b76d57d5",
-        "rootfs-cu129.json": "49f4c8a1e3d50dc35a5e390bca527d1c75dffab2db43579dc6a8e82a85ae328f",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0000": "6db8da013bb25c061e0fb53564f5172141d787ed640145a0dfe54f47ae376503",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0001": "76bc3270970f8108cbf3f1726ace669561cabfe915e60f153fce8aa84f64817f",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0002": "08674968082a618545630180dc608890772a8c7dcf668fbc7b3d4fee22d7fcb3",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0003": "a878934e78eba6ee9092ebe7664541a9b9be4c56c9338b6259754acecdb152b0",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0004": "4850146d64fdffc978ebc45e10d17aef5fd6c92c91d3cf629b32caae1e7b396a",
-        "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0005": "fec1cfb917327b9e7c4f879e8b2dee41e02fb89a86ef5e1bdba2659c29ec7383"
+        "rootfs-bundle.json": "9601c5c89235b072a7b1a90de1cdcee21ae3bfcc5a0921c29d7d508e3598d976",
+        "rootfs-cu129.json": "049ab98b56fc8bd3256d2855812ccc2b6239aeb056c2b953b8b711465baca4d0",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0000": "2274291989728b44fff09abf853977affeda25cb7324e94bf3c3b819da05f458",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0001": "56f909ef9e3903c86337162ff50ac5318bdf15ad5beea71ef992acf27d08aa8c",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0002": "74b86febeb0517480ee637b1c8c458e1c132e4cb061c8046071640c55128e244",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0003": "d666525cabe9fda6a730e24b5025604e2c5ea1f9114849fef1e22de18a5b8147",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0004": "3ca8ea0e6ecfa5086cdd7f0c14ee14337fd1a2dc3949f1b5c4149c87195b0261",
+        "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0005": "1986e7c6221e06ad3414ca910c0451d8db43e7427eba7dc0d56a15ce3bc6f493"
       },
-      "archive": "rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst",
-      "archive_sha256": "c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab",
-      "rootfs_manifest_digest": "sha256:2119f228c48d328510a54dbd68cb3c8a45b395717a21ccf39309f5b3b76d57d5",
+      "archive": "rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst",
+      "archive_sha256": "ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd",
+      "rootfs_manifest_digest": "sha256:9601c5c89235b072a7b1a90de1cdcee21ae3bfcc5a0921c29d7d508e3598d976",
       "ecosystem_lock_sha256": "sha256:608ffaea32487ad2e1280470bc65119abcbab58c8eb39a65948c6d794038645d",
       "split_parts": 6,
       "layers": [
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0000",
-          "sha256": "6db8da013bb25c061e0fb53564f5172141d787ed640145a0dfe54f47ae376503",
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0000",
+          "sha256": "2274291989728b44fff09abf853977affeda25cb7324e94bf3c3b819da05f458",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0001",
-          "sha256": "76bc3270970f8108cbf3f1726ace669561cabfe915e60f153fce8aa84f64817f",
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0001",
+          "sha256": "56f909ef9e3903c86337162ff50ac5318bdf15ad5beea71ef992acf27d08aa8c",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0002",
-          "sha256": "08674968082a618545630180dc608890772a8c7dcf668fbc7b3d4fee22d7fcb3",
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0002",
+          "sha256": "74b86febeb0517480ee637b1c8c458e1c132e4cb061c8046071640c55128e244",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0003",
-          "sha256": "a878934e78eba6ee9092ebe7664541a9b9be4c56c9338b6259754acecdb152b0",
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0003",
+          "sha256": "d666525cabe9fda6a730e24b5025604e2c5ea1f9114849fef1e22de18a5b8147",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0004",
-          "sha256": "4850146d64fdffc978ebc45e10d17aef5fd6c92c91d3cf629b32caae1e7b396a",
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0004",
+          "sha256": "3ca8ea0e6ecfa5086cdd7f0c14ee14337fd1a2dc3949f1b5c4149c87195b0261",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu129-c5f2fcb363e4a39026edc476c71b9bf01b10e1874595723d8c6784d6cfd946ab.tar.zst.part0005",
-          "sha256": "fec1cfb917327b9e7c4f879e8b2dee41e02fb89a86ef5e1bdba2659c29ec7383",
-          "size": 1266456878
+          "path": "rootfs/rootfs-cu129-ce76fa94870072c3d0cb46fc6f1cc29885004642c5c79259522633f290e79abd.tar.zst.part0005",
+          "sha256": "1986e7c6221e06ad3414ca910c0451d8db43e7427eba7dc0d56a15ce3bc6f493",
+          "size": 1302401304
         }
       ],
       "privacy_validation": {
-        "entries_verified": 29155,
-        "changed_files": [
-          "rootfs-bundle.json",
-          "rootfs/etc/group",
-          "rootfs/etc/passwd",
-          "rootfs/etc/resolv.conf"
-        ],
-        "all_other_file_bytes_modes_and_links_preserved": true,
-        "vendor_binaries_preserved": true,
-        "our_identity_findings": 0,
-        "upstream_vendor_metadata_preserved": true,
-        "rule_false_positives_in_unchanged_vendor_comment": {
-          "rootfs/usr/include/rdma/bnxt_re-abi.h": 1
-        }
+        "base_vendor_binaries_preserved": true,
+        "own_identifiers_in_added_runtime": 0,
+        "rootfs_absolute_paths_allowed": true,
+        "qualified_python_native_dependencies_bundled": true,
+        "original_build_output_base_absent_during_validation": true
+      },
+      "release_python": {
+        "version": "3.13.13",
+        "prefix": "/opt/vaso/python",
+        "manifest_sha256": "2eba2f8d0b198793d26c1449940b1d2744668bfd8915d611e238e85d9598f6b3"
+      },
+      "deployment_validation": {
+        "fresh_estate_restore": "passed",
+        "python": "3.13.13",
+        "gpu_smokes": "passed",
+        "network": "isolated",
+        "prior_build_prefixes": "absent"
       }
     },
     {
       "kind": "rootfs",
       "line": "cu130",
-      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:52e0367283a821e9efa5014c7271347dfa44f16bca4782374c56889d118ab8ba",
-      "tag": "dead00257b18",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:c8cd1486aef1e7b9be0f01eb2e44d82d7c8dea912bc4562b499f7c03caa6234c",
+      "tag": "2958d55c6b86",
       "verified_files": 8,
       "files": {
-        "rootfs-bundle.json": "afaf6d81c15a50e7940d116c29df64fbf54c1413f7ad7d12e06c7c142efe84d8",
-        "rootfs-cu130.json": "fe09af356a3524a42e0a46f16479b11635118a52c6617ddced5e1bc58adf2712",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0000": "e51428c109419e7bbfc20b3a73e65338e3d5ebea23d3f0e87f4857256f3e4cd8",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0001": "c2873d0fbe907212be49dbfc685b0c6997ff2218e17f6fe20990f924d22d21e7",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0002": "c1554cbe6ffa93c2a8b92c6ae8c83dbd4fa6f0181f419f1500cee2c473e003a5",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0003": "cc8bd2cdda28015e364ff2d3e7384ba36fbe21ec5a16d53ba3e0fb9557f391ca",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0004": "4db03dd2ecba43f7691c4a48d95bd6738d3b08b291b9f8fac44d7412d08dc0a4",
-        "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0005": "db6e78539f5ace2a78da6e63df27b9660b7e0cb13b6d7a75c58e11384a508a9f"
+        "rootfs-bundle.json": "7856e1fa3d988f928e771e688c6b53e7b8751c204fc6558ff59d682e70c8fd84",
+        "rootfs-cu130.json": "185734ad1f6ddb62e6cc263c816a7d29c54c49a779e53da4ae7f284e5d34c9c3",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0000": "843ebb46f62c68a9dfdf99eea59757f7e660d9b75b1d249511d90a689ac70c85",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0001": "225a9917a3df9f56e2d59ffdcebb7cc33d1c5126715b37944cc272804940c527",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0002": "16f7c9d1572dd012e97c4f5968fbb150888d96f93286a1f92933aabe8708b528",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0003": "599e6589fc7e3e28485b270fca73bac8269cc3f3203cba4e6005281e07f9aa37",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0004": "04cb3d1400976ce9fb01c2376fe4e7bbfca1d2a1b12c61a7744d6cf0f52b2ca2",
+        "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0005": "153b436d884ac790dc31b6ac8cb76a07996f55a28eb96e959da12aeccbe71b49"
       },
-      "archive": "rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst",
-      "archive_sha256": "dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e",
-      "rootfs_manifest_digest": "sha256:afaf6d81c15a50e7940d116c29df64fbf54c1413f7ad7d12e06c7c142efe84d8",
+      "archive": "rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst",
+      "archive_sha256": "2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228",
+      "rootfs_manifest_digest": "sha256:7856e1fa3d988f928e771e688c6b53e7b8751c204fc6558ff59d682e70c8fd84",
       "ecosystem_lock_sha256": "sha256:608ffaea32487ad2e1280470bc65119abcbab58c8eb39a65948c6d794038645d",
       "split_parts": 6,
       "layers": [
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0000",
-          "sha256": "e51428c109419e7bbfc20b3a73e65338e3d5ebea23d3f0e87f4857256f3e4cd8",
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0000",
+          "sha256": "843ebb46f62c68a9dfdf99eea59757f7e660d9b75b1d249511d90a689ac70c85",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0001",
-          "sha256": "c2873d0fbe907212be49dbfc685b0c6997ff2218e17f6fe20990f924d22d21e7",
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0001",
+          "sha256": "225a9917a3df9f56e2d59ffdcebb7cc33d1c5126715b37944cc272804940c527",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0002",
-          "sha256": "c1554cbe6ffa93c2a8b92c6ae8c83dbd4fa6f0181f419f1500cee2c473e003a5",
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0002",
+          "sha256": "16f7c9d1572dd012e97c4f5968fbb150888d96f93286a1f92933aabe8708b528",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0003",
-          "sha256": "cc8bd2cdda28015e364ff2d3e7384ba36fbe21ec5a16d53ba3e0fb9557f391ca",
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0003",
+          "sha256": "599e6589fc7e3e28485b270fca73bac8269cc3f3203cba4e6005281e07f9aa37",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0004",
-          "sha256": "4db03dd2ecba43f7691c4a48d95bd6738d3b08b291b9f8fac44d7412d08dc0a4",
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0004",
+          "sha256": "04cb3d1400976ce9fb01c2376fe4e7bbfca1d2a1b12c61a7744d6cf0f52b2ca2",
           "size": 2000000000
         },
         {
-          "path": "rootfs/rootfs-cu130-dead00257b187cc8bf8fa0d22afbefe2552f6cc89308902498df04174059ed6e.tar.zst.part0005",
-          "sha256": "db6e78539f5ace2a78da6e63df27b9660b7e0cb13b6d7a75c58e11384a508a9f",
-          "size": 275953634
+          "path": "rootfs/rootfs-cu130-2958d55c6b864c845dbfaff515e173463f6e846895d682a16c9b1d383d195228.tar.zst.part0005",
+          "sha256": "153b436d884ac790dc31b6ac8cb76a07996f55a28eb96e959da12aeccbe71b49",
+          "size": 315558495
         }
       ],
       "privacy_validation": {
-        "entries_verified": 29327,
-        "changed_files": [
-          "rootfs-bundle.json",
-          "rootfs/etc/group",
-          "rootfs/etc/passwd",
-          "rootfs/etc/resolv.conf"
-        ],
-        "all_other_file_bytes_modes_and_links_preserved": true,
-        "vendor_binaries_preserved": true,
-        "our_identity_findings": 0,
-        "upstream_vendor_metadata_preserved": true,
-        "rule_false_positives_in_unchanged_vendor_comment": {
-          "rootfs/usr/include/rdma/bnxt_re-abi.h": 1
-        }
+        "base_vendor_binaries_preserved": true,
+        "own_identifiers_in_added_runtime": 0,
+        "rootfs_absolute_paths_allowed": true,
+        "qualified_python_native_dependencies_bundled": true,
+        "original_build_output_base_absent_during_validation": true
+      },
+      "release_python": {
+        "version": "3.13.13",
+        "prefix": "/opt/vaso/python",
+        "manifest_sha256": "7cab84ec19965847dbc239a5b8a965383bafca9f0b404147c1ee611f00b6ef22"
+      },
+      "deployment_validation": {
+        "fresh_estate_restore": "passed",
+        "python": "3.13.13",
+        "gpu_smokes": "passed",
+        "network": "isolated",
+        "prior_build_prefixes": "absent"
       }
     }
-  ]
+  ],
+  "deployment_verification": "tools/publish/fresh-estate-verification.json"
 }

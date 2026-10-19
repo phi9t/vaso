@@ -42,7 +42,7 @@ def test_generic_context_needs_no_foundry_and_preserves_command(tmp_path: Path) 
     assert argv[argv.index("--chdir") + 1] == "/workspace/vaso"
     assert "--ro-bind" in argv and str(rootfs / "bin") in argv
     pairs = {argv[i + 1]: argv[i + 2] for i, token in enumerate(argv) if token == "--setenv"}
-    assert pairs["PATH"] == "/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"
+    assert pairs["PATH"] == "/opt/vaso/compat-bin:/opt/vaso/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"
     assert (tmp_path / "estate/sources").is_dir()
     assert (tmp_path / "estate/agents/leases").is_dir()
     bindings = [argv[i + 1:i + 3] for i, token in enumerate(argv) if token in {"--bind", "--ro-bind"}]
@@ -57,6 +57,19 @@ def test_generic_context_refuses_missing_rootfs_before_execution(tmp_path: Path)
     ], env=env, cwd=checkout, capture_output=True, text=True)
     assert proc.returncode == 2
     assert "rootfs is missing" in proc.stderr
+
+
+def test_generic_context_preserves_rootfs_tool_prefix(tmp_path: Path) -> None:
+    checkout, rootfs, env = minimal_checkout(tmp_path)
+    tools = rootfs / "opt/vaso"
+    tools.mkdir(parents=True)
+    proc = subprocess.run([
+        "bash", str(checkout / "insula/execution/insula.sh"),
+        "--rootfs", str(rootfs), "--print-argv", "--", "/opt/vaso/python/bin/python3",
+    ], env=env, cwd=checkout, capture_output=True, text=True)
+    assert proc.returncode == 0, proc.stderr
+    argv = json.loads(proc.stdout)
+    assert any(argv[i:i + 3] == ["--ro-bind", str(tools), "/opt/vaso"] for i in range(len(argv)))
 
 
 def test_sourceable_launcher_stops_on_failed_preflight(tmp_path: Path) -> None:

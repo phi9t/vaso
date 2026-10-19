@@ -583,6 +583,14 @@ def test_rebase_conflict_never_moves_landing_ref(repos, capsys):
     assert sh(repos["lead"], "rev-parse", "landing") == before
 
 
+def test_filesystem_type_uses_visible_overmount(tmp_path, monkeypatch):
+    mounts = f"tmpfs / tmpfs rw 0 0\ntmpfs {tmp_path} tmpfs rw 0 0\n/dev/disk {tmp_path} ext4 rw 0 0\n"
+    original = Path.read_text
+    monkeypatch.setattr(Path, "read_text", lambda self, *args, **kwargs:
+                        mounts if self == Path("/proc/mounts") else original(self, *args, **kwargs))
+    assert relay.fs_type(tmp_path) == "ext4"
+
+
 def test_agent_io_root_refuses_tmpfs_and_pins_env(repos, monkeypatch, tmp_path):
     monkeypatch.setattr(relay, "fs_type", lambda path: "tmpfs")
     with pytest.raises(relay.RelayError, match="tmpfs"):
