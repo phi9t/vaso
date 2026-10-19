@@ -31,6 +31,34 @@ behavior through the command or module interface, including relevant failure
 cases. Choose verification proportional to the change; prose edits do not
 need new tests. Vendored code and historical records retain their own formats.
 
+## Unattended execution
+
+Treat unattended end-to-end runs as evidence of system quality. A supported
+workflow should take a documented starting state through input preparation,
+execution, output validation, and a durable result without an agent or human
+repairing it mid-run. Move recurring operator knowledge into the owning code
+and its interface; improve the complete path rather than only the latest command.
+
+Declare configuration, pinned inputs, resource needs, credentials, and authority
+before execution. Automate acquisition and prerequisite checks where appropriate.
+Missing prerequisites should produce a specific failure and recovery path before
+expensive work. Once launched, the run should complete or fail without prompts,
+ambient machine state, or manual reconstruction of the next step.
+
+Preserve the input identities, stage outcomes, logs, artifacts, and exit status.
+Recovery should be safe to repeat; retries should be bounded and retain failed
+attempts. Make progress, final status, and failure causes inspectable independently
+of the launching terminal. Exercise the public entrypoint and relevant failure
+paths when changing orchestration.
+
+Unattended operation and determinism are separate claims. Given the same declared
+inputs and conditions, aim for repeatable behavior and verifiable outputs; state
+the comparison policy and resource assumptions. Distinguish a cached run from
+cold input preparation, actual native execution, and artifact reproducibility.
+Use evidence matching the claim. Reuse valid native proof by content identity
+under the build-stability contract rather than rebuilding unchanged packages
+for every support or documentation change.
+
 ## Verification
 
 Use a disk-backed `TMPDIR`; estate-placement tests reject tmpfs. For a checkout

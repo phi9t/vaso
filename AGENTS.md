@@ -4,6 +4,9 @@ Choose the exploration, implementation, and verification approach that fits
 the requested outcome. Carry authorized work through to a verified result.
 Use judgment for reversible choices; reuse authority already granted.
 
+Strive for unattended, repeatable end-to-end operation. For workflow changes,
+apply the unattended-execution standard in `docs/development.md`.
+
 ## Product and code map
 
 - `insula/`: rootfs, execution, and estate projection. Tools, toolchains, and
