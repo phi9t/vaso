@@ -188,7 +188,12 @@
       "deployment_validation": {
         "multi_gpu_qualification": "failed",
         "qualification_gpu_count": 8,
-        "qualification_report": "tools/publish/multigpu-qualification.json"
+        "qualification_report": "tools/publish/multigpu-qualification.json",
+        "latest_qualification_retry": {
+          "result": "passed",
+          "report": "tools/publish/cu130-jax-qualification-retry.json",
+          "prior_failure_resolved": false
+        }
       }
     },
     {
@@ -340,10 +345,16 @@
         "prior_build_prefixes": "absent",
         "multi_gpu_qualification": "failed",
         "qualification_gpu_count": 8,
-        "qualification_report": "tools/publish/multigpu-qualification.json"
+        "qualification_report": "tools/publish/multigpu-qualification.json",
+        "latest_qualification_retry": {
+          "result": "passed",
+          "report": "tools/publish/cu130-jax-qualification-retry.json",
+          "prior_failure_resolved": false
+        }
       }
     }
   ],
   "deployment_verification": "tools/publish/fresh-estate-verification.json",
-  "multi_gpu_qualification": "tools/publish/multigpu-qualification.json"
+  "multi_gpu_qualification": "tools/publish/multigpu-qualification.json",
+  "multi_gpu_qualification_retry": "tools/publish/cu130-jax-qualification-retry.json"
 }

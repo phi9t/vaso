@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "result": "passed",
+  "scope": "Complete CUDA 13.0 JAX deployment profile retried on eight GPUs under insula using the GHCR-restored estate.",
+  "source_commit": "859bd16b27da9c3a45ae468e1079f508a4a238ea",
+  "started_utc": "2026-10-19T02:09:28.962006+00:00",
+  "finished_utc": "2026-10-19T02:14:25.086557+00:00",
+  "hardware": {
+    "gpu_count": 8,
+    "gpu_model": "NVIDIA B200",
+    "all_gpus_idle_before_start": true
+  },
+  "execution": {
+    "fresh_wheel_environment": true,
+    "fresh_workload_caches": true,
+    "offline_hash_locked_installation": true,
+    "rootfs_python": "/opt/vaso/python/bin/python3",
+    "python_version": "3.13.13",
+    "network": "isolated; loopback only",
+    "native_rebuilds": 0,
+    "source_versions_toolchains_and_acceptance_criteria_changed": false,
+    "gpu_leases_released": true
+  },
+  "prior_failure": {
+    "report": "tools/publish/multigpu-qualification.json",
+    "workload": "W5b",
+    "symptom": "XLA collective first-call rendezvous timeout",
+    "root_cause_resolved": false,
+    "original_results_preserved": true
+  },
+  "artifacts": [
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "jax",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu130@sha256:e66f57112a13b16baa64ad608910f839216f014869ce077b8c44193d803cb661"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:c8cd1486aef1e7b9be0f01eb2e44d82d7c8dea912bc4562b499f7c03caa6234c"
+    }
+  ],
+  "input_hash_verification": [
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "jax",
+      "verified_files": 16
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "verified_runtime_files": 2931,
+      "rootfs_manifest_digest": "sha256:7856e1fa3d988f928e771e688c6b53e7b8751c204fc6558ff59d682e70c8fd84"
+    }
+  ],
+  "stages_returncodes": {
+    "workloads": 0,
+    "gates": 0,
+    "consumer": 0
+  },
+  "workload_summary_sha256": "050c37ded3c7d6d068b84f16a16b52eebcea81f5697581dada69b64a3c78e89b",
+  "gate_results_sha256": "949129898fdd0b29d258804cb1b78b496b503697a19d2e919b406464be0443e5",
+  "workloads": [
+    {
+      "id": "W3a",
+      "verdict": "passed",
+      "criteria": {
+        "finite_losses": true,
+        "loss_drop": true,
+        "step_count": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 15.885852601961233
+    },
+    {
+      "id": "W3b",
+      "verdict": "passed",
+      "criteria": {
+        "device_count": true,
+        "finite_losses": true,
+        "loss_drop": true,
+        "parameter_consistency": true,
+        "psum": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 32.85885635903105
+    },
+    {
+      "id": "W3c",
+      "verdict": "passed",
+      "criteria": {
+        "compile_succeeded": true,
+        "max_abs_error": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 9.977240054984577
+    },
+    {
+      "id": "W5a",
+      "verdict": "passed",
+      "criteria": {
+        "device_count": true,
+        "finite_losses": true,
+        "fsdp_sharding": true,
+        "loss_drop_60_percent": true,
+        "loss_near_entropy_floor": true,
+        "loss_not_below_entropy_floor": true,
+        "mfu_recorded": true,
+        "model_shape": true,
+        "step_count": true,
+        "tokens_per_second_recorded": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 37.71737742994446
+    },
+    {
+      "id": "W5b",
+      "verdict": "passed",
+      "criteria": {
+        "collectives_exercised": true,
+        "device_count": true,
+        "finite_losses": true,
+        "loss_falls": true,
+        "loss_within_w5a_tolerance": true,
+        "mesh_shape": true,
+        "step_count": true,
+        "tensor_parallel_sharding": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 30.410087680909783
+    },
+    {
+      "id": "W5c",
+      "verdict": "passed",
+      "criteria": {
+        "cpu_backend": true,
+        "finite": true,
+        "gpu_backend": true,
+        "grad_relative_error": true,
+        "loss_relative_error": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 16.53693356004078
+    },
+    {
+      "id": "W5d",
+      "verdict": "passed",
+      "criteria": {
+        "cudnn_ran": true,
+        "finite": true,
+        "grad_agreement": true,
+        "output_agreement": true,
+        "seq_lengths": true,
+        "xla_ran": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 17.037429091054946
+    },
+    {
+      "id": "W5e",
+      "verdict": "passed",
+      "criteria": {
+        "pallas_agreement": true,
+        "pallas_matmul_ran": true,
+        "xla_enabled_disabled_agreement": true,
+        "xla_flags_recorded": true,
+        "xla_triton_disabled_ran": true,
+        "xla_triton_enabled_ran": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 31.205050237942487
+    },
+    {
+      "id": "W5f",
+      "verdict": "passed",
+      "criteria": {
+        "deterministic_mode": true,
+        "finite_losses": true,
+        "loss_curves_match": true,
+        "seed_recorded": true,
+        "step_count": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 31.658526894985698
+    },
+    {
+      "id": "W5g",
+      "verdict": "passed",
+      "criteria": {
+        "child_processes_passed": true,
+        "distributed_topology": true,
+        "mosaic_nvshmem_available": true,
+        "mosaic_remote_dma_ran": true,
+        "numeric_result": true,
+        "nvshmem_not_xla_metadata_fallback": true,
+        "profiler_events_recorded": true,
+        "rank_count": true,
+        "single_copy_nvshmem_host": true,
+        "xla_nvshmem_flag": true
+      },
+      "failed_criteria": [],
+      "returncode": 0,
+      "duration_seconds": 11.92956374201458
+    }
+  ],
+  "gates": [
+    {
+      "name": "jax_import",
+      "group": "jax",
+      "blocking": true,
+      "returncode": 0
+    },
+    {
+      "name": "jax_matmul",
+      "group": "jax",
+      "blocking": true,
+      "returncode": 0
+    },
+    {
+      "name": "jax_psum_2gpu",
+      "group": "jax",
+      "blocking": true,
+      "returncode": 0
+    }
+  ],
+  "consumer": {
+    "module": "python_consumers.verify_jax",
+    "returncode": 0,
+    "stdout_sha256": "d3445f78ddd7caec3fd03f50dcbd2ca32e5c8598550646a2573df5f89fd1bf0b"
+  },
+  "totals": {
+    "workloads": 10,
+    "workloads_passed": 10,
+    "gates": 3,
+    "gates_passed": 3,
+    "consumers": 1,
+    "consumers_passed": 1
+  }
+}
