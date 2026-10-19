@@ -51,7 +51,12 @@
         "upstream_wheel_payloads_preserved": true,
         "local_mpi_metadata_redacted": true,
         "native_code_and_symbol_sections_preserved": true,
-        "gpu_qualification_repeated": false
+        "gpu_qualification_repeated": true
+      },
+      "deployment_validation": {
+        "multi_gpu_qualification": "passed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     },
     {
@@ -96,7 +101,12 @@
         "upstream_wheel_payloads_preserved": true,
         "local_mpi_metadata_redacted": true,
         "native_code_and_symbol_sections_preserved": true,
-        "gpu_qualification_repeated": false
+        "gpu_qualification_repeated": true
+      },
+      "deployment_validation": {
+        "multi_gpu_qualification": "passed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     },
     {
@@ -132,7 +142,12 @@
         "upstream_wheel_payloads_preserved": true,
         "local_mpi_metadata_redacted": false,
         "native_code_and_symbol_sections_preserved": true,
-        "gpu_qualification_repeated": false
+        "gpu_qualification_repeated": true
+      },
+      "deployment_validation": {
+        "multi_gpu_qualification": "passed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     },
     {
@@ -168,7 +183,12 @@
         "upstream_wheel_payloads_preserved": true,
         "local_mpi_metadata_redacted": false,
         "native_code_and_symbol_sections_preserved": true,
-        "gpu_qualification_repeated": false
+        "gpu_qualification_repeated": true
+      },
+      "deployment_validation": {
+        "multi_gpu_qualification": "failed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     },
     {
@@ -241,7 +261,10 @@
         "python": "3.13.13",
         "gpu_smokes": "passed",
         "network": "isolated",
-        "prior_build_prefixes": "absent"
+        "prior_build_prefixes": "absent",
+        "multi_gpu_qualification": "passed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     },
     {
@@ -314,9 +337,13 @@
         "python": "3.13.13",
         "gpu_smokes": "passed",
         "network": "isolated",
-        "prior_build_prefixes": "absent"
+        "prior_build_prefixes": "absent",
+        "multi_gpu_qualification": "failed",
+        "qualification_gpu_count": 8,
+        "qualification_report": "tools/publish/multigpu-qualification.json"
       }
     }
   ],
-  "deployment_verification": "tools/publish/fresh-estate-verification.json"
+  "deployment_verification": "tools/publish/fresh-estate-verification.json",
+  "multi_gpu_qualification": "tools/publish/multigpu-qualification.json"
 }

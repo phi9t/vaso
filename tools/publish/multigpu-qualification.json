@@ -1,0 +1,1039 @@
+{
+  "schema_version": 1,
+  "result": "failed",
+  "scope": "Complete deployment workload and runtime gate qualification of the published wheels on eight GPUs per CUDA line; native builds and build-time acceptance are not repeated.",
+  "source_commit": "859bd16b27da9c3a45ae468e1079f508a4a238ea",
+  "started_utc": "2026-10-19T01:23:14.005318+00:00",
+  "finished_utc": "2026-10-19T01:50:57.554257+00:00",
+  "hardware": {
+    "gpu_count": 8,
+    "gpu_model": "NVIDIA B200"
+  },
+  "execution": {
+    "fresh_ghcr_restored_estate": true,
+    "acquisition_evidence": "tools/publish/fresh-estate-verification.json",
+    "source_snapshot": "git archive of source_commit; tracked files only",
+    "python": "/opt/vaso/python/bin/python3",
+    "python_version": "3.13.13",
+    "wheel_installation": "offline, no dependency resolution, SHA256-locked requirements",
+    "network": "isolated; loopback only",
+    "prior_build_prefixes_or_caches": "absent",
+    "gpu_lease_amount_per_run": 8,
+    "native_rebuilds": 0,
+    "workload_command": "python3 -m workloads.run_workloads --from-release --line LINE --gpus 8 --out /run/vaso/run/workloads --only PROFILE_WORKLOADS",
+    "gate_command": "python3 native/pytorch/gates.py --from-release --out-dir /run/vaso/run/gates --results-out /run/vaso/run/gates/results.json --only PROFILE_GATES --block-group core --block-group compile --block-group vision_audio --block-group jax --execute",
+    "consumer_command": "PYTHONPATH=/workspace/experiment/examples/consumers python3 -m python_consumers.verify_PROFILE"
+  },
+  "artifacts": [
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "torch",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu129@sha256:7572668ffcea3064dba2e41e4a6ffc9637eec679f740c222ce3224cdda4d2bfe"
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "torch",
+      "reference": "ghcr.io/phi9t/vaso-release-torch-cu130@sha256:d252738bd004c3e80d8fff61f994c463380ace850037e0907365f171445c5987"
+    },
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "jax",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu129@sha256:89ab1bec0bcdd22b1a4261161aa2c93a6aad877ef12022e684824716d567cdff"
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "jax",
+      "reference": "ghcr.io/phi9t/vaso-release-jax-cu130@sha256:e66f57112a13b16baa64ad608910f839216f014869ce077b8c44193d803cb661"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu129",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu129@sha256:e8095b10e3eda2732bcdd29a516864020b21724e53198ea96efaa605bdeb34ca"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "reference": "ghcr.io/phi9t/vaso-rootfs-cu130@sha256:c8cd1486aef1e7b9be0f01eb2e44d82d7c8dea912bc4562b499f7c03caa6234c"
+    }
+  ],
+  "input_hash_verification": [
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "torch",
+      "verified_files": 25
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "torch",
+      "verified_files": 25
+    },
+    {
+      "kind": "release",
+      "line": "cu129",
+      "profile": "jax",
+      "verified_files": 16
+    },
+    {
+      "kind": "release",
+      "line": "cu130",
+      "profile": "jax",
+      "verified_files": 16
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu129",
+      "verified_runtime_files": 2931,
+      "rootfs_manifest_digest": "sha256:9601c5c89235b072a7b1a90de1cdcee21ae3bfcc5a0921c29d7d508e3598d976"
+    },
+    {
+      "kind": "rootfs",
+      "line": "cu130",
+      "verified_runtime_files": 2931,
+      "rootfs_manifest_digest": "sha256:7856e1fa3d988f928e771e688c6b53e7b8751c204fc6558ff59d682e70c8fd84"
+    }
+  ],
+  "runs": [
+    {
+      "line": "cu129",
+      "profile": "torch",
+      "workload_count": 30,
+      "gate_count": 10,
+      "workload_verdict": "passed",
+      "gate_verdict": "passed",
+      "stages_returncodes": {
+        "workloads": 0,
+        "gates": 0,
+        "consumer": 0
+      },
+      "workload_summary_sha256": "fe9f67ed1f2bc396283e05083b8c1372c15ac151081b06456e97ea5b61d98caa",
+      "gate_results_sha256": "9ef9bf599e1c7b9c08922d190e321e2fe9b8428f6f28bd1e569cf5a5c13be8c3",
+      "consumer_stdout_sha256": "1261d9051132b37c6da168d33823aa1d312019f1c8feb770bd0bf80f0aee5422",
+      "consumer": "python_consumers.verify_torch",
+      "workloads": [
+        {
+          "id": "W1a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 6.6731179089983925
+        },
+        {
+          "id": "W1b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 46.48803442006465
+        },
+        {
+          "id": "W1c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 19.042773530934937
+        },
+        {
+          "id": "W1d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 32.15248010295909
+        },
+        {
+          "id": "W2a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 4.27440952998586
+        },
+        {
+          "id": "W2b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 25.178318038932048
+        },
+        {
+          "id": "W2c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 11.930466302088462
+        },
+        {
+          "id": "W6a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.8193530270364136
+        },
+        {
+          "id": "W6b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.8176697369199246
+        },
+        {
+          "id": "W6c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 7.925305468030274
+        },
+        {
+          "id": "W6d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.76914523600135
+        },
+        {
+          "id": "W6e",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.76778785395436
+        },
+        {
+          "id": "W6f",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.1181767670204863
+        },
+        {
+          "id": "W6g",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.6675003570271656
+        },
+        {
+          "id": "W6h",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.465908829937689
+        },
+        {
+          "id": "W6i",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.415822412003763
+        },
+        {
+          "id": "W6j",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.869786925963126
+        },
+        {
+          "id": "W6k",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.7163578710751608
+        },
+        {
+          "id": "W6l",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.7665108289802447
+        },
+        {
+          "id": "W6m",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.9666505040368065
+        },
+        {
+          "id": "W6n",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.4158382690511644
+        },
+        {
+          "id": "W6o",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.7662322559626773
+        },
+        {
+          "id": "W6p",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.415728356107138
+        },
+        {
+          "id": "W6q",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.617486355942674
+        },
+        {
+          "id": "W6r",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.568971178960055
+        },
+        {
+          "id": "W6s",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.719194232020527
+        },
+        {
+          "id": "W6t",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.517389206914231
+        },
+        {
+          "id": "W6u",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.567470422014594
+        },
+        {
+          "id": "W6v",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.4173883700277656
+        },
+        {
+          "id": "W6w",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.4687223699875176
+        }
+      ],
+      "gates": [
+        {
+          "name": "import_cuda",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "feature_parity",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "b200_matmul",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "cudnn_conv",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "nccl_distributed",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "gloo_distributed",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torch_compile",
+          "group": "compile",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "sdpa_flash",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torchvision_ops",
+          "group": "vision_audio",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torchaudio_ops",
+          "group": "vision_audio",
+          "blocking": true,
+          "returncode": 0
+        }
+      ]
+    },
+    {
+      "line": "cu129",
+      "profile": "jax",
+      "workload_count": 10,
+      "gate_count": 3,
+      "workload_verdict": "passed",
+      "gate_verdict": "passed",
+      "stages_returncodes": {
+        "workloads": 0,
+        "gates": 0,
+        "consumer": 0
+      },
+      "workload_summary_sha256": "6f6bd140e822dafb47febee1df4d5cd32446b8f0badc4fde94e44c97f40f394a",
+      "gate_results_sha256": "949129898fdd0b29d258804cb1b78b496b503697a19d2e919b406464be0443e5",
+      "consumer_stdout_sha256": "d3445f78ddd7caec3fd03f50dcbd2ca32e5c8598550646a2573df5f89fd1bf0b",
+      "consumer": "python_consumers.verify_jax",
+      "workloads": [
+        {
+          "id": "W3a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 13.547814152087085
+        },
+        {
+          "id": "W3b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 37.620207719970495
+        },
+        {
+          "id": "W3c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 6.57286885404028
+        },
+        {
+          "id": "W5a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 39.13712753599975
+        },
+        {
+          "id": "W5b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 28.9646480580559
+        },
+        {
+          "id": "W5c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 15.946368479984812
+        },
+        {
+          "id": "W5d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 14.84129691903945
+        },
+        {
+          "id": "W5e",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 21.746826444985345
+        },
+        {
+          "id": "W5f",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 28.503394410945475
+        },
+        {
+          "id": "W5g",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 7.123389553045854
+        }
+      ],
+      "gates": [
+        {
+          "name": "jax_import",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "jax_matmul",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "jax_psum_2gpu",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        }
+      ]
+    },
+    {
+      "line": "cu130",
+      "profile": "torch",
+      "workload_count": 30,
+      "gate_count": 10,
+      "workload_verdict": "passed",
+      "gate_verdict": "passed",
+      "stages_returncodes": {
+        "workloads": 0,
+        "gates": 0,
+        "consumer": 0
+      },
+      "workload_summary_sha256": "60dbca9a9f54a3f42b60d3a012c537bd2f1f6461e4e8e6a993591f81253e8e5d",
+      "gate_results_sha256": "9ef9bf599e1c7b9c08922d190e321e2fe9b8428f6f28bd1e569cf5a5c13be8c3",
+      "consumer_stdout_sha256": "1261d9051132b37c6da168d33823aa1d312019f1c8feb770bd0bf80f0aee5422",
+      "consumer": "python_consumers.verify_torch",
+      "workloads": [
+        {
+          "id": "W1a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 10.879195429966785
+        },
+        {
+          "id": "W1b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 39.67782609898131
+        },
+        {
+          "id": "W1c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 22.795428016106598
+        },
+        {
+          "id": "W1d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 30.20585619402118
+        },
+        {
+          "id": "W2a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 7.624552896013483
+        },
+        {
+          "id": "W2b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 23.646274404018186
+        },
+        {
+          "id": "W2c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 15.335549705894664
+        },
+        {
+          "id": "W6a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 5.422461587935686
+        },
+        {
+          "id": "W6b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 4.920883298967965
+        },
+        {
+          "id": "W6c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 14.486209399998188
+        },
+        {
+          "id": "W6d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.769221230992116
+        },
+        {
+          "id": "W6e",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.7177051440812647
+        },
+        {
+          "id": "W6f",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.1184345179935917
+        },
+        {
+          "id": "W6g",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.7678210199810565
+        },
+        {
+          "id": "W6h",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.5159450470237061
+        },
+        {
+          "id": "W6i",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.4659136389382184
+        },
+        {
+          "id": "W6j",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 4.019424010068178
+        },
+        {
+          "id": "W6k",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.816343499114737
+        },
+        {
+          "id": "W6l",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.7662974080303684
+        },
+        {
+          "id": "W6m",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.9664354199776426
+        },
+        {
+          "id": "W6n",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.466098894015886
+        },
+        {
+          "id": "W6o",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.9665354200406
+        },
+        {
+          "id": "W6p",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 1.4661909670103341
+        },
+        {
+          "id": "W6q",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.668356416048482
+        },
+        {
+          "id": "W6r",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 4.620195246068761
+        },
+        {
+          "id": "W6s",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.9693316210759804
+        },
+        {
+          "id": "W6t",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.7177691450342536
+        },
+        {
+          "id": "W6u",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.7678055990254506
+        },
+        {
+          "id": "W6v",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 2.717640670016408
+        },
+        {
+          "id": "W6w",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 3.769122914993204
+        }
+      ],
+      "gates": [
+        {
+          "name": "import_cuda",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "feature_parity",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "b200_matmul",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "cudnn_conv",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "nccl_distributed",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "gloo_distributed",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torch_compile",
+          "group": "compile",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "sdpa_flash",
+          "group": "core",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torchvision_ops",
+          "group": "vision_audio",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "torchaudio_ops",
+          "group": "vision_audio",
+          "blocking": true,
+          "returncode": 0
+        }
+      ]
+    },
+    {
+      "line": "cu130",
+      "profile": "jax",
+      "workload_count": 10,
+      "gate_count": 3,
+      "workload_verdict": "failed",
+      "gate_verdict": "passed",
+      "stages_returncodes": {
+        "workloads": 1,
+        "gates": 0,
+        "consumer": 0
+      },
+      "workload_summary_sha256": "444e195eef46eafb0f88d2b77f6e3b67b9a3e6c76a4b7d6e2ec33ac51ba76015",
+      "gate_results_sha256": "949129898fdd0b29d258804cb1b78b496b503697a19d2e919b406464be0443e5",
+      "consumer_stdout_sha256": "d3445f78ddd7caec3fd03f50dcbd2ca32e5c8598550646a2573df5f89fd1bf0b",
+      "consumer": "python_consumers.verify_jax",
+      "workloads": [
+        {
+          "id": "W3a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 15.986177354934625
+        },
+        {
+          "id": "W3b",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 42.82456821703818
+        },
+        {
+          "id": "W3c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 6.423073673038743
+        },
+        {
+          "id": "W5a",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 56.2946609739447
+        },
+        {
+          "id": "W5b",
+          "verdict": "failed",
+          "failed_criteria": [
+            "runner_result_json",
+            "subprocess_returncode"
+          ],
+          "returncode": -6,
+          "duration_seconds": 117.09083892998751
+        },
+        {
+          "id": "W5c",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 13.734315793961287
+        },
+        {
+          "id": "W5d",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 13.187068758998066
+        },
+        {
+          "id": "W5e",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 27.202395359054208
+        },
+        {
+          "id": "W5f",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 40.42118780699093
+        },
+        {
+          "id": "W5g",
+          "verdict": "passed",
+          "failed_criteria": [],
+          "returncode": 0,
+          "duration_seconds": 10.92940083798021
+        }
+      ],
+      "gates": [
+        {
+          "name": "jax_import",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "jax_matmul",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        },
+        {
+          "name": "jax_psum_2gpu",
+          "group": "jax",
+          "blocking": true,
+          "returncode": 0
+        }
+      ]
+    }
+  ],
+  "coverage_limits": [
+    {
+      "line": "cu129",
+      "profile": "torch",
+      "workload": "W6i",
+      "reason": "mpirun not present in rootfs",
+      "coverage": "MPI backend availability checked; launched MPI process-group probe not run."
+    },
+    {
+      "line": "cu130",
+      "profile": "torch",
+      "workload": "W6i",
+      "reason": "mpirun not present in rootfs",
+      "coverage": "MPI backend availability checked; launched MPI process-group probe not run."
+    }
+  ],
+  "coresidence_checks": [
+    {
+      "line": "cu129",
+      "workload": "W4",
+      "verdict": "passed",
+      "returncode": 0,
+      "criteria": {
+        "jax_imported": true,
+        "jax_step_finite": true,
+        "jax_to_torch_exact": true,
+        "torch_imported": true,
+        "torch_step_finite": true,
+        "torch_to_jax_exact": true
+      },
+      "duration_seconds": 10.3278145249933,
+      "workload_summary_sha256": "34d1a47056576c96fe5c8dcc7de136060d99ca6bb05983692e874f12ef05bc71",
+      "composition": "Verified GHCR-installed Torch and JAX environments for the same line projected read-only into a new rootfs venv; Torch NumPy 2.4.6 selected by path precedence. No dependency resolution.",
+      "module_paths": {
+        "torch": "/run/vaso/profiles/torch/lib/python3.13/site-packages/torch/__init__.py",
+        "jax": "/run/vaso/profiles/jax/lib/python3.13/site-packages/jax/__init__.py",
+        "numpy": "/run/vaso/profiles/torch/lib/python3.13/site-packages/numpy/__init__.py",
+        "triton": "/run/vaso/profiles/torch/lib/python3.13/site-packages/triton/__init__.py"
+      }
+    },
+    {
+      "line": "cu130",
+      "workload": "W4",
+      "verdict": "passed",
+      "returncode": 0,
+      "criteria": {
+        "jax_imported": true,
+        "jax_step_finite": true,
+        "jax_to_torch_exact": true,
+        "torch_imported": true,
+        "torch_step_finite": true,
+        "torch_to_jax_exact": true
+      },
+      "duration_seconds": 10.027585632982664,
+      "workload_summary_sha256": "75375494cfc92e80d70dbabc41fb1952ab699ff0a08f1cf34c145f7e4b5ab0c0",
+      "composition": "Verified GHCR-installed Torch and JAX environments for the same line projected read-only into a new rootfs venv; Torch NumPy 2.4.6 selected by path precedence. No dependency resolution.",
+      "module_paths": {
+        "torch": "/run/vaso/profiles/torch/lib/python3.13/site-packages/torch/__init__.py",
+        "jax": "/run/vaso/profiles/jax/lib/python3.13/site-packages/jax/__init__.py",
+        "numpy": "/run/vaso/profiles/torch/lib/python3.13/site-packages/numpy/__init__.py",
+        "triton": "/run/vaso/profiles/torch/lib/python3.13/site-packages/triton/__init__.py"
+      }
+    }
+  ],
+  "totals": {
+    "workloads": 82,
+    "workloads_passed": 81,
+    "gates": 26,
+    "gates_passed": 26,
+    "consumers": 4,
+    "consumers_passed": 4
+  },
+  "diagnostics": {
+    "workload": "W5b",
+    "line": "cu130",
+    "initial_failure": "XLA kCollectivePermute first-call rendezvous timed out: 8 device threads expected, 2 arrived; process aborted.",
+    "artifact_or_acceptance_changes": false,
+    "root_cause": "Unresolved; three focused reruns passed. The original failed qualification is retained.",
+    "resource_observation": "Other GPU work was observed after the initial failure and during the focused reruns; global GPU exclusivity was not enforced by the estate-local lease.",
+    "focused_reruns": [
+      {
+        "attempt": 1,
+        "verdict": "passed",
+        "returncode": 0,
+        "duration_seconds": 38.768219784018584,
+        "criteria": {
+          "collectives_exercised": true,
+          "device_count": true,
+          "finite_losses": true,
+          "loss_falls": true,
+          "loss_within_w5a_tolerance": true,
+          "mesh_shape": true,
+          "step_count": true,
+          "tensor_parallel_sharding": true
+        },
+        "result_sha256": "46ee19ada3e21728c80ef60a4544cc052bf9435eb5b583d701d32a71bd7008cd"
+      },
+      {
+        "attempt": 2,
+        "verdict": "passed",
+        "returncode": 0,
+        "duration_seconds": 37.21870026004035,
+        "criteria": {
+          "collectives_exercised": true,
+          "device_count": true,
+          "finite_losses": true,
+          "loss_falls": true,
+          "loss_within_w5a_tolerance": true,
+          "mesh_shape": true,
+          "step_count": true,
+          "tensor_parallel_sharding": true
+        },
+        "result_sha256": "d1c931c89252c6c39e2a4705a2d86c6eb136b7caa4766fa0879ae9200ded1c0c"
+      },
+      {
+        "attempt": 3,
+        "verdict": "passed",
+        "returncode": 0,
+        "duration_seconds": 33.262241739896126,
+        "criteria": {
+          "collectives_exercised": true,
+          "device_count": true,
+          "finite_losses": true,
+          "loss_falls": true,
+          "loss_within_w5a_tolerance": true,
+          "mesh_shape": true,
+          "step_count": true,
+          "tensor_parallel_sharding": true
+        },
+        "result_sha256": "8710dbc42037466be1694921d5080a91efebdebaa6696012146999885ebbb1c8"
+      }
+    ]
+  }
+}
