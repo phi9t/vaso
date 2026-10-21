@@ -220,6 +220,9 @@ def report_text(report: dict[str, Any]) -> str:
     if report.get("pid"):
         lines.append(f"PID       {report['pid']}")
     lines.append(f"Phase     {report.get('phase', '-')}")
+    cache_start = report.get("cache_start")
+    if isinstance(cache_start, dict) and cache_start.get("mode"):
+        lines.append(f"Cache     {str(cache_start['mode']).upper()} at launch")
     lines.append(f"Elapsed   {format_duration(report.get('duration_seconds'))}")
     current = report.get("current_stage")
     if current:
@@ -384,6 +387,19 @@ class Console:
             f"  matrix   {', '.join(report['lines'])} × {', '.join(report['profiles'])}"
         )
         self._write(f"  summary  {report['summary_path']}")
+        cache_start = report.get("cache_start", {})
+        cache_mode = cache_start.get("mode") if isinstance(cache_start, dict) else None
+        if cache_mode == "cold":
+            self._write(
+                "  cache    cold; selected output bases and action caches were empty"
+            )
+        elif cache_mode == "warm":
+            self._write(
+                "  cache    warm; reuse still depends on matching Bazel action keys"
+            )
+        self._write(
+            "  bazel    local=executing here; disk-cache=enabled, not a cache hit"
+        )
         status_cmd = (
             f"foundry/build.sh --estate-root {shlex.quote(str(estate))} --status"
         )

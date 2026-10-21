@@ -115,6 +115,27 @@ and preserve existing input identity; missing evidence does not justify a
 metadata-only rebuild. Determinism compares contents from independent runs;
 a fresh output base alone does not prove native actions avoided cache hits.
 
+After both profile output bases exist, run the cross-framework decoder workload
+without rebuilding native packages:
+
+```sh
+foundry/workloads/nanogpt_speedrun/run.sh \
+  --estate-root "$VASO_ESTATE_ROOT" --line cu129 --mode benchmark
+```
+
+Retain the attempt's complete `attestation/` directory as a CI artifact, including
+on failure. Replay it without a GPU:
+
+```sh
+python3 -B foundry/workloads/nanogpt_speedrun/attest.py \
+  --verify-bundle /absolute/path/to/attempt/attestation
+```
+
+The [speedrun guide](../foundry/workloads/nanogpt_speedrun/README.md) documents
+prerequisites, stage deadlines, bounded resume, evidence packaging, matrix scope,
+and the rules for numerical and performance claims. Attestations are local and
+unsigned; native build/release qualification remains separate.
+
 `tools/ci/nightly.sh` wraps both profiles and both CUDA lines. It is
 operator-triggered and flocked, runs release gates under leases, and only runs
 determinism after those gates pass. Estate-local leases do not guarantee global

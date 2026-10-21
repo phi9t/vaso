@@ -28,6 +28,77 @@ foundry/build.sh --estate-root "$VASO_ESTATE_ROOT" \
   --line all --profile all --seed-estate /path/to/input-estate
 ```
 
+For a genuinely cold rebuild of the complete matrix, use the dedicated wrapper:
+
+```sh
+foundry/full_rebuild.sh \
+  --seed-estate "$VASO_ESTATE_ROOT"
+```
+
+It creates a uniquely named estate beside the seed estate, links only the
+prepared read-only rootfs lines, copies the pinned BCR mirror, and passes the
+remaining verified source closure through `--seed-estate`. Output bases, action
+caches, nested build caches, and native state therefore begin empty. Declare the
+seed with `--seed-estate` or `VASO_FULL_REBUILD_SEED_ESTATE`; the wrapper never
+guesses a home-directory estate. Override the fresh-estate parent with
+`--estate-parent` or `VASO_FULL_REBUILD_ESTATE_PARENT`.
+
+### Bazel execution and cache reuse
+
+Each matrix row is one offline Bazel invocation inside insula. The Torch row
+requests four release-wheel targets (PyTorch, torchvision, torchaudio, and
+Triton); the JAX row requests the jaxlib release wheelhouse. Bazel 9.2 runs with
+local spawn execution and three distinct persistent input/output mechanisms:
+
+| State | Scope | Reused when |
+|---|---|---|
+| Repository cache and distdirs | Estate-wide | A pinned source hash matches |
+| Output base | CUDA line and profile | The same estate, line, and profile are rerun |
+| Bazel disk cache | CUDA line, shared by profiles | A complete action key and declared inputs match |
+
+`--seed-estate` is not a build-cache clone. It supplies SHA-256-verified source
+blobs to the new estate; it does not import output bases, disk-cache entries,
+native state, or prior results. `full_rebuild.sh` therefore proves cold native
+execution while avoiding redundant acquisition of immutable inputs.
+
+The main native products are package-sized Bazel actions. A PyTorch action runs
+its committed CMake/Ninja plan and atomically emits a prefix tree and wheel;
+jaxlib, Triton, torchvision, and torchaudio follow the same ownership model.
+Their internal translation units are not individual Bazel actions. This avoids
+reusing undeclared CMake/Ninja work trees with stale flags, but means a changed
+PyTorch source, plan, toolchain, rootfs identity, or dependency manifest reruns
+the whole PyTorch action. Valid independent package actions remain reusable.
+Downstream torchvision and torchaudio actions also depend on the PyTorch prefix.
+Release-wheel repair is a separate cheap action, so provenance-only changes do
+not require native compilation.
+
+A Bazel status line such as:
+
+```text
+[15 / 26] Building native PyTorch wheel ...; 584s local, disk-cache
+```
+
+means 15 of 26 Bazel actions have completed, the displayed package action has
+executed locally for 584 seconds, and the disk-cache backend is enabled.
+`disk-cache` does **not** mean the displayed action was a cache hit; a hit is
+restored without spending those 584 seconds executing the action.
+
+For normal incremental work, keep and reuse an estate:
+
+```sh
+foundry/build.sh --estate-root /path/to/warm-estate \
+  --line cu129 --profile torch
+```
+
+This requests the complete selected profile, but Bazel executes only missing or
+invalidated actions. `build.sh` currently exposes partial selection at CUDA-line
+and profile granularity. Advanced callers can target one release-wheel label via
+`foundry/run.sh --bazel-build`, but that lower-level interface requires the
+package's explicit native-build token and is not the default operator workflow.
+Use `full_rebuild.sh` only when the claim being tested requires empty native
+caches. Keep the checkout fixed for either mode; the runner fingerprints it and
+stops between stages if any tracked or untracked source changes.
+
 The runner reads source/resource pins and repository dependencies from the
 checked-in module declarations and selected native package definitions. It seeds
 the module and native repository caches, including auxiliary patches/resources.
@@ -143,6 +214,18 @@ tools/agents/triumvirate-gate.sh --release --profile torch --line cu129 \
 
 Single-host distributed qualification uses numeric loopback rendezvous and
 loopback interfaces, so it does not require DNS in the isolated network.
+
+The [cross-framework decoder speedrun](../foundry/workloads/nanogpt_speedrun/README.md)
+uses the built packages for matched GPT, Qwen3, mini-Kimi-K3, and
+mini-GLM-5.3-Flash training in Torch and JAX. Its launcher runs both profile
+output bases through insula, retains per-attempt progress and results, and
+compares explicit Triton/Pallas plus FlashAttention/cuDNN candidates against
+matched baselines. It is performance and functional workload evidence, not a
+native rebuild or checkpoint-compatibility claim.
+Each attempt produces a portable, hash-bound workload attestation with checked
+matrix coverage, recomputed timing/parity results, source identity, retained
+native input records, and logs. It labels smoke runs and subsets explicitly;
+correctness acceptance does not require optimized arms to be faster.
 
 `insula/rootfs/build_rootfs.sh` provisions the rootfs. Foundry's
 `insula.sh` is the canonical build/release execution entrypoint.

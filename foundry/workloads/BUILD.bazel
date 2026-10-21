@@ -14,6 +14,11 @@ py_test(
         "w4_coresidence.py",
         "w5_jax_model.py",
         "w6_features.py",
+        "w7_nanogpt_speedrun.py",
+        "nanogpt_speedrun/__init__.py",
+        "nanogpt_speedrun/common.py",
+        "nanogpt_speedrun/spec.py",
+        "nanogpt_speedrun/wheel_runtime.py",
     ],
     data = [
         "run_workloads.py",
@@ -23,6 +28,52 @@ py_test(
         "w4_coresidence.py",
         "w5_jax_model.py",
         "w6_features.py",
+        "w7_nanogpt_speedrun.py",
+        "nanogpt_speedrun/__init__.py",
+        "nanogpt_speedrun/common.py",
+        "nanogpt_speedrun/spec.py",
+        "nanogpt_speedrun/wheel_runtime.py",
     ],
     main = "criteria_test.py",
+)
+
+py_test(
+    name = "nanogpt_speedrun_orchestrate_test",
+    srcs = [
+        "__init__.py",
+        "nanogpt_speedrun/__init__.py",
+        "nanogpt_speedrun/orchestrate.py",
+        "nanogpt_speedrun/orchestrate_test.py",
+        "nanogpt_speedrun/attest_test.py",
+        "nanogpt_speedrun/attest.py",
+        "nanogpt_speedrun/common.py",
+        "nanogpt_speedrun/spec.py",
+    ],
+    data = ["nanogpt_speedrun/run.sh"],
+    main = "nanogpt_speedrun/orchestrate_test.py",
+)
+
+py_test(
+    name = "nanogpt_speedrun_wheel_runtime_test",
+    srcs = [
+        "__init__.py",
+        "nanogpt_speedrun/__init__.py",
+        "nanogpt_speedrun/wheel_runtime.py",
+        "nanogpt_speedrun/wheel_runtime_test.py",
+        "nanogpt_speedrun/spec.py",
+    ],
+    main = "nanogpt_speedrun/wheel_runtime_test.py",
+)
+
+py_test(
+    name = "nanogpt_speedrun_attest_test",
+    srcs = [
+        "__init__.py",
+        "nanogpt_speedrun/__init__.py",
+        "nanogpt_speedrun/attest.py",
+        "nanogpt_speedrun/attest_test.py",
+        "nanogpt_speedrun/common.py",
+        "nanogpt_speedrun/spec.py",
+    ],
+    main = "nanogpt_speedrun/attest_test.py",
 )

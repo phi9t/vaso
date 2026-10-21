@@ -24,12 +24,24 @@ SPEC.loader.exec_module(estate)
 class EstatePlacementTest(unittest.TestCase):
     def test_namespace_query_does_not_require_placement_or_disk_headroom(self) -> None:
         output = io.StringIO()
-        with mock.patch.object(estate, "discover_estate_root", side_effect=SystemExit("insufficient space")) as discover:
+        with mock.patch.object(
+            estate, "discover_estate_root", side_effect=SystemExit("insufficient space")
+        ) as discover:
             with contextlib.redirect_stdout(output):
-                result = estate.main(["--print-sandbox-dirs", "--root", "/missing/estate", "--required-gib", "100000"])
+                result = estate.main(
+                    [
+                        "--print-sandbox-dirs",
+                        "--root",
+                        "/missing/estate",
+                        "--required-gib",
+                        "100000",
+                    ]
+                )
         self.assertEqual(result, 0)
         self.assertIn("/run/vaso", output.getvalue().splitlines())
-        self.assertEqual(output.getvalue().splitlines(), list(estate.CANONICAL_SANDBOX_DIRS))
+        self.assertEqual(
+            output.getvalue().splitlines(), list(estate.CANONICAL_SANDBOX_DIRS)
+        )
         discover.assert_not_called()
 
     def setUp(self) -> None:
@@ -45,7 +57,11 @@ class EstatePlacementTest(unittest.TestCase):
 
     def _candidate(self, target: str, seat: Path, avail: int = 10**12) -> object:
         return estate.MountCandidate(
-            target=Path(target), fstype="ext4", avail_bytes=avail, seat=seat, writable=True
+            target=Path(target),
+            fstype="ext4",
+            avail_bytes=avail,
+            seat=seat,
+            writable=True,
         )
 
     def test_missing_explicit_root_fails_closed(self) -> None:
@@ -55,8 +71,10 @@ class EstatePlacementTest(unittest.TestCase):
         self.assertIn("VASO_ESTATE_ROOT", str(ctx.exception))
 
     def test_missing_explicit_root_does_not_probe_mounts(self) -> None:
-        with mock.patch.dict("os.environ", {}, clear=True), \
-                mock.patch.object(estate, "_list_mounts") as list_mounts:
+        with (
+            mock.patch.dict("os.environ", {}, clear=True),
+            mock.patch.object(estate, "_list_mounts") as list_mounts,
+        ):
             with self.assertRaises(SystemExit):
                 estate.discover_estate_root(1)
         list_mounts.assert_not_called()
@@ -64,12 +82,16 @@ class EstatePlacementTest(unittest.TestCase):
     def test_explicit_root_on_ram_is_rejected(self) -> None:
         with mock.patch.object(estate, "seat_fstype", return_value="tmpfs"):
             with self.assertRaises(SystemExit) as ctx:
-                estate.discover_estate_root(1, explicit_root=str(self.base / "explicit"))
+                estate.discover_estate_root(
+                    1, explicit_root=str(self.base / "explicit")
+                )
         self.assertIn("tmpfs", str(ctx.exception))
 
     def test_explicit_root_on_disk_is_accepted(self) -> None:
         with mock.patch.object(estate, "seat_fstype", return_value="ext4"):
-            chosen = estate.discover_estate_root(1, explicit_root=str(self.base / "explicit"))
+            chosen = estate.discover_estate_root(
+                1, explicit_root=str(self.base / "explicit")
+            )
         self.assertEqual(chosen.root, (self.base / "explicit").resolve())
 
     def test_seat_fstype_reads_real_mounts(self) -> None:
@@ -77,13 +99,19 @@ class EstatePlacementTest(unittest.TestCase):
 
     def test_ram_seats_are_never_probed_or_created(self) -> None:
         ram_seat = self.base / "var-tmp" / "vaso-u" / "estate"
-        findmnt = {"filesystems": [{"target": "/", "fstype": "ext4", "avail": "1000000000000"}]}
-        with mock.patch.object(estate.subprocess, "run") as run, \
-                mock.patch.object(estate, "_seat_for", return_value=ram_seat), \
-                mock.patch.object(estate, "seat_fstype", return_value="tmpfs"):
+        findmnt = {
+            "filesystems": [{"target": "/", "fstype": "ext4", "avail": "1000000000000"}]
+        }
+        with (
+            mock.patch.object(estate.subprocess, "run") as run,
+            mock.patch.object(estate, "_seat_for", return_value=ram_seat),
+            mock.patch.object(estate, "seat_fstype", return_value="tmpfs"),
+        ):
             run.return_value.stdout = __import__("json").dumps(findmnt)
             self.assertEqual(estate._list_mounts(), [])
-        self.assertFalse((self.base / "var-tmp").exists(), "probing must not create RAM-backed seats")
+        self.assertFalse(
+            (self.base / "var-tmp").exists(), "probing must not create RAM-backed seats"
+        )
 
     def test_report_lists_declared_io_subtrees(self) -> None:
         root = self.base / "estate"
@@ -103,12 +131,28 @@ class EstatePlacementTest(unittest.TestCase):
         est = estate.VasoEstate(root).materialize()
 
         self.assertEqual(est.cuda_rootfs("cu129"), root / "rootfs-lines/cu129/rootfs")
-        self.assertEqual(est.cuda_rootfs_manifest("cu130"), root / "rootfs-lines/cu130/rootfs-bundle.json")
-        self.assertEqual(est.line_bazel_output_base("cu129"), root / "vaso/lines/cu129/cache/bazel/output-base")
-        self.assertEqual(est.line_bazel_disk_cache("cu130"), root / "vaso/lines/cu130/cache/bazel/disk-cache")
-        self.assertEqual(est.line_native_state("cu129"), root / "vaso/lines/cu129/state/native")
-        self.assertEqual(est.line_native_stamps("cu130"), root / "vaso/lines/cu130/state/stamps")
-        self.assertEqual(est.bazel_repository_cache(), root / "vaso/cache/bazel/repository-cache")
+        self.assertEqual(
+            est.cuda_rootfs_manifest("cu130"),
+            root / "rootfs-lines/cu130/rootfs-bundle.json",
+        )
+        self.assertEqual(
+            est.line_bazel_output_base("cu129"),
+            root / "vaso/lines/cu129/cache/bazel/output-base",
+        )
+        self.assertEqual(
+            est.line_bazel_disk_cache("cu130"),
+            root / "vaso/lines/cu130/cache/bazel/disk-cache",
+        )
+        self.assertEqual(
+            est.line_native_state("cu129"), root / "vaso/lines/cu129/state/native"
+        )
+        self.assertEqual(
+            est.line_native_stamps("cu130"), root / "vaso/lines/cu130/state/stamps"
+        )
+        self.assertEqual(
+            est.bazel_repository_cache(), root / "vaso/cache/bazel/repository-cache"
+        )
+        self.assertTrue((root / "agents/leases").is_dir())
         self.assertTrue((root / "vaso/lines/cu129/cache/bazel/output-base").is_dir())
         self.assertTrue((root / "vaso/lines/cu130/state/stamps").is_dir())
 

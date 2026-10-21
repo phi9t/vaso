@@ -372,6 +372,32 @@ def planned_variants(
     ]
 
 
+def cache_start_state(
+    estate: Path, lines: list[str], profiles: list[str]
+) -> dict[str, object]:
+    """Describe selected native cache state before materialization or preparation."""
+
+    paths = {
+        estate / f"vaso/lines/{line}/cache/bazel/output-base-{profile}"
+        for line in lines
+        for profile in profiles
+    }
+    paths.update(estate / f"vaso/lines/{line}/cache/bazel/disk-cache" for line in lines)
+    selected = sorted(paths)
+    populated = []
+    for path in selected:
+        try:
+            next(path.iterdir())
+        except (FileNotFoundError, NotADirectoryError, StopIteration):
+            continue
+        populated.append(path)
+    return {
+        "mode": "warm" if populated else "cold",
+        "selected_paths": [str(path) for path in selected],
+        "populated_paths": [str(path) for path in populated],
+    }
+
+
 def abandon_stale_run(state_root: Path) -> dict | None:
     """Close a running record after its estate lock has become available."""
 
@@ -465,6 +491,7 @@ class Runner:
             "events_path": str(self.output / "events.jsonl"),
             "result_path": str(self.output / "result.txt"),
             "console_mode": self.console.mode,
+            "cache_start": cache_start_state(self.estate, self.lines, self.profiles),
             "current_stage": None,
             "stages": [],
             "variants": planned_variants(
@@ -982,7 +1009,25 @@ class Runner:
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""cache model:
+  Reusing the same estate and line/profile preserves that variant's Bazel
+  output base. Profiles on one CUDA line also share its Bazel disk cache.
+  Cache hits still require identical declared inputs and action keys.
+
+  --seed-estate imports only SHA-256-verified source blobs. It does not import
+  output bases, action-cache entries, native state, or previous build results.
+  Use foundry/full_rebuild.sh for a new estate and a cold full-matrix proof.
+
+Bazel progress legend:
+  "local" means the displayed action is executing on this host.
+  "disk-cache" means the disk-cache backend is enabled, not that the displayed
+  action was a cache hit. Native PyTorch and jaxlib are package-sized actions;
+  their internal CMake/Ninja compile steps are not separate Bazel actions.
+""",
+    )
     parser.add_argument(
         "--estate-root",
         type=Path,

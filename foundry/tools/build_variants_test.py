@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import sys
 import subprocess
@@ -16,6 +17,7 @@ import unittest
 from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
+TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or HERE)
 sys.path.insert(0, str(HERE))
 spec = importlib.util.spec_from_file_location(
     "build_variants", HERE / "build_variants.py"
@@ -65,7 +67,7 @@ class BuildVariantsTest(unittest.TestCase):
             )
 
     def test_rules_python_runtime_is_read_from_the_pinned_bcr_source(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)
             (root / "foundry/examples/consumers").mkdir(parents=True)
             (root / "foundry/MODULE.bazel").write_text(
@@ -157,7 +159,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
         return runner
 
     def test_local_seed_is_hashed_and_canonical_markers_are_restored(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             payload = b"native archive"
             sha = hashlib.sha256(payload).hexdigest()
@@ -184,7 +186,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
                 r.prepare_asset(asset)
 
     def test_nested_wheels_are_materialized_for_offline_pip(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             payload = b"wheel"
             source = Path(directory) / "wheel"
@@ -202,7 +204,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
                 )
 
     def test_failed_command_retains_log_and_nonzero_status(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             with self.assertRaisesRegex(RuntimeError, "exit 7"):
                 r.stage(
@@ -224,7 +226,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             )
 
     def test_interrupted_child_is_not_retried_as_an_acquisition_failure(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             with self.assertRaises(InterruptedError):
                 r.stage(
@@ -241,7 +243,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             self.assertLess(r.report["stages"][0]["returncode"], 0)
 
     def test_stage_heartbeat_and_transitions_are_durable(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             r.stage(
                 "heartbeat",
@@ -276,7 +278,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             )
 
     def test_stage_inherits_runner_lock_until_child_exits(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)
             r = self.make_runner(root)
             with (root / "runner.lock").open("w") as lock:
@@ -295,7 +297,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             self.assertIn("inherited", Path(r.report["stages"][0]["log"]).read_text())
 
     def test_build_event_wheels_become_structured_artifacts(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)
             output_base = root / "output-base"
             relative = Path(
@@ -345,7 +347,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
         console = b.Console(
             stream=stream,
             color="auto",
-            environ={"TMUX": "/tmp/tmux", "TERM": "screen-256color"},
+            environ={"TMUX": "tmux-session", "TERM": "screen-256color"},
             interactive=True,
         )
         report = {
@@ -383,8 +385,58 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
         self.assertIn("CUDA", output)
         self.assertIn("torch.whl", output)
 
+    def test_banner_explains_cache_state_and_bazel_progress_terms(self):
+        stream = io.StringIO()
+        console = b.Console(stream=stream, color="never")
+        report = {
+            "run_id": "run-1",
+            "lines": ["cu129"],
+            "profiles": ["torch"],
+            "summary_path": "/estate/run/summary.json",
+            "cache_start": {"mode": "cold"},
+        }
+
+        console.banner(report, Path("/estate"))
+
+        output = stream.getvalue()
+        self.assertIn("cache    cold", output)
+        self.assertIn("local=executing here", output)
+        self.assertIn("disk-cache=enabled, not a cache hit", output)
+
+    def test_cache_start_reports_only_selected_bazel_cache_paths(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            estate = Path(directory)
+            cold = b.cache_start_state(estate, ["cu129"], ["torch"])
+            self.assertEqual(cold["mode"], "cold")
+            self.assertEqual(cold["populated_paths"], [])
+
+            selected = estate / "vaso/lines/cu129/cache/bazel/output-base-torch"
+            selected.mkdir(parents=True)
+            (selected / "marker").write_text("cached", encoding="utf-8")
+            unrelated = estate / "vaso/lines/cu130/cache/bazel/output-base-jax"
+            unrelated.mkdir(parents=True)
+            (unrelated / "marker").write_text("other", encoding="utf-8")
+
+            warm = b.cache_start_state(estate, ["cu129"], ["torch"])
+            self.assertEqual(warm["mode"], "warm")
+            self.assertEqual(warm["populated_paths"], [str(selected)])
+            self.assertNotIn(str(unrelated), warm["selected_paths"])
+
+    def test_help_explains_cache_boundaries_and_progress_legend(self):
+        stream = io.StringIO()
+        with redirect_stdout(stream), self.assertRaises(SystemExit) as raised:
+            b.main(["--help"])
+
+        self.assertEqual(raised.exception.code, 0)
+        output = stream.getvalue()
+        self.assertIn(
+            "--seed-estate imports only SHA-256-verified source blobs", output
+        )
+        self.assertIn('"disk-cache" means the disk-cache backend is enabled', output)
+        self.assertIn("package-sized actions", output)
+
     def test_finish_and_status_command_preserve_preparation_result(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             r.finish("prepared")
 
@@ -407,7 +459,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             self.assertIn("PREPARED", stream.getvalue())
 
     def test_new_owner_marks_unfinished_latest_run_abandoned(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             log = r.output / "001-build.log"
             log.write_text("last useful line\n")
@@ -427,7 +479,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             self.assertIn("ABANDONED", Path(report["result_path"]).read_text())
 
     def test_source_edits_are_detected(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)
             subprocess.run(["git", "init", "-q", str(root)], check=True)
             path = root / "source"
@@ -440,7 +492,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
                 r.check_source()
 
     def test_bad_download_cannot_become_a_cached_input(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             r.args.fetch = True
             r.available = lambda _: None
@@ -463,7 +515,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             )
 
     def test_all_variants_are_serial_offline_and_token_enabled(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             calls = []
             r.stage = lambda name, command, line, profile: calls.append(
@@ -515,7 +567,7 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             )
 
     def test_prepare_only_cannot_claim_a_build(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
             r.args.prepare_only = True
             r.lines, r.profiles = ["cu129"], ["torch"]

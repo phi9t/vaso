@@ -216,7 +216,7 @@ fi
   --repository_cache=/vaso/cache/bazel/repository-cache \
   --test_env=BAZEL=/opt/vaso/bin/bazel-real \
   --test_env=BAZEL_BIN=/opt/vaso/bin/bazel-real \
-  //tools:all //workloads:criteria_test \
+  //tools:all //workloads:all \
   //native/common:native_action_toolchain_test \
   //native/common:release_wheel_action_test //native/common:repair_wheel_unit_test \
 	  //native/common:plan_executor_test \
