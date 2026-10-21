@@ -42,7 +42,7 @@ import json
 import os
 import shutil
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 # Relative dirs that make up the estate. Bazel cache/output live here so they
@@ -70,6 +70,7 @@ ESTATE_DIRS: tuple[str, ...] = (
     "vaso/tmp",
     "vaso/tools/bin",
     "agents",
+    "agents/leases",
     "opt-vaso",
     "opt-vaso/bin",
     "opt-vaso/spack",
@@ -125,7 +126,9 @@ class VasoEstate:
 
     def _validate_cuda_line(self, line: str) -> str:
         if line not in CUDA_LINES:
-            raise ValueError(f"unknown CUDA line {line!r}; expected one of: {', '.join(CUDA_LINES)}")
+            raise ValueError(
+                f"unknown CUDA line {line!r}; expected one of: {', '.join(CUDA_LINES)}"
+            )
         return line
 
     @property
@@ -143,7 +146,12 @@ class VasoEstate:
         return self.root / "rootfs-lines" / self._validate_cuda_line(line) / "rootfs"
 
     def cuda_rootfs_manifest(self, line: str) -> Path:
-        return self.root / "rootfs-lines" / self._validate_cuda_line(line) / "rootfs-bundle.json"
+        return (
+            self.root
+            / "rootfs-lines"
+            / self._validate_cuda_line(line)
+            / "rootfs-bundle.json"
+        )
 
     def line_host(self, line: str) -> Path:
         return self.root / "vaso" / "lines" / self._validate_cuda_line(line)
@@ -194,8 +202,7 @@ class VasoEstate:
             "cuda_lines": list(CUDA_LINES),
             "cuda_rootfs": {line: str(self.cuda_rootfs(line)) for line in CUDA_LINES},
             "cuda_rootfs_manifests": {
-                line: str(self.cuda_rootfs_manifest(line))
-                for line in CUDA_LINES
+                line: str(self.cuda_rootfs_manifest(line)) for line in CUDA_LINES
             },
             "line_dirs": {
                 line: [str(self.line_host(line) / rel) for rel in LINE_ESTATE_DIRS]
@@ -270,7 +277,9 @@ def _seat_for(mount_target: Path) -> Path:
     lives on this mount; otherwise fall back to a per-user dir under the mount.
     """
     user = os.environ.get("USER") or os.environ.get("LOGNAME") or "vaso"
-    home = Path(os.environ.get("HOME", "")).resolve() if os.environ.get("HOME") else None
+    home = (
+        Path(os.environ.get("HOME", "")).resolve() if os.environ.get("HOME") else None
+    )
     if home and _same_mount(home, mount_target):
         return home / "vaso-estate"
     if mount_target == Path("/"):
@@ -387,7 +396,9 @@ def discover_estate_root(
         root = Path(explicit).expanduser().resolve()
         kind = seat_fstype(root)
         if kind in FSTYPE_BLOCKLIST:
-            raise SystemExit(f"VASO_ESTATE_ROOT {root} is on {kind}; the estate must live on a disk volume")
+            raise SystemExit(
+                f"VASO_ESTATE_ROOT {root} is on {kind}; the estate must live on a disk volume"
+            )
         root.mkdir(parents=True, exist_ok=True)
         free = shutil.disk_usage(root).free
         if free < required_bytes:
@@ -401,7 +412,9 @@ def discover_estate_root(
     candidates = [
         c
         for c in _list_mounts()
-        if c.suitable and c.avail_bytes >= required_bytes and seat_fstype(c.seat) not in FSTYPE_BLOCKLIST
+        if c.suitable
+        and c.avail_bytes >= required_bytes
+        and seat_fstype(c.seat) not in FSTYPE_BLOCKLIST
     ]
     if not candidates:
         raise SystemExit(
@@ -427,7 +440,9 @@ def discover_estate_root(
 def main(argv: list[str] | None = None) -> int:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Discover and seat the vaso host estate")
+    parser = argparse.ArgumentParser(
+        description="Discover and seat the vaso host estate"
+    )
     parser.add_argument(
         "--required-gib",
         type=float,
@@ -441,8 +456,12 @@ def main(argv: list[str] | None = None) -> int:
         default=[],
         help="preferred mount prefixes, e.g. --prefer <data-volume> (repeatable)",
     )
-    parser.add_argument("--materialize", action="store_true", help="create the directories")
-    parser.add_argument("--json", action="store_true", help="print the estate model as JSON")
+    parser.add_argument(
+        "--materialize", action="store_true", help="create the directories"
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="print the estate model as JSON"
+    )
     parser.add_argument(
         "--report",
         action="store_true",

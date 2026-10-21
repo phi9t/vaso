@@ -14,6 +14,7 @@ EXPECTED_TOKEN_EMITTERS = {
     Path("foundry/scripts/agents/triumvirate-gate-insula.sh"): "out_args",
     Path("scripts/release/determinism_check.sh"): "BAZEL_FLAGS",
 }
+DELEGATING_TOKEN_EMITTERS = {Path("foundry/tools/build_variants.py")}
 
 
 def _tracked_source_files() -> list[Path]:
@@ -27,7 +28,10 @@ def _tracked_source_files() -> list[Path]:
     paths: list[Path] = []
     for raw in result.stdout.splitlines():
         path = Path(raw)
-        if path.suffix not in {".sh", ".py", ".bzl", ".bazel"} and path.name not in {"BUILD", "BUILD.bazel"}:
+        if path.suffix not in {".sh", ".py", ".bzl", ".bazel"} and path.name not in {
+            "BUILD",
+            "BUILD.bazel",
+        }:
             continue
         if "tests" in path.parts or path.name.endswith("_test.py"):
             continue
@@ -53,7 +57,7 @@ def test_native_token_emitters_use_shared_determinism_helper() -> None:
         if TOKEN_FLAG.search((ROOT / path).read_text(encoding="utf-8"))
     }
 
-    assert emitters == set(EXPECTED_TOKEN_EMITTERS)
+    assert emitters == set(EXPECTED_TOKEN_EMITTERS) | DELEGATING_TOKEN_EMITTERS
     for path, array_name in EXPECTED_TOKEN_EMITTERS.items():
         text = (ROOT / path).read_text(encoding="utf-8")
         assert "native_determinism_args.sh" in text
@@ -61,6 +65,10 @@ def test_native_token_emitters_use_shared_determinism_helper() -> None:
             rf"append_native_determinism_bazel_args\s+\\?\s*{re.escape(array_name)}\b",
             text,
         ), path
+    for path in DELEGATING_TOKEN_EMITTERS:
+        text = (ROOT / path).read_text(encoding="utf-8")
+        assert '"foundry/run.sh"' in text
+        assert '"--bazel-build"' in text
 
 
 def test_native_output_base_mount_is_shared_by_all_tokened_entrypoints() -> None:
@@ -108,7 +116,9 @@ def test_run_and_gate_bazel_argv_use_shared_disk_cache_gc_helper() -> None:
     assert "--experimental_disk_cache_gc_max_age=" not in run_text
 
     gate_text = INSULA_GATE.read_text(encoding="utf-8")
-    profile_args = gate_text.split("bazel_profile_command_args() {", 1)[1].split("\n}", 1)[0]
+    profile_args = gate_text.split("bazel_profile_command_args() {", 1)[1].split(
+        "\n}", 1
+    )[0]
     assert "append_native_bazel_disk_cache_gc_args out_args" in profile_args
     assert "--experimental_disk_cache_gc_max_size=" not in gate_text
     assert "--experimental_disk_cache_gc_max_age=" not in gate_text
@@ -119,4 +129,7 @@ def test_triumvirate_host_wrapper_forwards_release_epoch_from_helper() -> None:
 
     assert 'native_determinism_resolve_release_git_sha "$ROOT" "$commit_input"' in text
     assert 'native_determinism_source_date_epoch "$ROOT" "$release_git_sha"' in text
-    assert 'args+=("--commit" "$release_git_sha" "--source-date-epoch" "$release_source_date_epoch")' in text
+    assert (
+        'args+=("--commit" "$release_git_sha" "--source-date-epoch" "$release_source_date_epoch")'
+        in text
+    )

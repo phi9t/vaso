@@ -18,6 +18,9 @@ from workloads import w3_jax
 from workloads import w4_coresidence
 from workloads import w5_jax_model
 from workloads import w6_features
+from workloads import w7_nanogpt_speedrun
+from workloads.nanogpt_speedrun import common as speedrun_common
+from workloads.nanogpt_speedrun import spec as speedrun_spec
 
 
 W6_WORKLOAD_IDS = [
@@ -1482,6 +1485,10 @@ class RunnerTest(unittest.TestCase):
                 "W5f",
                 "W5g",
                 *W6_WORKLOAD_IDS,
+                "W7a",
+                "W7b",
+                "W7c",
+                "W7d",
             ],
         )
         self.assertEqual(run_workloads.WORKLOADS["W3b"].min_gpus, 8)
@@ -1492,6 +1499,7 @@ class RunnerTest(unittest.TestCase):
         self.assertEqual(run_workloads.WORKLOADS["W4"].module, "workloads.w4_coresidence")
         self.assertEqual(run_workloads.WORKLOADS["W6c"].min_gpus, 2)
         self.assertEqual(run_workloads.WORKLOADS["W6w"].module, "workloads.w6_features")
+        self.assertEqual(run_workloads.WORKLOADS["W7d"].module, "workloads.w7_nanogpt_speedrun")
 
     def test_jax_model_group_expands_to_w5_workloads(self) -> None:
         selected, error = run_workloads._select_workloads(["jax_model"])
@@ -1504,6 +1512,18 @@ class RunnerTest(unittest.TestCase):
 
         self.assertIsNone(error)
         self.assertEqual([workload.id for workload in selected], W6_WORKLOAD_IDS)
+
+    def test_speedrun_groups_select_framework_specific_arms(self) -> None:
+        torch, torch_error = run_workloads._select_workloads(["speedrun_torch"])
+        jax, jax_error = run_workloads._select_workloads(["speedrun_jax"])
+        both, both_error = run_workloads._select_workloads(["speedrun"])
+
+        self.assertIsNone(torch_error)
+        self.assertIsNone(jax_error)
+        self.assertIsNone(both_error)
+        self.assertEqual([workload.id for workload in torch], ["W7a", "W7b"])
+        self.assertEqual([workload.id for workload in jax], ["W7c", "W7d"])
+        self.assertEqual([workload.id for workload in both], ["W7a", "W7b", "W7c", "W7d"])
 
     def test_summary_fails_when_any_workload_fails(self) -> None:
         summary = run_workloads.aggregate_results(
@@ -1764,11 +1784,100 @@ class RunnerTest(unittest.TestCase):
             "w4_coresidence.py",
             "w5_jax_model.py",
             "w6_features.py",
+            "w7_nanogpt_speedrun.py",
         ):
             text = (source_root / name).read_text(encoding="utf-8")
             self.assertNotIn('"' + host_tmp, text)
             self.assertNotIn("'" + host_tmp, text)
             self.assertNotIn(host_var_tmp, text)
+
+
+class NanoGPTSpeedrunContractTest(unittest.TestCase):
+    def test_family_matrix_preserves_distinct_architecture_seams(self) -> None:
+        families = {item["name"]: item for item in speedrun_spec.architecture_matrix()}
+
+        self.assertEqual(set(families), set(speedrun_spec.FAMILIES))
+        self.assertEqual(families["gpt"]["positional"], "learned")
+        self.assertTrue(families["qwen3"]["qk_norm"])
+        self.assertEqual(
+            families["mini_kimi_k3"]["attention_pattern"],
+            ("linear", "linear", "linear", "softmax"),
+        )
+        self.assertEqual(
+            families["mini_glm_53_flash"]["attention_pattern"],
+            ("linear", "linear", "linear", "sparse"),
+        )
+
+    def test_optimized_case_requires_execution_and_numerical_parity(self) -> None:
+        case = {
+            "arm": "triton",
+            "losses": [4.0, 3.0],
+            "timing": {"tokens_per_second": 10.0},
+            "runtime": {"module_file": "/vaso-bazel-ob/prefix/jax/__init__.py"},
+            "optimization": {
+                "executed": True,
+                "max_abs_error": 1.0e-5,
+                "tolerance": 2.0e-5,
+            },
+        }
+
+        checks = speedrun_common.case_checks(case)
+
+        self.assertTrue(all(checks.values()))
+
+    def test_optimized_case_checks_each_component_tolerance(self) -> None:
+        case = {
+            "arm": "triton",
+            "losses": [4.0, 3.0],
+            "timing": {"tokens_per_second": 10.0},
+            "runtime": {"module_file": "/vaso-bazel-ob/prefix/jax/__init__.py"},
+            "optimization": {
+                "executed": True,
+                "max_abs_error": 0.2,
+                "tolerance": 0.25,
+                "activation": {
+                    "executed": True,
+                    "max_abs_error": 9.0e-5,
+                    "tolerance": 5.0e-5,
+                },
+            },
+        }
+
+        checks = speedrun_common.case_checks(case)
+
+        self.assertFalse(checks["optimization_numerics"])
+
+    def test_source_identity_accepts_launcher_commit(self) -> None:
+        with mock.patch.dict(
+            os.environ, {"VASO_SOURCE_GIT_COMMIT": "0123456789abcdef"}
+        ):
+            identity = speedrun_common.source_identity()
+
+        self.assertEqual(identity["git_commit"], "0123456789abcdef")
+        self.assertEqual(len(identity["workload_sha256"]), 64)
+
+    def test_comparison_only_claims_speedup_for_matched_faster_case(self) -> None:
+        baseline = {
+            "backend": "torch",
+            "family": "gpt",
+            "mode": "smoke",
+            "run_spec": {"steps": 12},
+            "timing": {"tokens_per_second": 100.0},
+        }
+        candidate = {
+            **baseline,
+            "timing": {"tokens_per_second": 120.0},
+        }
+
+        comparison = speedrun_common.compare_cases(baseline, candidate)
+
+        self.assertTrue(comparison["matched_inputs"])
+        self.assertEqual(comparison["speedup"], 1.2)
+        self.assertEqual(comparison["claim"], "smoke validation; no speedup claim")
+
+    def test_configured_families_reject_unknown_names(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unknown family"):
+            w7_nanogpt_speedrun._configured_families("gpt,not-a-model")
 
 
 if __name__ == "__main__":

@@ -78,6 +78,10 @@ WORKLOADS: dict[str, Workload] = {
     "W6u": Workload("W6u", "workloads.w6_features", 1, "Torchaudio CUDA forced alignment"),
     "W6v": Workload("W6v", "workloads.w6_features", 1, "Torchaudio CUDA CTC decoder"),
     "W6w": Workload("W6w", "workloads.w6_features", 1, "Triton Proton profiler"),
+    "W7a": Workload("W7a", "workloads.w7_nanogpt_speedrun", 1, "Torch decoder-family baseline matrix"),
+    "W7b": Workload("W7b", "workloads.w7_nanogpt_speedrun", 1, "Torch Triton and FlashAttention decoder-family matrix"),
+    "W7c": Workload("W7c", "workloads.w7_nanogpt_speedrun", 1, "JAX decoder-family baseline matrix"),
+    "W7d": Workload("W7d", "workloads.w7_nanogpt_speedrun", 1, "JAX Pallas Triton and cuDNN decoder-family matrix"),
 }
 
 WORKLOAD_GROUPS: dict[str, tuple[str, ...]] = {
@@ -107,6 +111,9 @@ WORKLOAD_GROUPS: dict[str, tuple[str, ...]] = {
         "W6v",
         "W6w",
     ),
+    "speedrun_torch": ("W7a", "W7b"),
+    "speedrun_jax": ("W7c", "W7d"),
+    "speedrun": ("W7a", "W7b", "W7c", "W7d"),
 }
 
 
