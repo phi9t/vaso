@@ -198,6 +198,8 @@ def _recompute_cpu_jobs(state: dict[str, Any], budget: int) -> None:
 
 def _try_acquire(args: argparse.Namespace) -> tuple[dict[str, Any] | None, str | None]:
     resource = args.resource
+    if args.devices is not None and resource != "gpu":
+        return None, "--devices applies only to gpu leases"
     ttl = args.ttl if args.ttl is not None else DEFAULT_TTL_SECONDS
     if ttl <= 0:
         return None, "--ttl must be positive"
@@ -224,12 +226,21 @@ def _try_acquire(args: argparse.Namespace) -> tuple[dict[str, Any] | None, str |
             if amount > capacity:
                 _write_state(resource, state)
                 return None, f"requested {amount} GPUs but capacity is {capacity}"
+            requested = None
+            if args.devices is not None:
+                try:
+                    requested = [int(value) for value in args.devices.split(",")]
+                except ValueError:
+                    return None, "--devices must contain comma-separated GPU indices"
+                if (len(requested) != amount or len(set(requested)) != amount
+                        or any(device < 0 or device >= capacity for device in requested)):
+                    return None, "--devices must name --amount distinct indices within GPU capacity"
             used = {
                 int(device)
                 for lease in state["leases"]
                 for device in lease.get("devices", [])
             }
-            free = [device for device in range(capacity) if device not in used]
+            free = [device for device in (requested if requested is not None else range(capacity)) if device not in used]
             if len(free) < amount:
                 _write_state(resource, state)
                 return None, None
@@ -377,6 +388,7 @@ def _parser() -> argparse.ArgumentParser:
     acquire_parser.add_argument("--timeout", type=float, default=0.0)
     acquire_parser.add_argument("--amount", type=int)
     acquire_parser.add_argument("--capacity", type=int)
+    acquire_parser.add_argument("--devices", help="exact comma-separated physical GPU indices; no fallback")
     acquire_parser.add_argument("--budget", type=int)
     acquire_parser.set_defaults(func=acquire)
 

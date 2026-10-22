@@ -1,20 +1,12 @@
 #!/usr/bin/env bash
-# Drive the checked-in profile-lock Bazel build graph. Two phases:
+# Execute one Foundry build, query, or verification invocation inside insula.
+# foundry/build.sh owns unattended matrix preparation and sequencing.
 #
-#   1. HOST: validate the checked-in profile lock for the selected profile.
-#   2. INSULA: `bazel test //synthetic:...` inside a bwrap rootfs, which
-#      consumes native/rootfs/vendored providers through generated @vaso_* repos.
-#
-# The host-side directory tree that backs the insula (rootfs bundle, caches,
-# runs, home) is seated by insula/estate/estate.py on a disk volume with enough free
-# space. Bazel's cache/output dirs live in that estate, so they PERSIST outside
-# the insula and are PROJECTED in at the stable /vaso sandbox paths. Builds are
-# incremental across runs.
-#
-# The insula root is the selected CUDA/Ubuntu rootfs bundle under
-# estate/rootfs-lines/<cu129|cu130>. The line must be explicit; production
-# builds must not silently depend on the legacy estate/rootfs path or the host
-# filesystem.
+# This adapter validates the selected line/profile, prepares owned estate paths,
+# leases, and run records, then enters the rootfs through foundry/insula.sh.
+# Bazel tools resolve inside that rootfs. The estate persists caches and outputs
+# projected at stable sandbox paths; its host location must be explicit.
+# See docs/code-tour.md for the end-to-end call path.
 set -euo pipefail
 
 EXP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

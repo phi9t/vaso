@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "candidate_sha256": "a8487427ec0ebcf7e4608b7404c32a1d3ccfa54d86937d283e682950549d4b08",
+  "candidate_tool_sha256": "9ac839be2c0be998ade6fedeb4e0169baa4910d97e4d728ada72ec7cd69e0e2c",
+  "runner_sha256": "e53f652cd4d0b8f7bec69670515bb9748c2fe52d27f77e9aba15ab33c5434a85",
+  "scope": "single-gpu",
+  "status": "passed-attempt",
+  "finished_at": "2026-10-22T19:15:39.037189+00:00",
+  "coverage_limits": [
+    "multi-GPU workloads and gates omitted as listed in plan",
+    "CUDA 13 W5b cold/warm diagnostics not run",
+    "cooperative single-device lease; no exclusive host reservation"
+  ],
+  "qualification_complete": false,
+  "promotion": "not evaluated",
+  "raw_summary_sha256": "9d5f0f65c12445168721f3a416eb37a7ec553a26c9e2fdc8f51bce2c4920a9b2",
+  "counts": {
+    "stages": 18,
+    "workloads": 198,
+    "gates": 66,
+    "consumers": 12
+  },
+  "stages": [
+    {
+      "name": "round-1-cu129-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 17,
+      "reuse": false
+    },
+    {
+      "name": "round-1-cu129-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 429,
+      "reuse": false
+    },
+    {
+      "name": "round-1-cu129-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 19,
+      "reuse": false
+    },
+    {
+      "name": "round-1-cu130-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 17,
+      "reuse": false
+    },
+    {
+      "name": "round-1-cu130-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 429,
+      "reuse": false
+    },
+    {
+      "name": "round-1-cu130-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 0,
+      "cache_after_files": 19,
+      "reuse": false
+    },
+    {
+      "name": "round-2-cu129-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 17,
+      "cache_after_files": 17,
+      "reuse": true
+    },
+    {
+      "name": "round-2-cu129-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 429,
+      "cache_after_files": 429,
+      "reuse": true
+    },
+    {
+      "name": "round-2-cu129-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 19,
+      "cache_after_files": 19,
+      "reuse": true
+    },
+    {
+      "name": "round-2-cu130-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 17,
+      "cache_after_files": 17,
+      "reuse": true
+    },
+    {
+      "name": "round-2-cu130-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 429,
+      "cache_after_files": 429,
+      "reuse": true
+    },
+    {
+      "name": "round-2-cu130-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 19,
+      "cache_after_files": 19,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu129-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 17,
+      "cache_after_files": 17,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu129-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 429,
+      "cache_after_files": 429,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu129-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 19,
+      "cache_after_files": 19,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu130-torch",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 17,
+      "cache_after_files": 17,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu130-jax",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 429,
+      "cache_after_files": 429,
+      "reuse": true
+    },
+    {
+      "name": "round-3-cu130-coresidence",
+      "status": "passed",
+      "returncode": 0,
+      "cache_before_files": 19,
+      "cache_after_files": 19,
+      "reuse": true
+    }
+  ],
+  "earlier_attempts": [
+    {
+      "attempt": 1,
+      "status": "failed",
+      "cause": "Co-residence NumPy required Torch to preload OpenBLAS; composition now uses the pinned JAX NumPy wheel with bundled OpenBLAS."
+    },
+    {
+      "attempt": 2,
+      "status": "failed",
+      "cause": "GPU monitor misattributed a previously observed owned process after exit while NVML still reported it; ownership tracking corrected."
+    }
+  ]
+}

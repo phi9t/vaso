@@ -28,6 +28,7 @@ tools/
   bazel-lab/     build-system experiments
   publish/       delivery administration
   testing/       host test collection tools
+scripts/release/ candidate selection, restore, qualification, and release cutting
 ```
 
 Tests live beside their owner. `docs/development.md` records coding conventions
@@ -95,6 +96,13 @@ The generic CPU acceptance suite does not qualify a GPU/native build.
 | Insula execution | Command argv/environment/cwd, namespace settings, leases, status/log/result evidence; `insula/execution/` |
 | Foundry | Profile/line selection, sources/patches, locks, plans/schema, declared action dependencies, prefix/wheel artifacts, qualification |
 | Support | Worker/CI coordination, adaptation history, publication administration; outside normal native input identity |
+
+Release orchestration keeps a candidate selection separate from attempts and
+promotion. `scripts/release/candidate.py` owns the immutable selection schema
+and payload checks. Qualification policy selects Foundry workloads; the runner
+owns attempts, while GPU monitoring and command execution have separate
+implementations. The [workflow ownership table](release-qualification.md#maintaining-the-workflow)
+identifies those files and the evidence they produce.
 
 The rootfs identity is separate from a build profile. A profile selects a
 compatible package/compiler/feature set; a CUDA line selects an ecosystem

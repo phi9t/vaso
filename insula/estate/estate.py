@@ -1,39 +1,16 @@
-"""Vaso host-side directory structure: data model + placement discovery.
+"""Host backing paths and disk placement for insula execution.
 
-Two concerns, kept separate:
+VasoEstate describes paths relative to an explicitly chosen root and creates
+empty directories. discover_estate_root checks placement and free space; neither
+operation installs a rootfs, acquires inputs, or builds packages.
 
-1. `VasoEstate` is the **data model** for the host-side directory tree that
-   backs a vaso insula. It mirrors the sandbox contract in
-   `docs/rootfs-container-infra-design.md`: a durable state/cache/runs/traces
-   layout plus a rootfs bundle and a home backing store. It knows nothing about
-   *where* on disk it lives.
+The current layout is defined by ESTATE_DIRS and LINE_ESTATE_DIRS below:
+rootfs-lines/<line>/ holds prepared bases; vaso/ holds persistent state and
+caches; sources/ holds acquired inputs; agents/ holds execution evidence and
+leases. Foundry's adapter chooses which paths to project into each process.
+Compatibility directories do not select or supply ambient host toolchains.
 
-2. `discover_estate_root` is the **placement tool**. Given the candidate mounts
-   on this host and a required free-space budget, it picks a suitable base
-   directory (a real ext4/xfs volume with enough headroom, writable, not tmpfs)
-   and returns a `VasoEstate` seated there.
-
-The estate layout (relative to a chosen `root`):
-
-    <root>/
-      rootfs-lines/<line>/    materialized/extracted bwrap rootfs bundles
-      home/kvothe/            backing store for /home/kvothe
-      state/                  durable vaso-owned state  (/vaso/state)
-        spack/                spack locks/config state
-      cache/                  explicit caches           (/vaso/cache)
-        bazel/repository-cache
-      lines/<cu129|cu130>/    per-CUDA-line state/cache partitions
-        cache/bazel/output-base
-        cache/bazel/disk-cache
-        state/native
-        state/stamps
-        state/spack
-        spack/                spack source/build caches
-        uv/  cargo/  go/
-      runs/                   run records               (/vaso/runs)
-      traces/                 derived trace indexes      (/vaso/traces)
-      tmp/                    scratch                    (/vaso/tmp)
-      tools/bin/              host tool shims projected read-only into /vaso/tools/bin
+See docs/estate.md for the complete layout, projection, and restore contract.
 """
 
 from __future__ import annotations

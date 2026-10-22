@@ -19,8 +19,6 @@ import sys
 from collections import Counter
 from pathlib import PurePosixPath
 
-DEFAULT_ROOTS = ("insula/execution", "tools", "harness/packaging_test.py", "harness/smoke", "scripts/release", "third_party/rust_pyo3_cargo/vendor_pin_test.py")
-
 
 def normalize(nodeid: str) -> str:
     path, _, rest = nodeid.partition("::")
@@ -57,7 +55,10 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", metavar="BASELINE")
     mode.add_argument("--check", metavar="BASELINE")
-    parser.add_argument("--roots", nargs="+", default=list(DEFAULT_ROOTS))
+    parser.add_argument(
+        "--roots", nargs="+", default=[],
+        help="override pytest's testpaths (default: use pyproject.toml)",
+    )
     parser.add_argument("--cwd")
     args = parser.parse_args(argv)
 

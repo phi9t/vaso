@@ -1,8 +1,29 @@
 # Development
 
-Vaso has two product modules: insula and Foundry. Start with
-`architecture.md` for ownership and `../GLOSSARY.md` for domain terms.
+Vaso has two product modules: insula and Foundry. Start with the
+[code tour](code-tour.md) to follow a build, [architecture](architecture.md)
+for ownership, and the [glossary](../GLOSSARY.md) for domain terms.
 Use the nearest module reference and source implementation for current facts.
+
+## Where to change behavior
+
+| Change | Owner and entrypoint |
+|---|---|
+| Rootfs contents or tooling | `insula/rootfs/`; provision pinned inputs before execution |
+| Estate layout or sandbox paths | `insula/estate/`; keep host placement separate from content identity |
+| Launch, environment, readiness, or leases | `insula/execution/`; generic execution enters through `insula.sh` |
+| Unattended build variants | `foundry/build.sh` → `foundry/tools/build_variants.py`; `build_inputs.py` owns verified inputs, `build_session.py` owns execution/results, and `build_progress.py` owns presentation |
+| Native package behavior | `foundry/native/<package>/` and the plan generator in `foundry/tools/gen_plans.py`; inspect native impact before regenerating plans |
+| Runtime workloads and consumers | `foundry/workloads/`, `foundry/native/pytorch/gates.py`, and `foundry/examples/consumers/` |
+| Candidate selection, restore, or repeated qualification | `scripts/release/`; see the ownership table in [candidate qualification](release-qualification.md#maintaining-the-workflow) |
+| Scheduled-run orchestration or publication | `tools/ci/` and `tools/publish/`; product policy stays with insula or Foundry |
+
+Prefer a change in the owning implementation and its adjacent tests. Keep shell
+entrypoints thin. Add a shared helper when multiple callers need the same
+behavior; keep workflow-specific policy with its caller. Historical designs and
+incident records live behind the [reference index](reference/README.md), while
+current interfaces belong in the product guides. Native-input compatibility
+paths are documented in [architecture](architecture.md#compatibility-and-native-stability).
 
 ## Coding conventions
 
@@ -72,8 +93,10 @@ python3 -B foundry/tools/rebuild_impact.py --repo-root . --fast --base HEAD --wo
 python3 -B foundry/tools/plan_key_snapshot.py --check
 ```
 
-The host suite covers execution, support tooling, packaging, and fixtures.
-Foundry suites run under its Bazel module. Focused standard-library suites
+The host suite covers execution, build orchestration, support tooling, packaging,
+and fixtures. Its test paths are defined once in `pyproject.toml`; the collection
+guard uses the same configuration. Foundry native suites run under its Bazel
+module. Focused standard-library suites
 can also run directly, for example `python3 -B foundry/tools/tracker_lint_test.py`.
 `verification.md` documents historical regression cases and real Bubblewrap
 acceptance. GPU, ABI, workload, and release qualification use Foundry's gates.

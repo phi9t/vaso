@@ -22,16 +22,17 @@ run shipped wheels, or prepare a build estate. These workflows require a
 prepared Linux host and access to the private GHCR packages.
 
 The repository includes `cu129` and `cu130` CUDA lines and separate Torch/Triton
-and JAX profiles. The tested deployment baseline is Linux x86-64 with eight
-NVIDIA B200 GPUs. Other configurations are unqualified. The first preview is
-still being prepared: a passing retry has not resolved the earlier CUDA 13
-JAX collective timeout. See [status and evidence](docs/status.md).
+and JAX profiles. The first preview targets single-GPU execution using one
+NVIDIA B200 on the tested Linux x86-64 host. Multi-GPU support is deferred;
+other hardware is unqualified. Release verification is in progress. See
+[status and evidence](docs/status.md).
 
 ## Documentation
 
 - [Insula](docs/insula.md): rootfs, execution, and estate projection.
 - [Foundry](docs/foundry.md): pinned inputs and offline Bazel builds.
 - [Estate lifecycle](docs/estate.md): contents, persistence, and restore.
+- [Code tour](docs/code-tour.md): follow a build and find the code to change.
 - [Architecture](docs/architecture.md): module boundaries and data ownership.
 - [Development](docs/development.md): coding conventions and verification.
 - [Technical references](docs/reference/README.md): build rationale and history.

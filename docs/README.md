@@ -9,11 +9,14 @@ projection; Foundry owns hermetic Bazel builds inside insula.
 - [Insula guide](insula.md): rootfs layout, generic commands, and projections.
 - [Estate lifecycle](estate.md): backing storage, build inputs, backups, and restore.
 - [Foundry guide](foundry.md): pinned tools, offline inputs, builds, and wheel use.
+- [Candidate qualification](release-qualification.md): fixed inputs, unattended rounds,
+  single-GPU coverage, and retained results.
 - [Status and evidence](status.md): tested combinations, qualification results,
   and current limits.
 
 ## Developing Vaso
 
+- [Code tour](code-tour.md): follow a build through the implementation and data model.
 - [Architecture](architecture.md): module interfaces, identities, and data ownership.
 - [Glossary](../GLOSSARY.md): product vocabulary.
 - [Development](development.md): coding conventions and verification commands.
