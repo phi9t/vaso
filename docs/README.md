@@ -21,7 +21,8 @@ projection; Foundry owns hermetic Bazel builds inside insula.
 - [Build stability](agents/build-stability.md): native identity and rebuild constraints.
 - [Shared execution](agents/cross-agent-collaboration.md): shared estates and worktrees.
 - [Local effort records](agents/issue-tracker.md): tickets, evidence, and ledgers.
-- [Publication](agents/publication.md): sanitized source and private GHCR artifacts.
+- [Publication](agents/publication.md): privacy rules, sanitized snapshots,
+  private GHCR artifacts, and retained evidence.
 
 ## Deep dives and history
 
