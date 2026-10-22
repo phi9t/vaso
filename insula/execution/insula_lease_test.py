@@ -106,6 +106,21 @@ def test_gpu_sets_are_disjoint() -> None:
         _release(estate, second["id"])
 
 
+def test_exact_gpu_selection_never_falls_back() -> None:
+    estate = _estate("exact-gpu")
+    selected = _acquire(estate, "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", "7")
+    try:
+        assert selected["devices"] == [7]
+        assert selected["env"]["CUDA_VISIBLE_DEVICES"] == "7"
+        conflict = _lease_cmd(estate, "acquire", "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", "7")
+        assert conflict.returncode == 75
+        for devices in ("8", "-1", "0,0", "bad", "0,1"):
+            invalid = _lease_cmd(estate, "acquire", "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", devices)
+            assert invalid.returncode == 2
+    finally:
+        _release(estate, selected["id"])
+
+
 def test_check_requires_live_matching_lease() -> None:
     estate = _estate("check")
     held = _acquire(estate, "--resource", "insula:cu129")

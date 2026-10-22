@@ -56,6 +56,23 @@ class CompareTest(unittest.TestCase):
 
 
 class CollectTest(unittest.TestCase):
+    def test_default_collection_uses_the_project_testpaths(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "selected").mkdir()
+            (root / "selected/test_one.py").write_text("def test_selected(): pass\n")
+            (root / "test_other.py").write_text("def test_unselected(): pass\n")
+            (root / "pyproject.toml").write_text(
+                '[tool.pytest.ini_options]\ntestpaths = ["selected"]\n'
+            )
+            baseline = root / "baseline.txt"
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--cwd", str(root), "--write", str(baseline)],
+                capture_output=True, text=True, check=True,
+            )
+            self.assertIn("recorded 1 test ids", result.stdout)
+            self.assertEqual(baseline.read_text(), "one::test_selected\n")
+
     def test_collects_prefix_and_suffix_named_tests_under_the_roots(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

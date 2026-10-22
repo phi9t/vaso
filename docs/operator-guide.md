@@ -13,8 +13,8 @@ with owned storage and the selected artifact identities.
 
 Prepare a Linux host with Bubblewrap/user-namespace support, Bash, and Python for
 host orchestration. GPU execution also needs accessible NVIDIA devices and a
-compatible host driver. The tested deployment baseline is Linux x86-64 with eight
-B200 GPUs. Reserve physical GPUs across estates before qualification.
+compatible host driver. Preview qualification uses one B200 on the tested Linux x86-64 host. Select an
+idle physical device and check ownership across estates before qualification.
 
 Acquisition needs registry/network access and private GHCR credentials. Store
 credentials outside the checkout as described in [publication](agents/publication.md).
@@ -140,6 +140,10 @@ unsigned; native build/release qualification remains separate.
 operator-triggered and flocked, runs release gates under leases, and only runs
 determinism after those gates pass. Estate-local leases do not guarantee global
 physical-GPU ownership.
+
+For candidate-bound repeated execution, use the
+[candidate qualification runner](release-qualification.md). It runs the approved
+single-GPU preview policy and retains the deferred eight-GPU protocol.
 
 Keep failures and retries as separate records. Missing inputs, denied access,
 digest mismatches, or busy GPUs are failed prerequisites, not passing tests.

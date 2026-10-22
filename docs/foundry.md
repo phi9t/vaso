@@ -98,6 +98,9 @@ package's explicit native-build token and is not the default operator workflow.
 Use `full_rebuild.sh` only when the claim being tested requires empty native
 caches. Keep the checkout fixed for either mode; the runner fingerprints it and
 stops between stages if any tracked or untracked source changes.
+Cancellation forwards the signal to the stage process group, allows 15 seconds
+for shutdown, then kills remaining processes. Reporting failures also stop owned
+children so they cannot retain the estate lock indefinitely.
 
 The runner reads source/resource pins and repository dependencies from the
 checked-in module declarations and selected native package definitions. It seeds

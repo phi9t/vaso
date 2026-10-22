@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "approval": "User approved three rounds and narrowed the first preview to single-GPU paths on 2026-10-22",
+  "hardware": {
+    "os": "Linux",
+    "arch": "x86_64",
+    "gpu_model": "NVIDIA B200",
+    "gpu_count": 1,
+    "qualification_host": "tested eight-B200 host with one selected device"
+  },
+  "matrix": [
+    {
+      "line": "cu129",
+      "profile": "torch"
+    },
+    {
+      "line": "cu129",
+      "profile": "jax"
+    },
+    {
+      "line": "cu130",
+      "profile": "torch"
+    },
+    {
+      "line": "cu130",
+      "profile": "jax"
+    }
+  ],
+  "rounds": [
+    {
+      "id": 1,
+      "cache": "fresh"
+    },
+    {
+      "id": 2,
+      "cache": "verified-reuse"
+    },
+    {
+      "id": 3,
+      "cache": "verified-reuse"
+    }
+  ],
+  "jax_diagnostics": {
+    "status": "deferred-with-multi-gpu-support",
+    "line": "cu130",
+    "workload": "W5b",
+    "requires_gpu_count": 8
+  },
+  "exclusive_physical_gpu_reservation_required": false,
+  "sample_occupancy_during_execution": true,
+  "retain_all_attempts": true,
+  "unexplained_failures_block_promotion": true,
+  "historical_jax_timeout_must_be_resolved": false,
+  "candidate_and_acceptance_criteria_fixed": true,
+  "evidence_reuse_requires_matching_relevant_identities": true,
+  "co_residence_and_consumers_required": true,
+  "launched_mpi_supported": false,
+  "statistical_reliability_claim": false,
+  "supported_runtime_scope": "single-gpu",
+  "selected_device_cooperative_lease_and_occupancy_checks_required": true,
+  "multi_gpu_support": "unqualified; historical W5b timeout must be resolved before adding support"
+}

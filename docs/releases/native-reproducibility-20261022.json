@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "status": "failed-comparison",
+  "source_commit": "2af81e43",
+  "source_identity": "477e034777feffb08927ed151740a5278c996b67502075eef0a17ef57b1df3fd",
+  "build_statuses": [
+    "built",
+    "built"
+  ],
+  "scope": "Two independent Torch-profile builds on each CUDA line; unchanged dependency actions may reuse matching cache entries. This is not a full clean dependency rebuild.",
+  "promotion": "blocked",
+  "lines": [
+    {
+      "line": "cu129",
+      "raw_comparison_sha256": "dfffacc78b5ac5dabb750d1ff8f7ac7408649787bcea0ab4646d983b1794a95a",
+      "identical": false,
+      "differing_wheel_files": [
+        {
+          "allowed": false,
+          "first_sha256": "sha256:27e98e4601b81ff5ff93b2b8b7f92990417c27bd10fd0f505bc6b7c1be080b45",
+          "path": "torch/lib/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:5d15068d773ee7999a6a8ea968fc44cc4dc549060c1a77d993bc435660506fa8",
+          "wheel": "torch-2.14.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:f400bfd8a695116f9fb6d9d61aa34d1739c43ea936e10006af3bcb847b4ca5bc",
+          "path": "torch/lib/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:3943be3cd66a841c22ac607897fe7fd298947a1d672fe2fede7cda216ad17b69",
+          "wheel": "torch-2.14.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:5c02e08d2086d8389ce624c8e72275a15d8a507f0b3d1cb8590a84b6363f3eb3",
+          "path": "torchaudio.libs/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:44eedd7deb5f07cd7f8ec0c2d8cd7bf9909edec28bf7d0606194b4fbf5a90968",
+          "wheel": "torchaudio-2.11.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:a62010f66156db002c02702b5982481f18eeae63cb8656fedec6c03427bfd457",
+          "path": "torchaudio.libs/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:5d48ca8077e669d784e10bc7e52ce1276dc915e86ea2c0d38b545d3817d8a852",
+          "wheel": "torchaudio-2.11.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:5c02e08d2086d8389ce624c8e72275a15d8a507f0b3d1cb8590a84b6363f3eb3",
+          "path": "torchvision.libs/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:44eedd7deb5f07cd7f8ec0c2d8cd7bf9909edec28bf7d0606194b4fbf5a90968",
+          "wheel": "torchvision-0.29.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:a62010f66156db002c02702b5982481f18eeae63cb8656fedec6c03427bfd457",
+          "path": "torchvision.libs/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:5d48ca8077e669d784e10bc7e52ce1276dc915e86ea2c0d38b545d3817d8a852",
+          "wheel": "torchvision-0.29.0+vaso.cu129.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        }
+      ],
+      "differing_dependency_names": [
+        "torch"
+      ],
+      "unmaterialized_manifests": []
+    },
+    {
+      "line": "cu130",
+      "raw_comparison_sha256": "9264eecfdfcb50bd809cbddf78e2d9d96df6260ac44ca6024497f726caf0336c",
+      "identical": false,
+      "differing_wheel_files": [
+        {
+          "allowed": false,
+          "first_sha256": "sha256:e75fc71541842c3dc48a6be62c64f1977f4e7e27f69e4888c225bf413b1396de",
+          "path": "torch/lib/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:165bc4cc05156048be27687f0abcdaa780cf3a419be16946471b70c9029d3379",
+          "wheel": "torch-2.14.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:d62a587336d47373a01997634f3c942ed95222d7f69d1185970022e195630eff",
+          "path": "torch/lib/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:df133631f613227c803dab37f8e7519f9f7bbe283a585240c428a5307f47bbb8",
+          "wheel": "torch-2.14.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:59d214308dbd4a4e3d41e87fd7822256bff87b626717c7212d353549762f745f",
+          "path": "torchaudio.libs/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:80be81baad81add6d370bc825e82b9579907aecd9159f891575803a5bc43764a",
+          "wheel": "torchaudio-2.11.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:77c89942322e19064584bc9072ae94010f431b00fd29612af247616d9f43d291",
+          "path": "torchaudio.libs/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:3d64e0c6c9e97a347cdccfbe35bc7146df0dcab8b91c177c7b67ba827119fbc4",
+          "wheel": "torchaudio-2.11.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:59d214308dbd4a4e3d41e87fd7822256bff87b626717c7212d353549762f745f",
+          "path": "torchvision.libs/libtorch_cuda.so",
+          "reason": null,
+          "second_sha256": "sha256:80be81baad81add6d370bc825e82b9579907aecd9159f891575803a5bc43764a",
+          "wheel": "torchvision-0.29.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        },
+        {
+          "allowed": false,
+          "first_sha256": "sha256:77c89942322e19064584bc9072ae94010f431b00fd29612af247616d9f43d291",
+          "path": "torchvision.libs/libtorch_nvshmem.so",
+          "reason": null,
+          "second_sha256": "sha256:3d64e0c6c9e97a347cdccfbe35bc7146df0dcab8b91c177c7b67ba827119fbc4",
+          "wheel": "torchvision-0.29.0+vaso.cu130.g2af81e43-cp313-cp313-linux_x86_64.whl"
+        }
+      ],
+      "differing_dependency_names": [
+        "torch"
+      ],
+      "unmaterialized_manifests": []
+    }
+  ]
+}

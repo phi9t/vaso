@@ -600,6 +600,80 @@ class GenPlansTest(unittest.TestCase):
         self.assertIn("__pycache__", install_command)
         self.assertIn("torch-*.whl", install_command)
 
+    def test_pytorch_cmake_cuda_environment_receives_executor_seed(self) -> None:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("executor_cuda_env", GRAPH_ROOT / "native/common/plan_executor.py")
+        executor = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(executor)
+        with tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:
+            root = Path(tmp)
+            generated = root / "plans"
+            result = self.run_generator(GRAPH_ROOT, generated)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            for line in ("cu129", "cu130"):
+                plan = json.loads((generated / "torch" / line / "pytorch.plan.json").read_text())
+                env = executor.command_env(plan, plan["configure"],
+                    {"seed": "12345678", "source_date_epoch": "0", "prefix_map_flags": ""},
+                    {}, {}, {}, root / "work", root / "out")
+                cuda_export = next(command for command in plan["configure"]["argv"][2].splitlines()
+                                   if command.startswith("export CUDAFLAGS="))
+                env["cuda_prefix_map_flags"] = ""
+                actual = subprocess.check_output(["/bin/bash", "-c", cuda_export + '\n printf "%s" "$CUDAFLAGS"'], env=env, text=True)
+                self.assertIn("--frandom-seed=12345678", actual)
+                self.assertIn("--objdir-as-tempdir", actual)
+
+    def test_peachpy_patch_preserves_symbol_insertion_order_and_rejects_drift(self) -> None:
+        with tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:
+            root = Path(tmp)
+            generated = root / "plans"
+            result = self.run_generator(GRAPH_ROOT, generated)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            plan = json.loads((generated / "torch/cu129/pytorch.plan.json").read_text())
+            script = plan["configure"]["argv"][2]
+            start = script.index("normalize_peachpy_symbol_order() (")
+            end = script.index("\nPYTHON\n)\n", start) + len("\nPYTHON\n)")
+            patch = script[start:end].replace("/vaso/build/pytorch-cu129/src", str(root))
+            path = root / "third_party/python-peachpy/peachpy/name.py"
+            path.parent.mkdir(parents=True)
+            # Preserve the upstream allocation operations, with controllable hashes.
+            path.write_text('''class Scope:
+    def __init__(self):
+        self.prenames = dict()
+    def add(self, scope_name):
+        scope = scope_name
+        self.prenames.setdefault(scope_name.prename, set())
+        self.prenames[scope_name.prename].add(scope)
+    def assign(self):
+        for i, obj in enumerate(self.prenames[None]):
+            obj.name = "__local" + str(i)
+''')
+            command = ["bash", "-c", "set -euo pipefail\n" + patch + "\nnormalize_peachpy_symbol_order"]
+            subprocess.run(command, check=True)
+            once = path.read_bytes()
+            subprocess.run(command, check=True)
+            self.assertEqual(path.read_bytes(), once)
+            namespace = {}
+            exec(path.read_text(), namespace)
+            class Symbol:
+                prename = None
+                def __init__(self, value):
+                    self.value = value
+                def __hash__(self):
+                    return self.value
+            symbols = [Symbol(i) for i in (7, 2, 4)]
+            scope = namespace["Scope"]()
+            for symbol in [*symbols, symbols[0]]:
+                scope.add(symbol)
+            scope.assign()
+            self.assertEqual([s.name for s in symbols], ["__local0", "__local1", "__local2"])
+            path.write_text("unexpected upstream version\n")
+            failed = subprocess.run(command, capture_output=True, text=True)
+            self.assertNotEqual(failed.returncode, 0)
+            self.assertIn("upstream allocation changed", failed.stderr)
+            self.assertEqual(path.read_text(), "unexpected upstream version\n")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,8 +7,8 @@ runs do not yet establish a complete, promotable Vaso release.
 
 The intended preview serves operators who can follow the documentation and
 have access to the private GHCR packages. It covers `cu129` and `cu130`, with
-Torch/Triton and JAX profiles, on the tested Linux x86-64/eight-B200 baseline.
-Other hardware configurations are unqualified. Launched MPI process groups
+Torch/Triton and JAX profiles, using one B200 on the tested Linux x86-64 host.
+Multi-GPU features and other hardware configurations are unqualified. Launched MPI process groups
 are outside initial support; backend availability is not launched-MPI evidence.
 
 All process tools and dependencies resolve inside the selected insula rootfs.
@@ -23,10 +23,11 @@ qualification are distinct requirements.
 | [Fresh-estate verification](../tools/publish/fresh-estate-verification.json) | Independent pulls, hash verification, offline wheel installation, and single-GPU checks on both lines | Does not repeat native build proof or full qualification |
 | [Multi-GPU qualification](../tools/publish/multigpu-qualification.json) | 81/82 workloads, 26/26 runtime gates, and four consumers passed, including co-residence coverage | CUDA 13 JAX tensor parallelism hit a collective timeout |
 | [CUDA 13 JAX full-profile retry](../tools/publish/cu130-jax-qualification-retry.json) | Ten workloads, three gates, and one consumer passed with fresh environment and caches | The earlier failure remains unresolved |
+| [Candidate 2 single-GPU rounds](releases/single-gpu-qualification-20261022.json) | All 18 stages passed across three rounds on both CUDA lines: 198 workload executions, 66 gates, and 12 consumers | Cooperative device lease and monitoring; multi-GPU cases omitted; earlier failed attempts retained |
 
 The original run observed other GPU work. Its estate-local lease did not
-establish exclusive ownership across the physical host. Controlled repeatability
-is still required; passing retries cannot erase the failed attempt or prove its
+establish exclusive ownership across the physical host. Controlled multi-GPU repeatability
+is required before adding multi-GPU support; passing retries cannot erase the failed attempt or prove its
 cause fixed. These reports do not qualify broader hardware.
 
 ## Release requirements
@@ -42,8 +43,32 @@ across independent runs using the declared comparison policy. It does not promis
 identical ZIP archive bytes. Matching historical proof may be reused with verified
 content identity and truthful provenance; metadata alone must not trigger rebuilds.
 
-Exact repeatability and promotion policy remain unsettled. The complete
-release-specific operator recipe is also implementation work. Current guides
+The approved repeatability policy requires three rounds of the single-GPU matrix
+with fresh caches followed by two rounds with verified cache reuse. The user
+deferred multi-GPU support and its CUDA 13 JAX diagnostic gates. Every attempt is retained; unexplained
+failures block promotion. [Candidate qualification](release-qualification.md)
+documents the executable single-GPU protocol and the deferred multi-GPU gates.
+
+[Candidate 2](releases/preview-candidate-2.json) freezes source, all six
+component identities, and the revised single-GPU policy. Its
+[checksum](releases/preview-candidate-2.json.sha256)
+is independent of subsequent implementation changes. Restored payload checks and all 2,931 pinned Python runtime files per line
+passed on 2026-10-22; this was verification of an existing GHCR-restored estate,
+not a new registry acquisition. The three-round single-GPU attempt completed
+successfully with fresh caches followed by two verified reuse rounds. This
+qualifies the recorded runtime attempt, not the complete release.
+
+Native reproducibility remains open. The earlier cold matrix builds used
+different release stamps and produced unequal Torch libraries. A subsequent
+[controlled comparison](releases/native-reproducibility-20261022.json) used the
+same source and stamp for two independent Torch-profile runs on both lines.
+All builds completed, but `libtorch_cuda.so` and `libtorch_nvshmem.so` still
+differ, including copies bundled into Torchvision and Torchaudio. Matching
+dependency actions could reuse caches in these runs. Earlier determinism
+summaries cannot yet be reused because their retained dependency-manifest
+closure is incomplete. No reproducibility exception or promotion was granted.
+
+The complete release-specific operator recipe remains implementation work. Current guides
 identify the implemented entrypoints and their prerequisites rather than claim
 a one-command installation or completed release qualification.
 
