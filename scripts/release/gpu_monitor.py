@@ -6,7 +6,10 @@ memory-threshold wait is a separate readiness check, not qualification proof.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
+import csv
+import io
 from datetime import datetime, timezone
 import json
 import os
@@ -27,29 +30,77 @@ def gpu_snapshot() -> dict:
             timeout=15,
         )
 
+    return {
+        "observed_at": now(),
+        **parse_snapshot(
+            query(["--query-gpu=index,uuid,name,utilization.gpu,memory.used"]),
+            query(["--query-compute-apps=gpu_uuid,pid"]),
+        ),
+    }
+
+
+def _query_rows(text: str, query: str, columns: int) -> Iterator[tuple[int, list[str]]]:
+    rows = csv.reader(io.StringIO(text), skipinitialspace=True, strict=True)
+    try:
+        for row in rows:
+            if not row:
+                continue
+            if len(row) != columns:
+                raise ValueError(
+                    f"GPU {query} query row {rows.line_num}: expected {columns} columns"
+                )
+            yield rows.line_num, [value.strip() for value in row]
+    except csv.Error:
+        raise ValueError(
+            f"GPU {query} query row {rows.line_num}: invalid CSV"
+        ) from None
+
+
+def parse_snapshot(devices_csv: str, processes_csv: str) -> dict:
+    """Validate query data and replace private device UUIDs with physical indices."""
     devices = []
     uuid_indices = {}
-    for row in query(
-        ["--query-gpu=index,uuid,name,utilization.gpu,memory.used"]
-    ).splitlines():
-        index, device_uuid, name, utilization, memory = [
-            s.strip() for s in row.split(",")
-        ]
-        uuid_indices[device_uuid] = int(index)
+    indices = set()
+    for row, values in _query_rows(devices_csv, "device", 5):
+        index_text, device_uuid, name, utilization_text, memory_text = values
+        problem = f"GPU device query row {row}"
+        try:
+            index, utilization, memory = map(
+                int, (index_text, utilization_text, memory_text)
+            )
+        except ValueError:
+            raise ValueError(
+                f"{problem}: index, utilization and memory must be integers"
+            ) from None
+        if index < 0 or not 0 <= utilization <= 100 or memory < 0:
+            raise ValueError(f"{problem}: invalid index, utilization or memory range")
+        if not device_uuid or not name:
+            raise ValueError(f"{problem}: device identity is missing")
+        if index in indices or device_uuid in uuid_indices:
+            raise ValueError(f"{problem}: duplicate device identity")
+        indices.add(index)
+        uuid_indices[device_uuid] = index
         devices.append(
             {
-                "index": int(index),
+                "index": index,
                 "name": name,
-                "utilization": int(utilization),
-                "memory_mib": int(memory),
+                "utilization": utilization,
+                "memory_mib": memory,
             }
         )
     processes = []
-    for row in query(["--query-compute-apps=gpu_uuid,pid"]).splitlines():
-        device_uuid, pid = [value.strip() for value in row.split(",")]
-        processes.append({"gpu_index": uuid_indices[device_uuid], "pid": int(pid)})
+    for row, (device_uuid, pid_text) in _query_rows(processes_csv, "process", 2):
+        problem = f"GPU process query row {row}"
+        if device_uuid not in uuid_indices:
+            raise ValueError(f"{problem}: device absent from device query")
+        try:
+            pid = int(pid_text)
+        except ValueError:
+            raise ValueError(f"{problem}: PID must be a positive integer") from None
+        if pid <= 0:
+            raise ValueError(f"{problem}: PID must be a positive integer")
+        processes.append({"gpu_index": uuid_indices[device_uuid], "pid": pid})
     return {
-        "observed_at": now(),
         "devices": devices,
         "processes": processes,
         "compute_pids": sorted({item["pid"] for item in processes}),

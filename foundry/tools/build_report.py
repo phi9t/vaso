@@ -6,6 +6,7 @@ absolute paths describe placement; they do not grant ownership of another run.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from datetime import datetime, timezone
 import json
 import os
@@ -62,27 +63,28 @@ def read_json(path: Path) -> dict[str, Any]:
     return value
 
 
-def latest_report(state_root: Path) -> tuple[dict[str, Any], Path] | None:
-    """Load the report selected by latest.json, with a legacy directory fallback."""
-
+def _summary_candidates(state_root: Path) -> Iterator[Path]:
+    """Try the selected summary before inspecting legacy run directories."""
     pointer = state_root / "latest.json"
-    candidates: list[Path] = []
     if pointer.is_file():
         value = read_json(pointer).get("summary")
         if isinstance(value, str):
-            candidates.append(Path(value))
+            yield Path(value)
     # The pointer is written by the estate lock owner. File modification times
     # are only a legacy fallback: inspecting or restoring an older summary must
     # not redirect status or stale-run recovery away from the selected run.
-    candidates.extend(
-        sorted(
-            state_root.glob("*/summary.json"),
-            key=lambda path: path.stat().st_mtime if path.is_file() else -1,
-            reverse=True,
-        )
+    yield from sorted(
+        state_root.glob("*/summary.json"),
+        key=lambda path: path.stat().st_mtime if path.is_file() else -1,
+        reverse=True,
     )
+
+
+def latest_report(state_root: Path) -> tuple[dict[str, Any], Path] | None:
+    """Load the selected report, scanning legacy history only if it is missing."""
+
     seen = set()
-    for summary in candidates:
+    for summary in _summary_candidates(state_root):
         try:
             resolved = summary.expanduser().resolve()
         except OSError:

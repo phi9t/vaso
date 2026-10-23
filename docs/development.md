@@ -13,6 +13,7 @@ Use the nearest module reference and source implementation for current facts.
 | Estate layout or sandbox paths | `insula/estate/`; keep host placement separate from content identity |
 | Launch, environment, readiness, or leases | `insula/execution/`; generic execution enters through `insula.sh` |
 | Unattended build variants | `foundry/build.sh` → `foundry/tools/build_variants.py`; the [code tour](code-tour.md#make-a-change-in-its-owner) maps inputs, execution, reports, and presentation to their owners |
+| Foundry invocation ledgers and solve diagnostics | `foundry/tools/run_result.py`; the previous `insula/execution/result.py` path is a compatibility link |
 | Native package behavior | `foundry/native/<package>/` and the plan generator in `foundry/tools/gen_plans.py`; inspect native impact before regenerating plans |
 | Runtime workloads and consumers | `foundry/workloads/`, `foundry/native/pytorch/gates.py`, and `foundry/examples/consumers/` |
 | Candidate selection, restore, or repeated qualification | `scripts/release/`; see the ownership table in [candidate qualification](release-qualification.md#maintaining-the-workflow) |
@@ -104,7 +105,15 @@ can also run directly, for example `python3 -B foundry/tools/tracker_lint_test.p
 `verification.md` documents historical regression cases and real Bubblewrap
 acceptance. GPU, ABI, workload, and release qualification use Foundry's gates.
 
-`tools/agents/standing-verify.sh` composes the standing checks. Its offline
+`tools/agents/standing-verify.sh` composes the standing checks. Its adjacent
+`red_registry.py` owns locked failure records, first-seen times, and shared/stale
+escalation. Stage execution and extraction of failed targets remain in the shell
+entrypoint. Registry updates publish a flushed replacement; failed writes retain
+the previous record and clean up partial files before retry. Registry updates
+must succeed before verification reports a pass. When a check fails, its exit
+code remains primary and a registry failure is reported separately. Malformed or
+unsupported records stop updates and clearing without replacing their history;
+retain those records for diagnosis. Its offline
 registry and pinned dependencies must already be present; a missing dependency
 is a failed prerequisite, not a passed build. Keep tests and build experiments
 on owned output bases, away from live estate caches and releases.

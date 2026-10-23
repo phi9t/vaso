@@ -1,25 +1,17 @@
 from __future__ import annotations
 
-import atexit
 import json
 import os
-import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[2]
 LEASE = ROOT / "insula" / "execution" / "lease.py"
-SCRATCH = Path(os.environ.get("TMPDIR", str(ROOT / ".scratch"))) / "test-insula-lease"
-
-
-def _estate(name: str) -> Path:
-    path = SCRATCH / f"{os.getpid()}-{name}"
-    shutil.rmtree(path, ignore_errors=True)
-    path.mkdir(parents=True)
-    atexit.register(shutil.rmtree, path, ignore_errors=True)
-    return path
 
 
 def _lease_cmd(estate: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -57,8 +49,8 @@ def _release(estate: Path, lease_id: object) -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_two_holders_of_one_line_time_out() -> None:
-    estate = _estate("same-line")
+def test_two_holders_of_one_line_time_out(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     held = _acquire(estate, "--resource", "insula:cu129")
     try:
         blocked = _lease_cmd(
@@ -79,8 +71,8 @@ def test_two_holders_of_one_line_time_out() -> None:
         _release(estate, held["id"])
 
 
-def test_different_lines_proceed_concurrently() -> None:
-    estate = _estate("different-lines")
+def test_different_lines_proceed_concurrently(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     first = _acquire(estate, "--resource", "insula:cu129")
     second = _acquire(estate, "--resource", "insula:cu130")
     try:
@@ -91,8 +83,8 @@ def test_different_lines_proceed_concurrently() -> None:
         _release(estate, second["id"])
 
 
-def test_gpu_sets_are_disjoint() -> None:
-    estate = _estate("gpu")
+def test_gpu_sets_are_disjoint(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     first = _acquire(estate, "--resource", "gpu", "--amount", "3", "--capacity", "8")
     second = _acquire(estate, "--resource", "gpu", "--amount", "4", "--capacity", "8")
     try:
@@ -106,8 +98,8 @@ def test_gpu_sets_are_disjoint() -> None:
         _release(estate, second["id"])
 
 
-def test_exact_gpu_selection_never_falls_back() -> None:
-    estate = _estate("exact-gpu")
+def test_exact_gpu_selection_never_falls_back(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     selected = _acquire(
         estate,
         "--resource",
@@ -153,8 +145,8 @@ def test_exact_gpu_selection_never_falls_back() -> None:
         _release(estate, selected["id"])
 
 
-def test_check_requires_live_matching_lease() -> None:
-    estate = _estate("check")
+def test_check_requires_live_matching_lease(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     held = _acquire(estate, "--resource", "insula:cu129")
     try:
         live = _lease_cmd(
@@ -195,8 +187,8 @@ def test_check_requires_live_matching_lease() -> None:
     assert json.loads(stale.stdout)["live"] is False
 
 
-def test_expired_or_dead_holder_is_reclaimed() -> None:
-    estate = _estate("reclaim")
+def test_expired_or_dead_holder_is_reclaimed(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     expired = _lease_cmd(
         estate,
         "acquire",
@@ -238,8 +230,8 @@ def test_expired_or_dead_holder_is_reclaimed() -> None:
     _release(estate, replacement["id"])
 
 
-def test_cpu_budget_splits_between_holders() -> None:
-    estate = _estate("cpu")
+def test_cpu_budget_splits_between_holders(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     first = _acquire(estate, "--resource", "host-cpu", "--budget", "16")
     second = _acquire(estate, "--resource", "host-cpu", "--budget", "16")
     try:
@@ -254,8 +246,8 @@ def test_cpu_budget_splits_between_holders() -> None:
         _release(estate, second["id"])
 
 
-def test_network_fetch_lease_is_exclusive() -> None:
-    estate = _estate("network-fetch")
+def test_network_fetch_lease_is_exclusive(tmp_path: Path) -> None:
+    estate = tmp_path / "estate"
     held = _acquire(estate, "--resource", "network-fetch")
     try:
         blocked = _lease_cmd(
@@ -383,3 +375,91 @@ def test_invalid_lease_configuration_fails_before_state_creation(tmp_path) -> No
         assert result.returncode == 2, result.stdout + result.stderr
         assert "Traceback" not in result.stderr
         assert not estate.exists()
+
+
+@pytest.mark.parametrize(
+    "problem",
+    [
+        "missing-query",
+        "failed-query",
+        "empty-query",
+        "invalid-env",
+        "negative-capacity",
+        "excess-amount",
+        "invalid-devices",
+    ],
+)
+def test_invalid_gpu_request_creates_no_coordination_state(
+    tmp_path, monkeypatch, problem
+):
+    estate = tmp_path / "estate"
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    (bin_dir / "python3").symlink_to(sys.executable)
+    monkeypatch.setenv("PATH", str(bin_dir))
+    monkeypatch.delenv("VASO_GPU_COUNT", raising=False)
+    if problem != "missing-query":
+        query = bin_dir / "nvidia-smi"
+        query.write_text(
+            "#!/bin/sh\n"
+            + (
+                "exit 9\n"
+                if problem == "failed-query"
+                else "exit 0\n"
+                if problem == "empty-query"
+                else "printf 'GPU 0: fixture\nGPU 1: fixture\n'\n"
+            )
+        )
+        query.chmod(0o755)
+    options = []
+    if problem == "invalid-env":
+        monkeypatch.setenv("VASO_GPU_COUNT", "invalid")
+    elif problem == "negative-capacity":
+        options = ["--capacity", "-1"]
+    elif problem == "excess-amount":
+        options = ["--amount", "3"]
+    elif problem == "invalid-devices":
+        options = ["--devices", "7"]
+    result = _lease_cmd(estate, "acquire", "--resource", "gpu", *options)
+    actual_status = result.returncode
+    assert actual_status == 2, result.stderr
+    assert "Traceback" not in result.stderr
+    assert not (estate / "agents/leases").exists()
+
+
+def test_explicit_gpu_capacity_does_not_need_query_and_zero_stays_zero(
+    tmp_path, monkeypatch
+):
+    estate = tmp_path / "estate"
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    (bin_dir / "python3").symlink_to(sys.executable)
+    monkeypatch.setenv("PATH", str(bin_dir))
+    monkeypatch.delenv("VASO_GPU_COUNT", raising=False)
+    rejected = _lease_cmd(estate, "acquire", "--resource", "gpu", "--capacity", "0")
+    assert rejected.returncode == 2
+    assert not (estate / "agents/leases").exists()
+    record = _acquire(estate, "--resource", "gpu", "--capacity", "1")
+    assert record["devices"] == [0]
+    _release(estate, record["id"])
+
+
+def test_detected_gpu_capacity_grants_only_observed_devices(tmp_path, monkeypatch):
+    estate = tmp_path / "estate"
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    (bin_dir / "python3").symlink_to(sys.executable)
+    query = bin_dir / "nvidia-smi"
+    query.write_text("#!/bin/sh\nprintf 'GPU 0: fixture\nGPU 1: fixture\n'\n")
+    query.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bin_dir))
+    monkeypatch.delenv("VASO_GPU_COUNT", raising=False)
+    record = _acquire(estate, "--resource", "gpu", "--amount", "2")
+    try:
+        assert record["devices"] == [0, 1]
+        state = json.loads((estate / "agents/leases/gpu.json").read_text())
+        assert state["capacity"] == 2
+        blocked = _lease_cmd(estate, "acquire", "--resource", "gpu")
+        assert blocked.returncode == 75
+    finally:
+        _release(estate, record["id"])

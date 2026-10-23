@@ -144,3 +144,44 @@ def test_restore_entrypoint_records_complete_execution_or_stops_before_probes(
     )
     assert summary["qualification"] == "not performed"
     assert (output / "state.json").is_file()
+
+
+@pytest.mark.parametrize("runner", ["restore", "qualify"])
+def test_existing_attempt_is_preserved_and_signal_handler_is_restored(
+    tmp_path, capsys, runner
+):
+    import signal
+    import qualify
+
+    module = restore if runner == "restore" else qualify
+    output = tmp_path / "attempt"
+    output.mkdir()
+    retained = output / "summary.json"
+    retained.write_bytes(b"retained evidence\n")
+    previous = signal.getsignal(signal.SIGTERM)
+    try:
+        result = module.main(
+            [
+                "--candidate",
+                str(tmp_path / "missing-candidate"),
+                "--candidate-sha256",
+                "a" * 64,
+                "--checkout",
+                str(tmp_path / "checkout"),
+                "--estate-root",
+                str(tmp_path / "estate"),
+                "--out",
+                str(output),
+            ]
+        )
+        assert result == 2
+        assert signal.getsignal(signal.SIGTERM) == previous
+        assert retained.read_bytes() == b"retained evidence\n"
+        assert list(output.iterdir()) == [retained]
+        assert not (tmp_path / "estate").exists()
+        message = capsys.readouterr().err
+        assert str(output) in message
+        assert "attempt directory" in message
+        assert "Traceback" not in message
+    finally:
+        signal.signal(signal.SIGTERM, previous)

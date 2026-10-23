@@ -13,7 +13,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-RESULT_PY = ROOT / "insula" / "execution" / "result.py"
+RESULT_PY = ROOT / "foundry" / "tools" / "run_result.py"
+sys.path.insert(0, str(RESULT_PY.parent))
 
 
 def _load_result_module():
@@ -27,7 +28,7 @@ def _load_result_module():
 
 def _scratch_root() -> Path:
     raw = os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR")
-    root = Path(raw) / "solve-diagnostics-test" if raw else ROOT / ".scratch" / "solve-diagnostics-test"
+    root = Path(raw or tempfile.gettempdir()) / "solve-diagnostics-test"
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -192,3 +193,45 @@ def test_finalize_records_solve_diagnostics_from_failed_stage_log() -> None:
                 ),
             }
         ]
+
+
+def test_large_failed_log_is_parsed_with_bounded_memory(tmp_path: Path) -> None:
+    import tracemalloc
+
+    result = _load_result_module()
+    log = tmp_path / "large-build.log"
+    with log.open("w") as stream:
+        for _ in range(1024):
+            stream.write("building translation unit\n" * 256)
+        stream.write(NO_VERSION_SAMPLE)
+    stage = {"name": "solve", "exit_code": 17, "log_path": str(log)}
+    expected = result.parse_spack_solve_diagnostic(NO_VERSION_SAMPLE)
+    tracemalloc.start()
+    try:
+        diagnostics = result._solve_diagnostics_for_stages([stage], "")
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert diagnostics == [{"stage": "solve", "log_path": str(log), **expected}]
+    assert peak < 1024 * 1024, f"diagnostic extraction allocated {peak} bytes"
+
+
+def test_line_parser_handles_blank_input_spec_lines_and_retains_later_reasons() -> None:
+    result = _load_result_module()
+    lines = iter(
+        [
+            "==> Error: No version exists that satisfies these input specs:\n",
+            "\n",
+            "   \n",
+            "    py-example@1\n",
+            "  1. package: '^cuda@13:' conflicts with '@:2.9'\n",
+        ]
+    )
+    diagnostic = result.parse_spack_solve_lines(lines)
+    assert diagnostic["spec"] == "py-example@1"
+    assert diagnostic["conflicting_constraints"] == [
+        "No version exists that satisfies these input specs",
+        "py-example@1",
+        "package: '^cuda@13:' conflicts with '@:2.9'",
+    ]
+    assert "compatible CUDA/package version" in diagnostic["hint"]

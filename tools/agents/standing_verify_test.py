@@ -5,6 +5,9 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
+
+import pytest
 from pathlib import Path
 
 
@@ -184,3 +187,33 @@ def test_standing_verify_clears_red_entry_when_stage_passes(tmp_path: Path) -> N
 
     assert passed.returncode == 0, passed.stdout + passed.stderr
     assert not red_entries(tmp_path / "estate")
+
+
+@pytest.mark.parametrize("action", ["clear-stage", "record"])
+def test_registry_failure_is_reported_without_hiding_stage_status(tmp_path, monkeypatch, action):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    write_executable(
+        bin_dir / "python3",
+        '#!/bin/bash\n'
+        'if [[ "${1:-}" == */red_registry.py && "$2" == "$FAIL_REGISTRY_ACTION" && "$7" == bazel ]]; then\n'
+        '  echo "registry unavailable" >&2; exit 37\nfi\n'
+        f'exec {str(sys.executable)!r} "$@"\n',
+    )
+    monkeypatch.setenv("PATH", str(bin_dir) + os.pathsep + os.environ["PATH"])
+    monkeypatch.setenv("FAIL_REGISTRY_ACTION", action)
+    bazel = write_executable(
+        tmp_path / "bazel",
+        '#!/bin/bash\n'
+        + ("echo 'FAILED: //tools:fixture'; exit 7\n" if action == "record"
+           else "echo 'Executed fixture successfully.'; exit 0\n"),
+    )
+    result = run_verify(tmp_path, "registry-fixture", bazel)
+    assert result.returncode == (7 if action == "record" else 37), result.stdout + result.stderr
+    assert "STANDING_VERIFY_FAILED stage=red-registry" in result.stderr
+    assert "related_stage=bazel" in result.stderr
+    assert "action=" + action in result.stderr
+    assert "registry unavailable" in result.stderr
+    assert "STANDING_VERIFY_PASSED" not in result.stdout
+    if action == "record":
+        assert "STANDING_VERIFY_FAILED stage=bazel rc=7" in result.stdout

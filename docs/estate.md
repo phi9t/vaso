@@ -57,6 +57,22 @@ Acquisition and publication may add `downloads/`, `releases/`, or `publish/`.
 These are workflow storage, not prerequisites created with complete contents
 by the estate model. The implementation is [estate.py](../insula/estate/estate.py).
 
+## Inspect persistent usage
+
+For an existing estate, report its cache, temporary, run, and agent subtrees:
+
+```sh
+python3 -B insula/estate/estate.py \
+  --root "$VASO_ESTATE_ROOT" --required-gib 0 --report
+```
+
+Each row reports logical bytes and unique inodes within that subtree. Hard links
+count once per row; symlinks count their own bytes and inode without following
+the target. Directory metadata contributes its logical size too. These are
+best-effort inventory totals: unreadable or disappearing entries are skipped.
+Placement and execution preflight check filesystem free space separately;
+the report does not measure allocated disk blocks.
+
 ## How the host becomes a process filesystem
 
 | Host backing | Typical build-process path | Behavior |
@@ -220,7 +236,9 @@ Restore warm state into an unused location. Verify source, rootfs lock and tool
 identities, output/input integrity, capacity, and all link destinations before
 reuse. Keep the old usable estate until the restored one passes relevant checks.
 Bundle extraction replaces its destination after staging, so unbundle into a
-fresh line directory rather than a live rootfs.
+fresh line directory rather than a live rootfs. Extraction errors remove the
+private staging tree and leave the existing destination unchanged; fix the
+bundle or prerequisite, then retry.
 
 ## Moving backing storage and sharing inputs
 

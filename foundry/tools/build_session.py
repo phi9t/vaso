@@ -303,6 +303,7 @@ class BuildSession:
         started_monotonic = time.monotonic()
         entry = {
             "name": name,
+            "command": list(command),
             "line": line,
             "profile": profile,
             "log": str(log),
@@ -326,15 +327,14 @@ class BuildSession:
         try:
             rc, interrupted = self._execute(command, env, log, entry, started_monotonic)
         except OSError as exc:
-            entry.update(status="failed", error=str(exc))
-            rc = getattr(exc, "errno", 1) or 1
-        status = (
-            "interrupted"
-            if interrupted or rc < 0
-            else "passed"
-            if rc == 0
-            else "failed"
-        )
+            entry["error"] = str(exc)
+            rc = entry.get("returncode")
+        if "error" in entry:
+            status = "failed"
+        elif interrupted or rc < 0:
+            status = "interrupted"
+        else:
+            status = "passed" if rc == 0 else "failed"
         tail = tail_lines(log, count=1 if status == "passed" else 8)
         entry.update(
             returncode=rc,
@@ -352,6 +352,7 @@ class BuildSession:
             stage=name,
             status=status,
             returncode=rc,
+            error=entry.get("error"),
             duration_seconds=entry["duration_seconds"],
             log=str(log),
         )
@@ -359,8 +360,9 @@ class BuildSession:
         self.console.stage_finished(entry)
         if status == "interrupted":
             raise InterruptedError(f"{name} interrupted; see {log}")
-        if rc:
-            raise StageFailure(f"{name} failed (exit {rc}); see {log}")
+        if status == "failed":
+            cause = entry.get("error") or f"exit {rc}"
+            raise StageFailure(f"{name} failed ({cause}); see {log}")
         self.check_source()
 
     def _execute(self, command, env, log, entry, started_monotonic):
@@ -426,6 +428,6 @@ class BuildSession:
                 # that outlive their immediate parent.
                 if proc.poll() is None or cancel_deadline is not None:
                     signal_group(signal.SIGKILL)
-                proc.wait()
+                entry["returncode"] = proc.wait()
                 for signum, handler in previous.items():
                     signal.signal(signum, handler)

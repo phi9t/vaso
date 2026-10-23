@@ -74,6 +74,46 @@ class FoundryToolsTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "mismatched rootfs tool"):
             foundry_tools.verify(self.rootfs, self.lock)
 
+    def test_malformed_tool_manifests_have_context_and_preserve_installed_files(
+        self,
+    ) -> None:
+        (self.cache / self.sha).write_bytes(self.payload)
+        valid = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
+        manifest = self.rootfs / "opt/vaso/foundry-tools.json"
+        binary = self.rootfs / "opt/vaso/bin/bazel-real"
+        cases = [
+            "invalid JSON",
+            [],
+            None,
+            {**valid, "schema_version": 2},
+            {**valid, "files": ["opt/vaso/bin/bazel-real"]},
+            {**valid, "files": {"opt/vaso/bin/bazel-real": None}},
+            {**valid, "files": {"opt/vaso/bin/bazel-real": "bad hash"}},
+        ]
+        for value in cases:
+            with self.subTest(value=value):
+                raw = value if isinstance(value, str) else json.dumps(value)
+                manifest.write_text(raw)
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(Path(foundry_tools.__file__)),
+                        "--rootfs",
+                        str(self.rootfs),
+                        "--lock",
+                        str(self.lock),
+                        "--verify",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertIn(str(manifest), result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertEqual(manifest.read_text(), raw)
+                self.assertEqual(binary.read_bytes(), self.payload)
+
     def test_missing_tool_and_lock_mismatch_are_prerequisite_errors(self) -> None:
         (self.cache / self.sha).write_bytes(self.payload)
         foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)

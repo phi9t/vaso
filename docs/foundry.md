@@ -62,6 +62,11 @@ native state, or prior results. `full_rebuild.sh` starts with empty native
 caches while avoiding redundant acquisition of immutable inputs. A completed
 run's Bazel events provide the evidence of actual native execution.
 
+Completed downloads in `vaso/cache/build-inputs/<sha256>` are source inputs too.
+The runner rechecks their hashes in the current and seed estates, so repository
+cache installation can retry offline without downloading the same bytes again.
+Attempt-specific `.part` files and corrupt completed files are never reused.
+
 The main native products are package-sized Bazel actions. A PyTorch action runs
 its committed CMake/Ninja plan and atomically emits a prefix tree and wheel;
 jaxlib, Triton, torchvision, and torchaudio follow the same ownership model.

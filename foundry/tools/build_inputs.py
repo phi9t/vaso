@@ -339,16 +339,18 @@ class InputStore:
             / asset.sha256
             / "file"
         )
-        candidates = [self.estate / cache_rel]
-        if self.seed_estate:
-            candidates.append(self.seed_estate / cache_rel)
+        estates = [self.estate, *([self.seed_estate] if self.seed_estate else [])]
+        candidates = [estate / cache_rel for estate in estates]
+        # Acquisition publishes only a hash-verified complete download here.
+        # Recheck its bytes on lookup; a failed cache install must not force a
+        # repeat network fetch. Attempt-specific .part files are never inputs.
+        candidates.extend(
+            estate / "vaso/cache/build-inputs" / asset.sha256 for estate in estates
+        )
         filenames = {Path(urlparse(url).path).name for url in asset.urls}
         if asset.filename:
             filenames.add(asset.filename)
-        for estate in [
-            self.estate,
-            *([self.seed_estate] if self.seed_estate else []),
-        ]:
+        for estate in estates:
             for sub in ("native", "pytorch", "triton", "jax", "bazel"):
                 candidates.extend(
                     estate / "sources" / sub / "distdir" / name

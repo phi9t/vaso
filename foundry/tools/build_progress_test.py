@@ -57,6 +57,16 @@ class BuildProgressTest(unittest.TestCase):
         self.assertIn("CUDA", output)
         self.assertIn("torch.whl", output)
 
+    def test_formatters_keep_unknown_numeric_values_inspectable(self):
+        for value in (None, "invalid", float("nan"), float("inf"), float("-inf"), 10**400):
+            with self.subTest(value=value):
+                self.assertEqual(b.format_duration(value), "-")
+                self.assertEqual(b.human_size(value), "-")
+        self.assertEqual(b.human_size(-1), "-")
+        self.assertEqual(b.format_duration(3661), "1:01:01")
+        self.assertEqual(b.format_duration("61.5"), "01:01")
+        self.assertEqual(b.human_size(1024), "1.0 KiB")
+
     def test_banner_explains_cache_state_and_bazel_progress_terms(self):
         stream = io.StringIO()
         console = b.Console(stream=stream, color="never")

@@ -132,6 +132,27 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
                 ),
             )
 
+    def test_completed_downloads_are_verified_but_partials_are_not_inputs(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            store = self.make_store(Path(directory))
+            payload = b"completed download"
+            asset = b.Asset(
+                "fixture", hashlib.sha256(payload).hexdigest(), ("https://a/archive",)
+            )
+            for estate in (store.estate, store.seed_estate):
+                with self.subTest(seed=estate == store.seed_estate):
+                    cache = estate / "vaso/cache/build-inputs"
+                    cache.mkdir(parents=True)
+                    partial = cache / (asset.sha256 + ".attempt.part")
+                    partial.write_bytes(payload)
+                    self.assertIsNone(store.find(asset))
+                    completed = cache / asset.sha256
+                    completed.write_bytes(b"corrupt")
+                    self.assertIsNone(store.find(asset))
+                    completed.write_bytes(payload)
+                    self.assertEqual(store.find(asset), completed)
+                    completed.unlink()
+
     def test_local_seed_is_hashed_and_canonical_markers_are_restored(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_store(Path(directory))

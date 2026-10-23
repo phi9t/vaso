@@ -14,6 +14,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path, PurePosixPath
 import shutil
 import stat
@@ -49,19 +50,51 @@ def tool_relative(value: str) -> Path:
     return path
 
 
+def _read_tool_manifest(manifest: Path) -> dict:
+    """Validate the versioned file inventory before checking installed bytes."""
+    try:
+        report = json.loads(manifest.read_text())
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"invalid rootfs tooling manifest {manifest}: JSON at line {exc.lineno}, column {exc.colno}"
+        ) from exc
+    if (
+        not isinstance(report, dict)
+        or type(report.get("schema_version")) is not int
+        or report["schema_version"] != 1
+    ):
+        raise ValueError(
+            f"invalid rootfs tooling manifest {manifest}: expected schema_version=1 object"
+        )
+    files = report.get("files")
+    if not files:
+        raise ValueError(f"empty rootfs tooling manifest: {manifest}")
+    if not isinstance(files, dict):
+        raise ValueError(
+            f"invalid rootfs tooling manifest {manifest}: files must be a hash mapping"
+        )
+    for name, sha in files.items():
+        if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{64}", sha) is None:
+            raise ValueError(
+                f"invalid rootfs tooling manifest {manifest}: invalid file hash for {name!r}"
+            )
+    return report
+
+
 def verify(rootfs: Path, lock: Path = LOCK) -> dict:
     manifest = rootfs / PREFIX / "foundry-tools.json"
     if not manifest.is_file():
         raise ValueError(
             f"missing rootfs tooling manifest: {manifest}; provision with foundry_tools.py"
         )
-    report = json.loads(manifest.read_text())
-    if report["lock_sha256"] != digest(lock):
+    report = _read_tool_manifest(manifest)
+    if report.get("lock_sha256") != digest(lock):
         raise ValueError(f"rootfs tooling lock mismatch: {manifest}")
-    if not report.get("files"):
-        raise ValueError(f"empty rootfs tooling manifest: {manifest}")
     for name, sha in report["files"].items():
-        path = rootfs / tool_relative(name)
+        try:
+            path = rootfs / tool_relative(name)
+        except ValueError as exc:
+            raise ValueError(f"invalid rootfs tooling manifest {manifest}: {exc}") from exc
         if not path.is_file() or path.is_symlink() or digest(path) != sha:
             raise ValueError(f"missing or mismatched rootfs tool: {path}")
     # Tool manifest cannot silently omit an executable selected by the lock.

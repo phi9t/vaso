@@ -6,6 +6,8 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[2]
 BUNDLE_SH = ROOT / "insula" / "rootfs" / "bundle.sh"
@@ -165,3 +167,51 @@ printf '%s\\n' "$rootfs_path"
     extracted_rootfs = Path(helper.stdout.strip())
     assert extracted_rootfs == dest_parent / "cu129" / "rootfs"
     assert (extracted_rootfs / "etc" / "issue").read_text(encoding="utf-8") == "vaso fixture\n"
+
+
+@pytest.mark.parametrize("archive", ["bad-compression", "missing-manifest"])
+@pytest.mark.parametrize("existing", [False, True])
+def test_failed_extraction_cleans_staging_preserves_destination_and_can_retry(tmp_path, existing, archive):
+    estate, lock = write_fixture_estate(tmp_path)
+    result = run_bundle(tmp_path, estate, lock, tmp_path / "out")
+    assert result.returncode == 0, result.stderr
+    good = next((tmp_path / "out").glob("rootfs-cu129-*.tar.zst"))
+    if archive == "missing-manifest":
+        incomplete = tmp_path / "incomplete.tar.zst"
+        subprocess.run(
+            ["tar", "--zstd", "-cf", str(incomplete), "-C",
+             str(estate / "rootfs-lines/cu129"), "rootfs"],
+            check=True, capture_output=True,
+        )
+        payload = incomplete.read_bytes()
+    else:
+        payload = b"not a zstandard archive"
+    bad = tmp_path / ("rootfs-cu129-" + hashlib.sha256(payload).hexdigest() + ".tar.zst")
+    bad.write_bytes(payload)
+    parent = tmp_path / "restore"
+    dest = parent / "cu129"
+    if existing:
+        dest.mkdir(parents=True)
+        (dest / "previous").write_text("preserved rootfs")
+
+    def restore(bundle):
+        return subprocess.run(
+            ["bash", str(BUNDLE_SH), "unbundle", "--bundle", str(bundle), "--dest", str(dest)],
+            env={**os.environ, "TMPDIR": str(tmp_path / "tmp")},
+            capture_output=True, text=True, check=False,
+        )
+
+    failed = restore(bad)
+    assert failed.returncode != 0
+    assert failed.stdout == ""
+    assert not list(parent.glob(".rootfs-unbundle.*"))
+    if existing:
+        assert (dest / "previous").read_text() == "preserved rootfs"
+        assert list(dest.iterdir()) == [dest / "previous"]
+    else:
+        assert not dest.exists()
+    retried = restore(good)
+    assert retried.returncode == 0, retried.stderr
+    assert retried.stdout.strip() == str(dest / "rootfs")
+    assert (dest / "rootfs/etc/issue").read_text() == "vaso fixture\n"
+    assert not list(parent.glob(".rootfs-unbundle.*"))

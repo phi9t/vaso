@@ -203,13 +203,19 @@ def _new_record(args: argparse.Namespace, resource: str, ttl: float) -> dict[str
 
 def _gpu_capacity(override: int | None) -> int:
     if override is not None:
-        return max(0, override)
+        if override < 0:
+            raise ValueError("--capacity must be nonnegative")
+        return override
     raw = os.environ.get("VASO_GPU_COUNT")
-    if raw:
+    if raw is not None:
         try:
-            return max(0, int(raw))
+            capacity = int(raw)
         except ValueError:
-            pass
+            raise ValueError("VASO_GPU_COUNT must be a nonnegative integer") from None
+        if capacity < 0:
+            raise ValueError("VASO_GPU_COUNT must be a nonnegative integer")
+        return capacity
+    hint = "cannot determine GPU capacity with nvidia-smi; supply --capacity or VASO_GPU_COUNT"
     try:
         result = subprocess.run(
             ["nvidia-smi", "-L"],
@@ -218,14 +224,13 @@ def _gpu_capacity(override: int | None) -> int:
             text=True,
             timeout=5,
         )
-    except (OSError, subprocess.TimeoutExpired):
-        return 8
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise ValueError(hint) from exc
     if result.returncode != 0:
-        return 8
-    count = sum(
+        raise ValueError(hint)
+    return sum(
         1 for line in result.stdout.splitlines() if line.strip().startswith("GPU ")
     )
-    return count or 8
 
 
 def _cpu_budget(override: int | None) -> int:
@@ -259,6 +264,29 @@ def _try_acquire(args: argparse.Namespace) -> tuple[dict[str, Any] | None, str |
     if args.pid is not None and not _valid_pid(args.pid):
         return None, "--pid must be a positive process ID below 2**31"
 
+    if resource == "gpu":
+        amount = args.amount if args.amount is not None else 1
+        if amount <= 0:
+            return None, "--amount must be positive for gpu leases"
+        capacity = _gpu_capacity(args.capacity)
+        if amount > capacity:
+            return None, f"requested {amount} GPUs but capacity is {capacity}"
+        requested = None
+        if args.devices is not None:
+            try:
+                requested = [int(value) for value in args.devices.split(",")]
+            except ValueError:
+                return None, "--devices must contain comma-separated GPU indices"
+            if (
+                len(requested) != amount
+                or len(set(requested)) != amount
+                or any(device < 0 or device >= capacity for device in requested)
+            ):
+                return (
+                    None,
+                    "--devices must name --amount distinct indices within GPU capacity",
+                )
+
     with _locked(resource):
         state = _load_state(resource)
         state["leases"] = _active_leases(list(state.get("leases", [])), _now())
@@ -273,29 +301,7 @@ def _try_acquire(args: argparse.Namespace) -> tuple[dict[str, Any] | None, str |
             return lease, None
 
         if resource == "gpu":
-            amount = args.amount if args.amount is not None else 1
-            if amount <= 0:
-                return None, "--amount must be positive for gpu leases"
-            capacity = _gpu_capacity(args.capacity)
             state["capacity"] = capacity
-            if amount > capacity:
-                _write_state(resource, state)
-                return None, f"requested {amount} GPUs but capacity is {capacity}"
-            requested = None
-            if args.devices is not None:
-                try:
-                    requested = [int(value) for value in args.devices.split(",")]
-                except ValueError:
-                    return None, "--devices must contain comma-separated GPU indices"
-                if (
-                    len(requested) != amount
-                    or len(set(requested)) != amount
-                    or any(device < 0 or device >= capacity for device in requested)
-                ):
-                    return (
-                        None,
-                        "--devices must name --amount distinct indices within GPU capacity",
-                    )
             used = {
                 int(device)
                 for lease in state["leases"]

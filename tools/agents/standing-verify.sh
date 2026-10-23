@@ -37,95 +37,13 @@ python3 -B "$ROOT/insula/rootfs/foundry_tools_test.py" >"$TMPDIR/verify-rootfs-t
 python3 -B "$ROOT/insula/estate/overlay_root_test.py" >"$TMPDIR/verify-rootfs-projection.log" 2>&1 || exit $?
 
 red_registry() {
-  local action=$1 stage=$2 target=${3:-}
-  python3 - "$action" "$RED_ROOT" "$ATTENTION_LOG" "$AGENT" "$ROOT_SHA" "$stage" "$target" <<'PY'
-import datetime as dt
-import fcntl
-import hashlib
-import json
-import os
-import re
-import sys
-import time
-from pathlib import Path
-
-action, red_root_s, attention_log_s, agent, sha, stage, target = sys.argv[1:]
-red_root = Path(red_root_s)
-attention_log = Path(attention_log_s)
-if action == "clear-stage" and not red_root.exists():
-    raise SystemExit(0)
-red_root.mkdir(parents=True, exist_ok=True)
-lock_path = red_root / ".lock"
-
-def stamp(epoch: float) -> str:
-    return dt.datetime.fromtimestamp(epoch, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-def safe_name(value: str) -> str:
-    base = re.sub(r"[^A-Za-z0-9_.-]+", "_", value).strip("_") or "red"
-    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:8]
-    return f"{base}-{digest}.json"
-
-def read_json(path: Path) -> dict:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-    return value if isinstance(value, dict) else {}
-
-def write_json(path: Path, value: dict) -> None:
-    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    tmp.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    os.replace(tmp, path)
-
-with lock_path.open("a", encoding="utf-8") as lock:
-    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
-    now = time.time()
-    now_s = stamp(now)
-    try:
-        if action == "record":
-            path = red_root / safe_name(target)
-            existing = read_json(path)
-            previous_agents = [str(item) for item in existing.get("agents", [])]
-            agents = list(previous_agents)
-            if agent not in agents:
-                agents.append(agent)
-            first_epoch = existing.get("first_seen_epoch", now)
-            try:
-                first_epoch = float(first_epoch)
-            except (TypeError, ValueError):
-                first_epoch = now
-            age = max(0, int(now - first_epoch))
-            second_distinct = agent not in previous_agents and len(previous_agents) >= 1
-            stale = age >= 3600 and not existing.get("stale_escalated")
-            shared = second_distinct and not existing.get("shared_escalated")
-            doc = {
-                "schema_version": 1,
-                "target": target,
-                "stage": stage,
-                "agents": agents,
-                "first_seen": existing.get("first_seen", now_s),
-                "first_seen_epoch": first_epoch,
-                "last_seen": now_s,
-                "last_seen_epoch": now,
-                "sha": sha,
-                "shared_escalated": bool(existing.get("shared_escalated")) or shared,
-                "stale_escalated": bool(existing.get("stale_escalated")) or stale,
-            }
-            write_json(path, doc)
-            if shared or stale:
-                attention_log.parent.mkdir(parents=True, exist_ok=True)
-                with attention_log.open("a", encoding="utf-8") as out:
-                    out.write(f"{now_s} SHARED_RED {target} agents={','.join(agents)} age={age}s\n")
-        elif action == "clear-stage":
-            for path in red_root.glob("*.json"):
-                doc = read_json(path)
-                if doc.get("stage") == stage:
-                    path.unlink(missing_ok=True)
-        else:
-            raise SystemExit(f"unknown red registry action: {action}")
-    finally:
-        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
-PY
+  local action=$1 stage=$2 target=${3:-} registry_rc=0
+  python3 "$ROOT/tools/agents/red_registry.py" \
+    "$action" "$RED_ROOT" "$ATTENTION_LOG" "$AGENT" "$ROOT_SHA" "$stage" "$target" || registry_rc=$?
+  if [ "$registry_rc" != 0 ]; then
+    echo "STANDING_VERIFY_FAILED stage=red-registry action=$action related_stage=$stage rc=$registry_rc" >&2
+  fi
+  return "$registry_rc"
 }
 
 failing_targets() {
@@ -161,7 +79,7 @@ record_stage_failure() {
   local stage=$1 rc=$2 log=$3 fallback=$4 target
   while IFS= read -r target; do
     [ -n "$target" ] || continue
-    red_registry record "$stage" "$target"
+    red_registry record "$stage" "$target" || return $?
   done < <(failing_targets "$stage" "$log" "$fallback")
 }
 
@@ -176,7 +94,7 @@ record_stage_failure() {
 rc=$?
 tail -5 "$TMPDIR/verify-hermetic-test-guard.log"
 if [ "$rc" = 0 ]; then
-  red_registry clear-stage hermetic-test-guard
+  red_registry clear-stage hermetic-test-guard || exit $?
 else
   record_stage_failure hermetic-test-guard "$rc" "$TMPDIR/verify-hermetic-test-guard.log" tools:hermetic_test_guard
   echo "STANDING_VERIFY_FAILED stage=hermetic-test-guard rc=$rc log=$TMPDIR/verify-hermetic-test-guard.log"
@@ -187,7 +105,7 @@ fi
 rc=$?
 tail -5 "$TMPDIR/verify-layout-guard.log"
 if [ "$rc" = 0 ]; then
-  red_registry clear-stage layout-guard
+  red_registry clear-stage layout-guard || exit $?
 else
   record_stage_failure layout-guard "$rc" "$TMPDIR/verify-layout-guard.log" tools:layout_guard
   echo "STANDING_VERIFY_FAILED stage=layout-guard rc=$rc log=$TMPDIR/verify-layout-guard.log"
@@ -203,7 +121,7 @@ fi
 rc=$?
 grep -E "E[0-9]+ (PASS|FAILED)|bazel-lab passed" "$TMPDIR/verify-bazel-lab.log" | head -12
 if [ "$rc" = 0 ]; then
-  red_registry clear-stage bazel-lab
+  red_registry clear-stage bazel-lab || exit $?
 else
   record_stage_failure bazel-lab "$rc" "$TMPDIR/verify-bazel-lab.log" tools/bazel-lab:fast
   echo "STANDING_VERIFY_FAILED stage=bazel-lab rc=$rc log=$TMPDIR/verify-bazel-lab.log"
@@ -232,7 +150,7 @@ fi
 rc=$?
 grep -E "Executed|FAILED" "$TMPDIR/verify-bazel.log" | head -12
 if [ "$rc" = 0 ]; then
-  red_registry clear-stage bazel
+  red_registry clear-stage bazel || exit $?
 else
   record_stage_failure bazel "$rc" "$TMPDIR/verify-bazel.log" bazel
   echo "STANDING_VERIFY_FAILED stage=bazel rc=$rc log=$TMPDIR/verify-bazel.log"
@@ -247,7 +165,7 @@ fi
 rc=$?
 tail -1 "$TMPDIR/verify-pytest.log"
 if [ "$rc" = 0 ]; then
-  red_registry clear-stage pytest
+  red_registry clear-stage pytest || exit $?
 else
   record_stage_failure pytest "$rc" "$TMPDIR/verify-pytest.log" pytest:configured-roots
   echo "STANDING_VERIFY_FAILED stage=pytest rc=$rc log=$TMPDIR/verify-pytest.log"

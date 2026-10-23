@@ -57,9 +57,11 @@ def build_event_artifacts(events: Path, output_base: Path) -> list[dict[str, Any
 
     Malformed records raise ValueError with their source file and line. Missing
     wheels remain in the inventory with exists=False so the workflow can report
-    materialization failures separately from parsing failures.
+    materialization failures separately from parsing failures. Repeated paths
+    must agree on known metadata; omitted fields never erase recorded values.
     """
     artifacts: dict[str, dict[str, Any]] = {}
+    declared_lengths: dict[str, int] = {}
     try:
         handle = events.open(encoding="utf-8")
     except OSError as exc:
@@ -70,7 +72,11 @@ def build_event_artifacts(events: Path, output_base: Path) -> list[dict[str, Any
                 event = json.loads(raw)
                 for relative, item in _wheel_files(event):
                     host_path = output_base / "execroot/_main" / relative
+                    key = str(relative)
+                    previous = artifacts.get(key, {})
                     length = item.get("length")
+                    if length is None:
+                        length = declared_lengths.get(key)
                     if length is None:
                         try:
                             size = host_path.stat().st_size
@@ -82,14 +88,24 @@ def build_event_artifacts(events: Path, output_base: Path) -> list[dict[str, Any
                         size = int(length)
                         if size < 0:
                             raise ValueError("negative release-wheel length")
+                        if key in declared_lengths and size != declared_lengths[key]:
+                            raise ValueError(
+                                f"conflicting release-wheel length for {relative}"
+                            )
+                        declared_lengths[key] = size
                     digest = item.get("digest", "")
                     if not isinstance(digest, str):
                         raise ValueError("expected a release-wheel digest string")
-                    artifacts[str(relative)] = {
+                    known_digest = previous.get("digest", "")
+                    if digest and known_digest and digest != known_digest:
+                        raise ValueError(
+                            f"conflicting release-wheel digest for {relative}"
+                        )
+                    artifacts[key] = {
                         "name": relative.name,
                         "path": str(host_path),
                         "size_bytes": size,
-                        "digest": digest,
+                        "digest": digest or known_digest,
                         "exists": host_path.is_file(),
                     }
             except ValueError as exc:

@@ -9,20 +9,36 @@ base, and the declared sandbox mountpoints are provided as `--dir`/`--tmpfs`
 targets that later binds attach to.
 
 It prints newline-separated bwrap args to stdout, so `run.sh` can splice them
-into the argv. All base-system paths resolve to the real base root and no
-self-referential symlink is introduced.
+into the argv. Mountpoints must be canonical absolute directories; paths and
+symlink targets containing newlines cannot be represented by this interface.
+Validation completes before any arguments are printed. All base-system paths
+resolve to the real base root and no self-referential symlink is introduced.
 """
+
 from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 # bwrap manages these; never bind them from base.
 SKIP_TOPLEVEL = {"proc", "dev", "tmp", "run", "sys"}
 
 
 def plan_binds(base: Path, mountpoints: list[str]) -> list[str]:
+    for mountpoint in mountpoints:
+        if (
+            not mountpoint.startswith("/")
+            or mountpoint.startswith("//")
+            or mountpoint == "/"
+            or str(PurePosixPath(mountpoint)) != mountpoint
+            or ".." in PurePosixPath(mountpoint).parts
+            or "\n" in mountpoint
+            or "\0" in mountpoint
+        ):
+            raise ValueError(
+                f"mountpoint must be a canonical absolute directory: {mountpoint!r}"
+            )
     args: list[str] = []
 
     # Top-level names occupied by a mountpoint (e.g. /opt for /opt/vaso). These
@@ -61,6 +77,10 @@ def plan_binds(base: Path, mountpoints: list[str]) -> list[str]:
     for mp in mountpoints:
         args += ["--dir", mp]
 
+    # The shell caller reads one token per line. Refuse an ambiguous plan even
+    # when the offending name or symlink target came from the prepared base.
+    if any("\n" in token or "\0" in token for token in args):
+        raise ValueError("rootfs overlay argument contains a newline or NUL")
     return args
 
 
@@ -75,7 +95,12 @@ def main(argv: list[str] | None = None) -> int:
         help="sandbox mountpoint to provide as a real dir (repeatable)",
     )
     args = parser.parse_args(argv)
-    for token in plan_binds(args.base.resolve(), args.mountpoints):
+    try:
+        plan = plan_binds(args.base.resolve(), args.mountpoints)
+    except (OSError, ValueError) as exc:
+        print(f"rootfs overlay: {exc}", file=sys.stderr)
+        return 2
+    for token in plan:
         print(token)
     return 0
 

@@ -1,6 +1,7 @@
 """Exercise deadlines, exit propagation, and process-group cleanup with real children."""
 
 import os
+import signal
 from pathlib import Path
 import sys
 import time
@@ -8,7 +9,7 @@ import time
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent))
-from process_runner import run_command
+from process_runner import interrupt_on_sigterm, run_command
 
 
 def test_stdin_is_closed_and_nonzero_exit_is_retained(tmp_path):
@@ -120,3 +121,19 @@ def test_existing_log_is_preserved_and_prevents_execution(tmp_path):
 
     assert log.read_text() == "previous attempt\n"
     assert not marker.exists()
+
+
+@pytest.mark.parametrize("terminate", [False, True])
+def test_attempt_interruption_scope_restores_the_callers_handler(terminate):
+    previous = signal.getsignal(signal.SIGTERM)
+    try:
+        if terminate:
+            with pytest.raises(KeyboardInterrupt, match="attempt interrupted"):
+                with interrupt_on_sigterm("attempt interrupted"):
+                    os.kill(os.getpid(), signal.SIGTERM)
+        else:
+            with interrupt_on_sigterm("attempt interrupted"):
+                assert signal.getsignal(signal.SIGTERM) != previous
+        assert signal.getsignal(signal.SIGTERM) == previous
+    finally:
+        signal.signal(signal.SIGTERM, previous)

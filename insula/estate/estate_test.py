@@ -163,6 +163,37 @@ class EstatePlacementTest(unittest.TestCase):
             estate.discover_estate_root(-1, explicit_root=str(root))
         self.assertFalse(root.exists())
 
+    def test_usage_counts_hard_links_as_one_inode(self) -> None:
+        root = self.base / "usage"
+        root.mkdir()
+        source = root / "archive"
+        source.write_bytes(b"shared bytes")
+        (root / "alias").hardlink_to(source)
+        self.assertEqual(
+            estate.tree_usage(root),
+            (root.lstat().st_size + len(b"shared bytes"), 2),
+        )
+
+    def test_usage_counts_links_without_following_external_targets(self) -> None:
+        outside = self.base / "outside"
+        outside.mkdir()
+        (outside / "large").write_bytes(b"external" * 1000)
+        root = self.base / "usage"
+        root.mkdir()
+        links = [root / name for name in ("file", "directory", "dangling")]
+        for link, target in zip(links, (outside / "large", outside, outside / "missing")):
+            link.symlink_to(target)
+        expected = root.lstat().st_size + sum(link.lstat().st_size for link in links)
+        self.assertEqual(estate.tree_usage(root), (expected, 4))
+
+    def test_usage_handles_a_link_as_the_requested_root(self) -> None:
+        for target in (self.base, self.base / "missing"):
+            link = self.base / "root-link"
+            link.symlink_to(target)
+            self.assertEqual(estate.tree_usage(link), (link.lstat().st_size, 1))
+            link.unlink()
+        self.assertEqual(estate.tree_usage(self.base / "missing"), (0, 0))
+
     def test_report_lists_declared_io_subtrees(self) -> None:
         root = self.base / "estate"
         est = estate.VasoEstate(root).materialize()

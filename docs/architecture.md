@@ -65,7 +65,9 @@ normal execution.
 `insula/rootfs/foundry_tools.lock.json` selects the build orchestrator and its
 verification tools by version and archive digest. Its provisioner prepares a
 fresh `/opt/vaso` prefix in staging, verifies it, and installs it atomically.
-Installed file digests are recorded in `/opt/vaso/foundry-tools.json`. Staging
+Installed file digests are recorded in `/opt/vaso/foundry-tools.json`. Verification
+validates its schema and file-hash inventory before checking installed bytes;
+malformed records identify the manifest in their diagnostic. Staging
 failures leave the final prefix unchanged and remove partial files.
 An existing populated prefix is verified rather than merged with new files.
 With `--base`, the whole hard-linked clone and its tooling are prepared in
@@ -127,6 +129,11 @@ links valid from the legacy experiment mount. The supported
 `scripts/insula/insula.sh` CLI and `harness/vaso` import path remain. Support
 implementation lives under `tools/`; unused helper, CI, publication, testing,
 agent, and Bazel-lab aliases have been removed.
+
+`insula/execution/result.py` is a compatibility link to
+`foundry/tools/run_result.py` for build and CI callers. Foundry owns those
+invocation ledgers and Spack solve diagnostics; generic insula execution does
+not load that adapter.
 
 Two files retain their original physical paths to preserve native-key-sensitive
 inputs: `foundry/rootfs/cuda_ecosystem.lock.json` and

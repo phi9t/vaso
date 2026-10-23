@@ -295,7 +295,7 @@ build_bundle() {
   echo "$final_archive"
 }
 
-unbundle() {
+unbundle() (
   [[ -n "$BUNDLE" ]] || { echo "--bundle is required" >&2; usage; return 2; }
   [[ -n "$DEST" ]] || { echo "--dest is required" >&2; usage; return 2; }
   [[ -f "$BUNDLE" ]] || { echo "missing bundle: $BUNDLE" >&2; return 1; }
@@ -326,17 +326,18 @@ unbundle() {
   local TMPDIR="$parent"
   tmp="$(mktemp -d -p "$TMPDIR" ".rootfs-unbundle.$line.XXXXXX")"
   cleanup() {
-    rm -rf "$tmp"
+    rm -rf -- "$tmp"
   }
-  trap cleanup RETURN
+  # Keep cleanup scoped to extraction, including an errexit from tar.
+  trap cleanup EXIT
   tar --use-compress-program='zstd -d -q' -xf "$BUNDLE" -C "$tmp"
   [[ -d "$tmp/rootfs" ]] || { echo "bundle missing top-level rootfs/" >&2; return 1; }
   [[ -f "$tmp/rootfs-bundle.json" ]] || { echo "bundle missing top-level rootfs-bundle.json" >&2; return 1; }
   rm -rf "$dest"
   mv "$tmp" "$dest"
-  trap - RETURN
+  trap - EXIT
   echo "$dest/rootfs"
-}
+)
 
 case "$MODE" in
   build) build_bundle ;;

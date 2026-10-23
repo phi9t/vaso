@@ -155,8 +155,24 @@ not erase failed ones. A changed candidate or relevant verification input requir
 | `qualify.py` | Attempt lifecycle, cache retention, wheel composition, evidence reuse, and final attempt status |
 | `qualification_policy.py` | Supported coverage and command recipes derived from the pinned candidate/source |
 | `gpu_monitor.py` | Physical-device preflight, exact leases, process ownership, and interference observations |
-| `process_runner.py` | Shared noninteractive execution, deadlines, logs, and cleanup of owned process groups |
+| `process_runner.py` | Scoped attempt interruption, noninteractive execution, deadlines, logs, and cleanup of owned process groups |
 | `preview-policy.json` | Current policy used when freezing a new candidate |
+
+Tests sit beside these owners: `gpu_monitor_test.py` covers observation parsing,
+physical-device readiness, and process ownership; `qualification_policy_test.py`
+covers matrix coverage and command recipes; `qualify_test.py` covers composition,
+cache inventory, and evidence reuse. These host tests use synthetic observations
+and owned child processes; they require no GPU or reservation.
+
+GPU observation parsing belongs to `gpu_monitor.parse_snapshot`. Acquisition
+adds the observation time; policy separately decides which devices are supported
+and free. Invalid query rows or inconsistent device/process observations stop
+qualification with a query-and-row diagnostic that omits device UUIDs.
+
+The restore and qualification CLIs validate arguments in `main`; `_run_attempt`
+owns each attempt's evidence and execution. The shared `interrupt_on_sigterm`
+scope restores the caller's signal handler when the attempt exits. An existing
+output directory is rejected with exit code 2 and remains unchanged.
 
 Candidate JSON files embed their policy; changing the default policy never
 rewrites an existing candidate. Runners record hashes of their implementation
@@ -168,3 +184,10 @@ Keep raw attempt evidence on the estate, and publish only reviewed,
 sanitized summaries. Restore and qualification do not invoke the publisher.
 The existing native determinism and release-cut commands remain separate:
 runtime success cannot substitute for build proof or grant promotion.
+
+Release cutting stages the complete directory beside its final destination and
+renames it into place after preparation succeeds. Each copied file is hashed in
+staging: wheels and SBOMs retain their selected pins; unpinned metadata must match
+the source hash captured immediately before copying. Validation failures and Python
+interruptions remove that staging directory, so the same process can retry.
+The upstream nightly results and acceptance evidence remain available for diagnosis.
