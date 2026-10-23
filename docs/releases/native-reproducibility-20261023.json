@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "status": "passed-torch-reproducibility-and-focused-runtime",
+  "source_commit": "dbe7eb9a7005a3a1ff284cc46e8ee27b3334d0c2",
+  "source_identity": "c27956be45fa2dfa68896c33134fc8f6c48b4f6dfe17f8a163b54f0da8c5fff3",
+  "scope": "Two independent prepared-estate Torch-profile builds per CUDA line, followed by unchanged content comparison and single-GPU feature/ABI and Torch/Triton consumer checks. Matching unchanged dependency actions may reuse predecessor cache entries; this is not a full cold dependency rebuild.",
+  "root_cause": "PyTorch appends CMAKE_CUDA_FLAGS before enable_language(CUDA), preventing initialization from CUDAFLAGS; deterministic nvcc flags must be passed explicitly through CMAKE_ARGS.",
+  "comparison_policy": "Existing unpacked wheel and dependency-prefix comparison; ZIP container bytes are not required to match. No allowlist entries or comparison normalization added.",
+  "comparator_sha256": "c5f639d8bfe2bb79fb03be95c1a6c8667ba7b551d0f29246fcf82f0186c1c992",
+  "allowlist_sha256": "295c5b4d11e56e4c087b2d85284ffb3eac5df338f87079ee525a96a6fced44d4",
+  "builds": [
+    {
+      "run_id": "20261023T005803Z-c87e8391",
+      "status": "built",
+      "summary_sha256": "01355c02343f704fba745b2aa4be4628453c948fc81a43337c2f277c9edf9697"
+    },
+    {
+      "run_id": "20261023T005803Z-2beeee54",
+      "status": "built",
+      "summary_sha256": "2ef8645202bc3f6845100679bf288978f360f4f4442e05e0bfe5e31fef3ab405"
+    }
+  ],
+  "estate_materialization_regression": {
+    "source_commit": "460a4ab7",
+    "tests_passed": 10,
+    "native_input_impact": "unchanged compared to native proof source"
+  },
+  "lines": [
+    {
+      "line": "cu129",
+      "identical": true,
+      "dependency_prefixes_identical": true,
+      "unmaterialized_manifests": [],
+      "raw_comparison_sha256": "43988ebff69da624aa4729a6e88669674a286c9d2b9201550f17df0f7d9ea267",
+      "native_execution": [
+        {
+          "run_id": "20261023T005803Z-c87e8391",
+          "executed_actions": [
+            "PytorchNativePrefix",
+            "TorchvisionNativePrefix",
+            "TorchaudioNativePrefix"
+          ],
+          "build_events_sha256": "c54c9abcb23783d499d18de244ea3f1d310a3ff0b6a22104675b5ee9d207de97",
+          "selected_cuda_commands_seeded": true,
+          "cuda_flags_sha256": "59c00cbaffec55374580b876d3af8b03e8a3a9ec7cb7f34b9d8f87de8d6152ec"
+        },
+        {
+          "run_id": "20261023T005803Z-2beeee54",
+          "executed_actions": [
+            "PytorchNativePrefix",
+            "TorchvisionNativePrefix",
+            "TorchaudioNativePrefix"
+          ],
+          "build_events_sha256": "fbdaa94da29777fed635678dcb3c285a887c5d2cdfe7b65a9e3a2fcddac94cac",
+          "selected_cuda_commands_seeded": true,
+          "cuda_flags_sha256": "59c00cbaffec55374580b876d3af8b03e8a3a9ec7cb7f34b9d8f87de8d6152ec"
+        }
+      ],
+      "library_sha256": {
+        "libtorch_cuda.so": [
+          "b82a8c9c1db349fde6b7f8367a71bf78448c7566ac42ba4f927dbd19cdf3d941",
+          "b82a8c9c1db349fde6b7f8367a71bf78448c7566ac42ba4f927dbd19cdf3d941"
+        ],
+        "libtorch_nvshmem.so": [
+          "d4c7ba1a437fa52b6b03947775389278f6c88a7a138e7b7bb45c0b2f520f5d6a",
+          "d4c7ba1a437fa52b6b03947775389278f6c88a7a138e7b7bb45c0b2f520f5d6a"
+        ]
+      },
+      "wheel_sha256": {
+        "torch-2.14.0+vaso.cu129.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "28bb4062be1b345890b5524ce568f243f860092e551829f8fa183e2f408f19e6",
+          "28bb4062be1b345890b5524ce568f243f860092e551829f8fa183e2f408f19e6"
+        ],
+        "torchaudio-2.11.0+vaso.cu129.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "610fcaeb5deae2b958654a4b426576450ba578d3db0b232e48590be06e6a72fe",
+          "610fcaeb5deae2b958654a4b426576450ba578d3db0b232e48590be06e6a72fe"
+        ],
+        "torchvision-0.29.0+vaso.cu129.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "4cd52e476f68d62a063df720bc06b735f765d6a841e4b152c7bcb502671bd934",
+          "4cd52e476f68d62a063df720bc06b735f765d6a841e4b152c7bcb502671bd934"
+        ],
+        "triton-3.8.0+vaso.cu129.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "ec14707f37e8e49065286ecc9e926b23dc361d7e48f5ee9ca74d83fe9a6378bf",
+          "ec14707f37e8e49065286ecc9e926b23dc361d7e48f5ee9ca74d83fe9a6378bf"
+        ]
+      },
+      "runtime": {
+        "status": "passed-focused-runtime",
+        "gates_passed": 9,
+        "consumer": "python_consumers.verify_torch",
+        "consumer_passed": true,
+        "result_sha256": "b2234a6b251a774cc1e72d9cddb6c78c280c13edcad811b78e42f7aba11ebb50",
+        "gates_sha256": "494fbb490634b8fa9d4c7c71432f94a52bb595ebf25b5aa814813428073edf51",
+        "cooperative_single_gpu_monitoring": true
+      }
+    },
+    {
+      "line": "cu130",
+      "identical": true,
+      "dependency_prefixes_identical": true,
+      "unmaterialized_manifests": [],
+      "raw_comparison_sha256": "f20d91e80695c552a1529c62c59b1626784933c6f2f6dd66c7f4e79545503c10",
+      "native_execution": [
+        {
+          "run_id": "20261023T005803Z-c87e8391",
+          "executed_actions": [
+            "PytorchNativePrefix",
+            "TorchvisionNativePrefix",
+            "TorchaudioNativePrefix"
+          ],
+          "build_events_sha256": "17afabe05b45dea982d6f321f563b299de0de71890eb5cc70616924ef66dd017",
+          "selected_cuda_commands_seeded": true,
+          "cuda_flags_sha256": "3d091eb9123f13d1e3cf4a9478dcabc66784440f0d35eb2846b6b14bba996479"
+        },
+        {
+          "run_id": "20261023T005803Z-2beeee54",
+          "executed_actions": [
+            "PytorchNativePrefix",
+            "TorchvisionNativePrefix",
+            "TorchaudioNativePrefix"
+          ],
+          "build_events_sha256": "326d7614f3d01208e7f94c6a236691953d7c6d84ffd1d0207c3d25baffd312d3",
+          "selected_cuda_commands_seeded": true,
+          "cuda_flags_sha256": "3d091eb9123f13d1e3cf4a9478dcabc66784440f0d35eb2846b6b14bba996479"
+        }
+      ],
+      "library_sha256": {
+        "libtorch_cuda.so": [
+          "d0722676cd20635a65e91813a8a1cd13561e88c17234cb7be0f5df2e03b1aa89",
+          "d0722676cd20635a65e91813a8a1cd13561e88c17234cb7be0f5df2e03b1aa89"
+        ],
+        "libtorch_nvshmem.so": [
+          "36c84b4a8a47b98513ef81ef972d43c98c126cfea71a32517c8f5692db28054b",
+          "36c84b4a8a47b98513ef81ef972d43c98c126cfea71a32517c8f5692db28054b"
+        ]
+      },
+      "wheel_sha256": {
+        "torch-2.14.0+vaso.cu130.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "8274932365ec5e3beab4b0cf33fe2748a0815dff86cc1fc5cf3bf3e437f6d6ce",
+          "8274932365ec5e3beab4b0cf33fe2748a0815dff86cc1fc5cf3bf3e437f6d6ce"
+        ],
+        "torchaudio-2.11.0+vaso.cu130.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "3e0a7c39a757b47e478b2cd6e45bfbec3b05af24921716cc771187237b1cc04c",
+          "3e0a7c39a757b47e478b2cd6e45bfbec3b05af24921716cc771187237b1cc04c"
+        ],
+        "torchvision-0.29.0+vaso.cu130.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "75bbce434351d207c9294ccc471c7818ddec8f9db107d65113077d4abfa02445",
+          "75bbce434351d207c9294ccc471c7818ddec8f9db107d65113077d4abfa02445"
+        ],
+        "triton-3.8.0+vaso.cu130.gdbe7eb9a-cp313-cp313-linux_x86_64.whl": [
+          "bd4df5888d2c34841b79ff91b0321385e6971c1e8e18ff049e0e558d5f5033db",
+          "bd4df5888d2c34841b79ff91b0321385e6971c1e8e18ff049e0e558d5f5033db"
+        ]
+      },
+      "runtime": {
+        "status": "passed-focused-runtime",
+        "gates_passed": 9,
+        "consumer": "python_consumers.verify_torch",
+        "consumer_passed": true,
+        "result_sha256": "aaec33b92604ff58aee1ac49a0ff1d2912c467375580a09a39ae6aac79432ba0",
+        "gates_sha256": "494fbb490634b8fa9d4c7c71432f94a52bb595ebf25b5aa814813428073edf51",
+        "cooperative_single_gpu_monitoring": true
+      }
+    }
+  ],
+  "host_tests": {
+    "source_commit": "dbe7eb9a7005a3a1ff284cc46e8ee27b3334d0c2",
+    "passed": 383,
+    "skipped": 1,
+    "raw_log_sha256": "d2b607ff8da303654616b92fe19f136da1319029a1ac8b0fa3331ad671476525"
+  },
+  "earlier_attempts": "Two initial prepared-estate preflight failures were retained. Missing sources/module-mirror prerequisites were provisioned before restarting; subsequent build attempts completed without intervention.",
+  "limits": [
+    "Focused runtime checks do not replace candidate-bound repeated qualification.",
+    "Multi-GPU support remains deferred.",
+    "No new GHCR acquisition, artifact publication, or release promotion."
+  ]
+}

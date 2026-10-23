@@ -28,6 +28,7 @@ CUDA_LINES: tuple[str, ...] = ("cu129", "cu130")
 
 ESTATE_DIRS: tuple[str, ...] = (
     "rootfs-lines",
+    "sources",
     "home/kvothe",
     "home/kvothe/.cache",
     "home/kvothe/.config",

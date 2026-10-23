@@ -6,6 +6,7 @@ from __future__ import annotations
 import filecmp
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -617,12 +618,25 @@ class GenPlansTest(unittest.TestCase):
                 env = executor.command_env(plan, plan["configure"],
                     {"seed": "12345678", "source_date_epoch": "0", "prefix_map_flags": ""},
                     {}, {}, {}, root / "work", root / "out")
-                cuda_export = next(command for command in plan["configure"]["argv"][2].splitlines()
-                                   if command.startswith("export CUDAFLAGS="))
-                env["cuda_prefix_map_flags"] = ""
-                actual = subprocess.check_output(["/bin/bash", "-c", cuda_export + '\n printf "%s" "$CUDAFLAGS"'], env=env, text=True)
-                self.assertIn("--frandom-seed=12345678", actual)
-                self.assertIn("--objdir-as-tempdir", actual)
+                script = plan["configure"]["argv"][2]
+                # Execute the actual generated here-document, then source its output.
+                # CUDAFLAGS alone is ignored when PyTorch appends CMAKE_CUDA_FLAGS
+                # before enable_language(CUDA); the -D argument must carry the seed.
+                exports = [command for command in script.splitlines()
+                           if command.startswith(("export CUDAFLAGS=", "export CMAKE_ARGS="))]
+                env.update(cuda_prefix_map_flags="-Xcompiler=-ffile-prefix-map=/prefix=.",
+                           cpuinfo="/cpuinfo", py_six_source_dir="/six", pthreadpool="/pthreadpool")
+                env_file = root / "generated-env.sh"
+                command = "cat > \"" + str(env_file) + "\" <<EOF\n" + "\n".join(exports) + "\nEOF\n"
+                command += 'source "' + str(env_file) + '"\nprintf "%s\\n%s" "$CUDAFLAGS" "$CMAKE_ARGS"'
+                actual = subprocess.check_output(["/bin/bash", "-c", command], env=env, text=True)
+                cuda_flags, cmake_args = actual.split("\n", 1)
+                definitions = dict(arg[2:].split("=", 1) for arg in shlex.split(cmake_args))
+                self.assertIn("--frandom-seed=12345678", cuda_flags)
+                self.assertIn("--objdir-as-tempdir", cuda_flags)
+                self.assertEqual(definitions["CMAKE_CUDA_FLAGS"], cuda_flags)
+                self.assertIn("-Xcompiler=-ffile-prefix-map=/prefix=.", definitions["CMAKE_CUDA_FLAGS"])
+                self.assertEqual(definitions["CPUINFO_SOURCE_DIR"], "/cpuinfo")
 
     def test_peachpy_patch_preserves_symbol_insertion_order_and_rejects_drift(self) -> None:
         with tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:

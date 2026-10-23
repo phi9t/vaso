@@ -1358,13 +1358,14 @@ def pytorch_env_script(package: dict[str, Any]) -> str:
             "export PIP_NO_INPUT=1",
             "export CFLAGS=\"$CFLAGS $compiler_prefix_map_flags\"",
             "export CXXFLAGS=\"$CXXFLAGS $compiler_prefix_map_flags\"",
-            # Modern CMake CUDA compilation reads CUDAFLAGS; retain the executor's
-            # seeded nvcc flags for separable compilation and device linking too.
+            # PyTorch appends CMAKE_CUDA_FLAGS before enabling CUDA, so CMake
+            # skips initialization from CUDAFLAGS. Pass the same seeded flags
+            # explicitly through its scikit-build CMAKE_ARGS entrypoint.
             "export CUDAFLAGS=\"$CUDAFLAGS $NVCC_FLAGS $cuda_prefix_map_flags\"",
             "export NVCC_FLAGS=\"$NVCC_FLAGS $cuda_prefix_map_flags\"",
             "export CMAKE_C_COMPILER=\"$CC\"",
             "export CMAKE_CXX_COMPILER=\"$CXX\"",
-            "export CMAKE_ARGS=\"-DCPUINFO_SOURCE_DIR=$cpuinfo -DPYTHON_SIX_SOURCE_DIR=$py_six_source_dir -DPYTHON_PEACHPY_SOURCE_DIR={src}/third_party/python-peachpy -DPTHREADPOOL_SOURCE_DIR=$pthreadpool\"",
+            "export CMAKE_ARGS=\"-DCPUINFO_SOURCE_DIR=$cpuinfo -DPYTHON_SIX_SOURCE_DIR=$py_six_source_dir -DPYTHON_PEACHPY_SOURCE_DIR={src}/third_party/python-peachpy -DPTHREADPOOL_SOURCE_DIR=$pthreadpool -DCMAKE_CUDA_FLAGS='$CUDAFLAGS $NVCC_FLAGS $cuda_prefix_map_flags'\"",
             "export CUDA_HOME=\"$cuda\"",
             "export CUDA_TOOLKIT_ROOT_DIR=\"$cuda\"",
             "export CUDA_PATH=\"$cuda\"",
