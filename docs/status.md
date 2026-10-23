@@ -58,15 +58,28 @@ not a new registry acquisition. The three-round single-GPU attempt completed
 successfully with fresh caches followed by two verified reuse rounds. This
 qualifies the recorded runtime attempt, not the complete release.
 
-Native reproducibility remains open. The earlier cold matrix builds used
-different release stamps and produced unequal Torch libraries. A subsequent
-[controlled comparison](releases/native-reproducibility-20261022.json) used the
-same source and stamp for two independent Torch-profile runs on both lines.
-All builds completed, but `libtorch_cuda.so` and `libtorch_nvshmem.so` still
-differ, including copies bundled into Torchvision and Torchaudio. Matching
-dependency actions could reuse caches in these runs. Earlier determinism
-summaries cannot yet be reused because their retained dependency-manifest
-closure is incomplete. No reproducibility exception or promotion was granted.
+Torch-profile reproducibility now passes on both CUDA lines. The
+[controlled proof](releases/native-reproducibility-20261023.json) compares two
+independent builds from the same fixed source and release stamp. All four
+wheels per line and their dependency prefixes match, including
+`libtorch_cuda.so` and `libtorch_nvshmem.so`. Build events confirm actual Torch,
+Torchvision, and Torchaudio execution in both estates. Matching unchanged
+actions could reuse caches; this was not a full cold dependency rebuild.
+
+PyTorch initialized `CMAKE_CUDA_FLAGS` before enabling CUDA, so CMake ignored
+the seeded `CUDAFLAGS`. Passing those flags explicitly through `CMAKE_ARGS`
+fixed the [earlier differences](releases/native-reproducibility-20261022.json).
+The comparison policy and empty allowlist remain unchanged. The new wheels
+installed offline. Nine single-GPU runtime gates and the Torch/Triton consumer
+passed on each line. Initial estate-preparation failures and their recovery
+remain recorded outside Git; estate materialization now creates `sources/`.
+
+The Torch CUDA/NVSHMEM reproducibility blocker is closed. Complete release
+qualification remains open: JAX proof reuse still needs its missing manifest
+closure and verified artifact relationship. Candidate 2's three-round runtime
+evidence identifies its original wheels; it does not qualify these new builds.
+A revised candidate needs matching repeated qualification and restore evidence
+before promotion. No release promotion or reproducibility exception was granted.
 
 The complete release-specific operator recipe remains implementation work. Current guides
 identify the implemented entrypoints and their prerequisites rather than claim

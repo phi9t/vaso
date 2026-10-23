@@ -152,6 +152,7 @@ class EstatePlacementTest(unittest.TestCase):
         self.assertEqual(
             est.bazel_repository_cache(), root / "vaso/cache/bazel/repository-cache"
         )
+        self.assertTrue((root / "sources").is_dir())
         self.assertTrue((root / "agents/leases").is_dir())
         self.assertTrue((root / "vaso/lines/cu129/cache/bazel/output-base").is_dir())
         self.assertTrue((root / "vaso/lines/cu130/state/stamps").is_dir())

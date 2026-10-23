@@ -488,7 +488,7 @@
         {
           "kind": "plan",
           "path": "plans/torch/cu129/pytorch.plan.json",
-          "sha256": "3bf73ffa5b392aa197e07ef8846080e5fa351356332783ed2f4fb3ea93d438b3"
+          "sha256": "2f09b0341a51e9ac20b38860b45a81a9905401a1c4e04cdbd4b518ff71bc450d"
         },
         {
           "kind": "schema",
@@ -818,7 +818,7 @@
           "sha256": "02ffcacf90620048fbafd359aae79eb1b48e3e79ac18399741f38f9e66a7f0ce"
         }
       ],
-      "merkle_key": "79d8ec0225cbb301d79ddca2d22a91a0e9201594211ad7c18d93e5ec0992f308"
+      "merkle_key": "547e2fffd05ca0880440c59b9f6bb88a0d5559377054dfedd938efde2cd0fcab"
     },
     "torch/cu129/py-torchaudio": {
       "inputs": [
@@ -915,7 +915,7 @@
           "name": "python-venv"
         },
         {
-          "key": "79d8ec0225cbb301d79ddca2d22a91a0e9201594211ad7c18d93e5ec0992f308",
+          "key": "547e2fffd05ca0880440c59b9f6bb88a0d5559377054dfedd938efde2cd0fcab",
           "kind": "dep",
           "label": "//native/pytorch:pytorch_action",
           "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
@@ -959,7 +959,7 @@
           "sha256": "5a5bbc9f7e5e6019f99d1e1451fe8000847add91b3362eb45a5f89b09ab85a57"
         }
       ],
-      "merkle_key": "a9ca88cc855237b9f1a36e517cc47c0f39eb131d700c53e5ce0c114cd4e6d76c"
+      "merkle_key": "d0777fae715885870c90b5ebbe84ae84482bf7b9813c3739d7ddc6f0313fd17d"
     },
     "torch/cu129/py-torchvision": {
       "inputs": [
@@ -1084,7 +1084,7 @@
           "name": "python-venv"
         },
         {
-          "key": "79d8ec0225cbb301d79ddca2d22a91a0e9201594211ad7c18d93e5ec0992f308",
+          "key": "547e2fffd05ca0880440c59b9f6bb88a0d5559377054dfedd938efde2cd0fcab",
           "kind": "dep",
           "label": "//native/pytorch:pytorch_action",
           "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
@@ -1135,7 +1135,7 @@
           "sha256": "171105939391eff2514bdde2531322a623095d3cacd694254db734e7e6e69cda"
         }
       ],
-      "merkle_key": "c4242904964a43bfd30f3a1fb8a265f2a23b8a47a1a1348450707bbfae5c5d6a"
+      "merkle_key": "e65be3b4b059486a9f4d0afea3b70bb7f7f7fecfc6ab477a7d67b627a54756df"
     },
     "torch/cu129/py-triton": {
       "inputs": [
@@ -1593,7 +1593,7 @@
         {
           "kind": "plan",
           "path": "plans/torch/cu130/pytorch.plan.json",
-          "sha256": "5e686abfe91330be739eca97b1ff5a47af229886bd61bc0608836070652988aa"
+          "sha256": "4088ac7e5439ba58b1402b6cd51de98a527287b6ae269075c05b13d7c00274c3"
         },
         {
           "kind": "schema",
@@ -1923,7 +1923,7 @@
           "sha256": "02ffcacf90620048fbafd359aae79eb1b48e3e79ac18399741f38f9e66a7f0ce"
         }
       ],
-      "merkle_key": "58bae3394053936b59b44e2a098ccd9800a657723a44d87caca83956237cec77"
+      "merkle_key": "2a49ce5002ae07e742bf5eb1056c9d475be3cc8a9cf27f57fe541e75d07cd4b3"
     },
     "torch/cu130/py-torchaudio": {
       "inputs": [
@@ -2020,7 +2020,7 @@
           "name": "python-venv"
         },
         {
-          "key": "58bae3394053936b59b44e2a098ccd9800a657723a44d87caca83956237cec77",
+          "key": "2a49ce5002ae07e742bf5eb1056c9d475be3cc8a9cf27f57fe541e75d07cd4b3",
           "kind": "dep",
           "label": "//native/pytorch:pytorch_action",
           "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
@@ -2064,7 +2064,7 @@
           "sha256": "5a5bbc9f7e5e6019f99d1e1451fe8000847add91b3362eb45a5f89b09ab85a57"
         }
       ],
-      "merkle_key": "1da68ff5bad3b84d66c030a04e211ce68a37bbf7f4f02b0cd18d8ee2ca5f213d"
+      "merkle_key": "96904695d7114f132bb25dadc7f3da9079addcee85a7889c9de3944369afa4fd"
     },
     "torch/cu130/py-torchvision": {
       "inputs": [
@@ -2189,7 +2189,7 @@
           "name": "python-venv"
         },
         {
-          "key": "58bae3394053936b59b44e2a098ccd9800a657723a44d87caca83956237cec77",
+          "key": "2a49ce5002ae07e742bf5eb1056c9d475be3cc8a9cf27f57fe541e75d07cd4b3",
           "kind": "dep",
           "label": "//native/pytorch:pytorch_action",
           "manifest": "action://native/pytorch:pytorch_action_prefix_manifest",
@@ -2240,7 +2240,7 @@
           "sha256": "171105939391eff2514bdde2531322a623095d3cacd694254db734e7e6e69cda"
         }
       ],
-      "merkle_key": "f1d9b94236bfb9ac9956537494fc6483ed7bd73025e333578c60b45f52518788"
+      "merkle_key": "e452127bda5f22ca4ddf9de3e04cb294f5eec11d6e5b9f7fdfd1bc50e6f439ae"
     },
     "torch/cu130/py-triton": {
       "inputs": [
