@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shlex
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +16,6 @@ from typing import Any
 BOOL_VALUES = {"ON", "OFF"}
 FILEPATH_KEYS = {"CMAKE_C_COMPILER", "CMAKE_CXX_COMPILER"}
 PATH_KEYS = {"CMAKE_INSTALL_PREFIX"}
-SHA256_LEN = 64
 
 
 def load_lock(path: Path) -> dict[str, Any]:
@@ -83,12 +84,12 @@ def pinned_base_image(base_image: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(base_image, dict):
         raise ValueError("components.llvm.build.base_image must be an object")
     digest = str(base_image.get("digest") or base_image.get("sha256") or "")
-    if digest.startswith("sha256:"):
-        digest_ref = digest
-    elif len(digest) == SHA256_LEN:
-        digest_ref = f"sha256:{digest}"
-    else:
-        raise ValueError("components.llvm.build.base_image must include a sha256 digest")
+    sha256 = digest.removeprefix("sha256:")
+    if re.fullmatch(r"[0-9a-f]{64}", sha256) is None:
+        raise ValueError(
+            "components.llvm.build.base_image must include a valid sha256 digest"
+        )
+    digest_ref = f"sha256:{sha256}"
 
     reference = str(base_image.get("reference") or "")
     name = reference.split("@", 1)[0] if reference else ""
@@ -98,7 +99,9 @@ def pinned_base_image(base_image: dict[str, Any]) -> dict[str, Any]:
         if repository and tag:
             name = f"{repository}:{tag}"
     if not name:
-        raise ValueError("components.llvm.build.base_image must include a repository/tag or reference")
+        raise ValueError(
+            "components.llvm.build.base_image must include a repository/tag or reference"
+        )
 
     pinned = dict(base_image)
     pinned["digest"] = digest_ref
@@ -142,17 +145,25 @@ def emit_env(plan: dict[str, Any]) -> str:
         "LLVM_URL": plan["source"]["url"],
         "LLVM_VERSION": plan["version"],
     }
-    return "".join(f"{key}={shlex.quote(str(value))}\n" for key, value in sorted(values.items()))
+    return "".join(
+        f"{key}={shlex.quote(str(value))}\n" for key, value in sorted(values.items())
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lock", type=Path, required=True)
     parser.add_argument("--estate-root", type=Path, required=True)
-    parser.add_argument("--format", choices=("json", "env", "cmake-args"), default="json")
+    parser.add_argument(
+        "--format", choices=("json", "env", "cmake-args"), default="json"
+    )
     args = parser.parse_args(argv)
 
-    plan = build_plan(load_lock(args.lock), args.estate_root)
+    try:
+        plan = build_plan(load_lock(args.lock), args.estate_root)
+    except (OSError, ValueError) as exc:
+        print(f"LLVM rootfs plan: {args.lock}: {exc}", file=sys.stderr)
+        return 2
     if args.format == "env":
         print(emit_env(plan), end="")
     elif args.format == "cmake-args":

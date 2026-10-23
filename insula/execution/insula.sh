@@ -370,7 +370,8 @@ insula_rootfs_from_bundle() {
     --bundle "$bundle" \
     --dest "$dest" \
     --line "$line" \
-    --digest "$digest")"
+    --digest "$digest")" || return $?
+  # Publish the caller's output only after verification and extraction succeed.
   out="$extracted_rootfs"
 }
 
@@ -467,10 +468,10 @@ insula_prepare_context() {
   export VASO_ESTATE_ROOT="$ESTATE_ROOT"
   mkdir -p "$ESTATE_ROOT/sources" "$ESTATE_ROOT/agents/leases" || return $?
   local -a mountpoints=()
-  local path
-  while IFS= read -r path; do mountpoints+=(--mountpoint "$path"); done < <(
-    python3 "$INSULA_REPO_ROOT/insula/estate/estate.py" --root "$ESTATE_ROOT" --print-sandbox-dirs
-  )
+  local path directories
+  directories="$(python3 "$INSULA_REPO_ROOT/insula/estate/estate.py" \
+    --root "$ESTATE_ROOT" --print-sandbox-dirs)" || return $?
+  while IFS= read -r path; do mountpoints+=(--mountpoint "$path"); done <<< "$directories"
   mountpoints+=(--mountpoint /workspace/vaso --mountpoint /run/vaso)
   local plan
   plan="$(python3 "$INSULA_REPO_ROOT/insula/estate/overlay_root.py" \

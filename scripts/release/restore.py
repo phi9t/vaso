@@ -16,12 +16,11 @@ import math
 import os
 from pathlib import Path
 import shutil
-import signal
 import sys
 
 import candidate
 from evidence import replace_json
-from process_runner import run_command
+from process_runner import interrupt_on_sigterm, run_command
 
 
 def now() -> str:
@@ -134,11 +133,17 @@ def main(argv=None) -> int:
     for name in ("candidate", "checkout", "estate_root", "out"):
         setattr(args, name, getattr(args, name).resolve())
 
-    def interrupted(_signum, _frame):
-        raise KeyboardInterrupt("restore interrupted")
+    with interrupt_on_sigterm("restore interrupted"):
+        return _run_attempt(args)
 
-    signal.signal(signal.SIGTERM, interrupted)
-    args.out.mkdir(parents=True, exist_ok=False)
+
+def _run_attempt(args: argparse.Namespace) -> int:
+    """Own one evidence directory and retain the outcome of its execution."""
+    try:
+        args.out.mkdir(parents=True, exist_ok=False)
+    except OSError as exc:
+        print(f"cannot create attempt directory {args.out}: {exc}", file=sys.stderr)
+        return 2
     summary = {
         "schema_version": 1,
         "candidate_sha256": args.candidate_sha256,

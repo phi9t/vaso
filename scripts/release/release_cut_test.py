@@ -9,6 +9,8 @@ import subprocess
 import zipfile
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "release" / "cut.sh"
@@ -409,3 +411,98 @@ def test_release_cut_refuses_execroot_relative_wheel_without_gate_output_base(tm
     assert result.returncode != 0
     assert "output_base" in result.stderr
     assert not (estate / "releases").exists()
+
+
+@pytest.mark.parametrize("failure", ["missing-sbom", "interrupted-copy"])
+def test_failed_cut_removes_staging_and_allows_same_process_retry(tmp_path, monkeypatch, failure):
+    monkeypatch.syspath_prepend(str(SCRIPT.parent))
+    import cut
+
+    estate = tmp_path / "estate"
+    info = make_green_nightly(estate)
+    monkeypatch.setenv("VASO_ESTATE_ROOT", str(estate))
+    args = cut.parser().parse_args(["--profile", "torch", "--line", "cu129", "--sha", SHA])
+    parent = estate / "releases/torch/cu129"
+    if failure == "missing-sbom":
+        sbom = info["sbom"]
+        previous = sbom.read_bytes()
+        sbom.unlink()
+        with pytest.raises(SystemExit, match="SBOM"):
+            cut.cut_release(args)
+        sbom.write_bytes(previous)
+    else:
+        with monkeypatch.context() as scoped:
+            def interrupt(source, destination):
+                Path(destination).write_bytes(b"partial wheel")
+                raise KeyboardInterrupt("cut interrupted")
+            scoped.setattr(cut.shutil, "copy2", interrupt)
+            with pytest.raises(KeyboardInterrupt):
+                cut.cut_release(args)
+    assert parent.is_dir()
+    assert list(parent.iterdir()) == []
+    release = cut.cut_release(args)
+    assert release.is_dir()
+    assert sorted(parent.iterdir()) == [release]
+    assert (release / "cut.json").is_file()
+
+
+@pytest.mark.parametrize("artifact", ["wheel", "sbom", "acceptance", "determinism", "rootfs_manifest"])
+@pytest.mark.parametrize("changed", ["source", "destination"])
+def test_cut_rejects_changed_copy_and_can_retry(tmp_path, monkeypatch, artifact, changed):
+    monkeypatch.syspath_prepend(str(SCRIPT.parent))
+    import cut
+
+    estate = tmp_path / "estate"
+    info = make_green_nightly(estate)
+    source = (
+        info["run_dir"] / "results/determinism-torch-cu129.json"
+        if artifact == "determinism" else info[artifact]
+    )
+    original = source.read_bytes()
+    monkeypatch.setenv("VASO_ESTATE_ROOT", str(estate))
+    args = cut.parser().parse_args(["--profile", "torch", "--line", "cu129", "--sha", SHA])
+    parent = estate / "releases/torch/cu129"
+    copy = cut.shutil.copy2
+
+    def changed_copy(src, destination):
+        if Path(src) == source and changed == "source":
+            source.write_bytes(b"changed during copy")
+        result = copy(src, destination)
+        if Path(src) == source and changed == "destination":
+            Path(destination).write_bytes(b"damaged copy")
+        return result
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(cut.shutil, "copy2", changed_copy)
+        with pytest.raises(SystemExit, match="copied.*sha256 mismatch"):
+            cut.cut_release(args)
+    assert list(parent.iterdir()) == []
+    source.write_bytes(original)
+    release = cut.cut_release(args)
+    assert sorted(parent.iterdir()) == [release]
+    for line in (release / "SHA256SUMS").read_text().splitlines():
+        digest, name = line.split("  ", 1)
+        assert hashlib.sha256((release / name).read_bytes()).hexdigest() == digest
+
+
+@pytest.mark.parametrize("artifact", ["wheel", "sbom"])
+def test_cut_keeps_validated_pin_when_source_changes_before_copy(tmp_path, monkeypatch, artifact):
+    monkeypatch.syspath_prepend(str(SCRIPT.parent))
+    import cut
+
+    estate = tmp_path / "estate"
+    info = make_green_nightly(estate)
+    source = info[artifact]
+    monkeypatch.setenv("VASO_ESTATE_ROOT", str(estate))
+    args = cut.parser().parse_args(["--profile", "torch", "--line", "cu129", "--sha", SHA])
+    copy = cut.copy_file
+
+    def change_before_copy(src, dst, label, **kwargs):
+        if Path(src) == source:
+            source.write_bytes(b"changed after validation")
+        copy(src, dst, label, **kwargs)
+
+    monkeypatch.setattr(cut, "copy_file", change_before_copy)
+    with pytest.raises(SystemExit, match="copied.*sha256 mismatch"):
+        cut.cut_release(args)
+    assert list((estate / "releases/torch/cu129").iterdir()) == []

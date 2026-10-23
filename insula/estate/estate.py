@@ -20,6 +20,7 @@ import math
 import os
 import re
 import shutil
+import stat
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -66,8 +67,8 @@ LINE_ESTATE_DIRS: tuple[str, ...] = (
 )
 
 # The canonical sandbox namespace presented inside every vaso insula. Each entry
-# is a stable absolute path from docs/rootfs-container-infra-design.md. Overlay
-# root mountpoints and estate binds are derived from this.
+# is a stable absolute path described in docs/estate.md. Launchers use these
+# directories to plan mountpoint scaffolding, then supply their explicit binds.
 CANONICAL_SANDBOX_DIRS: tuple[str, ...] = (
     "/home/kvothe",
     "/workspace",
@@ -82,10 +83,9 @@ CANONICAL_SANDBOX_DIRS: tuple[str, ...] = (
     "/run/vaso",
 )
 
-# Sandbox mount contract: host estate subdir -> (sandbox path, mode).
-# `vaso` is bound whole at /vaso (a single writable surface for this synthetic
-# experiment); the finer-grained per-surface binds in the design doc are a
-# follow-up. tools/bin and /opt/vaso are re-bound read-only.
+# Legacy layout description: host estate subdir -> (sandbox path, mode).
+# Exported by the layout CLI for compatibility. Production launchers construct
+# their own execution contexts; this table is not their effective mount list.
 SANDBOX_MOUNTS: tuple[tuple[str, str, str], ...] = (
     ("home/kvothe", "/home/kvothe", "rw"),
     ("workspace", "/workspace", "rw"),
@@ -204,26 +204,27 @@ REPORT_SUBTREES: tuple[tuple[str, str], ...] = (
 
 
 def tree_usage(path: Path) -> tuple[int, int]:
-    """Return logical bytes and inode count for a subtree."""
-    if not path.exists():
-        return 0, 0
+    """Count readable logical bytes and unique inodes without following links."""
+    pending = [path]
+    seen: set[tuple[int, int]] = set()
     bytes_total = 0
-    inodes = 0
-    for current, _dirs, files in os.walk(path):
-        current_path = Path(current)
+    while pending:
+        current = pending.pop()
         try:
-            bytes_total += current_path.stat().st_size
-            inodes += 1
+            metadata = current.lstat()
         except OSError:
-            pass
-        for name in files:
-            child = current_path / name
+            continue
+        identity = (metadata.st_dev, metadata.st_ino)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        bytes_total += metadata.st_size
+        if stat.S_ISDIR(metadata.st_mode):
             try:
-                bytes_total += child.stat().st_size
-                inodes += 1
+                pending.extend(current.iterdir())
             except OSError:
                 continue
-    return bytes_total, inodes
+    return bytes_total, len(seen)
 
 
 def format_report(estate: VasoEstate) -> str:

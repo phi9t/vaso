@@ -37,6 +37,8 @@ testpaths = [
     "foundry/tools/build_report_test.py",
     "foundry/tools/build_variants_test.py",
     "foundry/tools/insula_context_test.py",
+    "foundry/tools/result_test.py",
+    "foundry/tools/solve_diagnostics_test.py",
 ]
 python_files = ["*_test.py", "test_*.py"]
 addopts = ["--import-mode=importlib"]

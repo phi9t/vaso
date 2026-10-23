@@ -656,7 +656,8 @@ MP_ARGS+=(--mountpoint /run/nvidia-driver/lib)
 if [[ "$BAZEL_OUTPUT_BASE_SB" != /vaso/* ]]; then
   MP_ARGS+=(--mountpoint "$BAZEL_OUTPUT_BASE_SB")
 fi
-mapfile -t ROOT_PLAN < <(python3 "$REPO_ROOT/insula/estate/overlay_root.py" --base "$BASE_ROOT" "${MP_ARGS[@]}")
+ROOT_PLAN_TEXT="$(python3 "$REPO_ROOT/insula/estate/overlay_root.py" --base "$BASE_ROOT" "${MP_ARGS[@]}")"
+mapfile -t ROOT_PLAN <<< "$ROOT_PLAN_TEXT"
 
 INNER_PATH="/vaso/tools/bin${INNER_EXTRA_PATH:+:$INNER_EXTRA_PATH}:/usr/bin:/bin"
 INSULA_LIBRARY_PATH="/run/nvidia-driver/lib:$VASO_CUDA_HOME_SB/lib64"

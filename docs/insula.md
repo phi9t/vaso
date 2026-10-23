@@ -41,6 +41,11 @@ unsupported schemas, or invalid holder metadata produce exit code 2 and remain
 unchanged for diagnosis. Repair a record only after establishing holder ownership.
 Valid expired leases and dead local holders are still reclaimed automatically.
 
+GPU lease capacity comes from `--capacity`, then `VASO_GPU_COUNT`, or a
+successful `nvidia-smi -L` query. A failed query never supplies an assumed device
+count. Zero capacity permits no GPU leases. Invalid requests are rejected before
+the lease directory is created or existing coordination state is changed.
+
 Foundry's build/release context is in `foundry/tools/insula_context.sh`.
 Its canonical entrypoint is `foundry/insula.sh`; pinned build tools are
 installed by `rootfs/foundry_tools.py` before execution. See the [Foundry guide](foundry.md)

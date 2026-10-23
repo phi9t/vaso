@@ -191,6 +191,7 @@ class Runner:
             artifacts = build_event_artifacts(
                 Path(variant["build_events"]), Path(variant["output_base"])
             )
+            variant["artifacts"] = artifacts
             if not artifacts:
                 raise RuntimeError(
                     f"{line}/{profile}: build passed but Bazel reported no release wheels; "
@@ -229,7 +230,6 @@ class Runner:
             status="built",
             finished_at=utc_now(),
             duration_seconds=round(max(0.0, time.monotonic() - started_monotonic), 3),
-            artifacts=artifacts,
         )
         if self.run.report["stages"]:
             variant["log"] = self.run.report["stages"][-1].get("log")

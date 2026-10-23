@@ -54,6 +54,32 @@ class BuildSessionTest(unittest.TestCase):
                 all(variant["status"] == "pending" for variant in r.report["variants"])
             )
 
+    def test_launch_failure_retains_command_and_cause_without_inventing_exit_code(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            r = self.make_session(Path(directory))
+            command = [str(Path(directory) / "missing-tool"), "--version"]
+            with self.assertRaises(b.StageFailure) as raised:
+                r.stage("missing", command, "cu129", "torch")
+            r.finish("failed", str(raised.exception))
+
+            stage = r.report["stages"][0]
+            self.assertEqual(stage["status"], "failed")
+            self.assertIsNone(stage["returncode"])
+            self.assertNotIn("pid", stage)
+            self.assertEqual(stage["command"], command)
+            self.assertIn("missing-tool", stage["error"])
+            self.assertIn(stage["error"], str(raised.exception))
+            self.assertIn(stage["error"], Path(r.report["result_path"]).read_text())
+            saved = json.loads(Path(r.report["summary_path"]).read_text())
+            self.assertEqual(saved["stages"][0], stage)
+            events = [
+                json.loads(line)
+                for line in Path(r.report["events_path"]).read_text().splitlines()
+            ]
+            finished = next(e for e in events if e["event"] == "stage_finished")
+            self.assertIsNone(finished["returncode"])
+            self.assertEqual(finished["error"], stage["error"])
+
     def test_stage_cannot_wait_for_interactive_input(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_session(Path(directory))
@@ -135,6 +161,7 @@ class BuildSessionTest(unittest.TestCase):
             stage = r.report["stages"][0]
             self.assertEqual(stage["status"], "failed")
             self.assertIn("cannot persist progress", stage["error"])
+            self.assertEqual(stage["returncode"], -signal.SIGKILL)
             with self.assertRaises(ProcessLookupError):
                 os.kill(stage["pid"], 0)
 

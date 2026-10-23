@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -70,9 +71,16 @@ def ensure_file(path: Path, label: str) -> Path:
     return path
 
 
-def copy_file(src: Path, dst: Path, label: str) -> None:
+def copy_file(
+    src: Path, dst: Path, label: str, *, expected_sha256: str | None = None
+) -> None:
+    """Verify staged bytes against a pin or a source hash captured before copying."""
     ensure_file(src, label)
+    expected = expected_sha256 if expected_sha256 is not None else sha256_file(src)
     shutil.copy2(src, dst)
+    actual = sha256_file(dst)
+    if actual != expected:
+        die(f"copied {label} sha256 mismatch for {dst}: expected {expected}, got {actual}")
 
 
 def host_path(path: Any, estate: Path, *, line: str) -> Path:
@@ -404,16 +412,20 @@ def cut_release(args: argparse.Namespace) -> Path:
 
     parent = release_dir.parent
     parent.mkdir(parents=True, exist_ok=True)
-    tmp_dir = parent / f".{version}.tmp.{os.getpid()}"
-    if tmp_dir.exists():
-        die(f"temporary release dir already exists: {tmp_dir}")
-    tmp_dir.mkdir()
-    try:
+    with tempfile.TemporaryDirectory(dir=parent, prefix=f".{version}.tmp.") as staging:
+        tmp_dir = Path(staging)
         for wheel in wheels:
-            copy_file(Path(wheel["path"]), tmp_dir / wheel["name"], "release wheel")
+            copy_file(
+                Path(wheel["path"]), tmp_dir / wheel["name"], "release wheel",
+                expected_sha256=wheel["sha256"],
+            )
         sha_lines = [f"{wheel['sha256']}  {wheel['name']}\n" for wheel in wheels]
         (tmp_dir / "SHA256SUMS").write_text("".join(sha_lines), encoding="utf-8")
-        copy_file(release_sbom_path(acceptance, estate=estate, line=args.line), tmp_dir / "sbom.json", "release SBOM")
+        copy_file(
+            release_sbom_path(acceptance, estate=estate, line=args.line),
+            tmp_dir / "sbom.json", "release SBOM",
+            expected_sha256=strip_sha256_prefix(acceptance["release"]["sbom"].get("sha256")),
+        )
         copy_file(acceptance_path, tmp_dir / "acceptance.json", "acceptance JSON")
         write_json(tmp_dir / "workload-results.json", workload_results(acceptance, estate=estate, line=args.line))
         copy_file(determinism_path, tmp_dir / "determinism.json", "determinism report")
@@ -443,9 +455,6 @@ def cut_release(args: argparse.Namespace) -> Path:
         }
         write_json(tmp_dir / "cut.json", cut_doc)
         tmp_dir.rename(release_dir)
-    except Exception:
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-        raise
     return release_dir
 
 

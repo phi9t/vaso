@@ -154,6 +154,69 @@ class BuildArtifactsTest(unittest.TestCase):
                         b.build_event_artifacts(events, root / "output-base")
                     self.assertIn(f"{events}:2", str(raised.exception))
 
+    def test_repeated_artifact_metadata_is_consistent_and_order_independent(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            events = root / "events.jsonl"
+            name = "native/torch_release_wheel_wheelhouse/torch.whl"
+            records = [
+                {"digest": "a" * 64, "length": "123"},
+                {},
+                {"length": 123},
+                {"digest": "", "length": None},
+            ]
+            expected = None
+            for ordered in (
+                records,
+                list(reversed(records)),
+                [records[1], records[2], records[0]],
+            ):
+                events.write_text(
+                    "".join(
+                        json.dumps(
+                            {"namedSetOfFiles": {"files": [{"name": name, **fields}]}}
+                        )
+                        + "\n"
+                        for fields in ordered
+                    )
+                )
+                artifacts = b.build_event_artifacts(events, root / "output-base")
+                self.assertEqual(len(artifacts), 1)
+                self.assertEqual(artifacts[0]["digest"], "a" * 64)
+                self.assertEqual(artifacts[0]["size_bytes"], 123)
+                if expected is None:
+                    expected = artifacts
+                self.assertEqual(artifacts, expected)
+
+    def test_conflicting_repeated_metadata_reports_source_line(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            events = root / "events.jsonl"
+            name = "native/torch_release_wheel_wheelhouse/torch.whl"
+            for field, values in (
+                ("digest", ("a" * 64, "b" * 64)),
+                ("length", ("123", 124)),
+            ):
+                with self.subTest(field=field):
+                    events.write_text(
+                        "".join(
+                            json.dumps(
+                                {
+                                    "namedSetOfFiles": {
+                                        "files": [{"name": name, field: value}]
+                                    }
+                                }
+                            )
+                            + "\n"
+                            for value in values
+                        )
+                    )
+                    with self.assertRaises(ValueError) as raised:
+                        b.build_event_artifacts(events, root / "output-base")
+                    self.assertIn(f"{events}:2", str(raised.exception))
+                    self.assertIn("conflicting", str(raised.exception))
+                    self.assertIn(field, str(raised.exception))
+
     def test_missing_wheel_keeps_bazel_size_metadata(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)

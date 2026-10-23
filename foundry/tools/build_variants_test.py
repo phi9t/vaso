@@ -4,6 +4,8 @@ import argparse
 from contextlib import redirect_stdout
 import fcntl
 import io
+import json
+import hashlib
 import os
 from pathlib import Path
 import sys
@@ -94,6 +96,50 @@ class BuildVariantsTest(unittest.TestCase):
                     self.assertEqual(pointer.read_text(), "invalid JSON")
                     self.assertEqual(list(state.iterdir()), [pointer])
 
+    def test_status_preserves_failed_report_with_nonfinite_metrics(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            estate = Path(directory) / "estate"
+            summary = estate / "agents/build-variants/retained/summary.json"
+            summary.parent.mkdir(parents=True)
+            original = json.dumps(
+                {
+                    "run_id": "retained",
+                    "status": "failed",
+                    "error": "retained failure cause",
+                    "duration_seconds": float("inf"),
+                    "variants": [
+                        {
+                            "line": "cu129",
+                            "profile": "torch",
+                            "status": "failed",
+                            "duration_seconds": float("inf"),
+                            "artifacts": [
+                                {"name": "retained.whl", "size_bytes": float("-inf")}
+                            ],
+                        }
+                    ],
+                }
+            )
+            summary.write_text(original)
+            result = subprocess.run(
+                [
+                    str(HERE.parent / "build.sh"),
+                    "--estate-root",
+                    str(estate),
+                    "--status",
+                    "--color",
+                    "never",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("retained failure cause", result.stdout)
+            self.assertIn("retained.whl", result.stdout)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(summary.read_text(), original)
+
     def test_finish_and_status_command_preserve_preparation_result(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
@@ -163,6 +209,78 @@ class BuildVariantsTest(unittest.TestCase):
             )
             self.assertNotEqual(r.run.report["status"], "built")
 
+    def test_failed_materialization_retains_inventory_in_summary_and_status(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            runner = self.make_runner(Path(directory))
+            variant = runner.run.report["variants"][0]
+            relative = Path("native/pytorch/pytorch_release_wheel_wheelhouse")
+            present = (
+                Path(variant["output_base"]) / "execroot/_main" / relative / "present.whl"
+            )
+            present.parent.mkdir(parents=True)
+            present.write_bytes(b"wheel")
+            events = Path(variant["build_events"])
+            events.write_text(
+                json.dumps(
+                    {
+                        "namedSetOfFiles": {
+                            "files": [
+                                {"name": str(relative / "present.whl"), "length": "5"},
+                                {
+                                    "name": str(relative / "missing.whl"),
+                                    "length": "123",
+                                    "digest": "a" * 64,
+                                },
+                            ]
+                        }
+                    }
+                )
+                + "\n"
+            )
+            with (
+                patch.object(runner, "preflight"),
+                patch.object(runner, "prepare_inputs"),
+                patch.object(runner.run, "stage"),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "not materialized") as raised:
+                    runner.execute()
+            runner.run.finish("failed", str(raised.exception))
+            saved = json.loads(Path(runner.run.report["summary_path"]).read_text())
+            failed = saved["variants"][0]
+            self.assertEqual(failed["status"], "failed")
+            self.assertEqual([v["status"] for v in saved["variants"]][1:], ["pending"] * 3)
+            artifacts = {item["name"]: item for item in failed["artifacts"]}
+            self.assertEqual(set(artifacts), {"present.whl", "missing.whl"})
+            self.assertTrue(artifacts["present.whl"]["exists"])
+            self.assertFalse(artifacts["missing.whl"]["exists"])
+            self.assertEqual(artifacts["missing.whl"]["size_bytes"], 123)
+            self.assertEqual(artifacts["missing.whl"]["digest"], "a" * 64)
+            status = subprocess.run(
+                [
+                    str(HERE.parent / "build.sh"),
+                    "--estate-root",
+                    str(runner.estate),
+                    "--status",
+                    "--color",
+                    "never",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+            self.assertTrue(
+                any(
+                    "missing.whl" in line and "MISSING" in line
+                    for line in status.splitlines()
+                )
+            )
+            self.assertTrue(
+                any(
+                    "present.whl" in line and "PRESENT" in line
+                    for line in status.splitlines()
+                )
+            )
+
     def test_bad_download_cannot_become_a_cached_input(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
@@ -185,6 +303,41 @@ class BuildVariantsTest(unittest.TestCase):
             self.assertFalse(
                 list((r.estate / "vaso/cache/build-inputs").glob("*.part"))
             )
+
+    def test_install_failure_can_retry_offline_from_completed_download(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            runner = self.make_runner(Path(directory))
+            runner.args.fetch = True
+            payload = b"retained source archive"
+            asset = b.Asset(
+                "fixture", hashlib.sha256(payload).hexdigest(),
+                ("https://example.org/archive",),
+            )
+
+            def download(*_):
+                partial = (
+                    runner.estate / "vaso/cache/build-inputs"
+                    / (asset.sha256 + "." + runner.run.output.name + ".part")
+                )
+                partial.write_bytes(payload)
+
+            with patch.object(runner.run, "stage", side_effect=download) as stage:
+                with patch.object(
+                    runner.inputs, "install", side_effect=OSError("cache unavailable")
+                ):
+                    with self.assertRaisesRegex(OSError, "cache unavailable"):
+                        runner.prepare_asset(asset)
+                self.assertEqual(stage.call_count, 1)
+            self.assertEqual(runner.run.report.get("inputs_prepared", 0), 0)
+            runner.args.fetch = False
+            with patch.object(
+                runner.run, "stage", side_effect=AssertionError("unexpected fetch")
+            ):
+                runner.prepare_asset(asset)
+            self.assertEqual(runner.run.report["inputs_prepared"], 1)
+            cached = runner.inputs.find(asset)
+            self.assertEqual(cached.read_bytes(), payload)
+            self.assertIn("repository-cache", cached.parts)
 
     def test_all_variants_are_serial_offline_and_token_enabled(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:

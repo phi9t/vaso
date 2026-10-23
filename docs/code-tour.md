@@ -10,6 +10,39 @@ For commands to run, use the [operator guide](operator-guide.md). This tour
 connects those commands to their implementation. The [architecture](architecture.md)
 defines module contracts; the [glossary](../GLOSSARY.md) defines the terms.
 
+## Follow a generic command
+
+For `insula/execution/insula.sh --rootfs DIR --workspace PROJECT -- COMMAND`,
+start in [insula.sh](../insula/execution/insula.sh):
+
+1. `insula_main` parses the command, rootfs, workspace, and execution phase.
+   `--line` selects a prepared estate rootfs; `--rootfs` supplies an explicit base.
+2. `insula_prepare_context` checks the base shell and workspace, then asks
+   [estate.py](../insula/estate/estate.py) to validate and materialize the explicit
+   estate. This creates backing directories, not toolchains or package inputs.
+3. [overlay_root.py](../insula/estate/overlay_root.py) plans read-only base binds
+   and writable mountpoint scaffolding. The context supplies the project,
+   persistent state, home, prepared tools, environment, and working directory.
+   Namespace and overlay planning failures stop preparation.
+4. `insula` runs readiness checks through `insula_preflight`, then
+   `insula_build_argv` assembles the Bubblewrap request. `--print-argv` prints
+   that request and skips preflight and execution; context preparation still runs.
+5. Normal execution starts the command with the prepared request and returns
+   its status. Fetch execution requires an explicit hash pin and obtains a
+   network-fetch lease. The caller owns other shared-resource reservations.
+
+| Change | Owner | Relevant host tests |
+|---|---|---|
+| Estate directories or placement | `insula/estate/estate.py` | `estate_test.py` |
+| Base overlay or namespace-to-host translation | `insula/estate/overlay_root.py`, `path_map.py` | `overlay_root_test.py`, `path_map_test.py` |
+| Context preparation or command execution | `insula/execution/insula.sh` | `context_test.py`, `insula_entrypoint_test.py`, `planning_failure_test.py` |
+| Resource reservation | `insula/execution/lease.py` | `insula_lease_test.py` |
+
+Tests sit beside their owner. The Python package under `insula/execution/vaso/`
+supplies readiness checks and a legacy host-layout planning CLI. Its
+`BwrapPlan` scaffold does not execute the standalone shell launcher's request.
+For execution options and caller-supplied contexts, use the [insula guide](insula.md).
+
 ## Follow one build
 
 With a prepared estate, `foundry/build.sh --line cu129 --profile torch` builds
@@ -46,7 +79,8 @@ flowchart TD
    [build_report.py](../foundry/tools/build_report.py) owns report storage and
    selection. It derives summary, event, and result paths from the selected
    attempt directory; stale recovery writes there. JSON and text reports are
-   replaced atomically. [build_progress.py](../foundry/tools/build_progress.py)
+   replaced atomically. Foundry invocation results reuse its atomic JSON writer.
+   [build_progress.py](../foundry/tools/build_progress.py)
    renders the recorded state and log excerpts.
    [build_artifacts.py](../foundry/tools/build_artifacts.py) extracts wheel
    paths and metadata from Bazel events; malformed records name the source file
@@ -107,8 +141,9 @@ to choose a file. For the unattended build workflow:
 | Report storage, selection, and owned output paths | `build_report.py` | `build_report_test.py` |
 | Console and status output | `build_progress.py` | `build_progress_test.py` |
 | Wheel discovery and build-event validation | `build_artifacts.py` | `build_artifacts_test.py` |
+| Invocation ledgers, final results, and solve diagnostics | `run_result.py` | `result_test.py`, `solve_diagnostics_test.py` |
 
-These files are under `foundry/tools/`. The six build-orchestration suites run
+These files are under `foundry/tools/`. The eight build-orchestration suites run
 in the normal host suite. Select them without a rootfs, GPU, or custom temporary
 directory:
 
@@ -116,7 +151,8 @@ directory:
 python3 -B -m pytest -q -p no:cacheprovider \
   foundry/tools/build_inputs_test.py foundry/tools/build_session_test.py \
   foundry/tools/build_progress_test.py foundry/tools/build_variants_test.py \
-  foundry/tools/build_artifacts_test.py foundry/tools/build_report_test.py
+  foundry/tools/build_artifacts_test.py foundry/tools/build_report_test.py \
+  foundry/tools/result_test.py foundry/tools/solve_diagnostics_test.py
 ```
 
 The tests use system temporary storage by default and honor `TEST_TMPDIR` or
@@ -133,8 +169,13 @@ Support-code changes should preserve native plan keys and command arguments.
 
 Start with `foundry/build.sh --estate-root "$VASO_ESTATE_ROOT" --status`.
 The run directory under `agents/build-variants/` contains `summary.json`,
-`events.jsonl`, `result.txt`, and stage logs. Inspect the first failed stage:
+`events.jsonl`, `result.txt`, and stage logs. Each new stage records its command.
+A command that could not start has a `null` return code and an `error` explaining
+why. If the child started, the return code describes that process; a separate
+reporting error still makes the stage fail. Inspect the first failed stage:
 
+- Namespace or overlay planning failures belong to `insula/estate/`; both
+  launchers stop before entering Bubblewrap and preserve the planner's exit code.
 - A preflight failure belongs to estate, rootfs, or tool readiness.
 - An input-preparation failure belongs to the pinned source closure or its
   acquisition. `missing-inputs.json` lists missing local bytes.
@@ -142,6 +183,20 @@ The run directory under `agents/build-variants/` contains `summary.json`,
   the failing package's action and plan.
 - A wheel can build successfully and fail runtime qualification. Inspect that
   qualification attempt's evidence using the [qualification guide](release-qualification.md).
+
+A missing-wheel failure preserves the parsed artifact inventory in the failed
+variant. The artifact table labels recorded availability `PRESENT` or `MISSING`;
+`-` means older records did not capture availability. Presence describes materialization.
+Release qualification supplies content and runtime proof.
+
+Individual `foundry/run.sh` invocations also record stage ledgers and final
+results through `foundry/tools/run_result.py`. The same validator checks new and
+retained stage records. Invalid records return exit code 2 with their ledger
+path and line; finalization preserves the ledger and any previous result.
+A requested pass verdict must agree with the command and stage exit codes.
+Explicit failed and blocked classifications remain available to callers.
+Solve-diagnostic extraction streams failed-stage logs, retaining only the selected
+diagnostic fields rather than loading the complete log into memory.
 
 Retain failed attempts. Fix the owning behavior or prerequisite, then start a
 new run; do not rewrite a failed result into a successful one. Some old paths

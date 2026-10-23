@@ -33,6 +33,21 @@ class BuildReportTest(unittest.TestCase):
             self.assertEqual(report["status"], "running")
             self.assertEqual(report["run_id"], "active")
 
+    def test_selected_summary_does_not_require_access_to_legacy_history(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            selected = root / "active" / "summary.json"
+            b.atomic_json(selected, {"status": "running"})
+            b.atomic_json(root / "latest.json", {"summary": str(selected)})
+
+            with patch.object(
+                Path, "glob", side_effect=PermissionError("history is unavailable")
+            ):
+                report, path = b.latest_report(root)
+
+            self.assertEqual(path, selected)
+            self.assertEqual(report["status"], "running")
+
     def test_legacy_scan_used_when_pointer_or_selected_summary_is_missing(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import math
 import os
 from pathlib import Path
 import re
@@ -18,8 +19,11 @@ FAILURE_STATES = {"abandoned", "failed", "interrupted"}
 
 def format_duration(seconds: Any) -> str:
     try:
-        total = max(0, int(float(seconds)))
-    except (TypeError, ValueError):
+        value = float(seconds)
+        if not math.isfinite(value):
+            return "-"
+        total = max(0, int(value))
+    except (TypeError, ValueError, OverflowError):
         return "-"
     hours, remainder = divmod(total, 3600)
     minutes, seconds = divmod(remainder, 60)
@@ -31,7 +35,9 @@ def format_duration(seconds: Any) -> str:
 def human_size(size: Any) -> str:
     try:
         value = float(size)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
+        return "-"
+    if not math.isfinite(value) or value < 0:
         return "-"
     for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
         if value < 1024 or unit == "TiB":
@@ -150,10 +156,16 @@ def report_text(report: dict[str, Any]) -> str:
             for artifact in variant.get("artifacts", []):
                 if not isinstance(artifact, dict):
                     continue
+                availability = "-"
+                if artifact.get("exists") is True:
+                    availability = "PRESENT"
+                elif artifact.get("exists") is False:
+                    availability = "MISSING"
                 artifact_rows.append(
                     [
                         f"{variant.get('line', '-')}/{variant.get('profile', '-')}",
                         str(artifact.get("name", "-")),
+                        availability,
                         human_size(artifact.get("size_bytes")),
                         str(artifact.get("digest", ""))[:12] or "-",
                     ]
@@ -163,7 +175,7 @@ def report_text(report: dict[str, Any]) -> str:
                 [
                     "",
                     "Artifacts",
-                    *_table(["VARIANT", "WHEEL", "SIZE", "DIGEST"], artifact_rows),
+                    *_table(["VARIANT", "WHEEL", "FILE", "SIZE", "DIGEST"], artifact_rows),
                 ]
             )
 

@@ -7,7 +7,8 @@ sharing cancellation, stdin, logging, and deadline behavior across workflows.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import math
 import os
@@ -19,6 +20,20 @@ import time
 
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+@contextmanager
+def interrupt_on_sigterm(message: str) -> Iterator[None]:
+    """Make termination unwind an attempt, then restore the caller's handler."""
+
+    def interrupted(_signum, _frame):
+        raise KeyboardInterrupt(message)
+
+    previous = signal.signal(signal.SIGTERM, interrupted)
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGTERM, previous)
 
 
 def _stop_group(process: subprocess.Popen) -> None:
