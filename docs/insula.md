@@ -36,6 +36,11 @@ The caller owns shared execution leases; the launcher exposes lease helpers.
 `--print-argv` makes the resulting request inspectable. Preflight failure
 and command exit status propagate to the caller.
 
+Lease state lives under `$VASO_ESTATE_ROOT/agents/leases`. Malformed JSON,
+unsupported schemas, or invalid holder metadata produce exit code 2 and remain
+unchanged for diagnosis. Repair a record only after establishing holder ownership.
+Valid expired leases and dead local holders are still reclaimed automatically.
+
 Foundry's build/release context is in `foundry/tools/insula_context.sh`.
 Its canonical entrypoint is `foundry/insula.sh`; pinned build tools are
 installed by `rootfs/foundry_tools.py` before execution. See the [Foundry guide](foundry.md)

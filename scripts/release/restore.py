@@ -20,6 +20,7 @@ import signal
 import sys
 
 import candidate
+from evidence import replace_json
 from process_runner import run_command
 
 
@@ -38,14 +39,7 @@ def restoration_plan(doc: dict, checkout: Path, estate: Path) -> list[dict]:
     for item in doc["components"]:
         repository, digest = item["reference"].split("@", 1)
         registry, package = repository.rsplit("/", 1)
-        expected = "-".join(
-            [
-                "vaso",
-                item["kind"],
-                *([item["profile"]] if item.get("profile") else []),
-                item["line"],
-            ]
-        )
+        expected = "vaso-" + candidate.component_name(item)
         if package != expected:
             raise ValueError(f"component reference must name {expected}")
         command = [
@@ -154,15 +148,13 @@ def main(argv=None) -> int:
         "runner_sha256": candidate.sha256(Path(__file__)),
         "runner_files_sha256": {
             name: candidate.sha256(Path(__file__).with_name(name))
-            for name in ("restore.py", "candidate.py", "process_runner.py")
+            for name in ("restore.py", "candidate.py", "evidence.py", "process_runner.py")
         },
         "qualification": "not performed",
     }
 
     def save_state():
-        temporary = args.out / "state.json.tmp"
-        temporary.write_bytes(candidate.canonical(summary))
-        temporary.replace(args.out / "state.json")
+        replace_json(args.out / "state.json", summary)
 
     try:
         if candidate.sha256(args.candidate) != args.candidate_sha256:

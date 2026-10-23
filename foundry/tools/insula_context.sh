@@ -444,15 +444,22 @@ PY' \
 }
 
 insula_prepare_experiment_context() {
-  local exp_dir="$1"
-  local line="$2"
+  local exp_dir="${1:-}"
+  local line="${2:-}"
   local required_gib="${3:-${VASO_REQUIRED_GIB:-40}}"
-  : "${line:?line is required}"
-
-  local prefer_dir
-  : "${VASO_ESTATE_ROOT:?set VASO_ESTATE_ROOT}"
-  prefer_dir="$(df -P "$exp_dir" | awk 'NR==2{print $6}')"
-  ESTATE_ROOT="$(python3 "$INSULA_REPO_ROOT/insula/estate/estate.py" --root "$VASO_ESTATE_ROOT" --required-gib "$required_gib" --prefer "$prefer_dir" --materialize)" || return $?
+  if [[ -z "$line" ]]; then
+    echo "Foundry context: line is required" >&2
+    return 2
+  fi
+  if [[ -z "$exp_dir" ]]; then
+    echo "Foundry context: experiment directory is required" >&2
+    return 2
+  fi
+  if [[ -z "${VASO_ESTATE_ROOT:-}" ]]; then
+    echo "Foundry context: set VASO_ESTATE_ROOT" >&2
+    return 2
+  fi
+  ESTATE_ROOT="$(python3 "$INSULA_REPO_ROOT/insula/estate/estate.py" --root "$VASO_ESTATE_ROOT" --required-gib "$required_gib" --materialize)" || return $?
   export VASO_ESTATE_ROOT="$ESTATE_ROOT"
   VASO_CUDA_LINE="$line"
   export VASO_CUDA_LINE

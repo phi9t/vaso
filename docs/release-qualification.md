@@ -3,6 +3,9 @@
 A candidate pins source, two CUDA rootfs bundles, four profile wheel closures,
 and an acceptance policy. Freezing those identities does not certify a release.
 [Status and evidence](status.md) records the remaining release gates.
+Each rootfs must pin `rootfs-bundle.json` and its whole archive. If the archive
+also appears in the file inventory, both hashes must agree. Validation rejects
+incomplete or contradictory selections before restoration starts.
 
 ## Freeze and verify
 
@@ -146,7 +149,8 @@ not erase failed ones. A changed candidate or relevant verification input requir
 
 | File in `scripts/release/` | Responsibility |
 |---|---|
-| `candidate.py` | Candidate schema, immutable selection, source and payload identity |
+| `candidate.py` | Candidate schema, canonical component names, immutable selection, source and payload identity |
+| `evidence.py` | Canonical JSON bytes, atomic creation of immutable evidence, and replacement of progress state |
 | `restore.py` | Fresh-estate acquisition and generic execution using existing entrypoints |
 | `qualify.py` | Attempt lifecycle, cache retention, wheel composition, evidence reuse, and final attempt status |
 | `qualification_policy.py` | Supported coverage and command recipes derived from the pinned candidate/source |
@@ -156,7 +160,11 @@ not erase failed ones. A changed candidate or relevant verification input requir
 
 Candidate JSON files embed their policy; changing the default policy never
 rewrites an existing candidate. Runners record hashes of their implementation
-files. Keep raw attempt evidence on the estate, and publish only reviewed,
+files, including the shared evidence writer. Evidence creation refuses an
+existing name and publishes only a complete, flushed JSON file. Progress updates
+replace the previous state atomically. A failed write preserves previous records
+and removes its partial file; it does not reinterpret a failed attempt.
+Keep raw attempt evidence on the estate, and publish only reviewed,
 sanitized summaries. Restore and qualification do not invoke the publisher.
 The existing native determinism and release-cut commands remain separate:
 runtime success cannot substitute for build proof or grant promotion.

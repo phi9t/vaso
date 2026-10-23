@@ -1,7 +1,6 @@
-"""Readable progress and artifact extraction from build events."""
+"""Readable progress, durable report selection, and terminal rendering."""
 
 import io
-import json
 import os
 from pathlib import Path
 import sys
@@ -9,58 +8,12 @@ import tempfile
 import unittest
 
 HERE = Path(__file__).resolve().parent
-TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or HERE)
+TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or tempfile.gettempdir())
 sys.path.insert(0, str(HERE))
 import build_progress as b
 
 
 class BuildProgressTest(unittest.TestCase):
-    def test_build_event_wheels_become_structured_artifacts(self):
-        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
-            root = Path(directory)
-            output_base = root / "output-base"
-            relative = Path(
-                "bazel-out/k8-fastbuild/bin/native/pytorch/"
-                "pytorch_release_wheel_wheelhouse/torch-1.whl"
-            )
-            wheel = output_base / "execroot/_main" / relative
-            wheel.parent.mkdir(parents=True)
-            wheel.write_bytes(b"wheel")
-            events = root / "events.jsonl"
-            events.write_text(
-                json.dumps(
-                    {
-                        "namedSetOfFiles": {
-                            "files": [
-                                {
-                                    "name": (
-                                        "native/pytorch/"
-                                        "pytorch_release_wheel_wheelhouse/torch-1.whl"
-                                    ),
-                                    "pathPrefix": ["bazel-out", "k8-fastbuild", "bin"],
-                                    "digest": "a" * 64,
-                                    "length": "5",
-                                },
-                                {
-                                    "name": "native/pytorch/manifest.json",
-                                    "pathPrefix": ["bazel-out"],
-                                },
-                            ]
-                        }
-                    }
-                )
-                + "\n"
-            )
-
-            artifacts = b.build_event_artifacts(events, output_base)
-
-            self.assertEqual(len(artifacts), 1)
-            self.assertEqual(artifacts[0]["name"], "torch-1.whl")
-            self.assertEqual(artifacts[0]["path"], str(wheel))
-            self.assertEqual(artifacts[0]["size_bytes"], 5)
-            self.assertEqual(artifacts[0]["digest"], "a" * 64)
-            self.assertTrue(artifacts[0]["exists"])
-
     def test_tmux_console_pretty_prints_matrix_and_artifacts(self):
         stream = io.StringIO()
         console = b.Console(

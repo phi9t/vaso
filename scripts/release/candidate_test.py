@@ -110,3 +110,55 @@ def test_symlink_cannot_substitute_external_artifact(tmp_path):
     external.write_text("{}")
     wheel.symlink_to(external)
     assert candidate.verify_payloads(doc, estate)["status"] == "failed"
+
+
+@pytest.mark.parametrize("problem", ["missing-metadata", "conflicting-archive"])
+def test_rootfs_identity_must_be_complete_and_consistent(tmp_path, capsys, problem):
+    doc, _ = selection(tmp_path)
+    rootfs = doc["components"][0]
+    if problem == "missing-metadata":
+        rootfs["files"] = {rootfs["archive"]: rootfs["archive_sha256"]}
+    else:
+        rootfs["files"][rootfs["archive"]] = "f" * 64
+    with pytest.raises(ValueError, match="rootfs-bundle.json|conflicting.*archive"):
+        candidate.validate(doc)
+    path = tmp_path / "invalid-candidate.json"
+    digest = candidate.write_new(path, doc)
+    output = tmp_path / "verification.json"
+    estate = tmp_path / "fresh"
+    assert (
+        candidate.main(
+            [
+                "verify",
+                "--candidate",
+                str(path),
+                "--candidate-sha256",
+                digest,
+                "--checkout",
+                str(tmp_path / "missing-checkout"),
+                "--estate-root",
+                str(estate),
+                "--out",
+                str(output),
+            ]
+        )
+        == 2
+    )
+    error = capsys.readouterr().err
+    assert "rootfs-bundle.json" in error or "conflicting rootfs archive" in error
+    assert not output.exists() and not estate.exists()
+
+
+def test_matching_archive_pin_and_null_rootfs_profile_preserve_component_identity(
+    tmp_path,
+):
+    doc, estate = selection(tmp_path)
+    for item in doc["components"]:
+        if item["kind"] == "rootfs":
+            item["profile"] = None
+            item["files"][item["archive"]] = item["archive_sha256"]
+            assert candidate.component_dir(estate, item) == estate / "downloads" / (
+                "rootfs-" + item["line"]
+            )
+    candidate.validate(doc)
+    assert candidate.verify_payloads(doc, estate)["status"] == "passed"

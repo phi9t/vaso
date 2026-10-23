@@ -48,20 +48,27 @@ def run_command(
     *,
     monitor: Callable[[int], None] | None = None,
 ) -> dict:
+    """Return a terminal stage record once a new log has been created.
+
+    Launch failures have no child exit code (``returncode`` is None). Invalid
+    deadlines and log-creation failures raise before execution; existing logs
+    are never replaced.
+    """
     if not math.isfinite(timeout) or timeout <= 0:
         raise ValueError("command timeout must be finite and positive")
     record = {"started_at": now(), "command": list(command), "status": "running"}
     with log.open("xb") as stream:
-        process = subprocess.Popen(
-            command,
-            stdin=subprocess.DEVNULL,
-            stdout=stream,
-            stderr=subprocess.STDOUT,
-            env=env,
-            start_new_session=True,
-        )
-        started = heartbeat = time.monotonic()
+        process = None
         try:
+            process = subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=stream,
+                stderr=subprocess.STDOUT,
+                env=env,
+                start_new_session=True,
+            )
+            started = heartbeat = time.monotonic()
             while True:
                 if monitor:
                     monitor(process.pid)
@@ -87,9 +94,13 @@ def run_command(
             if process.returncode:
                 _stop_group(process)
         except (Exception, KeyboardInterrupt) as exc:
-            _stop_group(process)
+            if process is not None:
+                _stop_group(process)
             record.update(
-                status="failed", error=str(exc), returncode=process.returncode
+                status="failed",
+                error=str(exc),
+                returncode=process.returncode if process is not None else None,
             )
+            stream.write(f"\nstage failed: {exc}\n".encode("utf-8", errors="replace"))
     record["finished_at"] = now()
     return record

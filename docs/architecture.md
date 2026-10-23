@@ -63,9 +63,16 @@ SHA-256 pin and a network-fetch lease. Rootfs provisioning happens before
 normal execution.
 
 `insula/rootfs/foundry_tools.lock.json` selects the build orchestrator and its
-verification tools by version and archive digest. Its provisioner installs a
-fresh `/opt/vaso` prefix and records installed file digests in
-`/opt/vaso/foundry-tools.json`. The CUDA bundle manifest identifies the base
+verification tools by version and archive digest. Its provisioner prepares a
+fresh `/opt/vaso` prefix in staging, verifies it, and installs it atomically.
+Installed file digests are recorded in `/opt/vaso/foundry-tools.json`. Staging
+failures leave the final prefix unchanged and remove partial files.
+An existing populated prefix is verified rather than merged with new files.
+With `--base`, the whole hard-linked clone and its tooling are prepared in
+staging. Pinned inputs are checked before cloning, and the new rootfs appears
+at its destination only after verification. Failed attempts retain the base and
+leave no partial rootfs at the requested destination.
+The CUDA bundle manifest identifies the base
 layer; the tooling manifest identifies this addition. Execution verifies the
 installed closure and never copies an ambient host Bazel into it. Offline
 module inputs use the pinned BCR manifest and a read-only verification step.

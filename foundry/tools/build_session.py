@@ -21,11 +21,17 @@ import uuid
 from build_inputs import digest
 from build_progress import (
     Console,
-    atomic_json,
-    latest_pointer,
-    latest_report,
     report_text,
     tail_lines,
+)
+
+
+from build_report import (
+    atomic_json,
+    atomic_text,
+    latest_pointer,
+    latest_report,
+    report_paths,
     utc_now,
 )
 
@@ -142,9 +148,7 @@ def abandon_stale_run(state_root: Path) -> dict | None:
         updated_at=now,
         error=reason,
     )
-    report.setdefault("summary_path", str(summary))
-    report.setdefault("events_path", str(summary.parent / "events.jsonl"))
-    report.setdefault("result_path", str(summary.parent / "result.txt"))
+    report.update(report_paths(summary.parent), summary_path=str(summary))
     events = Path(report["events_path"])
     events.parent.mkdir(parents=True, exist_ok=True)
     with events.open("a", encoding="utf-8") as handle:
@@ -154,7 +158,7 @@ def abandon_stale_run(state_root: Path) -> dict | None:
         handle.flush()
         os.fsync(handle.fileno())
     atomic_json(summary, report)
-    Path(report["result_path"]).write_text(report_text(report), encoding="utf-8")
+    atomic_text(Path(report["result_path"]), report_text(report))
     atomic_json(state_root / "latest.json", latest_pointer(report))
     return report
 
@@ -188,7 +192,6 @@ class BuildSession:
         self.started_monotonic = time.monotonic()
         self.event_sequence = 0
         self.identity = source_identity(self.root)
-        summary = self.output / "summary.json"
         self.report = {
             "schema_version": 2,
             "run_id": run_id,
@@ -202,9 +205,7 @@ class BuildSession:
             "profiles": self.profiles,
             "source_identity": self.identity,
             "estate_root": str(self.estate),
-            "summary_path": str(summary),
-            "events_path": str(self.output / "events.jsonl"),
-            "result_path": str(self.output / "result.txt"),
+            **report_paths(self.output),
             "console_mode": self.console.mode,
             "cache_start": cache_start_state(self.estate, self.lines, self.profiles),
             "current_stage": None,
@@ -272,9 +273,7 @@ class BuildSession:
             self.report["error"] = error
         self.event("run_finished", status=status, error=error)
         self.save()
-        Path(self.report["result_path"]).write_text(
-            report_text(self.report), encoding="utf-8"
-        )
+        atomic_text(Path(self.report["result_path"]), report_text(self.report))
 
     def check_source(self):
         if source_identity(self.root) != self.identity:

@@ -2,8 +2,10 @@
 
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 
+sys.path.insert(0, str(Path(__file__).parent))
 from overlay_root import plan_binds
 
 

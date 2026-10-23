@@ -50,15 +50,13 @@ RUN_RESULT_STARTED_UTC=""
 INSULA_IO_INITIALIZED=0
 LEASE_IDS=()
 
-# --- seat the host estate (placement discovery) ------------------------------
+# --- validate and materialize the explicit host estate ----------------------
 # The estate must be explicit. Old automatic placement could silently select an
 # obsolete home estate and send results to the wrong tree.
 : "${VASO_ESTATE_ROOT:?set VASO_ESTATE_ROOT}"
-PREFER_DIR="$(df -P "$EXP_DIR" | awk 'NR==2{print $6}')"
 ESTATE_ROOT="$(python3 "$REPO_ROOT/insula/estate/estate.py" \
   --root "$VASO_ESTATE_ROOT" \
   --required-gib "$REQUIRED_GIB" \
-  --prefer "$PREFER_DIR" \
   --materialize)"
 export VASO_ESTATE_ROOT="$ESTATE_ROOT"
 echo "estate root: $ESTATE_ROOT"

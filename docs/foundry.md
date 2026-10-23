@@ -58,8 +58,9 @@ local spawn execution and three distinct persistent input/output mechanisms:
 
 `--seed-estate` is not a build-cache clone. It supplies SHA-256-verified source
 blobs to the new estate; it does not import output bases, disk-cache entries,
-native state, or prior results. `full_rebuild.sh` therefore proves cold native
-execution while avoiding redundant acquisition of immutable inputs.
+native state, or prior results. `full_rebuild.sh` starts with empty native
+caches while avoiding redundant acquisition of immutable inputs. A completed
+run's Bazel events provide the evidence of actual native execution.
 
 The main native products are package-sized Bazel actions. A PyTorch action runs
 its committed CMake/Ninja plan and atomically emits a prefix tree and wheel;
@@ -97,7 +98,7 @@ and profile granularity. Advanced callers can target one release-wheel label via
 package's explicit native-build token and is not the default operator workflow.
 Use `full_rebuild.sh` only when the claim being tested requires empty native
 caches. Keep the checkout fixed for either mode; the runner fingerprints it and
-stops between stages if any tracked or untracked source changes.
+stops between stages if tracked or non-ignored untracked source files change.
 Cancellation forwards the signal to the stage process group, allows 15 seconds
 for shutdown, then kills remaining processes. Reporting failures also stop owned
 children so they cannot retain the estate lock indefinitely.
@@ -111,7 +112,9 @@ Missing local inputs are listed together in the run's `missing-inputs.json`.
 
 Add `--fetch` to allow separate acquisition phases for declared pinned HTTPS
 inputs. Downloads use insula's fetch phase and validate hashes before entering
-the cache. Native builds remain offline. Curated archives with placeholder URLs
+the cache. Cache and distdir installation checks the copied bytes before
+atomic replacement; interrupted copies leave the final destination untouched.
+Native builds remain offline. Curated archives with placeholder URLs
 must be supplied locally, for example through `--seed-estate`; the runner cannot
 reconstruct them by downloading a different upstream archive.
 
@@ -137,7 +140,9 @@ foundry/build.sh --estate-root "$VASO_ESTATE_ROOT" --status
 When attached to a terminal or tmux, the runner prints colored stage transitions,
 30-second elapsed-time and log-tail heartbeats, a final matrix table, and the
 release wheel names, sizes, and Bazel-reported digests. `--status-interval`
-changes the heartbeat interval; `--color auto|always|never` controls ANSI color.
+sets a finite positive heartbeat interval; `--color auto|always|never` controls
+ANSI color. Invalid arguments fail before a run starts. If status or setup cannot
+read a record, the CLI identifies the file and returns exit code 2.
 The same state is written without ANSI escapes for unattended launchers. If a
 runner dies before recording a terminal state, the next lock owner marks that
 run `abandoned` instead of leaving it indefinitely `running`.

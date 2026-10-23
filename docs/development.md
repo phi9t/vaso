@@ -12,7 +12,7 @@ Use the nearest module reference and source implementation for current facts.
 | Rootfs contents or tooling | `insula/rootfs/`; provision pinned inputs before execution |
 | Estate layout or sandbox paths | `insula/estate/`; keep host placement separate from content identity |
 | Launch, environment, readiness, or leases | `insula/execution/`; generic execution enters through `insula.sh` |
-| Unattended build variants | `foundry/build.sh` → `foundry/tools/build_variants.py`; `build_inputs.py` owns verified inputs, `build_session.py` owns execution/results, and `build_progress.py` owns presentation |
+| Unattended build variants | `foundry/build.sh` → `foundry/tools/build_variants.py`; the [code tour](code-tour.md#make-a-change-in-its-owner) maps inputs, execution, reports, and presentation to their owners |
 | Native package behavior | `foundry/native/<package>/` and the plan generator in `foundry/tools/gen_plans.py`; inspect native impact before regenerating plans |
 | Runtime workloads and consumers | `foundry/workloads/`, `foundry/native/pytorch/gates.py`, and `foundry/examples/consumers/` |
 | Candidate selection, restore, or repeated qualification | `scripts/release/`; see the ownership table in [candidate qualification](release-qualification.md#maintaining-the-workflow) |
@@ -93,10 +93,13 @@ python3 -B foundry/tools/rebuild_impact.py --repo-root . --fast --base HEAD --wo
 python3 -B foundry/tools/plan_key_snapshot.py --check
 ```
 
-The host suite covers execution, build orchestration, support tooling, packaging,
-and fixtures. Its test paths are defined once in `pyproject.toml`; the collection
-guard uses the same configuration. Foundry native suites run under its Bazel
-module. Focused standard-library suites
+The host suite covers insula execution, estate placement, rootfs preparation,
+build orchestration, support tooling, and packaging. Its test paths are defined
+once in `pyproject.toml`; the collection guard uses the same configuration.
+Rootfs tests use synthetic filesystem trees, local archives, and fake or mocked
+build tools. They require no Docker daemon, network acquisition, or GPU.
+Live bundle construction and GPU qualification use their acceptance workflows.
+Foundry native suites run under its Bazel module. Focused standard-library suites
 can also run directly, for example `python3 -B foundry/tools/tracker_lint_test.py`.
 `verification.md` documents historical regression cases and real Bubblewrap
 acceptance. GPU, ABI, workload, and release qualification use Foundry's gates.

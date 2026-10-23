@@ -21,12 +21,6 @@ def _match_mount(path: str, mount: str) -> str | None:
     return None
 
 
-def _join_host(host_root: Path, rel: str) -> Path:
-    if not rel:
-        return host_root
-    return host_root / Path(rel)
-
-
 def insula_to_host_path(
     path: os.PathLike[str] | str,
     estate_root: os.PathLike[str] | str,
@@ -57,25 +51,32 @@ def insula_to_host_path(
         mounts.extend(
             [
                 ("/workspace/experiment", repo / "foundry"),
+                ("/workspace/foundry", repo / "foundry"),
+                ("/workspace/insula", repo / "insula"),
                 ("/workspace/third_party", repo / "third_party"),
                 ("/workspace/repo", repo),
             ]
         )
 
+    tools = (
+        estate / "rootfs-lines" / line / "rootfs/opt/vaso"
+        if line
+        else estate / "opt-vaso"
+    )
     mounts.extend(
         [
-        ("/vaso/agents", estate / "agents"),
-        ("/vaso/rootfs-lines", estate / "rootfs-lines"),
-        ("/vaso/sources", estate / "sources"),
-        ("/vaso", estate / "vaso"),
-        ("/opt/vaso", estate / "rootfs-lines" / line / "rootfs" / "opt/vaso" if line else estate / "opt-vaso"),
-        ("/workspace", estate / "workspace"),
-        ("/home/kvothe", estate / "home" / "kvothe"),
+            ("/vaso/agents", estate / "agents"),
+            ("/vaso/rootfs-lines", estate / "rootfs-lines"),
+            ("/vaso/sources", estate / "sources"),
+            ("/vaso", estate / "vaso"),
+            ("/opt/vaso", tools),
+            ("/workspace", estate / "workspace"),
+            ("/home/kvothe", estate / "home" / "kvothe"),
         ]
     )
 
     for mount, host_root in mounts:
         rel = _match_mount(normalized, mount)
         if rel is not None:
-            return _join_host(host_root, rel)
+            return host_root / rel
     return Path(raw)

@@ -23,15 +23,20 @@ include = ["vaso*"]
 # test path, so the crates' bundled Python tests are never collected.
 testpaths = [
     "insula/execution",
+    "insula/estate",
+    "insula/rootfs",
     "tools",
     "harness/packaging_test.py",
     "harness/smoke",
     "scripts/release",
     "third_party/rust_pyo3_cargo/vendor_pin_test.py",
     "foundry/tools/build_inputs_test.py",
+    "foundry/tools/build_artifacts_test.py",
     "foundry/tools/build_session_test.py",
     "foundry/tools/build_progress_test.py",
+    "foundry/tools/build_report_test.py",
     "foundry/tools/build_variants_test.py",
+    "foundry/tools/insula_context_test.py",
 ]
 python_files = ["*_test.py", "test_*.py"]
 addopts = ["--import-mode=importlib"]

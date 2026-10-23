@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
-TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or HERE)
+TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or tempfile.gettempdir())
 sys.path.insert(0, str(HERE))
 import build_variants as b
 
@@ -46,6 +46,54 @@ class BuildVariantsTest(unittest.TestCase):
         self.assertIn('"disk-cache" means the disk-cache backend is enabled', output)
         self.assertIn("package-sized actions", output)
 
+    def test_invalid_status_intervals_fail_before_creating_an_estate(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            estate = Path(directory) / "new"
+            for interval in ("nan", "inf", "-inf", "0", "-1"):
+                with self.subTest(interval=interval):
+                    result = subprocess.run(
+                        [
+                            str(HERE.parent / "build.sh"),
+                            "--estate-root",
+                            str(estate),
+                            "--status-interval=" + interval,
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn("finite and positive", result.stderr)
+                    self.assertNotIn("Traceback", result.stderr)
+                    self.assertFalse(estate.exists())
+
+    def test_status_and_setup_errors_have_actionable_diagnostics(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            estate = root / "estate"
+            state = estate / "agents/build-variants"
+            state.mkdir(parents=True)
+            pointer = state / "latest.json"
+            pointer.write_text("invalid JSON")
+            for mode in (["--status"], []):
+                with self.subTest(mode=mode):
+                    result = subprocess.run(
+                        [
+                            str(HERE.parent / "build.sh"),
+                            "--estate-root",
+                            str(estate),
+                            *mode,
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn(str(pointer), result.stderr)
+                    self.assertNotIn("Traceback", result.stderr)
+                    self.assertEqual(pointer.read_text(), "invalid JSON")
+                    self.assertEqual(list(state.iterdir()), [pointer])
+
     def test_finish_and_status_command_preserve_preparation_result(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             r = self.make_runner(Path(directory))
@@ -58,6 +106,12 @@ class BuildVariantsTest(unittest.TestCase):
                 )
             )
             self.assertIn("PREPARED", Path(r.run.report["result_path"]).read_text())
+            # Editing a historical report must not change the public status view.
+            historical = r.run.state_root / "historical" / "summary.json"
+            historical.parent.mkdir()
+            historical.write_text('{"status": "failed"}')
+            selected_mtime = Path(r.run.report["summary_path"]).stat().st_mtime
+            os.utime(historical, (selected_mtime + 60, selected_mtime + 60))
             result = subprocess.run(
                 [
                     str(HERE.parent / "build.sh"),

@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -190,6 +191,34 @@ class BcrMirrorTest(unittest.TestCase):
         )
         self.assertEqual(rewritten["integrity"], "sha256-test")
         self.assertNotIn("mirror_urls", rewritten)
+
+    def test_cache_copy_failure_preserves_existing_bytes_and_can_retry(self) -> None:
+        for problem in ("changed-copy", "interrupted-copy"):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:
+                root = Path(tmp)
+                archive = root / "source.tar.gz"
+                archive.write_bytes(b"pinned source")
+                sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+                cache = root / "cache"
+                dest = cache / "content_addressable/sha256" / sha / "file"
+                dest.parent.mkdir(parents=True)
+                dest.write_bytes(b"previous invalid cache")
+
+                def fail_copy(source, target):
+                    Path(target).write_bytes(b"incomplete or changed bytes")
+                    if problem == "interrupted-copy":
+                        raise OSError("copy interrupted")
+
+                error = ValueError if problem == "changed-copy" else OSError
+                with patch.object(bcr_mirror.shutil, "copyfile", side_effect=fail_copy):
+                    with self.assertRaises(error):
+                        bcr_mirror.seed_repository_cache(cache, archive, sha, ["fixture"])
+                self.assertEqual(dest.read_bytes(), b"previous invalid cache")
+                self.assertEqual(list(dest.parent.iterdir()), [dest])
+
+                bcr_mirror.seed_repository_cache(cache, archive, sha, ["fixture"])
+                self.assertEqual(dest.read_bytes(), archive.read_bytes())
+                self.assertEqual(len(list(dest.parent.glob("id-*"))), 1)
 
     def test_seed_repository_cache_copies_verified_archive_by_sha(self) -> None:
         with tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:
