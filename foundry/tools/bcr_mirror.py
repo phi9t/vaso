@@ -18,6 +18,7 @@ import os
 import re
 import shutil
 import sys
+import tempfile
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -185,6 +186,26 @@ def rewrite_source_json(source_json: bytes, archive_row: ManifestRow) -> bytes:
     return (json.dumps(doc, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
+def copy_verified_archive(source: Path, dest: Path, sha256: str) -> Path:
+    """Atomically install the copied bytes only after checking their pin.
+
+    Keep the previous destination on failure and remove partial copies. The
+    temporary directory is on the destination filesystem so replacement stays
+    atomic; copying and hashing stream rather than loading archives into RAM.
+    """
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=dest.parent, prefix=f".{dest.name}.") as directory:
+        temporary = Path(directory) / "archive"
+        shutil.copyfile(source, temporary)
+        actual = _sha256_file(temporary)
+        if actual != sha256:
+            raise ValueError(
+                f"archive sha256 mismatch: {source}: expected {sha256}, got {actual}"
+            )
+        os.replace(temporary, dest)
+    return dest
+
+
 def seed_repository_cache(
     repository_cache: Path,
     archive: Path,
@@ -197,9 +218,7 @@ def seed_repository_cache(
     dest = repository_cache / "content_addressable" / "sha256" / sha256 / "file"
     dest.parent.mkdir(parents=True, exist_ok=True)
     if not dest.exists() or _sha256_file(dest) != sha256:
-        tmp = dest.with_name(f".{dest.name}.{os.getpid()}.tmp")
-        shutil.copyfile(archive, tmp)
-        os.replace(tmp, dest)
+        copy_verified_archive(archive, dest, sha256)
     for canonical_id in canonical_ids:
         marker = dest.parent / f"id-{hashlib.sha256(canonical_id.encode('utf-8')).hexdigest()}"
         marker.touch()

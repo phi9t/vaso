@@ -271,6 +271,9 @@ def test_reuse_cli_preserves_executed_scope_without_a_new_device_selection(
         == 0
     )
     summary = json.loads((output / "summary.json").read_text())
+    assert summary["runner_files_sha256"]["evidence.py"] == candidate.sha256(
+        Path(qualify.__file__).with_name("evidence.py")
+    )
     assert summary["scope"] == "single-gpu" and summary["gpu_index"] == 7
     assert summary["promotion"] == "not evaluated"
 

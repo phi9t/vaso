@@ -30,9 +30,14 @@ def fixture(tmp_path):
 
 def test_restore_plan_pulls_exact_digests_and_materializes_both_lines(tmp_path):
     doc, _ = fixture(tmp_path)
+    doc["components"][0]["profile"] = None
     plan = restore.restoration_plan(doc, Path("/checkout"), tmp_path / "fresh")
     pulls = [stage for stage in plan if stage["name"].startswith("pull-")]
     assert len(pulls) == 6
+    first_pull = pulls[0]["command"]
+    assert first_pull[first_pull.index("--target-dir") + 1] == str(
+        tmp_path / "fresh/downloads/rootfs-cu129"
+    )
     assert all(
         "--tag" not in stage["command"] and "--digest" in stage["command"]
         for stage in pulls
@@ -66,7 +71,7 @@ def test_restore_checks_credentials_and_space_before_acquisition(tmp_path, monke
         restore.prerequisites(tmp_path, 10**30)
 
 
-@pytest.mark.parametrize("problem", [None, "pull", "corrupt"])
+@pytest.mark.parametrize("problem", [None, "pull", "corrupt", "launch"])
 def test_restore_entrypoint_records_complete_execution_or_stops_before_probes(
     tmp_path, monkeypatch, problem
 ):
@@ -96,7 +101,16 @@ def test_restore_entrypoint_records_complete_execution_or_stops_before_probes(
             )
         return {"status": "passed", "returncode": 0}
 
-    monkeypatch.setattr(restore, "run_command", execute)
+    if problem == "launch":
+        monkeypatch.setattr(
+            restore,
+            "restoration_plan",
+            lambda *_: [
+                {"name": "missing-tool", "command": [str(tmp_path / "missing-tool")]}
+            ],
+        )
+    else:
+        monkeypatch.setattr(restore, "run_command", execute)
     rc = restore.main(
         [
             "--candidate",
@@ -119,5 +133,14 @@ def test_restore_entrypoint_records_complete_execution_or_stops_before_probes(
     else:
         assert rc == 0 and summary["status"] == "restored-and-entered" and entered == 2
         assert len(summary["stages"]) == 12
+    if problem == "launch":
+        failed = summary["stages"][-1]
+        assert failed["returncode"] is None
+        assert "missing-tool" in failed["error"]
+        assert failed["error"] in (output / "missing-tool.log").read_text()
+        assert len(summary["stages"]) == 1
+    assert summary["runner_files_sha256"]["evidence.py"] == candidate.sha256(
+        Path(restore.__file__).with_name("evidence.py")
+    )
     assert summary["qualification"] == "not performed"
     assert (output / "state.json").is_file()

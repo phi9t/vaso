@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
-from typing import Any
+from evidence import canonical as canonical, write_new as write_new
 
 MATRIX = {
     (line, profile) for line in ("cu129", "cu130") for profile in ("torch", "jax")
@@ -25,18 +25,6 @@ REPO = Path(__file__).resolve().parents[2]
 def sha256(path: Path) -> str:
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
-
-
-def canonical(doc: Any) -> bytes:
-    return (json.dumps(doc, sort_keys=True, indent=2) + "\n").encode()
-
-
-def write_new(path: Path, doc: Any) -> str:
-    data = canonical(doc)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("xb") as stream:
-        stream.write(data)
-    return hashlib.sha256(data).hexdigest()
 
 
 def git(repo: Path, *args: str) -> str:
@@ -77,6 +65,11 @@ def validate(doc: dict) -> None:
             safe_member(item["archive"])
             if not re.fullmatch("[0-9a-f]{64}", item["archive_sha256"]):
                 raise ValueError("invalid archive hash")
+            if "rootfs-bundle.json" not in item["files"]:
+                raise ValueError("rootfs component must pin rootfs-bundle.json")
+            archive_hash = item["files"].get(item["archive"], item["archive_sha256"])
+            if archive_hash != item["archive_sha256"]:
+                raise ValueError("conflicting rootfs archive hashes")
     expected = {("rootfs", line, None) for line in ("cu129", "cu130")}
     expected |= {("release", line, profile) for line, profile in MATRIX}
     if seen != expected:
@@ -139,11 +132,17 @@ def freeze(
     return doc
 
 
+def component_name(item: dict) -> str:
+    """Canonical name of a validated rootfs or profile-release selection."""
+    parts = [item["kind"]]
+    if item["kind"] == "release":
+        parts.append(item["profile"])
+    parts.append(item["line"])
+    return "-".join(parts)
+
+
 def component_dir(estate: Path, item: dict) -> Path:
-    name = "-".join(
-        str(item[key]) for key in ("kind", "profile", "line") if key in item
-    )
-    return estate / "downloads" / name
+    return estate / "downloads" / component_name(item)
 
 
 def verify_payloads(doc: dict, estate: Path) -> dict:

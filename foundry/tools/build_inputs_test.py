@@ -2,21 +2,45 @@
 
 import hashlib
 import os
+import shutil
 from pathlib import Path
 import sys
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
-TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or HERE)
+TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or tempfile.gettempdir())
 sys.path.insert(0, str(HERE))
 import build_inputs as b
 
 
 class BuildInputsTest(unittest.TestCase):
     def make_store(self, temp):
-        return b.InputStore(temp / "new", seed_estate=temp / "seed", run_id="test-run")
+        return b.InputStore(temp / "new", seed_estate=temp / "seed")
+
+    def test_asset_rejects_invalid_identity_before_storage(self):
+        cases = [
+            {"sha256": "../outside"},
+            {"sha256": None},
+            {"urls": ()},
+            {"urls": ["https://a/1"]},
+            {"urls": (None,)},
+            {"urls": ("",)},
+            {"filename": "../archive.tar.gz"},
+            {"filename": "/archive.tar.gz"},
+            {"filename": "."},
+            {"filename": ".."},
+            {"filename": ""},
+            {"filename": "archive\x00.tar.gz"},
+        ]
+        for changes in cases:
+            with self.subTest(changes=changes):
+                values = dict(owner="fixture", sha256="a" * 64, urls=("https://a/1",))
+                values.update(changes)
+                with self.assertRaisesRegex(ValueError, "fixture"):
+                    b.Asset(**values)
 
     def test_actual_profiles_include_fp16_resource_and_jax_wheels(self):
         assets = b.selected_assets(HERE.parents[1], ["torch", "jax"])
@@ -135,6 +159,51 @@ MINOR_MAPPING = {"3.11": "3.11.9"}
             self.assertIsNone(r.find(asset))
             with self.assertRaisesRegex(ValueError, "archive sha256 mismatch"):
                 r.install(asset, path)
+
+    def test_nested_install_uses_verified_cache_if_original_source_changes(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            store = self.make_store(root)
+            payload = b"pinned wheel"
+            source = root / "wheel"
+            source.write_bytes(payload)
+            asset = b.Asset("nested", b.digest(source), ("https://a/pkg.whl",), "pkg.whl")
+            seed = b.seed_repository_cache
+
+            def seed_then_change_source(*args, **kwargs):
+                cached = seed(*args, **kwargs)
+                source.write_bytes(b"changed seed")
+                return cached
+
+            with patch.object(b, "seed_repository_cache", side_effect=seed_then_change_source):
+                store.install(asset, source)
+
+            self.assertEqual((store.estate / "sources/jax/distdir/pkg.whl").read_bytes(), payload)
+
+    def test_failed_nested_copy_leaves_no_partial_wheel_and_can_retry(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            store = self.make_store(root)
+            source = root / "wheel"
+            source.write_bytes(b"pinned wheel")
+            asset = b.Asset("nested", b.digest(source), ("https://a/pkg.whl",), "pkg.whl")
+            distdir = store.estate / "sources/jax/distdir"
+            # Both installers use this same implementation; fail only the
+            # distdir copy after the repository cache has been seeded.
+            copy = shutil.copyfile
+
+            def fail_distdir_copy(source, target):
+                if Path(target).parent.parent == distdir:
+                    Path(target).write_bytes(b"partial wheel")
+                    raise OSError("copy interrupted")
+                return copy(source, target)
+
+            with patch.object(shutil, "copyfile", side_effect=fail_distdir_copy):
+                with self.assertRaisesRegex(OSError, "copy interrupted"):
+                    store.install(asset, source)
+            self.assertEqual(list(distdir.iterdir()), [])
+            store.install(asset, source)
+            self.assertEqual((distdir / "pkg.whl").read_bytes(), source.read_bytes())
 
     def test_nested_wheels_are_materialized_for_offline_pip(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:

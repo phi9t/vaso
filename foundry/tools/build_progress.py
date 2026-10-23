@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Durable state and terminal rendering for unattended Foundry builds."""
+"""Console rendering and bounded log excerpts for unattended Foundry builds."""
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-import json
 import os
 from pathlib import Path
 import re
@@ -16,33 +14,6 @@ from typing import Any, TextIO
 ANSI_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 SUCCESS_STATES = {"built", "passed", "prepared"}
 FAILURE_STATES = {"abandoned", "failed", "interrupted"}
-
-
-def utc_now() -> str:
-    """Return an ISO-8601 UTC timestamp with stable second precision."""
-
-    return (
-        datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-    )
-
-
-def atomic_json(path: Path, value: dict[str, Any]) -> None:
-    """Atomically replace a JSON object on the same filesystem."""
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(f"{path.name}.tmp")
-    with temp.open("w", encoding="utf-8") as handle:
-        handle.write(json.dumps(value, indent=2, sort_keys=True) + "\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    os.replace(temp, path)
-
-
-def read_json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{path}: expected a JSON object")
-    return value
 
 
 def format_duration(seconds: Any) -> str:
@@ -94,105 +65,6 @@ def tail_lines(path: Path, *, count: int = 1, width: int = 180) -> list[str]:
         if line and (not lines or line != lines[-1]):
             lines.append(line)
     return lines[-count:]
-
-
-def build_event_artifacts(events: Path, output_base: Path) -> list[dict[str, Any]]:
-    """Return release wheels named by Bazel's successful build-event stream."""
-
-    artifacts: dict[str, dict[str, Any]] = {}
-    try:
-        handle = events.open(encoding="utf-8")
-    except OSError as exc:
-        raise ValueError(f"missing Bazel build events: {events}") from exc
-    with handle:
-        for line_number, raw in enumerate(handle, start=1):
-            try:
-                event = json.loads(raw)
-            except json.JSONDecodeError as exc:
-                raise ValueError(
-                    f"invalid Bazel build event {events}:{line_number}: {exc.msg}"
-                ) from exc
-            files = event.get("namedSetOfFiles", {}).get("files", [])
-            if not isinstance(files, list):
-                continue
-            for item in files:
-                if not isinstance(item, dict):
-                    continue
-                name = item.get("name")
-                prefix = item.get("pathPrefix", [])
-                if (
-                    not isinstance(name, str)
-                    or not name.endswith(".whl")
-                    or "_release_wheel" not in name
-                    or not isinstance(prefix, list)
-                    or not all(isinstance(part, str) for part in prefix)
-                ):
-                    continue
-                relative = Path(*prefix) / name
-                if relative.is_absolute() or ".." in relative.parts:
-                    raise ValueError(f"unsafe Bazel artifact path: {relative}")
-                host_path = output_base / "execroot/_main" / relative
-                try:
-                    size = int(item.get("length", host_path.stat().st_size))
-                except (OSError, TypeError, ValueError):
-                    size = 0
-                artifacts[str(relative)] = {
-                    "name": Path(name).name,
-                    "path": str(host_path),
-                    "size_bytes": size,
-                    "digest": str(item.get("digest", "")),
-                    "exists": host_path.is_file(),
-                }
-    return sorted(artifacts.values(), key=lambda item: item["name"])
-
-
-def latest_report(state_root: Path) -> tuple[dict[str, Any], Path] | None:
-    """Load the report selected by latest.json, with a legacy directory fallback."""
-
-    pointer = state_root / "latest.json"
-    candidates: list[Path] = list(state_root.glob("*/summary.json"))
-    if pointer.is_file():
-        value = read_json(pointer).get("summary")
-        if isinstance(value, str):
-            candidates.append(Path(value))
-    candidates.sort(
-        key=lambda path: path.stat().st_mtime if path.is_file() else -1, reverse=True
-    )
-    seen = set()
-    for summary in candidates:
-        try:
-            resolved = summary.expanduser().resolve()
-        except OSError:
-            continue
-        if resolved in seen or not resolved.is_file():
-            continue
-        seen.add(resolved)
-        report = read_json(resolved)
-        report.setdefault("summary_path", str(resolved))
-        report.setdefault("run_id", resolved.parent.name)
-        return report, resolved
-    return None
-
-
-def latest_pointer(report: dict[str, Any]) -> dict[str, Any]:
-    variants = report.get("variants", [])
-    counts: dict[str, int] = {}
-    if isinstance(variants, list):
-        for variant in variants:
-            if isinstance(variant, dict):
-                state = str(variant.get("status", "unknown"))
-                counts[state] = counts.get(state, 0) + 1
-    return {
-        "schema_version": 1,
-        "run_id": report.get("run_id"),
-        "status": report.get("status"),
-        "phase": report.get("phase"),
-        "updated_at": report.get("updated_at"),
-        "current_stage": report.get("current_stage"),
-        "variant_counts": counts,
-        "summary": report.get("summary_path"),
-        "result": report.get("result_path"),
-    }
 
 
 def _table(headers: list[str], rows: list[list[str]]) -> list[str]:

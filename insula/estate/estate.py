@@ -16,9 +16,10 @@ See docs/estate.md for the complete layout, projection, and restore contract.
 from __future__ import annotations
 
 import json
+import math
 import os
+import re
 import shutil
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -234,42 +235,11 @@ def format_report(estate: VasoEstate) -> str:
     return "\n".join(lines) + "\n"
 
 
-@dataclass(frozen=True)
-class MountCandidate:
-    target: Path
-    fstype: str
-    avail_bytes: int
-    seat: Path
-    writable: bool
-
-    @property
-    def suitable(self) -> bool:
-        return self.writable and self.fstype not in FSTYPE_BLOCKLIST
-
-
-def _seat_for(mount_target: Path) -> Path:
-    """Where under a mount to seat the estate.
-
-    Shared cluster volumes are typically writable only under a per-user subtree
-    (e.g. `<data-volume>/home/<user>`), not at the mount root. Prefer `$HOME` when it
-    lives on this mount; otherwise fall back to a per-user dir under the mount.
-    """
-    user = os.environ.get("USER") or os.environ.get("LOGNAME") or "vaso"
-    home = (
-        Path(os.environ.get("HOME", "")).resolve() if os.environ.get("HOME") else None
-    )
-    if home and _same_mount(home, mount_target):
-        return home / "vaso-estate"
-    if mount_target == Path("/"):
-        return Path("/var/tmp") / f"vaso-{user}" / "estate"
-    return mount_target / user / "vaso-estate"
-
-
 def seat_fstype(path: Path) -> str:
     """Filesystem type that actually backs `path` (its nearest existing ancestor).
 
-    A mount's own fstype is not enough: the root mount's seat is under /var/tmp,
-    which is frequently its own tmpfs (RAM) mount.
+    Inspect the nearest existing ancestor because the estate may not exist yet.
+    Use its deepest matching mount so nested RAM filesystems are rejected too.
     """
     target = path
     while not target.exists() and target != target.parent:
@@ -284,75 +254,14 @@ def seat_fstype(path: Path) -> str:
         fields = line.split()
         if len(fields) < 3:
             continue
-        mount = fields[1].replace("\\040", " ")
+        # Decode once: a literal backslash followed by "040" must stay literal.
+        mount = re.sub(
+            r"\\([0-7]{3})", lambda escaped: chr(int(escaped[1], 8)), fields[1]
+        )
         inside = str(target) == mount or str(target).startswith(mount.rstrip("/") + "/")
         if inside and len(mount) >= len(best):
             best, kind = mount, fields[2]
     return kind
-
-
-def _same_mount(path: Path, mount_target: Path) -> bool:
-    try:
-        return os.stat(path).st_dev == os.stat(mount_target).st_dev
-    except OSError:
-        return False
-
-
-def _probe_writable(seat: Path) -> bool:
-    """A seat is usable if we can create it and write a probe file."""
-    try:
-        seat.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        return False
-    probe = seat / ".vaso-write-probe"
-    try:
-        probe.write_text("ok")
-        probe.unlink()
-        return True
-    except OSError:
-        return False
-
-
-def _list_mounts() -> list[MountCandidate]:
-    """Enumerate real filesystem mounts, each with a probed writable seat."""
-    out = subprocess.run(
-        ["findmnt", "-J", "-b", "-o", "TARGET,FSTYPE,AVAIL"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    data = json.loads(out.stdout)
-    candidates: list[MountCandidate] = []
-    seen_seats: set[Path] = set()
-
-    def walk(node: dict) -> None:
-        target = node.get("target")
-        fstype = node.get("fstype") or ""
-        avail = node.get("avail")
-        if target and avail is not None and fstype not in FSTYPE_BLOCKLIST:
-            path = Path(target)
-            seat = _seat_for(path)
-            # Never probe (and so create) a seat on a RAM-backed filesystem:
-            # the root mount's seat is under /var/tmp, often its own tmpfs.
-            if seat_fstype(seat) in FSTYPE_BLOCKLIST:
-                seen_seats.add(seat)
-            if seat not in seen_seats:
-                seen_seats.add(seat)
-                candidates.append(
-                    MountCandidate(
-                        target=path,
-                        fstype=fstype,
-                        avail_bytes=int(avail),
-                        seat=seat,
-                        writable=_probe_writable(seat),
-                    )
-                )
-        for child in node.get("children", []) or []:
-            walk(child)
-
-    for fs in data.get("filesystems", []):
-        walk(fs)
-    return candidates
 
 
 def discover_estate_root(
@@ -361,18 +270,23 @@ def discover_estate_root(
     explicit_root: str | None = None,
     prefer: list[str] | None = None,
 ) -> VasoEstate:
-    """Pick a disk volume with enough free space and seat the estate there.
+    """Validate an explicit disk-backed estate and its available headroom.
 
-    Selection order:
-      1. `explicit_root` (env `VASO_ESTATE_ROOT` or arg) always wins if it has
-         room and is writable.
-      2. Missing explicit roots fail closed. Entry points must not silently
-         discover or materialize an old default estate.
+    The argument takes precedence over VASO_ESTATE_ROOT. A missing root fails
+    closed; no mount discovery or automatic placement occurs. ``prefer`` is
+    accepted for compatibility with old callers and has no effect.
     """
+    if required_bytes < 0:
+        raise ValueError("required estate headroom must be nonnegative")
     explicit = explicit_root or os.environ.get("VASO_ESTATE_ROOT")
     if explicit:
         root = Path(explicit).expanduser().resolve()
         kind = seat_fstype(root)
+        if not kind:
+            raise SystemExit(
+                f"cannot determine filesystem type for VASO_ESTATE_ROOT {root}; "
+                "ensure /proc/mounts is readable"
+            )
         if kind in FSTYPE_BLOCKLIST:
             raise SystemExit(
                 f"VASO_ESTATE_ROOT {root} is on {kind}; the estate must live on a disk volume"
@@ -387,39 +301,12 @@ def discover_estate_root(
 
     raise SystemExit("set VASO_ESTATE_ROOT or pass --root")
 
-    candidates = [
-        c
-        for c in _list_mounts()
-        if c.suitable
-        and c.avail_bytes >= required_bytes
-        and seat_fstype(c.seat) not in FSTYPE_BLOCKLIST
-    ]
-    if not candidates:
-        raise SystemExit(
-            f"no suitable volume with >= {required_bytes} bytes free "
-            f"(need a writable, non-tmpfs mount)"
-        )
-
-    prefer = prefer or []
-
-    # Sort: preferred prefixes first, non-root first, then most free space desc.
-    candidates.sort(
-        key=lambda c: (
-            0 if any(str(c.target).startswith(p) for p in prefer) else 1,
-            1 if c.target == Path("/") else 0,
-            -c.avail_bytes,
-        )
-    )
-    chosen = candidates[0]
-    chosen.seat.mkdir(parents=True, exist_ok=True)
-    return VasoEstate(root=chosen.seat.resolve())
-
 
 def main(argv: list[str] | None = None) -> int:
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Discover and seat the vaso host estate"
+        description="Validate and materialize an explicitly selected insula estate"
     )
     parser.add_argument(
         "--required-gib",
@@ -427,12 +314,12 @@ def main(argv: list[str] | None = None) -> int:
         default=40.0,
         help="required free space in GiB (rootfs bundle + caches)",
     )
-    parser.add_argument("--root", help="explicit estate root (overrides discovery)")
+    parser.add_argument("--root", help="estate root (defaults to VASO_ESTATE_ROOT)")
     parser.add_argument(
         "--prefer",
         action="append",
         default=[],
-        help="preferred mount prefixes, e.g. --prefer <data-volume> (repeatable)",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument(
         "--materialize", action="store_true", help="create the directories"
@@ -457,8 +344,12 @@ def main(argv: list[str] | None = None) -> int:
             print(directory)
         return 0
 
-    required = int(args.required_gib * (1024**3))
-    estate = discover_estate_root(required, explicit_root=args.root, prefer=args.prefer)
+    required_bytes = args.required_gib * (1024**3)
+    if not math.isfinite(required_bytes) or required_bytes < 0:
+        parser.error("--required-gib must give finite, nonnegative headroom")
+    estate = discover_estate_root(
+        int(required_bytes), explicit_root=args.root, prefer=args.prefer
+    )
     if args.materialize:
         estate.materialize()
     if args.report:

@@ -84,6 +84,15 @@ case "$LINE" in
     ;;
 esac
 
+if [[ -n "${VASO_ESTATE_ROOT:-}" ]]; then
+  ESTATE_ROOT="$VASO_ESTATE_ROOT"
+elif [[ -n "${VASO_AGENT_IO_ROOT:-}" && "$VASO_AGENT_IO_ROOT" == */agents/* ]]; then
+  ESTATE_ROOT="${VASO_AGENT_IO_ROOT%%/agents/*}"
+else
+  echo "set VASO_ESTATE_ROOT before building a rootfs" >&2
+  exit 2
+fi
+
 if [[ ! -f "$LOCK" ]]; then
   echo "lock not found: $LOCK" >&2
   exit 2
@@ -158,14 +167,6 @@ else
   APT_INSTALL=("${APT_PACKAGES[@]}")
 fi
 
-if [[ -n "${VASO_ESTATE_ROOT:-}" ]]; then
-  ESTATE_ROOT="$VASO_ESTATE_ROOT"
-elif [[ -n "${VASO_AGENT_IO_ROOT:-}" && "$VASO_AGENT_IO_ROOT" == */agents/* ]]; then
-  ESTATE_ROOT="${VASO_AGENT_IO_ROOT%%/agents/*}"
-else
-  PREFER_DIR="$(df -P "$EXP_DIR" | awk 'NR==2{print $6}')"
-  ESTATE_ROOT="$(python3 "$REPO_ROOT/insula/estate/estate.py" --required-gib 1 --prefer "$PREFER_DIR")"
-fi
 ESTATE_ROOT="$(mkdir -p "$ESTATE_ROOT" && cd "$ESTATE_ROOT" && pwd -P)"
 export VASO_ESTATE_ROOT="$ESTATE_ROOT"
 

@@ -3,7 +3,9 @@
 
 The CLI selects a matrix; Runner sequences preflight, input preparation, and
 builds. Pinned bytes belong to build_inputs; durable commands and run records
-belong to build_session; build_progress renders those records.
+belong to build_session; build_report stores and selects reports;
+build_progress renders them; build_artifacts discovers wheel outputs from
+Bazel events.
 """
 
 from __future__ import annotations
@@ -11,6 +13,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -18,6 +21,7 @@ import sys
 import time
 from urllib.parse import urlparse
 
+from build_artifacts import build_event_artifacts
 from build_inputs import (
     Asset,
     InputStore,
@@ -26,7 +30,8 @@ from build_inputs import (
     rules_python_asset_from_mirror,
     selected_assets,
 )
-from build_progress import Console, build_event_artifacts, latest_report, utc_now
+from build_progress import Console
+from build_report import latest_report, utc_now
 from build_session import BuildSession, StageFailure, abandon_stale_run
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -67,7 +72,6 @@ class Runner:
         self.inputs = InputStore(
             self.estate,
             seed_estate=args.seed_estate,
-            run_id=self.run.output.name,
         )
 
     def execute(self):
@@ -345,6 +349,64 @@ class Runner:
         self.run.save()
 
 
+def _run(args: argparse.Namespace) -> int:
+    """Inspect or execute a parsed request; the CLI owns setup diagnostics."""
+    estate = args.estate_root.expanduser().resolve()
+    state_root = estate / "agents/build-variants"
+    console = Console(color=args.color)
+    if args.status:
+        loaded = latest_report(state_root)
+        if loaded is None:
+            print(
+                f"no Foundry variant runs recorded under {state_root}", file=sys.stderr
+            )
+            return 2
+        report, _ = loaded
+        console.final(report)
+        return 0
+    lock_path = estate / "agents/build-variants.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print(
+                "another variant runner owns this estate; inspect it with "
+                f"foundry/build.sh --estate-root {estate} --status",
+                file=sys.stderr,
+            )
+            return 2
+        stale = abandon_stale_run(state_root)
+        if stale is not None:
+            print(
+                f"Marked stale run {stale.get('run_id', '-')} abandoned; "
+                f"summary: {stale.get('summary_path', '-')}",
+                flush=True,
+            )
+        runner = Runner(args, console=console, lock_fd=lock.fileno())
+        console.banner(runner.run.report, runner.estate)
+
+        def interrupted(signum, _frame):
+            raise InterruptedError(f"runner interrupted by signal {signum}")
+
+        previous_term = signal.signal(signal.SIGTERM, interrupted)
+        exit_code = 0
+        try:
+            runner.execute()
+        except (InterruptedError, KeyboardInterrupt) as exc:
+            runner.run.finish("interrupted", str(exc) or "runner interrupted")
+            exit_code = 130
+        except (OSError, ValueError, RuntimeError) as exc:
+            runner.run.finish("failed", str(exc))
+            exit_code = 1
+        else:
+            runner.run.finish(runner.run.report["status"])
+        finally:
+            signal.signal(signal.SIGTERM, previous_term)
+        console.final(runner.run.report)
+    return exit_code
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -409,63 +471,14 @@ Bazel progress legend:
     args = parser.parse_args(argv)
     if not args.estate_root:
         parser.error("--estate-root or VASO_ESTATE_ROOT is required")
-    if args.status_interval <= 0:
-        parser.error("--status-interval must be greater than zero")
+    if not math.isfinite(args.status_interval) or args.status_interval <= 0:
+        parser.error("--status-interval must be finite and positive")
     args.estate_root = Path(args.estate_root)
-    estate = args.estate_root.expanduser().resolve()
-    state_root = estate / "agents/build-variants"
-    console = Console(color=args.color)
-    if args.status:
-        loaded = latest_report(state_root)
-        if loaded is None:
-            print(
-                f"no Foundry variant runs recorded under {state_root}", file=sys.stderr
-            )
-            return 2
-        report, _ = loaded
-        console.final(report)
-        return 0
-    lock_path = estate / "agents/build-variants.lock"
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("a+") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            print(
-                "another variant runner owns this estate; inspect it with "
-                f"foundry/build.sh --estate-root {estate} --status",
-                file=sys.stderr,
-            )
-            return 2
-        stale = abandon_stale_run(state_root)
-        if stale is not None:
-            print(
-                f"Marked stale run {stale.get('run_id', '-')} abandoned; "
-                f"summary: {stale.get('summary_path', '-')}",
-                flush=True,
-            )
-        runner = Runner(args, console=console, lock_fd=lock.fileno())
-        console.banner(runner.run.report, runner.estate)
-
-        def interrupted(signum, _frame):
-            raise InterruptedError(f"runner interrupted by signal {signum}")
-
-        previous_term = signal.signal(signal.SIGTERM, interrupted)
-        exit_code = 0
-        try:
-            runner.execute()
-        except (InterruptedError, KeyboardInterrupt) as exc:
-            runner.run.finish("interrupted", str(exc) or "runner interrupted")
-            exit_code = 130
-        except (OSError, ValueError, RuntimeError) as exc:
-            runner.run.finish("failed", str(exc))
-            exit_code = 1
-        else:
-            runner.run.finish(runner.run.report["status"])
-        finally:
-            signal.signal(signal.SIGTERM, previous_term)
-        console.final(runner.run.report)
-    return exit_code
+    try:
+        return _run(args)
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"Foundry build: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

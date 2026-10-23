@@ -31,16 +31,26 @@ flowchart TD
 1. [build.sh](../foundry/build.sh) forwards arguments to
    [build_variants.py](../foundry/tools/build_variants.py). Start at `Runner.execute`:
    preflight, prepare inputs, then build each requested line/profile in order.
-   `main` owns argument parsing and the estate lock.
+   `main` validates arguments and reports setup errors. `_run` handles status
+   inspection, the estate lock, and the run lifecycle.
 2. [build_inputs.py](../foundry/tools/build_inputs.py) reads pinned source
    declarations, including nested JAX inputs and the Python runtime selected by
-   the pinned Bazel module. `InputStore` finds and installs hash-verified bytes.
-   Acquisition is a separate workflow stage; native builds remain offline.
+   the pinned Bazel module. `Asset` validates hashes, URL lists, and optional
+   distdir filenames. `InputStore` finds and installs verified bytes through
+   [bcr_mirror.py](../foundry/tools/bcr_mirror.py), which checks copied bytes
+   before atomically installing them. Acquisition is a separate workflow stage;
+   native builds remain offline.
 3. [build_session.py](../foundry/tools/build_session.py) runs each command with
    closed stdin and an inherited estate lock. It checks for checkout edits,
    records progress, forwards cancellation, and cleans up failed execution.
-   [build_progress.py](../foundry/tools/build_progress.py) renders the recorded
-   state and extracts wheel paths from Bazel events.
+   [build_report.py](../foundry/tools/build_report.py) owns report storage and
+   selection. It derives summary, event, and result paths from the selected
+   attempt directory; stale recovery writes there. JSON and text reports are
+   replaced atomically. [build_progress.py](../foundry/tools/build_progress.py)
+   renders the recorded state and log excerpts.
+   [build_artifacts.py](../foundry/tools/build_artifacts.py) extracts wheel
+   paths and metadata from Bazel events; malformed records name the source file
+   and line, while missing outputs remain visible in the inventory.
 4. [run.sh](../foundry/run.sh) handles one build invocation. It selects the
    Foundry context through [insula.sh](../foundry/insula.sh) and
    [insula_context.sh](../foundry/tools/insula_context.sh): rootfs, source mounts,
@@ -91,18 +101,28 @@ to choose a file. For the unattended build workflow:
 | Behavior | Implementation | Adjacent tests |
 |---|---|---|
 | Profile selection, preflight, acquisition policy, matrix order | `build_variants.py` | `build_variants_test.py` |
-| Source closure, pins, verified cache installation | `build_inputs.py` | `build_inputs_test.py` |
+| Source closure, pins, verified input storage | `build_inputs.py` | `build_inputs_test.py` |
+| BCR mirror and atomic verified archive copies | `bcr_mirror.py` | `bcr_mirror_test.py` |
 | Child lifecycle, source guard, durable stage transitions | `build_session.py` | `build_session_test.py` |
-| Console/status output and wheel discovery | `build_progress.py` | `build_progress_test.py` |
+| Report storage, selection, and owned output paths | `build_report.py` | `build_report_test.py` |
+| Console and status output | `build_progress.py` | `build_progress_test.py` |
+| Wheel discovery and build-event validation | `build_artifacts.py` | `build_artifacts_test.py` |
 
-These files are under `foundry/tools/`. The tests run in the normal host suite
-and can be selected without a rootfs or GPU:
+These files are under `foundry/tools/`. The six build-orchestration suites run
+in the normal host suite. Select them without a rootfs, GPU, or custom temporary
+directory:
 
 ```sh
 python3 -B -m pytest -q -p no:cacheprovider \
   foundry/tools/build_inputs_test.py foundry/tools/build_session_test.py \
-  foundry/tools/build_progress_test.py foundry/tools/build_variants_test.py
+  foundry/tools/build_progress_test.py foundry/tools/build_variants_test.py \
+  foundry/tools/build_artifacts_test.py foundry/tools/build_report_test.py
 ```
+
+The tests use system temporary storage by default and honor `TEST_TMPDIR` or
+`TMPDIR` when set. Keep that storage outside the checkout: test outputs must not
+look like source edits to the runner. Run `bcr_mirror_test.py` separately when
+changing archive storage or registry preparation.
 
 Use a disk-backed `TMPDIR` for the complete host suite. Follow
 [development verification](development.md#verification) for the full commands.

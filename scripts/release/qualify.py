@@ -21,6 +21,7 @@ import uuid
 import candidate
 import gpu_monitor as gpu
 import qualification_policy as policy
+from evidence import replace_json
 from process_runner import run_command
 
 
@@ -236,6 +237,7 @@ def main(argv=None) -> int:
             for name in (
                 "qualify.py",
                 "candidate.py",
+                "evidence.py",
                 "qualification_policy.py",
                 "gpu_monitor.py",
                 "process_runner.py",
@@ -372,9 +374,7 @@ def main(argv=None) -> int:
                     "candidate_sha256": args.candidate_sha256,
                     "updated_at": now(),
                 }
-                temporary = args.out / "state.json.tmp"
-                temporary.write_bytes(candidate.canonical(state))
-                temporary.replace(args.out / "state.json")
+                replace_json(args.out / "state.json", state)
                 result = run_command(
                     policy.stage_command(stage, args.checkout, release),
                     env,
@@ -416,17 +416,14 @@ def main(argv=None) -> int:
     finally:
         summary["finished_at"] = now()
         candidate.write_new(args.out / "summary.json", summary)
-        temporary = args.out / "state.json.tmp"
-        temporary.write_bytes(
-            candidate.canonical(
-                {
-                    "status": summary["status"],
-                    "updated_at": now(),
-                    "summary": "summary.json",
-                }
-            )
+        replace_json(
+            args.out / "state.json",
+            {
+                "status": summary["status"],
+                "updated_at": now(),
+                "summary": "summary.json",
+            },
         )
-        temporary.replace(args.out / "state.json")
         print(
             json.dumps(
                 {

@@ -12,14 +12,17 @@ import ast
 from dataclasses import dataclass
 import hashlib
 import json
-import os
 from pathlib import Path
 import re
-import shutil
 import tarfile
 from urllib.parse import urlparse
 
-from bcr_mirror import archive_store_path, load_manifest, seed_repository_cache
+from bcr_mirror import (
+    archive_store_path,
+    copy_verified_archive,
+    load_manifest,
+    seed_repository_cache,
+)
 from native_source_versions import module_text_with_includes
 
 PACKAGES = {
@@ -41,10 +44,33 @@ def digest(path: Path) -> str:
 
 @dataclass(frozen=True)
 class Asset:
+    """A validated archive pin, with an optional single distdir filename.
+
+    URL schemes remain acquisition policy: legacy HTTP pins may be satisfied
+    from verified local storage even though the fetch runner requires HTTPS.
+    """
+
     owner: str
     sha256: str
     urls: tuple[str, ...]
     filename: str | None = None  # Nested JAX inputs also need a distdir filename.
+
+    def __post_init__(self):
+        if not isinstance(self.sha256, str) or not SHA.fullmatch(self.sha256):
+            raise ValueError(f"{self.owner}: invalid SHA-256")
+        if (
+            not isinstance(self.urls, tuple)
+            or not self.urls
+            or any(not isinstance(url, str) or not url for url in self.urls)
+        ):
+            raise ValueError(f"{self.owner}: expected nonempty archive URLs")
+        if self.filename is not None and (
+            not isinstance(self.filename, str)
+            or self.filename in ("", ".", "..")
+            or "\x00" in self.filename
+            or Path(self.filename).name != self.filename
+        ):
+            raise ValueError(f"{self.owner}: invalid distdir filename: {self.filename!r}")
 
 
 def repo_declarations(text: str) -> dict[str, dict]:
@@ -99,8 +125,6 @@ def repo_assets(name: str, attrs: dict) -> list[Asset]:
         else:
             pairs = [(value, tuple(urls))]
         for sha, mirrors in pairs:
-            if not isinstance(sha, str) or not SHA.fullmatch(sha):
-                raise ValueError(f"{name}: invalid {key}")
             result.append(Asset(name, sha, mirrors))
     return result
 
@@ -175,8 +199,6 @@ def rules_python_asset(module_text: str, versions_text: str) -> Asset:
         if not url.startswith("https://"):
             raise ValueError(f"rules_python: non-HTTPS runtime URL: {url}")
         urls.append(url)
-    if not isinstance(sha256, str) or not SHA.fullmatch(sha256):
-        raise ValueError(f"rules_python: invalid runtime hash for Python {version}")
     return Asset(
         f"rules_python:python_{minor}_{RULES_PYTHON_PLATFORM}", sha256, tuple(urls)
     )
@@ -247,8 +269,6 @@ def jax_cccl_asset(repo_root: Path) -> Asset:
         literal_assignment(support, "JAX_LOCAL_CCCL_ARCHIVE_STRIP_PREFIX") + ".tar.gz"
     )
     tag = filename.removeprefix("cccl-src-").removesuffix(".tar.gz")
-    if not isinstance(sha256, str) or not SHA.fullmatch(sha256):
-        raise ValueError("jaxlib: invalid CCCL archive hash")
     if not tag.startswith("v") or Path(filename).name != filename:
         raise ValueError(f"jaxlib: invalid CCCL release filename: {filename}")
     url = f"https://github.com/NVIDIA/cccl/releases/download/{tag}/{filename}"
@@ -286,15 +306,12 @@ def selected_assets(repo_root: Path, profiles: list[str]) -> list[Asset]:
                 item[k] for k in ("name", "sha256", "filename", "urls")
             )
             if (
-                not SHA.fullmatch(sha)
-                or Path(filename).name != filename
-                or filename in ("", ".", "..")
-            ):
-                raise ValueError(f"invalid nested JAX input: {name}")
-            if (
                 not isinstance(urls, list)
                 or not urls
-                or any(not u.startswith("https://") for u in urls)
+                or any(
+                    not isinstance(u, str) or not u.startswith("https://")
+                    for u in urls
+                )
             ):
                 raise ValueError(f"invalid nested JAX URLs: {name}")
             assets.append(Asset("jax-nested:" + name, sha, tuple(urls), filename))
@@ -312,10 +329,9 @@ class InputStore:
     at the write boundary, including sources supplied by acquisition.
     """
 
-    def __init__(self, estate: Path, *, seed_estate: Path | None, run_id: str):
+    def __init__(self, estate: Path, *, seed_estate: Path | None):
         self.estate = estate
         self.seed_estate = seed_estate.expanduser().resolve() if seed_estate else None
-        self.run_id = run_id
 
     def find(self, asset: Asset) -> Path | None:
         cache_rel = (
@@ -346,7 +362,7 @@ class InputStore:
 
     def install(self, asset: Asset, source: Path) -> None:
         cache = self.estate / "vaso/cache/bazel/repository-cache"
-        seed_repository_cache(
+        cached = seed_repository_cache(
             cache,
             source,
             asset.sha256,
@@ -358,6 +374,4 @@ class InputStore:
             if dest.is_file() and digest(dest) != asset.sha256:
                 raise RuntimeError(f"conflicting nested archive: {dest}")
             if not dest.exists():
-                temp = dest.with_name(dest.name + "." + self.run_id + ".tmp")
-                shutil.copyfile(source, temp)
-                os.replace(temp, dest)
+                copy_verified_archive(cached, dest, asset.sha256)

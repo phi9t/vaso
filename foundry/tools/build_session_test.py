@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
-TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or HERE)
+TEST_TMP_ROOT = Path(os.environ.get("TEST_TMPDIR") or os.environ.get("TMPDIR") or tempfile.gettempdir())
 sys.path.insert(0, str(HERE))
 import build_session as b
 
@@ -230,6 +230,30 @@ class BuildSessionTest(unittest.TestCase):
             self.assertEqual(report["variants"][0]["status"], "abandoned")
             self.assertIn("last useful line", report["stages"][0]["tail"])
             self.assertIn("ABANDONED", Path(report["result_path"]).read_text())
+
+    def test_stale_recovery_writes_only_to_the_selected_attempt(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root = Path(directory)
+            r = self.make_session(root)
+            foreign = root / "other-estate"
+            foreign.mkdir()
+            events = foreign / "events.jsonl"
+            result = foreign / "result.txt"
+            events.write_text("retained events\n")
+            result.write_text("retained result\n")
+            r.report.update(events_path=str(events), result_path=str(result))
+            # Preserve the actual summary location; only recorded output paths
+            # belong to the other estate (for example after restoring a run).
+            summary = Path(r.report["summary_path"])
+            b.atomic_json(summary, r.report)
+
+            report = b.abandon_stale_run(r.state_root)
+
+            self.assertEqual(events.read_text(), "retained events\n")
+            self.assertEqual(result.read_text(), "retained result\n")
+            self.assertEqual(report["events_path"], str(r.output / "events.jsonl"))
+            self.assertEqual(report["result_path"], str(r.output / "result.txt"))
+            self.assertIn("ABANDONED", (r.output / "result.txt").read_text())
 
     def test_source_edits_are_detected(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:

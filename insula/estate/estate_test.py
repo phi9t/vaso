@@ -55,15 +55,6 @@ class EstatePlacementTest(unittest.TestCase):
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def _candidate(self, target: str, seat: Path, avail: int = 10**12) -> object:
-        return estate.MountCandidate(
-            target=Path(target),
-            fstype="ext4",
-            avail_bytes=avail,
-            seat=seat,
-            writable=True,
-        )
-
     def test_missing_explicit_root_fails_closed(self) -> None:
         with mock.patch.dict("os.environ", {}, clear=True):
             with self.assertRaises(SystemExit) as ctx:
@@ -73,11 +64,11 @@ class EstatePlacementTest(unittest.TestCase):
     def test_missing_explicit_root_does_not_probe_mounts(self) -> None:
         with (
             mock.patch.dict("os.environ", {}, clear=True),
-            mock.patch.object(estate, "_list_mounts") as list_mounts,
+            mock.patch("subprocess.run") as run,
         ):
             with self.assertRaises(SystemExit):
                 estate.discover_estate_root(1)
-        list_mounts.assert_not_called()
+        run.assert_not_called()
 
     def test_explicit_root_on_ram_is_rejected(self) -> None:
         with mock.patch.object(estate, "seat_fstype", return_value="tmpfs"):
@@ -97,21 +88,80 @@ class EstatePlacementTest(unittest.TestCase):
     def test_seat_fstype_reads_real_mounts(self) -> None:
         self.assertNotEqual(estate.seat_fstype(Path("/proc/self")), "")
 
+    def test_mount_path_escapes_select_the_actual_nested_filesystem(self) -> None:
+        for name in (
+            "mount space",
+            "mount\t tab",
+            "mount\nnewline",
+            r"mount\backslash",
+            r"mount\040",
+        ):
+            with self.subTest(name=name):
+                mount = self.base / name
+                mount.mkdir()
+                encoded = (
+                    str(mount)
+                    .replace("\\", r"\134")
+                    .replace(" ", r"\040")
+                    .replace("\t", r"\011")
+                    .replace("\n", r"\012")
+                )
+                records = f"root / ext4 rw 0 0\nram {encoded} tmpfs rw 0 0\n"
+                with mock.patch.object(Path, "read_text", return_value=records):
+                    self.assertEqual(estate.seat_fstype(mount / "new/estate"), "tmpfs")
+                    with self.assertRaisesRegex(SystemExit, "tmpfs"):
+                        estate.discover_estate_root(
+                            1, explicit_root=str(mount / "new/estate")
+                        )
+                self.assertFalse((mount / "new").exists())
+
+    def test_unavailable_filesystem_metadata_rejects_placement_before_creation(
+        self,
+    ) -> None:
+        root = self.base / "unknown-filesystem"
+        with mock.patch.object(
+            Path, "read_text", side_effect=PermissionError("mount metadata unavailable")
+        ):
+            with self.assertRaisesRegex(SystemExit, "cannot determine filesystem"):
+                estate.discover_estate_root(1, explicit_root=str(root))
+        self.assertFalse(root.exists())
+
     def test_ram_seats_are_never_probed_or_created(self) -> None:
         ram_seat = self.base / "var-tmp" / "vaso-u" / "estate"
-        findmnt = {
-            "filesystems": [{"target": "/", "fstype": "ext4", "avail": "1000000000000"}]
-        }
-        with (
-            mock.patch.object(estate.subprocess, "run") as run,
-            mock.patch.object(estate, "_seat_for", return_value=ram_seat),
-            mock.patch.object(estate, "seat_fstype", return_value="tmpfs"),
-        ):
-            run.return_value.stdout = __import__("json").dumps(findmnt)
-            self.assertEqual(estate._list_mounts(), [])
+        with mock.patch.object(estate, "seat_fstype", return_value="tmpfs"):
+            with self.assertRaises(SystemExit):
+                estate.discover_estate_root(1, explicit_root=str(ram_seat))
         self.assertFalse(
             (self.base / "var-tmp").exists(), "probing must not create RAM-backed seats"
         )
+
+    def test_invalid_headroom_is_rejected_before_creating_an_estate(self) -> None:
+        root = self.base / "new-estate"
+        for value in ("nan", "inf", "-inf", "-1", "1e308"):
+            with self.subTest(value=value), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as error:
+                    estate.main(["--root", str(root), "--required-gib=" + value])
+                self.assertEqual(error.exception.code, 2)
+                self.assertFalse(root.exists())
+
+    def test_legacy_preference_does_not_override_explicit_root(self) -> None:
+        root = self.base / "explicit"
+        output = io.StringIO()
+        with (
+            mock.patch.object(estate, "seat_fstype", return_value="ext4"),
+            contextlib.redirect_stdout(output),
+        ):
+            result = estate.main(
+                ["--root", str(root), "--required-gib", "0", "--prefer", "/elsewhere"]
+            )
+        self.assertEqual(result, 0)
+        self.assertEqual(output.getvalue().strip(), str(root.resolve()))
+
+    def test_negative_headroom_fails_before_creating_an_explicit_root(self) -> None:
+        root = self.base / "explicit"
+        with self.assertRaisesRegex(ValueError, "nonnegative"):
+            estate.discover_estate_root(-1, explicit_root=str(root))
+        self.assertFalse(root.exists())
 
     def test_report_lists_declared_io_subtrees(self) -> None:
         root = self.base / "estate"

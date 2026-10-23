@@ -84,7 +84,8 @@ the backing files; coordinate their ownership separately.
 ## Create a usable estate
 
 Commands below run from the repository root. Choose an owned disk-backed path
-with enough space for the intended workload:
+with enough space for the intended workload. Pass `--root` or set
+`VASO_ESTATE_ROOT`; placement never chooses a mount automatically:
 
 ```sh
 export VASO_ESTATE_ROOT=/path/to/owned-estate
@@ -92,6 +93,10 @@ export VASO_CUDA_LINE=cu129
 python3 -B insula/estate/estate.py \
   --root "$VASO_ESTATE_ROOT" --required-gib 100 --materialize
 ```
+
+Placement inspects the nearest existing ancestor of a new estate path and its
+actual mount. RAM-backed filesystems and unavailable mount metadata are rejected
+before the estate directory is created.
 
 Materialization creates the layout. It does not install a rootfs, populate
 sources, or build packages. The placement tool defaults to 40 GiB free; Foundry

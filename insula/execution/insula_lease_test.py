@@ -108,14 +108,46 @@ def test_gpu_sets_are_disjoint() -> None:
 
 def test_exact_gpu_selection_never_falls_back() -> None:
     estate = _estate("exact-gpu")
-    selected = _acquire(estate, "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", "7")
+    selected = _acquire(
+        estate,
+        "--resource",
+        "gpu",
+        "--amount",
+        "1",
+        "--capacity",
+        "8",
+        "--devices",
+        "7",
+    )
     try:
         assert selected["devices"] == [7]
         assert selected["env"]["CUDA_VISIBLE_DEVICES"] == "7"
-        conflict = _lease_cmd(estate, "acquire", "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", "7")
+        conflict = _lease_cmd(
+            estate,
+            "acquire",
+            "--resource",
+            "gpu",
+            "--amount",
+            "1",
+            "--capacity",
+            "8",
+            "--devices",
+            "7",
+        )
         assert conflict.returncode == 75
         for devices in ("8", "-1", "0,0", "bad", "0,1"):
-            invalid = _lease_cmd(estate, "acquire", "--resource", "gpu", "--amount", "1", "--capacity", "8", "--devices", devices)
+            invalid = _lease_cmd(
+                estate,
+                "acquire",
+                "--resource",
+                "gpu",
+                "--amount",
+                "1",
+                "--capacity",
+                "8",
+                "--devices",
+                devices,
+            )
             assert invalid.returncode == 2
     finally:
         _release(estate, selected["id"])
@@ -125,13 +157,23 @@ def test_check_requires_live_matching_lease() -> None:
     estate = _estate("check")
     held = _acquire(estate, "--resource", "insula:cu129")
     try:
-        live = _lease_cmd(estate, "check", "--id", str(held["id"]), "--resource", "insula:cu129")
+        live = _lease_cmd(
+            estate, "check", "--id", str(held["id"]), "--resource", "insula:cu129"
+        )
         assert live.returncode == 0, live.stderr
         assert json.loads(live.stdout)["live"] is True
 
         live_any_resource = _lease_cmd(estate, "check", "--id", str(held["id"]))
+        assert (
+            json.loads((estate / "agents/leases/insula_cu129.json").read_text())[
+                "resource"
+            ]
+            == "insula:cu129"
+        )
         assert live_any_resource.returncode == 0, live_any_resource.stderr
-        assert json.loads(live_any_resource.stdout)["lease"]["resource"] == "insula:cu129"
+        assert (
+            json.loads(live_any_resource.stdout)["lease"]["resource"] == "insula:cu129"
+        )
 
         foreign_resource = _lease_cmd(
             estate,
@@ -146,7 +188,9 @@ def test_check_requires_live_matching_lease() -> None:
     finally:
         _release(estate, held["id"])
 
-    stale = _lease_cmd(estate, "check", "--id", str(held["id"]), "--resource", "insula:cu129")
+    stale = _lease_cmd(
+        estate, "check", "--id", str(held["id"]), "--resource", "insula:cu129"
+    )
     assert stale.returncode == 75
     assert json.loads(stale.stdout)["live"] is False
 
@@ -230,3 +274,112 @@ def test_network_fetch_lease_is_exclusive() -> None:
         assert "timed out acquiring network-fetch" in blocked.stderr
     finally:
         _release(estate, held["id"])
+
+
+def test_corrupt_lease_state_is_preserved_and_cannot_grant_a_new_holder(
+    tmp_path,
+) -> None:
+    estate = tmp_path / "estate"
+    states = estate / "agents/leases"
+    states.mkdir(parents=True)
+    state = states / "insula_cu129.json"
+    for invalid in (
+        "not JSON",
+        "[]",
+        '{"schema_version": 99, "resource": "insula:cu129", "leases": []}',
+    ):
+        state.write_text(invalid)
+        for command in (
+            ("acquire", "--resource", "insula:cu129", "--timeout", "0"),
+            ("list",),
+            ("check", "--id", "unknown"),
+            ("release", "--id", "unknown"),
+        ):
+            result = _lease_cmd(estate, *command)
+            assert result.returncode == 2, result.stdout + result.stderr
+            assert str(state) in result.stderr
+            assert "Traceback" not in result.stderr
+            assert state.read_text() == invalid
+
+
+def test_invalid_holder_metadata_is_not_silently_reclaimed(tmp_path) -> None:
+    estate = tmp_path / "estate"
+    states = estate / "agents/leases"
+    states.mkdir(parents=True)
+    state = states / "insula_cu129.json"
+    holder = {
+        "id": "unknown-holder",
+        "pid": os.getpid(),
+        "host": "fixture.invalid",
+        "resource": "insula:cu129",
+        "expiry_time": 9999999999,
+    }
+    for changed in (
+        {"pid": "damaged"},
+        {"pid": 1.5},
+        {"expiry_time": "damaged"},
+        {"expiry_time": float("nan")},
+        {"host": None},
+    ):
+        state.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "resource": "insula:cu129",
+                    "leases": [holder | changed],
+                }
+            )
+        )
+        before = state.read_bytes()
+        result = _lease_cmd(
+            estate, "acquire", "--resource", "insula:cu129", "--timeout", "0"
+        )
+        assert result.returncode == 2, result.stdout + result.stderr
+        assert str(state) in result.stderr
+        assert state.read_bytes() == before
+
+
+def test_gpu_holder_without_device_metadata_does_not_free_capacity(tmp_path) -> None:
+    estate = tmp_path / "estate"
+    state = estate / "agents/leases/gpu.json"
+    state.parent.mkdir(parents=True)
+    state.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "resource": "gpu",
+                "leases": [
+                    {
+                        "id": "unknown-holder",
+                        "pid": os.getpid(),
+                        "host": "fixture.invalid",
+                        "resource": "gpu",
+                        "expiry_time": 9999999999,
+                    }
+                ],
+            }
+        )
+    )
+    before = state.read_bytes()
+    result = _lease_cmd(
+        estate, "acquire", "--resource", "gpu", "--capacity", "1", "--amount", "1"
+    )
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "invalid GPU devices" in result.stderr
+    assert state.read_bytes() == before
+
+
+def test_invalid_lease_configuration_fails_before_state_creation(tmp_path) -> None:
+    estate = tmp_path / "estate"
+    for flags in (
+        ("--ttl", "nan"),
+        ("--ttl", "inf"),
+        ("--timeout", "nan"),
+        ("--timeout", "inf"),
+        ("--pid", "0"),
+        ("--pid", str(2**63)),
+    ):
+        result = _lease_cmd(estate, "acquire", "--resource", "insula:cu129", *flags)
+        assert result.returncode == 2, result.stdout + result.stderr
+        assert "Traceback" not in result.stderr
+        assert not estate.exists()
