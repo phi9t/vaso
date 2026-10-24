@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "status": "passed-bounded-implementation-acceptance",
+  "date": "2026-10-23",
+  "timezone": "America/Los_Angeles",
+  "raw_evidence_time": "UTC",
+  "tested_source": "c26eb9fb6b610c6c22edbf48c4523332fb680c19",
+  "baseline": "6d377df4a40023b26f8d8adc98588a1a275dfcc7",
+  "evidence_location": "Operator-owned simplification estate: evidence/acceptance (raw host paths outside Git)",
+  "verification": {
+    "full_host": {
+      "passed": 718,
+      "seconds": 156.96,
+      "real_cpu_acceptance_enabled": true
+    },
+    "collection": 718,
+    "focused_maintainer_tests": 64,
+    "prepare_to_execution": "local pinned synthetic CUDA/tool-metadata fixture with real shell, namespace and checked output; verified reuse and exit23/retry",
+    "real_cpu": "separate existing prepared rootfs; readiness, mounts/argv, exit status, interruption/retry, lease recovery, cleanup",
+    "build_matrix": "four variants through existing command-executor fixtures; no native build",
+    "qualification_plan_parity": "six v1/v2 and device absent/0/7 branches; full command bodies equal before/after reports",
+    "native_fast_impact": {
+      "exit_code": 10,
+      "meaning": "conservative may-rebuild for foundry/run.sh caller changes; no fast-pass or aquery claim"
+    }
+  },
+  "native_identity": {
+    "source": "c26eb9fb6b610c6c22edbf48c4523332fb680c19",
+    "baseline": "6d377df4a40023b26f8d8adc98588a1a275dfcc7",
+    "retained_proof_source": "dbe7eb9a7005a3a1ff284cc46e8ee27b3334d0c2",
+    "native_tree_entries": 668,
+    "tree_identity_sha256": "47ea549defec4270f2e369a9cb02950f67809f07b374d46bfe53adac955d112d",
+    "native_modes_blobs_paths_equal": true,
+    "caller_native_arguments_equal_after_documented_support_substitutions": true,
+    "ordered_source_closures": {
+      "torch": {
+        "assets": 113,
+        "sha256": "1ae1aa58bceb20c1281e5e792fdc034550c50c28527f7052620a953e0bf1af83"
+      },
+      "jax": {
+        "assets": 204,
+        "sha256": "397f685719d9df58cb4367827018df34dac2e25b31a1aaa4031e34268395b4b1"
+      }
+    },
+    "retained_build_summaries": [
+      {
+        "run_id": "20261023T005803Z-c87e8391",
+        "summary_sha256": "01355c02343f704fba745b2aa4be4628453c948fc81a43337c2f277c9edf9697"
+      },
+      {
+        "run_id": "20261023T005803Z-2beeee54",
+        "summary_sha256": "2ef8645202bc3f6845100679bf288978f360f4f4442e05e0bfe5e31fef3ab405"
+      }
+    ],
+    "retained_artifacts_rehashed": true,
+    "retained_comparison_runtime_relationships_verified": true,
+    "proof_sha256": "616c13fbda2f062d18868a258083e86a12463c2ba9c05ea79ff4b6defcf4e086",
+    "limits": [
+      "No live aquery or new native execution.",
+      "Support source identity differs; historical proof remains attributed to original source.",
+      "No proof reuse claim for JAX missing closure or candidate runtime qualification."
+    ]
+  },
+  "detailed_evidence_sha256": {
+    "full-host.log": "7bb9af858210ba8f6e5405e67e7e890ca00a34057fa062d357b41933cee062be",
+    "collection.log": "040048e0537660fbd955d6cba6f816cb602a7b2d007317ae36291580f0c80fec",
+    "plan-keys.log": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061",
+    "layout.log": "70764fca3e470c98e94f065513fc6f15b46c3003671bc86f4137af50698428bc",
+    "syntax.log": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061",
+    "maintainer-seams.log": "e06f4b78f9d82a4aba3d2a21cb0416f34a9c9ad3aba13d358b1b77909ec9f75e",
+    "foundry-exercise.log": "a85af27849c6333f9596acd671f233f3b4b0c087f95ab828843a9f8b628d7d1f",
+    "cpu/result.json": "fe5c9691212d2bca3b7e4ac9a5f2b5c519ef02540766f2974f74585bb11fdbd3",
+    "prepare-run/result.json": "127799f95ccc7531373c1baf0b63c972766fe1c984aa42c501bf5bfa8662a499",
+    "prepare-run/commands.json": "a9aee4a972d833890325f4c40adc695f55b0e84cb453d9d54419554d371dfa68",
+    "native-identity.json": "7050a2bb81cebfd8acd8ae6e0646c0ba11df38f06f834a2ca6abafd2519d5be2",
+    "qualification-plans-final.json": "50030642cf99325c2855852f3f481f9e867e58e1b240b6091e8e0ac51524ccd1",
+    "qualification-parity.log": "fb9a9544240b9da9d6fb36830f075ad4cf4b528c255f812a4fc9c9754d206612",
+    "native-impact.log": "96abc5d7bfb1a240d2a2ce14015e7cc1d6dc03b9d519f0a3b39eafdc47b2d4a6",
+    "public-commands.json": "c71c418573bcaa1782abf81ab5875ec21884535eb3dc1a527ad7d431760e04d6",
+    "public-commands-final.log": "cdda718095ede29d99b36b09daa43d4e9810d9b42c76e18922033d46a4bb6060",
+    "docs-checks.json": "08e70115146b28b16ed3f8180f21aea16ac15ee50cfa65ae593d995a6f499592"
+  },
+  "prior_evidence_sha256": {
+    "release/plans-before.json": "50030642cf99325c2855852f3f481f9e867e58e1b240b6091e8e0ac51524ccd1",
+    "release/plans-after.json": "50030642cf99325c2855852f3f481f9e867e58e1b240b6091e8e0ac51524ccd1",
+    "release/restore-plans.json": "881e446550e5bf3b41e64ebe475dd6ab106c83b992b765455ac9e722fe423454",
+    "execution/02-workspace-red.log": "e2e490c803c779d8c54e0f8e1581cb74f9428473b1f4060930552bb730ede4a5",
+    "execution/02-workspace-green.log": "c0bb7edc122a2f852497ff28990e7e83659dd02337712c5e74fd90608cb7ad4a",
+    "foundry/maintenance-exercise.py": "de885eec4a3d50134a558b01c5217e5531c497340693153a46befd976364a274",
+    "release/handoff.md": "4c8e5ab8e8d48af9d407aafb2620d0b29a4a9002faf9d2f293a5e91b725c55e9"
+  },
+  "privacy": {
+    "acceptance_additions": "external-rule scan clean",
+    "changed_current_text": "six context-reviewed collisions with one ordinary programming term; no host identifier or credential finding",
+    "rules": "external; never printed or committed",
+    "publication": "not performed"
+  },
+  "limits": [
+    "No live Docker construction, registry acquisition or publication.",
+    "No new native execution, live aquery, actual action input snapshot or GPU run.",
+    "Historical native proof retains original source and wheel identities; overall support source identity differs.",
+    "JAX manifest/artifact closure, candidate-bound repeated qualification, fresh restoration, unexplained failure disposition and promotion remain open.",
+    "Fixtures do not establish production CUDA bundle construction or native build proof."
+  ]
+}

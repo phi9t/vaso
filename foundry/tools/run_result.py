@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Stage ledgers, invocation results, and solve diagnostics for Foundry and CI.
 
-The generic insula launcher does not load this workflow adapter. The previous
-insula/execution/result.py path remains a compatibility link for callers.
+The generic insula launcher does not load this workflow adapter.
+Foundry and CI callers use this owning implementation directly.
 """
 
 from __future__ import annotations

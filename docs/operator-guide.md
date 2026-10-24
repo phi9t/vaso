@@ -11,13 +11,21 @@ with owned storage and the selected artifact identities.
 
 ## Prerequisites
 
-Prepare a Linux host with Bubblewrap/user-namespace support, Bash, and Python for
-host orchestration. GPU execution also needs accessible NVIDIA devices and a
-compatible host driver. Preview qualification uses one B200 on the tested Linux x86-64 host. Select an
-idle physical device and check ownership across estates before qualification.
+Prepare a Linux x86-64 host with Bubblewrap/user-namespace support, Bash, and
+Python 3.11 or newer for host orchestration. Installing the pinned acquisition
+CLI needs `curl`, gzip-capable `tar`, `sha256sum`, and `install`. Preparing a rootfs also needs `zstd`, Linux `flock` and GNU coreutils,
+including `readlink` and `mktemp`. Construction additionally needs Docker. These host tools prepare storage; workloads and native builds use
+tools inside the rootfs.
 
-Acquisition needs registry/network access and private GHCR credentials. Store
-credentials outside the checkout as described in [publication](agents/publication.md).
+GPU execution also needs accessible NVIDIA devices, a compatible host driver,
+and `nvidia-smi` for capacity discovery unless capacity is declared explicitly.
+Preview qualification uses one B200 on the tested host. Select an idle physical
+device and check ownership across estates before qualification.
+
+Acquisition needs registry/network access and private GHCR credentials. The
+puller reads `GHCR_TOKEN` or `$VASO_ESTATE_ROOT/publish/ghcr-token`; the file must
+have mode `600`. Store credentials outside the checkout as described in
+[publication](agents/publication.md).
 Normal execution and builds use the prepared rootfs and offline input closure.
 
 Set an estate on storage with room for rootfs bundles, installed files, caches,
@@ -26,6 +34,10 @@ and outputs. Native builds need substantially more space than wheel deployment.
 ```sh
 export VASO_ESTATE_ROOT=/path/to/owned-estate
 ```
+
+Use a fresh estate for this restore walkthrough. Run the command blocks in the
+same Bash session, stop if any command fails, and keep the checkout fixed while
+a build uses it. For scripted execution, start with `set -euo pipefail`.
 
 ## Restore a rootfs and wheels
 
@@ -50,19 +62,40 @@ tools/publish/artifact_store.py pull \
 ```
 
 Pulling verifies recorded file hashes and reassembles split rootfs archive layers.
-Set `ROOTFS_ARCHIVE` to the restored archive path and `ROOTFS_ARCHIVE_SHA256`
-to its 64-character checksum, then materialize the rootfs:
+The rootfs pull returns the archive name in its JSON `archive` field. The archive
+is directly under `downloads/rootfs-cu129/`; its name and checksum also appear
+as `archive` and `archive_sha256` in the inventory's matching rootfs entry.
+Set `ROOTFS_ARCHIVE` to that full restored path and `ROOTFS_ARCHIVE_SHA256` to
+the 64-character checksum. Materialize it into a new destination:
 
 ```sh
-insula/rootfs/bundle.sh unbundle \
+insula/rootfs/prepare.sh restore \
   --bundle "$ROOTFS_ARCHIVE" \
-  --dest "$VASO_ESTATE_ROOT/rootfs-lines/cu129" \
-  --line cu129 --digest "$ROOTFS_ARCHIVE_SHA256"
+  --line cu129 --digest "$ROOTFS_ARCHIVE_SHA256" --fetch
 ```
 
 The OCI manifest digest and archive SHA-256 identify different objects. Preserve
-the restored sidecar and bundle metadata. See the [publication guide](agents/publication.md)
-for bundle and credential details.
+the restored sidecar and bundle metadata. Preparation verifies the archive,
+selected ecosystem and installed tooling before publishing the complete line
+directory. `--fetch` authorizes acquiring missing pinned tooling; omit it when
+the tooling inputs already exist in `sources/foundry-tools`. Registry transport
+remains the separate pull above, with its own credentials.
+
+The default destination is `$VASO_ESTATE_ROOT/rootfs-lines/<line>`. Repeating the
+same selection verifies and reuses it. Preparation refuses a mismatched or damaged
+destination without repair or replacement. This includes older roots without a
+`rootfs-preparation.json` selection receipt. Recover using a fresh `--dest` line
+directory; do not replace a rootfs used by live execution. Preparation stages
+beside that destination and never clones or edits an existing base.
+
+Each attempt retains `result.json`, external command logs and, when verification
+runs, its ecosystem report under `$VASO_ESTATE_ROOT/agents/rootfs-prepare/`.
+The command prints the final result and attempt path as JSON. Failed attempts
+remain inspectable after retry. SIGINT/SIGTERM stop owned construction processes
+and remove owned staging; retry reconciles an owner killed without a terminal
+outcome after surviving extraction/construction releases its lock. A host crash
+or SIGKILL can leave a running record until that retry. See the
+[publication guide](agents/publication.md) for bundle and credential details.
 
 Run a shipped-wheel smoke check:
 
@@ -83,7 +116,7 @@ for `cu130`. The [Foundry guide](foundry.md) describes deployment behavior.
 A prepared rootfs can run a command without a build profile:
 
 ```sh
-insula/execution/insula.sh --line cu129 \
+insula/run.sh --line cu129 \
   --workspace /path/to/project -- /bin/sh -c 'pwd'
 ```
 
@@ -95,6 +128,9 @@ execution evidence.
 
 For serial unattended builds across CUDA lines and profiles, use the
 [variant runner](foundry.md#build-variants-unattended).
+It checks the prepared estate, acquires or reuses pinned inputs, runs the
+selected builds, and retains stage logs and a final result. Use its documented
+detached launch and `--status` command to follow a run after disconnection.
 
 The [Foundry guide](foundry.md) covers rootfs construction, pinned tool and module
 provisioning, source acquisition, and offline build execution. Wheel deployment
@@ -105,7 +141,7 @@ For a prepared build estate, the release gate and reproducibility entrypoints ar
 ```sh
 tools/agents/triumvirate-gate.sh --release --profile torch --line cu129 \
   --acceptance-out "$VASO_ESTATE_ROOT/acceptance-torch-cu129.json"
-scripts/release/determinism_check.sh --profile torch --line cu129 \
+tools/release/determinism_check.sh --profile torch --line cu129 \
   --work-dir "$VASO_ESTATE_ROOT/determinism/torch-cu129" \
   --out "$VASO_ESTATE_ROOT/determinism/torch-cu129.json"
 ```
@@ -152,13 +188,15 @@ cutting and publication require the complete evidence set and promotion authorit
 
 ## Inspect a checkout without a GPU estate
 
-The Python CLI supplies a local host-layout preflight:
+Use the host tests in [development](development.md) to check a checkout without
+prepared artifacts. The canonical commands expose `--help` without an estate:
 
 ```sh
-PYTHONPATH=insula/execution python3 -m vaso.cli --help
-PYTHONPATH=insula/execution python3 -m vaso.cli validate --tier 0
+insula/rootfs/prepare.sh --help
+insula/run.sh --help
+foundry/build.sh --help
 ```
 
-Tier 0 creates ignored `.vaso/` backing state and a run record. It does not enter
-production insula. Use [development](development.md) for lightweight tests and
-[executable verification](verification.md) for real Bubblewrap acceptance.
+Execution and builds require their documented prepared inputs. For a disposable
+CPU execution check against an existing rootfs, use
+[real Bubblewrap acceptance](verification.md#real-insula-operational-acceptance).

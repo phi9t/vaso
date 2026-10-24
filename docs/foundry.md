@@ -108,17 +108,20 @@ Cancellation forwards the signal to the stage process group, allows 15 seconds
 for shutdown, then kills remaining processes. Reporting failures also stop owned
 children so they cannot retain the estate lock indefinitely.
 
-The runner reads source/resource pins and repository dependencies from the
-checked-in module declarations and selected native package definitions. It seeds
-the module and native repository caches, including auxiliary patches/resources.
+The small `foundry/tools/build_selection.py` definition owns supported CUDA
+lines and profile package membership, deriving release targets and native
+tokens from that membership. The runner reads source/resource pins and
+repository dependencies from the checked-in module declarations and selected
+native package definitions. It seeds the module and native repository caches,
+including auxiliary patches/resources.
 For JAX it also prepares the declared nested archives and Python wheels in the
 local distdir. `--prepare-only` runs this preparation without native builds.
 Missing local inputs are listed together in the run's `missing-inputs.json`.
 
 Add `--fetch` to allow separate acquisition phases for declared pinned HTTPS
-inputs. Downloads use insula's fetch phase and validate hashes before entering
-the cache. Cache and distdir installation checks the copied bytes before
-atomic replacement; interrupted copies leave the final destination untouched.
+inputs. Downloads use the canonical `insula/run.sh` fetch phase with an explicit
+SHA-256 pin and validate hashes before entering the cache. Cache and distdir
+installation checks the copied bytes before atomic replacement; interrupted copies leave the final destination untouched.
 Native builds remain offline. Curated archives with placeholder URLs
 must be supplied locally, for example through `--seed-estate`; the runner cannot
 reconstruct them by downloading a different upstream archive.
@@ -148,12 +151,26 @@ release wheel names, sizes, and Bazel-reported digests. `--status-interval`
 sets a finite positive heartbeat interval; `--color auto|always|never` controls
 ANSI color. Invalid arguments fail before a run starts. If status or setup cannot
 read a record, the CLI identifies the file and returns exit code 2.
+A malformed `latest.json` summary pointer also stops status and setup; it must
+not select an older successful run. Legacy history is scanned only when the
+pointer file or its selected summary file is missing.
+Loaded summaries validate stage, variant, and artifact list structure before
+status rendering or stale-run recovery. Malformed lists identify the summary
+and field, leaving retained evidence untouched. Older summaries may omit these
+lists.
 The same state is written without ANSI escapes for unattended launchers. If a
 runner dies before recording a terminal state, the next lock owner marks that
 run `abandoned` instead of leaving it indefinitely `running`.
 
 Successful variants include target names, output base, Bazel build-event paths,
-and structured wheel artifacts. The runner enables the native action tokens,
+and structured wheel artifacts. Each requested release target must have at least
+one recorded wheel in its package-specific wheelhouse, and all recorded wheels
+must be materialized with sizes matching the inventory. A mismatch fails the
+variant and retains the recorded sizes for diagnosis. An incomplete inventory
+also fails the variant and remains in its summary. These checks cover size and
+target coverage, not wheel contents or
+the completeness of a target's dependency closure.
+The runner enables the native action tokens,
 requests all outputs, closes stdin, and never prompts. A failed preparation or
 build stops the matrix, preserves a bounded log tail in the result, and exits
 nonzero. Acquisition may try the next declared mirror, retaining earlier failed
@@ -167,15 +184,13 @@ can reuse valid cached outputs, but does not erase prior failed run records.
 
 ## Build interface
 
-With `VASO_ESTATE_ROOT` set to an owned estate, provision a fresh CUDA rootfs,
-then its pinned Foundry tools and module inputs.
-Acquisition happens before offline execution:
+With `VASO_ESTATE_ROOT` set to an owned estate, prepare the CUDA rootfs and
+pinned tools together, then acquire module inputs. Construction requires
+`--fetch`: Docker can acquire base images, apt packages and component sources.
+It is a provisioning operation, separate from offline native execution:
 
 ```sh
-insula/rootfs/build_rootfs.sh --line cu129
-python3 -B insula/rootfs/foundry_tools.py \
-  --rootfs "$VASO_ESTATE_ROOT/rootfs-lines/cu129/rootfs" \
-  --cache "$VASO_ESTATE_ROOT/sources/foundry-tools" --fetch
+insula/rootfs/prepare.sh build --line cu129 --fetch
 python3 -B foundry/tools/bcr_mirror.py --estate-root "$VASO_ESTATE_ROOT"
 python3 -B foundry/tools/bcr_mirror.py --estate-root "$VASO_ESTATE_ROOT" --check
 ```
@@ -188,11 +203,14 @@ repository cache. `--check` is read-only and does not seed it. See the
 The tooling lock is `insula/rootfs/foundry_tools.lock.json`. The installed
 `/opt/vaso/foundry-tools.json` records acquired identities and installed file
 digests. Execution validates that closure and never selects or copies host
-Bazel or Bubblewrap binaries into the sandbox. Existing immutable CUDA roots
-can be cloned with `foundry_tools.py --base OLD_ROOT --rootfs NEW_ROOT`;
-copy the base's `rootfs-bundle.json` beside the clone as its CUDA-layer identity.
-Keep the original root unchanged. A populated tools prefix is verified and
-never repaired during execution.
+Bazel or Bubblewrap binaries into the sandbox. Preparation stages construction,
+tooling installation, static ecosystem verification and their manifests before
+publishing. It retains each attempt under `agents/rootfs-prepare/` and verifies
+matching existing destinations without changing their files. A mismatch,
+damage or missing selection receipt requires a fresh `--dest`; preparation
+does not clone or repair existing roots. The [operator recipe](operator-guide.md#restore-a-rootfs-and-wheels)
+uses the same command to restore a pinned bundle. Component construction,
+bundle and tooling commands remain specialist interfaces.
 
 From the repository root, with a prepared estate and source caches:
 
@@ -240,11 +258,10 @@ matrix coverage, recomputed timing/parity results, source identity, retained
 native input records, and logs. It labels smoke runs and subsets explicitly;
 correctness acceptance does not require optimized arms to be faster.
 
-`insula/rootfs/build_rootfs.sh` provisions the rootfs. Foundry's
+`insula/rootfs/prepare.sh` prepares and verifies the complete rootfs. Foundry's
 `insula.sh` is the canonical build/release execution entrypoint.
 `tools/insula_context.sh` prepares build/release-specific projections and
-calls the generic launcher. Existing `scripts/insula/insula.sh` callers
-retain a compatibility adapter. Generic insula commands require neither a
+calls the generic launcher. Generic insula commands require neither a
 build profile nor a package lock.
 
 ## Deploy published wheels

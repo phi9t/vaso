@@ -11,7 +11,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[2]
-INSULA_SH = ROOT / "scripts" / "insula" / "insula.sh"
+INSULA_SH = ROOT / "foundry" / "insula.sh"
 DRIVER_BIND_DESTINATIONS = {
     "/run/nvidia-driver/lib/libcuda.so.1",
     "/run/nvidia-driver/lib/libcuda.so.580.105.08",
@@ -1138,7 +1138,7 @@ _ROOT_DERIVING_SCRIPTS = (
     "foundry/bootstrap_insula.sh",
     "foundry/seal_insula.sh",
     "foundry/verify_languages.sh",
-    "foundry/rootfs/bundle.sh",
+    "insula/rootfs/bundle.sh",
     "foundry/examples/consumers/run.sh",
 )
 

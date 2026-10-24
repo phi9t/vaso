@@ -11,12 +11,12 @@ Use the nearest module reference and source implementation for current facts.
 |---|---|
 | Rootfs contents or tooling | `insula/rootfs/`; provision pinned inputs before execution |
 | Estate layout or sandbox paths | `insula/estate/`; keep host placement separate from content identity |
-| Launch, environment, readiness, or leases | `insula/execution/`; generic execution enters through `insula.sh` |
+| Launch, environment, readiness, or leases | `insula/execution/`; generic execution enters through `insula/run.sh` |
 | Unattended build variants | `foundry/build.sh` → `foundry/tools/build_variants.py`; the [code tour](code-tour.md#make-a-change-in-its-owner) maps inputs, execution, reports, and presentation to their owners |
-| Foundry invocation ledgers and solve diagnostics | `foundry/tools/run_result.py`; the previous `insula/execution/result.py` path is a compatibility link |
+| Foundry invocation ledgers and solve diagnostics | `foundry/tools/run_result.py` |
 | Native package behavior | `foundry/native/<package>/` and the plan generator in `foundry/tools/gen_plans.py`; inspect native impact before regenerating plans |
 | Runtime workloads and consumers | `foundry/workloads/`, `foundry/native/pytorch/gates.py`, and `foundry/examples/consumers/` |
-| Candidate selection, restore, or repeated qualification | `scripts/release/`; see the ownership table in [candidate qualification](release-qualification.md#maintaining-the-workflow) |
+| Candidate selection, restore, or repeated qualification | `tools/release/`; see the ownership table in [candidate qualification](release-qualification.md#maintaining-the-workflow) |
 | Scheduled-run orchestration or publication | `tools/ci/` and `tools/publish/`; product policy stays with insula or Foundry |
 
 Prefer a change in the owning implementation and its adjacent tests. Keep shell
@@ -95,8 +95,11 @@ python3 -B foundry/tools/plan_key_snapshot.py --check
 ```
 
 The host suite covers insula execution, estate placement, rootfs preparation,
-build orchestration, support tooling, and packaging. Its test paths are defined
-once in `pyproject.toml`; the collection guard uses the same configuration.
+build orchestration and support tooling. Its test paths are defined once in
+`pyproject.toml`; the collection guard uses the same configuration.
+Production Python helpers load from `insula/execution/vaso/` through the
+supported shell commands. There is no installed Vaso Python distribution or
+console CLI. Doctor, lease and atomic-write tests cover the retained runtime.
 Rootfs tests use synthetic filesystem trees, local archives, and fake or mocked
 build tools. They require no Docker daemon, network acquisition, or GPU.
 Live bundle construction and GPU qualification use their acceptance workflows.

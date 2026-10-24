@@ -7,13 +7,36 @@ Each rootfs must pin `rootfs-bundle.json` and its whole archive. If the archive
 also appears in the file inventory, both hashes must agree. Validation rejects
 incomplete or contradictory selections before restoration starts.
 
+## Candidate and attempt state
+
+The candidate fixes which inputs and policy an attempt uses. Restore and
+qualification each create a new attempt directory; several attempts can refer
+to the same candidate without editing it. A changed selection or policy gets
+a new candidate and checksum.
+
+| Record or state | Location | Meaning and lifetime |
+|---|---|---|
+| Candidate | The JSON path supplied to `--candidate` | Immutable selection, checked against the separately retained `--candidate-sha256` |
+| Attempt | New directory supplied to restore or qualification `--out` | Evidence for one invocation, including failed prerequisites; never reused for a retry |
+| Progress | `<attempt>/state.json` | Replaceable live status; final qualification status points to the summary |
+| Plan | `<attempt>/plan.json`, when planning is reached | Selected acquisition or execution recipe; recording it does not establish execution |
+| Final result | `<attempt>/summary.json` | Terminal outcome and retained stage records for that attempt |
+| Payload verification | `<attempt>/payload-verification.json`, when verification is reached | Result of checking restored files against candidate pins |
+| Runtime caches | `<estate>/run/<group-id>/` during qualification | Writable execution state shared by the intended reuse rounds; inventories are retained with stage evidence |
+
+An early failure may leave a summary without a plan or payload-verification
+record. An attempt can finish as `blocked-prerequisite` or `preflight-passed`.
+`passed-attempt` records successful runtime execution within the attempt's scope.
+Keep the complete attempt directory for diagnosis and reuse checks. Read the
+[estate lifecycle](estate.md) for backing-state persistence and restore choices.
+
 ## Freeze and verify
 
 Freeze from an explicit source revision and the artifact inventory. The output
 must be new; the command refuses to overwrite an existing candidate.
 
 ```sh
-python3 -B scripts/release/candidate.py freeze \
+python3 -B tools/release/candidate.py freeze \
   --source <source-commit> --name <new-candidate-name> \
   --out "$VASO_ESTATE_ROOT/candidates/candidate.json"
 ```
@@ -25,8 +48,9 @@ estate directories: `downloads/rootfs-{cu129,cu130}` and
 `rootfs-lines/<line>/rootfs` with its bundle metadata alongside it.
 Create a clean detached checkout at the candidate's source commit.
 
-For a new estate, `restore.py` composes the existing acquisition, bundle, and
-generic insula entrypoints. Provision the GHCR credential first as
+For a new estate, `restore.py` composes acquisition,
+`insula/rootfs/prepare.sh restore`, and `insula/run.sh`. Preparation installs the
+matching bundle manifests and verifies rootfs tooling before generic execution. Provision the GHCR credential first as
 `$VASO_ESTATE_ROOT/publish/ghcr-token` with mode `600`, or supply `GHCR_TOKEN`
 through the environment. The host needs Bash, Python, Git, curl, tar, zstd,
 sha256sum, and Bubblewrap. The runner installs the pinned ORAS tool, pulls all
@@ -34,7 +58,7 @@ six digests, verifies and unpacks both rootfs archives, checks the candidate
 payloads, and runs a generic command inside each line:
 
 ```sh
-python3 -B scripts/release/restore.py \
+python3 -B tools/release/restore.py \
   --candidate "$CANDIDATE" --candidate-sha256 "$CANDIDATE_SHA256" \
   --checkout "$CANDIDATE_CHECKOUT" --estate-root "$VASO_ESTATE_ROOT" \
   --out "$VASO_ESTATE_ROOT/restore/attempt-1"
@@ -52,7 +76,7 @@ through this entrypoint remains unverified.
 For an already restored estate, verify its candidate inputs separately:
 
 ```sh
-python3 -B scripts/release/candidate.py verify \
+python3 -B tools/release/candidate.py verify \
   --candidate "$CANDIDATE" --candidate-sha256 "$CANDIDATE_SHA256" \
   --checkout "$CANDIDATE_CHECKOUT" --estate-root "$VASO_ESTATE_ROOT" \
   --out "$VASO_ESTATE_ROOT/candidate-verification.json"
@@ -75,7 +99,7 @@ Launched MPI is outside support.
 Set `GPU_INDEX` to the selected physical device index:
 
 ```sh
-python3 -B scripts/release/qualify.py \
+python3 -B tools/release/qualify.py \
   --candidate "$CANDIDATE" --candidate-sha256 "$CANDIDATE_SHA256" \
   --checkout "$CANDIDATE_CHECKOUT" --estate-root "$VASO_ESTATE_ROOT" \
   --gpu-index "$GPU_INDEX" \
@@ -123,7 +147,7 @@ selection hashes, and complete executed plan are identical, verify the retained
 attempt against the new policy without changing the original evidence:
 
 ```sh
-python3 -B scripts/release/qualify.py \
+python3 -B tools/release/qualify.py \
   --candidate "$CANDIDATE" --candidate-sha256 "$CANDIDATE_SHA256" \
   --checkout "$CANDIDATE_CHECKOUT" --estate-root "$VASO_ESTATE_ROOT" \
   --reuse-attempt "$PREVIOUS_ATTEMPT" \
@@ -131,8 +155,9 @@ python3 -B scripts/release/qualify.py \
   --out "$VASO_ESTATE_ROOT/qualification/policy-reuse-1"
 ```
 
-Only a completed passing attempt can satisfy this check. Missing stages, changed
-inputs or criteria, altered stage records, and unverified cache reuse fail.
+Only a completed passing attempt can satisfy this check. The consumed recipe and
+Foundry resource bytes and the runner closure must also match. Missing stages,
+changed inputs or criteria, altered stage records, and unverified cache reuse fail.
 The new receipt hashes the retained evidence and links both candidate identities;
 it does not erase earlier failed attempts or grant promotion.
 
@@ -147,22 +172,51 @@ not erase failed ones. A changed candidate or relevant verification input requir
 
 ## Maintaining the workflow
 
-| File in `scripts/release/` | Responsibility |
+| File in `tools/release/` | Responsibility |
 |---|---|
-| `candidate.py` | Candidate schema, canonical component names, immutable selection, source and payload identity |
+| `candidate.py` | Candidate schema and input-shape validation, canonical component names, immutable selection, source and payload identity |
 | `evidence.py` | Canonical JSON bytes, atomic creation of immutable evidence, and replacement of progress state |
+| `nightly_selection.py` | Pure selection of complete matching nightly summaries, including required gates on both CUDA lines |
+| `cut.py` | Read nightly summaries, validate artifacts, and assemble a release directory |
 | `restore.py` | Fresh-estate acquisition and generic execution using existing entrypoints |
 | `qualify.py` | Attempt lifecycle, cache retention, wheel composition, evidence reuse, and final attempt status |
-| `qualification_policy.py` | Supported coverage and command recipes derived from the pinned candidate/source |
+| `qualification_policy.py` | Validate supported policy data and select ordered coverage and commands from the pinned source recipe |
+| `qualification_recipe.json` | Maintained workload IDs, gates, and consumer modules for each line/profile |
 | `gpu_monitor.py` | Physical-device preflight, exact leases, process ownership, and interference observations |
 | `process_runner.py` | Scoped attempt interruption, noninteractive execution, deadlines, logs, and cleanup of owned process groups |
 | `preview-policy.json` | Current policy used when freezing a new candidate |
 
+`qualification_recipe.json` is read from the exact candidate source checkout;
+new freezes pin its bytes together with the comparator and allowlist under
+`tools/release/`. Resource needs remain declared once in Foundry's `WORKLOADS`;
+its passive `resource_metadata.py` reader inspects literal declarations without
+executing the selected source. Plans and summaries retain the actual consumed
+recipe/resource hashes, while summaries retain runner file hashes. Edit the
+recipe to change coverage, and verify the ordered plan and commands with the
+adjacent policy tests. A changed recipe, resources, runner, or executed plan
+requires new evidence rather than policy-only admission.
+
+Old immutable candidates, source checkouts, and attempt records keep their
+original identities and runners. A pinned checkout predating the maintained
+recipe fails clearly before GPU discovery; this runner never reconstructs live
+policy from a historical observation report. Use its original pinned runner to
+interpret historical evidence, or freeze a new candidate from maintained source.
+The retained historical reports remain evidence, not current coverage policy.
+An explicit device still selects single-device coverage even with an eight-GPU
+policy; this preserves the existing branch and does not qualify multi-GPU use.
+
 Tests sit beside these owners: `gpu_monitor_test.py` covers observation parsing,
 physical-device readiness, and process ownership; `qualification_policy_test.py`
 covers matrix coverage and command recipes; `qualify_test.py` covers composition,
-cache inventory, and evidence reuse. These host tests use synthetic observations
+cache inventory, and evidence reuse. `nightly_selection_test.py` exercises
+selection on summary data; `release_cut_test.py` covers the cut entrypoint and
+its failure paths. These host tests use synthetic observations
 and owned child processes; they require no GPU or reservation.
+
+Candidate loading hashes and parses one byte snapshot through
+`candidate.load_verified`. Verify, restore, qualification, and evidence reuse
+share it. Freezing likewise derives component selections and the recorded
+inventory hash from the same bytes, so file replacement cannot mix identities.
 
 GPU observation parsing belongs to `gpu_monitor.parse_snapshot`. Acquisition
 adds the observation time; policy separately decides which devices are supported

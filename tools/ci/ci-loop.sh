@@ -9,7 +9,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-RESULT_PY="$ROOT/insula/execution/result.py"
+RESULT_PY="$ROOT/foundry/tools/run_result.py"
 LEASE_PY="$ROOT/insula/execution/lease.py"
 SUMMARY_PY="$ROOT/tools/ci/ci_summary.py"
 source "$ROOT/tools/ci/ci_common.sh"

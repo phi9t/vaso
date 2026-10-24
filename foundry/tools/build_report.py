@@ -63,13 +63,36 @@ def read_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _object_list(value: Any, path: Path, field: str) -> list[dict[str, Any]]:
+    """Validate report containers before rendering or mutating their records."""
+    if not isinstance(value, list):
+        raise ValueError(f"{path}: {field}: expected a list of objects")
+    for index, item in enumerate(value):
+        if not isinstance(item, dict):
+            raise ValueError(f"{path}: {field}[{index}]: expected an object")
+    return value
+
+
+def read_summary(path: Path) -> dict[str, Any]:
+    """Load attempt records; omitted legacy lists remain supported."""
+    report = read_json(path)
+    _object_list(report.get("stages", []), path, "stages")
+    variants = _object_list(report.get("variants", []), path, "variants")
+    for index, variant in enumerate(variants):
+        _object_list(
+            variant.get("artifacts", []), path, f"variants[{index}].artifacts"
+        )
+    return report
+
+
 def _summary_candidates(state_root: Path) -> Iterator[Path]:
     """Try the selected summary before inspecting legacy run directories."""
     pointer = state_root / "latest.json"
     if pointer.is_file():
         value = read_json(pointer).get("summary")
-        if isinstance(value, str):
-            yield Path(value)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{pointer}: expected a nonempty summary path")
+        yield Path(value)
     # The pointer is written by the estate lock owner. File modification times
     # are only a legacy fallback: inspecting or restoring an older summary must
     # not redirect status or stale-run recovery away from the selected run.
@@ -92,7 +115,7 @@ def latest_report(state_root: Path) -> tuple[dict[str, Any], Path] | None:
         if resolved in seen or not resolved.is_file():
             continue
         seen.add(resolved)
-        report = read_json(resolved)
+        report = read_summary(resolved)
         report.update(report_paths(resolved.parent), summary_path=str(resolved))
         report.setdefault("run_id", resolved.parent.name)
         return report, resolved

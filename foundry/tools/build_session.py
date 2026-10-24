@@ -1,13 +1,15 @@
 """Durable execution of a Foundry build run.
 
-A BuildSession owns stage processes, source-edit checks, progress, and terminal
-results. The caller holds the estate lock and chooses commands and variants.
+A BuildSession owns stage processes, variant transitions, source-edit checks,
+progress, and terminal results. The caller holds the estate lock, chooses
+commands and variants, and validates their outputs.
 The report is the versioned JSON data contract consumed by status and release
 verification; workflow-specific fields stay in that report, not a second model.
 """
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -248,6 +250,49 @@ class BuildSession:
         self.event("phase_changed", phase=phase)
         self.save()
         self.console.phase(phase)
+
+    @contextmanager
+    def variant(self, line: str, profile: str):
+        """Record one variant; the caller must validate outputs before returning."""
+        variant = next(
+            item
+            for item in self.report["variants"]
+            if item["line"] == line and item["profile"] == profile
+        )
+        started_monotonic = time.monotonic()
+        variant.update(status="running", started_at=utc_now())
+        self.event("variant_started", line=line, profile=profile)
+        self.save()
+
+        def finish(error: BaseException | None = None):
+            status = "built"
+            if error is not None:
+                status = (
+                    "interrupted"
+                    if isinstance(error, (InterruptedError, KeyboardInterrupt))
+                    else "failed"
+                )
+                variant["error"] = str(error)
+            variant.update(
+                status=status,
+                finished_at=utc_now(),
+                duration_seconds=round(max(0.0, time.monotonic() - started_monotonic), 3),
+            )
+            if self.report["stages"]:
+                variant["log"] = self.report["stages"][-1].get("log")
+            fields = {"artifacts": len(variant["artifacts"])} if error is None else {}
+            self.event(
+                "variant_finished", line=line, profile=profile, status=status, **fields
+            )
+            self.save()
+
+        try:
+            yield variant
+        except (OSError, ValueError, RuntimeError, KeyboardInterrupt) as exc:
+            finish(exc)
+            raise
+        else:
+            finish()
 
     def finish(self, status: str, error: str | None = None):
         now = utc_now()

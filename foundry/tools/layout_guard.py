@@ -28,9 +28,8 @@ GENERATED_GRAPH_SUFFIXES = (
 BULK_GATE_EVIDENCE_PREFIX = ".scratch/production-build/evidence/"
 RETIRED_GRAPH_MODULES = ("experiments/spack-bazel-graph", "graph")
 RETIRED_HARNESS_PATHS = (
-    ("src/vaso", "harness/vaso"),
-    ("experiments/bazel-lab", "harness/bazel-lab"),
-    ("fixtures/vaso-fixtures", "harness/smoke"),
+    ("src/vaso", "insula/execution/vaso"),
+    ("experiments/bazel-lab", "tools/bazel-lab"),
 )
 RETIRED_VENDORED_PATHS = (
     ("foundry/examples/consumers/third_party", "third_party"),
@@ -121,13 +120,20 @@ def finding_for_path(path: str) -> Finding | None:
             f"the vaso_graph module belongs under {GRAPH_MODULE}/; move this file to {destination}",
         )
 
+    if path == "fixtures/vaso-fixtures" or path.startswith("fixtures/vaso-fixtures/"):
+        return Finding(
+            "old-harness-path",
+            path,
+            "retire the obsolete smoke scaffold; CPU execution acceptance lives at insula/execution/acceptance.py",
+        )
+
     for retired, replacement in RETIRED_HARNESS_PATHS:
         if path == retired or path.startswith(f"{retired}/"):
             destination = PurePosixPath(replacement, PurePosixPath(path).relative_to(retired)).as_posix()
             return Finding(
                 "old-harness-path",
                 path,
-                f"repo tooling belongs under harness/; move this file to {destination}",
+                f"use the owning module; move this file to {destination}",
             )
 
     if path.startswith("tests/"):

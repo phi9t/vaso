@@ -12,11 +12,14 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
+
+from vaso.atomic_files import atomic_text
 
 
 ROOT = Path(__file__).resolve().parents[2]
-FEATURES = ("readiness", "mounts-and-argv", "exit-status", "lease-recovery", "cleanup")
+FEATURES = ("readiness", "mounts-and-argv", "exit-status", "interruption-and-retry", "lease-recovery", "cleanup")
 
 
 class AcceptanceFailure(Exception):
@@ -26,6 +29,36 @@ class AcceptanceFailure(Exception):
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise AcceptanceFailure(message)
+
+
+def source_hashes(repo: Path) -> dict[str, str]:
+    """Identify execution code, including readiness's runtime package closure."""
+    paths = [
+        repo / relative
+        for relative in (
+            "insula/run.sh",
+            "insula/execution/acceptance.py",
+            "insula/execution/insula.sh",
+            "insula/execution/doctor.sh",
+            "insula/execution/lease.py",
+            "insula/estate/overlay_root.py",
+            "insula/estate/estate.py",
+            "insula/rootfs/verify_cuda_ecosystem.py",
+        )
+    ]
+    paths.extend(
+        path
+        for path in (repo / "insula/execution/vaso").rglob("*.py")
+        if not (
+            path.name.endswith("_test.py")
+            or path.name.startswith("test_")
+            or path.name == "conftest.py"
+        )
+    )
+    return {
+        path.relative_to(repo).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(paths)
+    }
 
 
 class AcceptanceRun:
@@ -47,28 +80,59 @@ class AcceptanceRun:
         self.save()
 
     def save(self) -> None:
-        (self.evidence / "result.json").write_text(json.dumps(self.report, indent=2) + "\n")
+        atomic_text(self.evidence / "result.json", json.dumps(self.report, indent=2) + "\n")
 
-    def command(self, name: str, argv: list[str], *, expected: int = 0) -> str:
+    def command(
+        self, name: str, argv: list[str], *, expected: int = 0,
+        interrupt_when: Path | None = None,
+    ) -> str:
         record = {"name": name, "argv": argv, "expected_exit": expected}
         self.report["commands"].append(record)
         self.save()
         process = subprocess.Popen(
-            argv, cwd=self.state, env=self.env, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, text=True, start_new_session=True,
+            argv,
+            cwd=self.state,
+            env=self.env,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            start_new_session=True,
         )
+        failure = None
         try:
+            if interrupt_when is not None:
+                deadline = time.monotonic() + 10
+                while not interrupt_when.exists() and process.poll() is None and time.monotonic() < deadline:
+                    time.sleep(0.02)
+                require(interrupt_when.exists(), f"{name}: child did not become ready for interruption")
+                # Signal only the public launcher: bwrap must stop its owned child.
+                process.send_signal(signal.SIGTERM)
+                record["signal"] = "SIGTERM"
             stdout, stderr = process.communicate(timeout=30)
         except subprocess.TimeoutExpired:
-            os.killpg(process.pid, signal.SIGKILL)
-            stdout, stderr = process.communicate()
             record["timed_out"] = True
+        except (Exception, KeyboardInterrupt) as exc:
+            failure = exc
+            record["error"] = str(exc) or type(exc).__name__
+        finally:
+            if process.poll() is None or failure is not None or record.get("timed_out"):
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                stdout, stderr = process.communicate()
         (self.evidence / f"{name}.stdout").write_text(stdout)
         (self.evidence / f"{name}.stderr").write_text(stderr)
         record["exit_code"] = process.returncode
         self.save()
+        if failure is not None:
+            raise failure
         require(not record.get("timed_out"), f"{name} timed out; see retained logs")
-        require(process.returncode == expected, f"{name}: expected exit {expected}, got {process.returncode}; see {name}.stderr")
+        require(
+            process.returncode == expected,
+            f"{name}: expected exit {expected}, got {process.returncode}; see {name}.stderr",
+        )
         return stdout
 
     def prepare(self) -> None:
@@ -78,13 +142,7 @@ class AcceptanceRun:
         require(bwrap is not None, "real bwrap is required in /usr/bin or /bin")
         self.bwrap = str(Path(bwrap).resolve())
         self.report["bwrap"] = {"path": self.bwrap, "sha256": hashlib.sha256(Path(self.bwrap).read_bytes()).hexdigest()}
-        self.report["source_sha256"] = {
-            path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
-            for path in (
-                "insula/execution/acceptance.py", "insula/execution/insula.sh",
-                "insula/execution/lease.py", "insula/estate/overlay_root.py", "insula/execution/vaso/doctor.py",
-            )
-        }
+        self.report["source_sha256"] = source_hashes(ROOT)
         manifest = self.rootfs.parent / "rootfs-bundle.json"
         if self.rootfs != Path("/") and manifest.is_file():
             self.report["rootfs"]["manifest_sha256"] = hashlib.sha256(manifest.read_bytes()).hexdigest()
@@ -100,29 +158,10 @@ class AcceptanceRun:
             "PATH": "/usr/bin:/bin", "HOME": str(estate / "home/kvothe"), "LC_ALL": "C",
             "PYTHONDONTWRITEBYTECODE": "1", "VASO_ESTATE_ROOT": str(estate), "VASO_AGENT": "acceptance",
         }
-        plan = self.command("root-plan", [
-            sys.executable, str(ROOT / "insula/estate/overlay_root.py"),
-            "--base", str(self.rootfs), "--mountpoint", "/workspace/acceptance", "--mountpoint", "/vaso/state",
-        ])
-        plan_path = self.evidence / "root-plan.argv"
-        plan_path.write_text(plan)
-        launcher = self.evidence / "launcher.sh"
-        launcher.write_text('''#!/usr/bin/env bash
-set -euo pipefail
-repo=$1; state=$2; real_bwrap=$3; plan=$4
-shift 4
-source "$repo/insula/execution/insula.sh"
-mapfile -t ROOT_PLAN < "$plan"
-INSULA_BIND_ARGS=(--ro-bind "$state/input" /workspace/acceptance --bind "$state/estate/vaso/state" /vaso/state)
-INSULA_ENV_ARGS=(--setenv PATH /usr/bin:/bin --setenv LC_ALL C)
-INSULA_BWRAP_BIN=$real_bwrap
-INSULA_ESTATE_MIN_FREE_GIB=0
-INSULA_REQUIRE_DRIVER=0
-insula_preflight >&2 || exit $?
-# Readiness was checked above; suppress only the duplicate internal check.
-INSULA_SKIP_PREFLIGHT=1 insula "$@"
-''')
-        self.launch = ["/bin/bash", str(launcher), str(ROOT), str(self.state), self.bwrap, str(plan_path)]
+        self.launch = [
+            str(ROOT / "insula/run.sh"), "--rootfs", str(self.rootfs),
+            "--workspace", str(self.state / "input"),
+        ]
         rendered = self.command("rendered-argv", [*self.launch, "--print-argv", "--", "/bin/sh", "-c", "printf 'ready\\n'"])
         self.report["bwrap"]["readiness_argv"] = json.loads(rendered)
         ready = self.command("readiness", [*self.launch, "--", "/bin/sh", "-c", "printf 'ready\\n'"])
@@ -133,9 +172,9 @@ INSULA_SKIP_PREFLIGHT=1 insula "$@"
         literal = "space and $(touch /vaso/state/injected)"
         output = self.command("mounts", [*self.launch, "--", "/bin/sh", "-c", '''
 set -eu
-IFS= read -r value < /workspace/acceptance/input.txt
+IFS= read -r value < /workspace/vaso/input.txt
 test "$value" = original
-if (printf tampered > /workspace/acceptance/input.txt) 2>/dev/null; then exit 91; fi
+if (printf tampered > /workspace/vaso/input.txt) 2>/dev/null; then exit 91; fi
 printf 'persisted\n' > /vaso/state/result.txt
 printf '%s' "$1" > /vaso/state/argv.txt
 printf 'mounts-ok\n'
@@ -147,6 +186,22 @@ printf 'mounts-ok\n'
         require((writable / "argv.txt").read_text() == literal, "argv was interpreted or changed")
         require(not (writable / "injected").exists(), "argv was interpreted by a shell")
         self.report["features"]["mounts-and-argv"] = True
+
+    def interruption(self) -> None:
+        writable = self.state / "estate/vaso/state"
+        self.command("interruption", [*self.launch, "--", "/bin/sh", "-c", """
+set -eu
+printf 'started\n' > /vaso/state/interrupted-started
+while :; do printf tick >> /vaso/state/heartbeat; sleep 0.05; done
+"""], expected=-signal.SIGTERM, interrupt_when=writable / "interrupted-started")
+        heartbeat = writable / "heartbeat"
+        before = heartbeat.read_bytes() if heartbeat.exists() else b""
+        time.sleep(0.2)
+        require((heartbeat.read_bytes() if heartbeat.exists() else b"") == before,
+                "interrupted child continued writing after the launcher stopped")
+        retry = self.command("retry", [*self.launch, "--", "/bin/sh", "-c", "printf 'retry-ok\\n'"])
+        require(retry == "retry-ok\n", "retry did not execute after failure and interruption")
+        self.report["features"]["interruption-and-retry"] = True
 
     def leases(self) -> None:
         lease = [sys.executable, str(ROOT / "insula/execution/lease.py")]
@@ -176,9 +231,10 @@ printf 'mounts-ok\n'
             self.mounts()
             self.command("exit-status", [*self.launch, "--", "/bin/sh", "-c", "exit 23"], expected=23)
             self.report["features"]["exit-status"] = True
+            self.interruption()
             self.leases()
-        except (AcceptanceFailure, OSError, ValueError, subprocess.SubprocessError) as exc:
-            self.report["error"] = str(exc)
+        except (AcceptanceFailure, OSError, ValueError, subprocess.SubprocessError, KeyboardInterrupt) as exc:
+            self.report["error"] = str(exc) or type(exc).__name__
         finally:
             temporary.cleanup()
             removed = not self.state.exists()
@@ -192,14 +248,31 @@ printf 'mounts-ok\n'
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rootfs", type=Path, required=True, help="existing rootfs; / explicitly selects a host stand-in")
-    parser.add_argument("--evidence-dir", type=Path, required=True, help="new directory; evidence survives state cleanup")
+    parser.add_argument(
+        "--rootfs",
+        type=Path,
+        required=True,
+        help="existing rootfs; / explicitly selects a host stand-in",
+    )
+    parser.add_argument(
+        "--evidence-dir",
+        type=Path,
+        required=True,
+        help="new directory; evidence survives state cleanup",
+    )
     args = parser.parse_args(argv)
+
+    def interrupted(_signum, _frame):
+        raise KeyboardInterrupt("acceptance interrupted by SIGTERM")
+
+    previous = signal.signal(signal.SIGTERM, interrupted)
     try:
         return AcceptanceRun(args.rootfs, args.evidence_dir).run()
     except OSError as exc:
         print(f"cannot create acceptance run: {exc}", file=sys.stderr)
         return 2
+    finally:
+        signal.signal(signal.SIGTERM, previous)
 
 
 if __name__ == "__main__":

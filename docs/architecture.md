@@ -28,7 +28,7 @@ tools/
   bazel-lab/     build-system experiments
   publish/       delivery administration
   testing/       host test collection tools
-scripts/release/ candidate selection, restore, qualification, and release cutting
+  release/       candidate selection, restore, qualification, and release cutting
 ```
 
 Tests live beside their owner. `docs/development.md` records coding conventions
@@ -44,13 +44,14 @@ and resource needs. Insula plans projections, checks readiness, executes,
 and returns status/evidence. It does not select a torch/JAX profile or validate
 a package lock for a generic command.
 
-`insula/execution/insula.sh` implements generic execution. `foundry/insula.sh`
-loads the Foundry adapter in `foundry/tools/insula_context.sh`; the old
-`scripts/insula/insula.sh` forwards existing build/release callers to it.
+`insula/run.sh` is the generic command; `insula/execution/insula.sh` owns its
+context and shell execution. `foundry/insula.sh`
+loads the Foundry adapter in `foundry/tools/insula_context.sh`.
+Build, release, and wheel-consumer callers use that adapter directly.
 Insula does not import that adapter.
 “All builds under insula” describes execution; the two source directories
-remain peers. The Python host-layout CLI is a legacy preflight scaffold,
-not an independent production sandbox implementation.
+remain peers. Production readiness, lease-state validation, and atomic-write
+helpers live under `insula/execution/vaso/` and load from the checkout.
 
 ## Rootfs and hermeticity
 
@@ -97,6 +98,19 @@ The generic CPU acceptance suite does not qualify a GPU/native build.
 
 ## Data model
 
+Lease reservation and the doctor share the read-only state reader in
+`insula/execution/vaso/lease_state.py`. It validates schema, filename/resource
+agreement, holder records, expiry values, and GPU device lists. `lease.py` owns
+locking, liveness, allocation, and state transitions; readiness checks neither
+rewrite nor reclaim records.
+
+`insula/execution/vaso/atomic_files.py` owns flushed replacement of complete
+text records for leases, acceptance results, run records, and validation reports.
+Callers retain their paths, serialization, and directory-creation policy. A
+failed write or replacement keeps the previous file and removes staging state.
+Run-result metadata supplements the declared outcome; it cannot replace `ok`,
+`exit_code`, or `kind`.
+
 | Owner | Data and implementation |
 |---|---|
 | Insula rootfs | CUDA ecosystem identity, rootfs manifests and bundle digests; `insula/rootfs/` |
@@ -107,7 +121,7 @@ The generic CPU acceptance suite does not qualify a GPU/native build.
 | Support | Worker/CI coordination, adaptation history, publication administration; outside normal native input identity |
 
 Release orchestration keeps a candidate selection separate from attempts and
-promotion. `scripts/release/candidate.py` owns the immutable selection schema
+promotion. `tools/release/candidate.py` owns the immutable selection schema
 and payload checks. Qualification policy selects Foundry workloads; the runner
 owns attempts, while GPU monitoring and command execution have separate
 implementations. The [workflow ownership table](release-qualification.md#maintaining-the-workflow)
@@ -125,21 +139,19 @@ object spanning both products.
 labels, and input bytes. Existing sandbox paths, including `/vaso-bazel-ob`
 and `/workspace/experiment`, remain stable for Foundry. Read-only sibling views
 at `/workspace/insula` and `/workspace/foundry` keep relative compatibility
-links valid from the legacy experiment mount. The supported
-`scripts/insula/insula.sh` CLI and `harness/vaso` import path remain. Support
-implementation lives under `tools/`; unused helper, CI, publication, testing,
-agent, and Bazel-lab aliases have been removed.
+links valid from the legacy experiment mount. Foundry invocation ledgers and
+Spack solve diagnostics belong to `foundry/tools/run_result.py`; generic insula
+execution does not load that adapter.
 
-`insula/execution/result.py` is a compatibility link to
-`foundry/tools/run_result.py` for build and CI callers. Foundry owns those
-invocation ledgers and Spack solve diagnostics; generic insula execution does
-not load that adapter.
-
-Two files retain their original physical paths to preserve native-key-sensitive
-inputs: `foundry/rootfs/cuda_ecosystem.lock.json` and
+Two files retain their physical paths to preserve native inputs:
+`foundry/rootfs/cuda_ecosystem.lock.json` and
 `scripts/agents/triumvirate-gate.sh`. Insula/tools expose them through links.
-Other legacy rootfs/estate paths link to their owning implementation. There
-is one copy of each implementation and each selected lock.
+Foundry's exported rootfs links and `tools/estate.py`/`estate_test.py` remain
+because `foundry/BUILD.bazel` and `foundry/tools/BUILD.bazel` consume those paths
+in test labels and runfiles. Remove them only with a reviewed label/runfiles
+migration. The unused bundle, overlay, generic result, and scripts execution
+aliases have been removed; the [migration table](command-migration.md) records
+current commands and retained support tooling.
 
 ## Spack reference material
 

@@ -17,6 +17,12 @@ supply GPU access. Normal execution needs no Docker daemon.
 
 ## Start here
 
+The three primary operations are `insula/rootfs/prepare.sh restore|build`,
+`insula/run.sh -- COMMAND`, and `foundry/build.sh --line cu129 --profile torch`.
+Foundry also provides `--prepare-only` and durable `--status` inspection.
+See the [command migration table](docs/command-migration.md) for specialist and
+retired routes.
+
 [Read the operator guide](docs/operator-guide.md) to restore published artifacts,
 run shipped wheels, or prepare a build estate. These workflows require a
 prepared Linux host and access to the private GHCR packages.
@@ -44,7 +50,7 @@ other hardware is unqualified. Release verification is in progress. See
 insula/       rootfs, execution, and estate projection
 foundry/      native rules, plans, locks, toolchains, and workloads
 docs/         guides, architecture, reference articles, and history
-tools/        development, CI, build experiments, and publication
+tools/        release, development, CI, build experiments, and publication
 third_party/  vendored sources and provenance
 ```
 

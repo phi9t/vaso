@@ -60,9 +60,9 @@ python3 -B insula/execution/acceptance.py \
   --evidence-dir /path/to/new/acceptance-evidence
 ```
 
-The command uses the real system Bubblewrap, the sourceable insula launcher,
-the overlay-root planner, the doctor, and the lease CLI. It creates its own
-private state below the evidence directory, clears inherited estate/launcher
+The command invokes `insula/run.sh` with real system Bubblewrap, the existing
+shell owner, the estate and overlay planners, the doctor, and the lease CLI.
+It creates its own private state below the evidence directory, clears inherited estate/launcher
 overrides, and runs CPU-only checks. It never builds packages, installs
 wheels, downloads sources, or acquires GPU leases.
 
@@ -71,6 +71,7 @@ wheels, downloads sources, or acquires GPU leases.
 | Readiness | Real doctor output, rendered bwrap argv, binary/source hashes, supplied rootfs path and optional sidecar hash; a command actually prints `ready` inside bwrap |
 | Mounts and argv | `mounts.stdout` prints `mounts-ok`; writes to a read-only input fail; writable state persists; a literal argument containing shell syntax arrives unchanged |
 | Exit propagation | `exit-status` records the requested exit code 23 through the launcher |
+| Interruption and retry | SIGTERM to the public launcher stops its owned workload; output pipes close, writes stop, and a subsequent invocation prints `retry-ok` |
 | Lease lifecycle | A live owned holder excludes another acquisition; after that holder terminates, acquisition succeeds; release leaves no active leases |
 | Cleanup | `result.json` records removal of owned temporary state; evidence files remain |
 
@@ -82,6 +83,18 @@ Every command record includes argv, expected exit, observed exit, and retained
 stdout/stderr. Missing prerequisites and readiness failures return nonzero
 and leave a failed report. Existing evidence directories are refused. Re-run
 with a new directory; never replace a failed report with a green skip.
+
+The source manifest hashes the acceptance command, canonical run entrypoint,
+shell owner, doctor wrapper, lease command, estate and overlay planners, and
+runtime Python files under
+`insula/execution/vaso/`. This conservative package inventory includes extracted
+helpers and nested modules while excluding colocated tests. Keep it with the
+logs when comparing attempts after a refactor.
+
+Commands run with closed stdin and a 30-second deadline. Timeouts, communication
+failures, and interruption stop the owned process group and retain its exit
+status and output before state cleanup. Ctrl-C and SIGTERM produce a failed
+report; the Python entrypoint restores the caller's SIGTERM handler afterward.
 
 For a host-root stand-in, explicitly pass `--rootfs /`. The report labels it
 `host-stand-in`. A supplied rootfs is labeled `supplied-rootfs`; a sidecar hash

@@ -26,7 +26,7 @@ TEXT_SCAN_DIRS = (
     "native",
     "scripts/agents",
     "scripts/ci",
-    "scripts/release",
+    "tools/release",
     "scripts/insula",
 )
 ROOT_TEXT_FILES = ("MODULE.bazel", "run.sh")

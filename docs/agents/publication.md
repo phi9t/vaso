@@ -156,6 +156,11 @@ export VASO_ESTATE_ROOT=$VASO_ESTATE_ROOT/.vaso-estate
 tools/publish/install_oras.sh
 ```
 
+The installer reuses only a checksum-verified archive. Downloads are staged
+beside the cache and published after verification; a failed transfer or checksum
+leaves no new cached archive. Rerunning also retries an older corrupt cache
+without requiring its manual deletion.
+
 Keep wheels and rootfs bundle blobs in the artifact store rather than Git.
 Prepare and inspect sanitized artifact copies before uploading; the artifact
 store's checksum and visibility checks do not scrub their contents. Inspect

@@ -153,9 +153,9 @@ class LayoutGuardTest(unittest.TestCase):
 
     def test_old_harness_paths_are_reported(self) -> None:
         expected = {
-            "src/vaso/cli.py": "harness/vaso/cli.py",
-            "experiments/bazel-lab/run_experiments.sh": "harness/bazel-lab/run_experiments.sh",
-            "fixtures/vaso-fixtures/MODULE.bazel": "harness/smoke/MODULE.bazel",
+            "src/vaso/doctor.py": "insula/execution/vaso/doctor.py",
+            "experiments/bazel-lab/run_experiments.sh": "tools/bazel-lab/run_experiments.sh",
+            "fixtures/vaso-fixtures/MODULE.bazel": "insula/execution/acceptance.py",
         }
         self.track(*expected)
 
@@ -191,7 +191,7 @@ class LayoutGuardTest(unittest.TestCase):
         self.assertIn("beside", findings[0].message)
 
     def test_tests_directories_below_the_top_level_pass(self) -> None:
-        self.track("foundry/examples/consumers/cutlass_gemm/tests/cutlass_gemm_test.py", "harness/vaso/cli_test.py")
+        self.track("foundry/examples/consumers/cutlass_gemm/tests/cutlass_gemm_test.py", "insula/execution/vaso/doctor_test.py")
 
         self.assertEqual(guard.collect_findings(self.root), [])
 
@@ -200,8 +200,8 @@ class LayoutGuardTest(unittest.TestCase):
 
         self.assertEqual(guard.collect_findings(self.root), [])
 
-    def test_harness_paths_pass(self) -> None:
-        self.track("harness/vaso/cli.py", "harness/bazel-lab/MODULE.bazel", "harness/smoke/MODULE.bazel")
+    def test_owned_tooling_paths_pass(self) -> None:
+        self.track("insula/execution/vaso/doctor.py", "tools/bazel-lab/MODULE.bazel")
 
         self.assertEqual(guard.collect_findings(self.root), [])
 

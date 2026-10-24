@@ -1,0 +1,146 @@
+{
+  "matrix": [
+    {
+      "line": "cu129",
+      "profile": "torch",
+      "workloads": [
+        "W1a",
+        "W1b",
+        "W1c",
+        "W1d",
+        "W2a",
+        "W2b",
+        "W2c",
+        "W6a",
+        "W6b",
+        "W6c",
+        "W6d",
+        "W6e",
+        "W6f",
+        "W6g",
+        "W6h",
+        "W6i",
+        "W6j",
+        "W6k",
+        "W6l",
+        "W6m",
+        "W6n",
+        "W6o",
+        "W6p",
+        "W6q",
+        "W6r",
+        "W6s",
+        "W6t",
+        "W6u",
+        "W6v",
+        "W6w"
+      ],
+      "gates": [
+        "import_cuda",
+        "feature_parity",
+        "b200_matmul",
+        "cudnn_conv",
+        "nccl_distributed",
+        "gloo_distributed",
+        "torch_compile",
+        "sdpa_flash",
+        "torchvision_ops",
+        "torchaudio_ops"
+      ],
+      "consumer": "python_consumers.verify_torch"
+    },
+    {
+      "line": "cu129",
+      "profile": "jax",
+      "workloads": [
+        "W3a",
+        "W3b",
+        "W3c",
+        "W5a",
+        "W5b",
+        "W5c",
+        "W5d",
+        "W5e",
+        "W5f",
+        "W5g"
+      ],
+      "gates": [
+        "jax_import",
+        "jax_matmul",
+        "jax_psum_2gpu"
+      ],
+      "consumer": "python_consumers.verify_jax"
+    },
+    {
+      "line": "cu130",
+      "profile": "torch",
+      "workloads": [
+        "W1a",
+        "W1b",
+        "W1c",
+        "W1d",
+        "W2a",
+        "W2b",
+        "W2c",
+        "W6a",
+        "W6b",
+        "W6c",
+        "W6d",
+        "W6e",
+        "W6f",
+        "W6g",
+        "W6h",
+        "W6i",
+        "W6j",
+        "W6k",
+        "W6l",
+        "W6m",
+        "W6n",
+        "W6o",
+        "W6p",
+        "W6q",
+        "W6r",
+        "W6s",
+        "W6t",
+        "W6u",
+        "W6v",
+        "W6w"
+      ],
+      "gates": [
+        "import_cuda",
+        "feature_parity",
+        "b200_matmul",
+        "cudnn_conv",
+        "nccl_distributed",
+        "gloo_distributed",
+        "torch_compile",
+        "sdpa_flash",
+        "torchvision_ops",
+        "torchaudio_ops"
+      ],
+      "consumer": "python_consumers.verify_torch"
+    },
+    {
+      "line": "cu130",
+      "profile": "jax",
+      "workloads": [
+        "W3a",
+        "W3b",
+        "W3c",
+        "W5a",
+        "W5b",
+        "W5c",
+        "W5d",
+        "W5e",
+        "W5f",
+        "W5g"
+      ],
+      "gates": [
+        "jax_import",
+        "jax_matmul",
+        "jax_psum_2gpu"
+      ],
+      "consumer": "python_consumers.verify_jax"
+    }
+  ]
+}

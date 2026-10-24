@@ -8,10 +8,64 @@ import time
 from pathlib import Path
 
 import pytest
+import lease as lease_module
 
 
 ROOT = Path(__file__).resolve().parents[2]
 LEASE = ROOT / "insula" / "execution" / "lease.py"
+
+
+@pytest.mark.parametrize("existing", [False, True])
+@pytest.mark.parametrize("failure", ["flush", "replace"])
+def test_failed_lease_write_preserves_state_cleans_staging_and_can_retry(
+    tmp_path, monkeypatch, capsys, existing, failure
+):
+    estate = tmp_path / "estate"
+    monkeypatch.setenv("VASO_ESTATE_ROOT", str(estate))
+    command = [
+        "acquire",
+        "--resource",
+        "host-cpu",
+        "--holder",
+        "fixture",
+        "--pid",
+        str(os.getpid()),
+        "--budget",
+        "4",
+        "--ttl",
+        "60",
+    ]
+    original_ids = []
+    if existing:
+        assert lease_module.main(command) == 0
+        original_ids.append(json.loads(capsys.readouterr().out)["id"])
+    path = estate / "agents/leases/host-cpu.json"
+    original = path.read_bytes() if existing else None
+
+    def fail(*args):
+        raise OSError("lease publication failed")
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(
+            lease_module.os, "fsync" if failure == "flush" else "replace", fail
+        )
+        assert lease_module.main(command) == 2
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert "lease publication failed" in output.err
+    assert "Traceback" not in output.err
+    if existing:
+        assert path.read_bytes() == original
+    else:
+        assert not path.exists()
+    expected = {path.with_suffix(".lock")}
+    assert set(path.parent.iterdir()) == (expected | {path} if existing else expected)
+
+    assert lease_module.main(command) == 0
+    acquired = json.loads(capsys.readouterr().out)
+    leases = lease_module._load_state("host-cpu")["leases"]
+    assert [lease["id"] for lease in leases] == original_ids + [acquired["id"]]
+    assert set(path.parent.iterdir()) == expected | {path}
 
 
 def _lease_cmd(estate: Path, *args: str) -> subprocess.CompletedProcess[str]:
