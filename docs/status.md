@@ -15,6 +15,10 @@ All process tools and dependencies resolve inside the selected insula rootfs.
 Bazel separately declares build inputs. Native build proof and deployment
 qualification are distinct requirements.
 
+The [simplified workflow acceptance](releases/simplification-acceptance-20261023.md)
+records host fixtures, real CPU execution and native identity checks. It does not
+close the release requirements below.
+
 ## Recorded deployment evidence
 
 | Record | What it establishes | Limit |

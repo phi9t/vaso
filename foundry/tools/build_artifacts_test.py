@@ -16,6 +16,48 @@ import build_artifacts as b
 
 
 class BuildArtifactsTest(unittest.TestCase):
+    def test_target_coverage_matches_complete_package_and_wheelhouse_paths(self):
+        output_base = Path("/owned/output-base")
+        targets = [
+            "//native/pytorch:pytorch_release_wheel",
+            "//native/triton:triton_release_wheel",
+            "//native/jaxlib:jaxlib_release_wheels",
+        ]
+        for prefix in ("", "bazel-out/k8-fastbuild/bin", "bazel-out/other-config/bin"):
+            with self.subTest(prefix=prefix):
+                paths = [
+                    output_base
+                    / "execroot/_main"
+                    / prefix
+                    / package
+                    / (name + "_wheelhouse")
+                    / "wheels/any-version.whl"
+                    for package, name in (t.removeprefix("//").split(":") for t in targets)
+                ]
+                artifacts = [{"path": str(path)} for path in paths]
+                self.assertEqual(
+                    b.missing_wheel_targets(artifacts, output_base, targets), []
+                )
+                self.assertEqual(
+                    b.missing_wheel_targets(artifacts[:1], output_base, targets),
+                    targets[1:],
+                )
+                self.assertEqual(b.missing_wheel_targets([], output_base, targets), targets)
+
+    def test_similar_target_or_package_does_not_cover_a_requested_wheelhouse(self):
+        output_base = Path("/owned/output-base")
+        targets = ["//native/pytorch:pytorch_release_wheel"]
+        for relative in (
+            "native/other/pytorch_release_wheel_wheelhouse/torch.whl",
+            "native/pytorch/other_release_wheel_wheelhouse/torch.whl",
+            "native/pytorch/pytorch_release_wheel_wheelhouse_extra/torch.whl",
+        ):
+            with self.subTest(relative=relative):
+                artifacts = [{"path": str(output_base / "execroot/_main" / relative)}]
+                self.assertEqual(
+                    b.missing_wheel_targets(artifacts, output_base, targets), targets
+                )
+
     def test_build_event_wheels_become_structured_artifacts(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory)

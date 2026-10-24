@@ -23,12 +23,9 @@ from bcr_mirror import (
     load_manifest,
     seed_repository_cache,
 )
+from build_selection import PACKAGES
 from native_source_versions import module_text_with_includes
 
-PACKAGES = {
-    "torch": ("pytorch", "torchvision", "torchaudio", "triton"),
-    "jax": ("jaxlib",),
-}
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 REPO = re.compile(r"@([A-Za-z0-9_.+-]+)//")
 RULES_PYTHON_PLATFORM = "x86_64-unknown-linux-gnu"

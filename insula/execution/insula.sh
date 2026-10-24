@@ -3,7 +3,7 @@
 #
 # Source this file to get the `insula` function, or execute it directly:
 #
-#   insula/execution/insula.sh --line cu129 -- bash -lc 'echo inside'
+#   insula/run.sh --line cu129 -- bash -lc 'echo inside'
 #
 # `--print-argv` renders the bwrap argv as JSON and does not execute it.
 
@@ -439,7 +439,7 @@ insula() {
   fi
   INSULA_PHASE="$phase"
   if [[ "$print_argv" != "1" ]]; then
-    insula_preflight || return $?
+    insula_preflight >&2 || return $?
   fi
   local -a argv
   insula_build_argv argv "$phase" "$@"
@@ -458,11 +458,30 @@ insula() {
 insula_prepare_context() {
   local rootfs="$1" workspace="$2" line="$3"
   : "${VASO_ESTATE_ROOT:?set VASO_ESTATE_ROOT}"
-  [[ -d "$rootfs" && -x "$rootfs/bin/sh" ]] || {
+  python3 - "$INSULA_REPO_ROOT/insula/rootfs" "$rootfs" <<'PY_SHELL' || {
+import os
+from pathlib import Path
+import sys
+
+sys.path.insert(0, sys.argv[1])
+from verify_cuda_ecosystem import resolve_rootfs_path
+
+try:
+    rootfs = Path(sys.argv[2])
+    shell = resolve_rootfs_path(rootfs, "/bin/sh")
+    usable = rootfs.is_dir() and shell.is_file() and os.access(shell, os.X_OK)
+except (OSError, RuntimeError):
+    usable = False
+sys.exit(0 if usable else 1)
+PY_SHELL
     echo "insula rootfs is missing or has no executable /bin/sh: $rootfs" >&2
     return 2
   }
-  [[ -d "$workspace" ]] || { echo "workspace is missing: $workspace" >&2; return 2; }
+  [[ -n "$workspace" && -d "$workspace" && -r "$workspace" && -x "$workspace" ]] || {
+    echo "insula --workspace requires a readable, searchable directory: ${workspace:-<empty>}; select --workspace DIR" >&2
+    return 2
+  }
+  workspace="$(readlink -f "$workspace")" || return $?
   ESTATE_ROOT="$(python3 "$INSULA_REPO_ROOT/insula/estate/estate.py" \
     --root "$VASO_ESTATE_ROOT" --required-gib "${VASO_REQUIRED_GIB:-0}" --materialize)" || return $?
   export VASO_ESTATE_ROOT="$ESTATE_ROOT"
@@ -509,7 +528,9 @@ insula_main() {
     case "$1" in
       --line) line="${2:?missing line}"; shift 2 ;;
       --rootfs) rootfs="${2:?missing rootfs}"; shift 2 ;;
-      --workspace) workspace="${2:?missing workspace}"; shift 2 ;;
+      --workspace)
+        [[ "$#" -ge 2 ]] || { echo "insula --workspace requires a readable, searchable directory; select --workspace DIR" >&2; return 2; }
+        workspace="$2"; shift 2 ;;
       --print-argv) print_argv=1; shift ;;
       --phase) phase="${2:?missing phase}"; shift 2 ;;
       --) shift; break ;;
@@ -532,7 +553,7 @@ insula_main() {
     # An explicitly supplied rootfs need not occupy a line-specific estate path.
     line=""
   fi
-  insula_prepare_context "$(readlink -m "$rootfs")" "$(readlink -m "$workspace")" "$line" || return $?
+  insula_prepare_context "$(readlink -m "$rootfs")" "$workspace" "$line" || return $?
   local -a options=(--phase "$phase")
   [[ "$print_argv" != 1 ]] || options+=(--print-argv)
   insula "${options[@]}" -- "$@"

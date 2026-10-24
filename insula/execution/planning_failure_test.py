@@ -57,7 +57,7 @@ def test_planning_error_stops_launcher_before_execution(tmp_path, launcher, fail
     if launcher == "generic":
         command = [
             "bash",
-            str(ROOT / "insula/execution/insula.sh"),
+            str(ROOT / "insula/run.sh"),
             "--rootfs",
             str(rootfs),
             "--workspace",

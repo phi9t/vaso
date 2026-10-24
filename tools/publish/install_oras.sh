@@ -15,20 +15,26 @@ esac
 base="$VASO_ESTATE_ROOT/opt-vaso"
 bin_dir="$base/bin"
 src_dir="$base/src"
-work_dir="$base/.install-oras.$$"
 archive="$src_dir/oras_${ORAS_VERSION}_${platform}.tar.gz"
 url="https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_${platform}.tar.gz"
 
+mkdir -p "$bin_dir" "$src_dir"
+# Stage beside the cache so only verified bytes become a persistent archive.
+work_dir="$(mktemp -d "$src_dir/.install-oras.XXXXXX")"
 cleanup() {
   rm -rf "$work_dir"
 }
 trap cleanup EXIT
 
-mkdir -p "$bin_dir" "$src_dir" "$work_dir"
-if [ ! -f "$archive" ]; then
-  curl -fsSL "$url" -o "$archive"
+verify_archive() {
+  printf '%s  %s\n' "$ORAS_SHA256" "$1" | sha256sum -c -
+}
+
+if [[ ! -f "$archive" ]] || ! verify_archive "$archive"; then
+  curl -fsSL "$url" -o "$work_dir/archive.tar.gz"
+  verify_archive "$work_dir/archive.tar.gz"
+  mv -f -- "$work_dir/archive.tar.gz" "$archive"
 fi
-printf '%s  %s\n' "$ORAS_SHA256" "$archive" | sha256sum -c -
 tar -xzf "$archive" -C "$work_dir" oras
 install -m 0755 "$work_dir/oras" "$bin_dir/oras"
 "$bin_dir/oras" version

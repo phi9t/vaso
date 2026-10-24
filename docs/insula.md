@@ -11,23 +11,34 @@ rootfs it sees. Host storage backs that filesystem and explicit data mounts.
 | `estate/` | `VasoEstate`, storage placement, sandbox projections, and path translation |
 | `execution/` | Bubblewrap argv, environment, readiness, leases, results, and operational acceptance |
 
-Build a rootfs with `insula/rootfs/build_rootfs.sh --line cu129` and an explicit
-`VASO_ESTATE_ROOT`. Rootfs construction can provision dependencies; execution
-uses the prepared filesystem.
+Prepare a rootfs with `insula/rootfs/prepare.sh build --line cu129 --fetch` and
+an explicit `VASO_ESTATE_ROOT`. Preparation stages the rootfs, tooling, and
+manifests together; execution uses the prepared filesystem.
 
 Run a generic command from the repository root without a Foundry profile or package lock:
 
 ```sh
-VASO_ESTATE_ROOT=/path/to/estate insula/execution/insula.sh \
+VASO_ESTATE_ROOT=/path/to/estate insula/run.sh \
   --line cu129 --workspace /path/to/project -- /bin/sh -c 'pwd'
 ```
 
 The command sees the project read-only at `/workspace/vaso`, writable estate
 state at `/vaso`, a read-only rootfs, a cleared environment, and an isolated
 network. `--rootfs DIR` selects an explicit rootfs instead of a CUDA line.
-`--print-argv` renders the request without entering Bubblewrap. It still
-materializes the selected estate layout. Fetch execution is explicit and
+The workspace must be a readable, searchable directory. Empty, missing, and
+file paths fail with exit 2 before estate materialization or child execution.
+`--print-argv` renders the request without readiness checks or entering
+Bubblewrap. It still materializes the selected estate layout. Fetch execution is explicit and
 requires a SHA-256 pin and the network-fetch lease.
+
+Readiness diagnostics go to stderr; stdout belongs to the command or the printed
+JSON plan. The launcher returns the command status and uses Bubblewrap's
+`--die-with-parent` to stop owned execution if the launcher terminates. It does
+not automatically retry a workload or create a generic run ledger. Keep stdout,
+stderr, and status with the calling workflow; repeated invocations reuse estate
+state, so the workload owns safe recovery of its outputs. The
+[CPU acceptance command](verification.md#real-insula-operational-acceptance)
+retains separate reports and logs while removing only its disposable state.
 
 For callers that prepare their own projections, source `execution/insula.sh`
 and supply `ROOT_PLAN`, `INSULA_BIND_ARGS`, `INSULA_ENV_ARGS`, and optional
@@ -40,6 +51,9 @@ Lease state lives under `$VASO_ESTATE_ROOT/agents/leases`. Malformed JSON,
 unsupported schemas, or invalid holder metadata produce exit code 2 and remain
 unchanged for diagnosis. Repair a record only after establishing holder ownership.
 Valid expired leases and dead local holders are still reclaimed automatically.
+Updates flush a staged file before replacing the state. Failed writes preserve
+the previous record and remove staging files, so an acquisition can retry
+without manual cleanup or retaining a reservation that was never granted.
 
 GPU lease capacity comes from `--capacity`, then `VASO_GPU_COUNT`, or a
 successful `nvidia-smi -L` query. A failed query never supplies an assumed device
@@ -50,12 +64,11 @@ Foundry's build/release context is in `foundry/tools/insula_context.sh`.
 Its canonical entrypoint is `foundry/insula.sh`; pinned build tools are
 installed by `rootfs/foundry_tools.py` before execution. See the [Foundry guide](foundry.md)
 for acquisition and offline prerequisite checks.
-The old `scripts/insula/insula.sh` loads that adapter for existing callers.
 Generic insula execution has no dependency on Foundry.
 
 The Python package under `execution/vaso/` supplies the production readiness
-checks and legacy host-layout preflight CLI. Tier-1 validation there remains
-a plan-only scaffold; it is not a second sandbox execution implementation.
+checks, lease-state validation, and atomic file updates. The shell entrypoints
+load these helpers directly from the checkout.
 
 See [architecture](architecture.md) for identities and compatibility paths, and
 [verification](verification.md) for real Bubblewrap acceptance.

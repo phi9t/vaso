@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
-from vaso.config import VasoConfig
+from vaso.lease_state import read_state
 
 
 @dataclass(frozen=True)
@@ -49,22 +49,6 @@ NVIDIA_DRIVER_LIBRARY_PATTERNS = (
     "libnvidia-nvvm.so.4",
     "libnvidia-gpucomp.so.*",
 )
-
-
-def run_doctor(config: VasoConfig) -> list[DoctorCheck]:
-    rootfs = config.state_root / "rootfs"
-    bwrap = shutil.which("bwrap")
-    rootfs_shell = (rootfs / "bin" / "sh").is_file() or (rootfs / "bin" / "bash").is_file()
-    return [
-        DoctorCheck("bwrap_available", bwrap is not None, bwrap or "not found"),
-        DoctorCheck("rootfs_exists", rootfs.is_dir(), str(rootfs)),
-        DoctorCheck("rootfs_has_shell", rootfs_shell, f"{rootfs}/bin/sh or {rootfs}/bin/bash"),
-        DoctorCheck(
-            "host_home_writable",
-            (config.state_root / "home" / "kvothe").is_dir(),
-            str(config.state_root / "home" / "kvothe"),
-        ),
-    ]
 
 
 def doctor_passed(checks: Iterable[DoctorCheck]) -> bool:
@@ -184,8 +168,24 @@ def _rootfs_manifest_checks(config: InsulaDoctorConfig) -> list[DoctorCheck]:
         return checks
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
+    except OSError as exc:
+        checks.append(
+            DoctorCheck(
+                "rootfs_manifest:json", False,
+                f"{manifest_path}: cannot read manifest: {exc}",
+            )
+        )
+        return checks
+    except ValueError as exc:
         checks.append(DoctorCheck("rootfs_manifest:json", False, f"{manifest_path} is invalid JSON: {exc}"))
+        return checks
+    if not isinstance(manifest, dict):
+        checks.append(
+            DoctorCheck(
+                "rootfs_manifest:json", False,
+                f"{manifest_path}: expected a JSON object",
+            )
+        )
         return checks
     checks.append(
         DoctorCheck(
@@ -223,11 +223,8 @@ def _lease_checks(estate_root: Path) -> list[DoctorCheck]:
     if lease_dir.is_dir():
         for path in sorted(lease_dir.glob("*.json")):
             try:
-                state = json.loads(path.read_text(encoding="utf-8"))
-            except json.JSONDecodeError:
-                corrupt.append(str(path))
-                continue
-            if not isinstance(state.get("leases", []), list):
+                read_state(path)
+            except (OSError, ValueError):
                 corrupt.append(str(path))
     checks.append(
         DoctorCheck(

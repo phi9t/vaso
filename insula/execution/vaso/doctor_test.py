@@ -4,14 +4,13 @@ import os
 import subprocess
 from pathlib import Path
 
-from vaso.cli import main
-from vaso.config import default_config
-from vaso.doctor import InsulaDoctorConfig, doctor_passed, run_doctor, run_insula_doctor
-from vaso.paths import ensure_host_layout
+import pytest
+
+from vaso.doctor import InsulaDoctorConfig, doctor_passed, run_insula_doctor
 
 
 ROOT = Path(__file__).resolve().parents[3]
-INSULA_SH = ROOT / "scripts" / "insula" / "insula.sh"
+INSULA_SH = ROOT / "foundry" / "insula.sh"
 
 
 def _make_fake_insula_tree(root: Path, *, line: str = "cu129") -> tuple[Path, Path, Path]:
@@ -103,25 +102,17 @@ def _make_fake_release_mounted_tree(root: Path, *, line: str = "cu129") -> tuple
     return estate, lock, driver
 
 
-def test_doctor_reports_unpopulated_rootfs(tmp_path):
-    repo = tmp_path / "workspace" / "vaso"
-    repo.mkdir(parents=True)
-    config = default_config(repo)
-    ensure_host_layout(config)
-    checks = run_doctor(config)
-    rootfs = [check for check in checks if check.name == "rootfs_has_shell"][0]
-    assert not rootfs.ok
-    assert "bin/sh" in rootfs.detail
-
-
-def test_cli_doctor_outputs_json(tmp_path, monkeypatch, capsys):
-    repo = tmp_path / "workspace" / "vaso"
-    repo.mkdir(parents=True)
-    monkeypatch.chdir(repo)
-    code = main(["doctor"])
-    assert code == 1
-    data = json.loads(capsys.readouterr().out)
-    assert "checks" in data
+@pytest.mark.parametrize("encoded", ["invalid JSON", "[]", "null", '"text"', "7"])
+def test_doctor_reports_invalid_rootfs_manifest_without_a_traceback(tmp_path, encoded):
+    estate, lock, driver = _make_fake_insula_tree(tmp_path)
+    manifest = estate / "rootfs-lines/cu129/rootfs-bundle.json"
+    manifest.write_text(encoded)
+    checks = run_insula_doctor(_insula_config(estate, lock, driver))
+    assert not doctor_passed(checks)
+    diagnostic = {check.name: check for check in checks}["rootfs_manifest:json"]
+    assert not diagnostic.ok
+    assert str(manifest) in diagnostic.detail
+    assert manifest.read_text() == encoded
 
 
 def test_insula_doctor_accepts_fake_healthy_estate(tmp_path: Path) -> None:
@@ -199,6 +190,39 @@ def test_insula_doctor_reports_manifest_lock_mismatch(tmp_path: Path) -> None:
     assert not mismatch.ok
     assert "rebuild the rootfs line" in mismatch.detail
     assert not doctor_passed(checks)
+
+
+@pytest.mark.parametrize("state", [
+    None,
+    [],
+    {"schema_version": 2, "resource": "gpu", "leases": []},
+    {"schema_version": 1, "resource": "host-cpu", "leases": []},
+    {"schema_version": 1, "resource": "gpu", "leases": [7]},
+])
+def test_doctor_rejects_invalid_lease_records_without_rewriting_them(tmp_path, state):
+    estate, lock, driver = _make_fake_insula_tree(tmp_path)
+    path = estate / "agents/leases/gpu.json"
+    original = json.dumps(state)
+    path.write_text(original)
+    checks = run_insula_doctor(_insula_config(estate, lock, driver))
+    lease_check = {check.name: check for check in checks}["lease_dir:json"]
+    assert not lease_check.ok
+    assert str(path) in lease_check.detail
+    assert not doctor_passed(checks)
+    assert path.read_text() == original
+    assert list(path.parent.iterdir()) == [path]
+
+
+def test_doctor_accepts_valid_lease_state_without_rewriting_it(tmp_path):
+    estate, lock, driver = _make_fake_insula_tree(tmp_path)
+    path = estate / "agents/leases/gpu.json"
+    original = '{"schema_version":1,"resource":"gpu","leases":[]}'
+    path.write_text(original)
+    checks = run_insula_doctor(_insula_config(estate, lock, driver))
+    assert {check.name: check for check in checks}["lease_dir:json"].ok
+    assert doctor_passed(checks)
+    assert path.read_text() == original
+    assert list(path.parent.iterdir()) == [path]
 
 
 def test_insula_doctor_reports_corrupt_lease_state(tmp_path: Path) -> None:

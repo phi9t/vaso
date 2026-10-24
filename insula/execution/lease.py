@@ -18,7 +18,6 @@ import fcntl
 import json
 import math
 import os
-import re
 import secrets
 import socket
 import subprocess
@@ -26,6 +25,13 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Iterator
+
+from vaso.atomic_files import atomic_text
+from vaso.lease_state import (
+    read_state,
+    safe_name as _safe_name,
+    valid_pid as _valid_pid,
+)
 
 
 EX_UNAVAILABLE = 75
@@ -56,10 +62,6 @@ def lease_dir() -> Path:
     return path
 
 
-def _safe_name(resource: str) -> str:
-    return re.sub(r"[^A-Za-z0-9_.-]+", "_", resource)
-
-
 def _state_path(resource: str) -> Path:
     return lease_dir() / f"{_safe_name(resource)}.json"
 
@@ -80,54 +82,11 @@ def _locked(resource: str) -> Iterator[None]:
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
-def _valid_pid(value: Any) -> bool:
-    return type(value) is int and 0 < value < 2**31
-
-
 def _load_state(resource: str) -> dict[str, Any]:
     path = _state_path(resource)
     if not path.exists():
         return {"schema_version": 1, "resource": resource, "leases": []}
-    try:
-        state = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(state, dict) or state.get("schema_version") != 1:
-            raise ValueError("expected a schema-version-1 lease object")
-        recorded_resource = state.get("resource")
-        if (
-            not isinstance(recorded_resource, str)
-            or _safe_name(recorded_resource) != path.stem
-        ):
-            raise ValueError("resource does not match the state filename")
-        leases = state.get("leases")
-        if not isinstance(leases, list):
-            raise ValueError("expected a leases list")
-        for index, lease in enumerate(leases):
-            if not isinstance(lease, dict):
-                raise ValueError(f"lease {index}: expected an object")
-            for field in ("id", "host", "resource"):
-                if not isinstance(lease.get(field), str) or not lease[field]:
-                    raise ValueError(f"lease {index}: missing {field}")
-            if _safe_name(lease["resource"]) != path.stem:
-                raise ValueError(
-                    f"lease {index}: resource does not match the state filename"
-                )
-            if not _valid_pid(lease.get("pid")):
-                raise ValueError(f"lease {index}: invalid holder PID")
-            expiry = lease.get("expiry_time")
-            if type(expiry) not in (int, float) or not math.isfinite(expiry):
-                raise ValueError(f"lease {index}: expiry_time must be finite")
-            if recorded_resource == "gpu":
-                devices = lease.get("devices")
-                if (
-                    not isinstance(devices, list)
-                    or not devices
-                    or any(type(device) is not int or device < 0 for device in devices)
-                    or len(set(devices)) != len(devices)
-                ):
-                    raise ValueError(f"lease {index}: invalid GPU devices")
-    except (ValueError, TypeError, KeyError, OverflowError) as exc:
-        raise ValueError(f"invalid lease state {path}: {exc}") from exc
-    return state
+    return read_state(path)
 
 
 def _resources(resource: str | None) -> list[str]:
@@ -143,9 +102,7 @@ def _resources(resource: str | None) -> list[str]:
 def _write_state(resource: str, state: dict[str, Any]) -> None:
     state["updated_at"] = _stamp(_now())
     path = _state_path(resource)
-    tmp = path.with_name(f"{path.name}.tmp.{os.getpid()}")
-    tmp.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    os.replace(tmp, path)
+    atomic_text(path, json.dumps(state, indent=2, sort_keys=True) + "\n")
 
 
 def _pid_alive(pid: int, host: str) -> bool:

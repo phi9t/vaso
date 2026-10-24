@@ -170,6 +170,12 @@ fi
 ESTATE_ROOT="$(mkdir -p "$ESTATE_ROOT" && cd "$ESTATE_ROOT" && pwd -P)"
 export VASO_ESTATE_ROOT="$ESTATE_ROOT"
 
+# All constructors share the LLVM cache and Docker image tags. Serialize them,
+# including specialist callers, before either shared resource can be modified.
+mkdir -p "$ESTATE_ROOT/rootfs-lines"
+exec {ROOTFS_CONSTRUCTION_LOCK_FD}>"$ESTATE_ROOT/rootfs-lines/.construction.lock"
+flock -x "$ROOTFS_CONSTRUCTION_LOCK_FD"
+
 if [[ -z "$DEST" ]]; then
   DEST="$ESTATE_ROOT/rootfs-lines/$LINE"
 fi

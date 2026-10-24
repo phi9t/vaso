@@ -54,9 +54,9 @@ def test_insula_path_resolver_matches_release_gate_bind_map(tmp_path: Path) -> N
     )
     assert (
         insula_to_host_path(
-            "/workspace/repo/scripts/release/cut.py", estate, repo_root=repo
+            "/workspace/repo/tools/release/cut.py", estate, repo_root=repo
         )
-        == repo / "scripts" / "release" / "cut.py"
+        == repo / "tools" / "release" / "cut.py"
     )
     assert (
         insula_to_host_path("/workspace/experiment/run.sh", estate, repo_root=repo)

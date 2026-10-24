@@ -14,7 +14,7 @@ EXP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$EXP_DIR/.." && pwd)"
 cd "$EXP_DIR"
 LEASE_PY="$REPO_ROOT/insula/execution/lease.py"
-RESULT_PY="$REPO_ROOT/insula/execution/result.py"
+RESULT_PY="$EXP_DIR/tools/run_result.py"
 INSULA_SH="$REPO_ROOT/foundry/insula.sh"
 . "$EXP_DIR/tools/native_determinism_args.sh"
 . "$INSULA_SH"
@@ -582,7 +582,7 @@ missing hermetic insula rootfs for VASO_CUDA_LINE=$VASO_CUDA_LINE:
   $CUDA_ROOTFS/bin/bash
 
 Build the Bazel/Spack insula rootfs first, for example:
-  VASO_ESTATE_ROOT="$ESTATE_ROOT" "$REPO_ROOT/insula/rootfs/build_rootfs.sh" --line "$VASO_CUDA_LINE"
+  VASO_ESTATE_ROOT="$ESTATE_ROOT" "$REPO_ROOT/insula/rootfs/prepare.sh" build --line "$VASO_CUDA_LINE" --fetch
 
 The legacy $ESTATE_ROOT/rootfs path is intentionally not selected implicitly.
 EOF

@@ -21,28 +21,24 @@ import sys
 import time
 from urllib.parse import urlparse
 
-from build_artifacts import build_event_artifacts
+from build_artifacts import (
+    artifact_size_mismatches,
+    build_event_artifacts,
+    missing_wheel_targets,
+)
 from build_inputs import (
     Asset,
     InputStore,
-    PACKAGES,
     digest,
     rules_python_asset_from_mirror,
     selected_assets,
 )
 from build_progress import Console
-from build_report import latest_report, utc_now
+from build_report import latest_report
 from build_session import BuildSession, StageFailure, abandon_stale_run
+from build_selection import CUDA_LINES, PACKAGES, TARGETS, TOKENS
 
 ROOT = Path(__file__).resolve().parents[2]
-TARGETS = {
-    "torch": [f"//native/{p}:{p}_release_wheel" for p in PACKAGES["torch"]],
-    "jax": ["//native/jaxlib:jaxlib_release_wheels"],
-}
-TOKENS = {
-    "torch": [f"--//native/{p}:token=build-native-{p}" for p in PACKAGES["torch"]],
-    "jax": ["--//native/jaxlib:token=build-native-llvm"],
-}
 
 
 class Runner:
@@ -57,8 +53,8 @@ class Runner:
     ):
         self.args, self.root = args, repo_root
         self.estate = args.estate_root.expanduser().resolve()
-        self.lines = ["cu129", "cu130"] if args.line == "all" else [args.line]
-        self.profiles = ["torch", "jax"] if args.profile == "all" else [args.profile]
+        self.lines = list(CUDA_LINES) if args.line == "all" else [args.line]
+        self.profiles = list(PACKAGES) if args.profile == "all" else [args.profile]
         self.run = BuildSession(
             repo_root,
             self.estate,
@@ -112,7 +108,7 @@ class Runner:
                         "acquire-" + asset.sha256[:12],
                         [
                             *pin_env,
-                            str(self.root / "insula/execution/insula.sh"),
+                            str(self.root / "insula/run.sh"),
                             "--line",
                             self.lines[0],
                             "--workspace",
@@ -164,17 +160,8 @@ class Runner:
         )
 
     def build_variant(self, line: str, profile: str):
-        variant = next(
-            item
-            for item in self.run.report["variants"]
-            if item["line"] == line and item["profile"] == profile
-        )
-        started_monotonic = time.monotonic()
-        variant.update(status="running", started_at=utc_now())
-        self.run.event("variant_started", line=line, profile=profile)
-        self.run.save()
-        events = f"/vaso/agents/build-variants/{self.run.output.name}/{line}-{profile}-events.jsonl"
-        try:
+        with self.run.variant(line, profile) as variant:
+            events = f"/vaso/agents/build-variants/{self.run.output.name}/{line}-{profile}-events.jsonl"
             self.run.stage(
                 f"build-{line}-{profile}",
                 [
@@ -205,42 +192,22 @@ class Runner:
                     f"{line}/{profile}: Bazel release wheels are not materialized: "
                     + ", ".join(missing)
                 )
-        except (OSError, ValueError, RuntimeError, KeyboardInterrupt) as exc:
-            status = (
-                "interrupted"
-                if isinstance(exc, (InterruptedError, KeyboardInterrupt))
-                else "failed"
+            mismatches = artifact_size_mismatches(artifacts)
+            if mismatches:
+                raise RuntimeError(
+                    f"{line}/{profile}: release wheel sizes differ from the inventory: "
+                    + ", ".join(mismatches)
+                    + f"; see {variant['build_events']}"
+                )
+            uncovered = missing_wheel_targets(
+                artifacts, Path(variant["output_base"]), TARGETS[profile]
             )
-            variant.update(
-                status=status,
-                finished_at=utc_now(),
-                duration_seconds=round(
-                    max(0.0, time.monotonic() - started_monotonic), 3
-                ),
-                error=str(exc),
-            )
-            if self.run.report["stages"]:
-                variant["log"] = self.run.report["stages"][-1].get("log")
-            self.run.event(
-                "variant_finished", line=line, profile=profile, status=status
-            )
-            self.run.save()
-            raise
-        variant.update(
-            status="built",
-            finished_at=utc_now(),
-            duration_seconds=round(max(0.0, time.monotonic() - started_monotonic), 3),
-        )
-        if self.run.report["stages"]:
-            variant["log"] = self.run.report["stages"][-1].get("log")
-        self.run.event(
-            "variant_finished",
-            line=line,
-            profile=profile,
-            status="built",
-            artifacts=len(artifacts),
-        )
-        self.run.save()
+            if uncovered:
+                raise RuntimeError(
+                    f"{line}/{profile}: Bazel reported no release wheels for: "
+                    + ", ".join(uncovered)
+                    + f"; see {variant['build_events']}"
+                )
 
     def preflight(self):
         self.run.set_phase("preflight")
@@ -259,30 +226,7 @@ class Runner:
             self.lines[0],
             self.profiles[0],
         )
-        expected = digest(self.root / "foundry/rootfs/cuda_ecosystem.lock.json")
         for line in self.lines:
-            manifest = self.estate / f"rootfs-lines/{line}/rootfs-bundle.json"
-            if (
-                not manifest.is_file()
-                or json.loads(manifest.read_text()).get("lock", {}).get("sha256")
-                != expected
-            ):
-                raise RuntimeError(
-                    f"{line}: supply a prepared rootfs matching this checkout's ecosystem lock; see docs/estate.md"
-                )
-            self.run.stage(
-                "tools-" + line,
-                [
-                    sys.executable,
-                    "-B",
-                    "insula/rootfs/foundry_tools.py",
-                    "--rootfs",
-                    str(manifest.parent / "rootfs"),
-                    "--verify",
-                ],
-                line,
-                self.profiles[0],
-            )
             self.run.stage(
                 "doctor-" + line,
                 [
@@ -294,6 +238,19 @@ class Runner:
                     line,
                     "--rootfs-lock",
                     "foundry/rootfs/cuda_ecosystem.lock.json",
+                ],
+                line,
+                self.profiles[0],
+            )
+            self.run.stage(
+                "tools-" + line,
+                [
+                    sys.executable,
+                    "-B",
+                    "insula/rootfs/foundry_tools.py",
+                    "--rootfs",
+                    str(self.estate / f"rootfs-lines/{line}/rootfs"),
+                    "--verify",
                 ],
                 line,
                 self.profiles[0],
@@ -409,6 +366,7 @@ def _run(args: argparse.Namespace) -> int:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
+        prog="foundry/build.sh",
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""cache model:
@@ -433,8 +391,8 @@ Bazel progress legend:
         default=os.environ.get("VASO_ESTATE_ROOT"),
         help="owned estate with matching rootfs/tooling; defaults to VASO_ESTATE_ROOT",
     )
-    parser.add_argument("--line", choices=("cu129", "cu130", "all"), default="cu129")
-    parser.add_argument("--profile", choices=("torch", "jax", "all"), default="torch")
+    parser.add_argument("--line", choices=(*CUDA_LINES, "all"), default="cu129")
+    parser.add_argument("--profile", choices=(*PACKAGES, "all"), default="torch")
     parser.add_argument(
         "--seed-estate",
         type=Path,

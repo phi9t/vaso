@@ -15,7 +15,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-RESULT_PY="$ROOT/insula/execution/result.py"
+RESULT_PY="$ROOT/foundry/tools/run_result.py"
 LEASE_PY="$ROOT/insula/execution/lease.py"
 SUMMARY_PY="$ROOT/tools/ci/nightly_summary.py"
 GPU_WAIT_PY="$ROOT/tools/ci/gpu_wait.py"
@@ -25,7 +25,7 @@ source "$ROOT/tools/ci/ci_common.sh"
 VASO_AGENT="${VASO_AGENT:-pb-nightly}"
 TARGET="${NIGHTLY_TARGET:-HEAD}"
 GATE_CMD="${NIGHTLY_GATE_CMD:-$ROOT/tools/agents/triumvirate-gate.sh}"
-DETERMINISM_CMD="${NIGHTLY_DETERMINISM_CMD:-$ROOT/scripts/release/determinism_check.sh}"
+DETERMINISM_CMD="${NIGHTLY_DETERMINISM_CMD:-$ROOT/tools/release/determinism_check.sh}"
 LEASE_TIMEOUT="${NIGHTLY_LEASE_TIMEOUT:-60}"
 LEASE_TTL="${NIGHTLY_LEASE_TTL:-21600}"
 GATE_TIMEOUT="${NIGHTLY_GATE_TIMEOUT:-8h}"

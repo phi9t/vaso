@@ -570,6 +570,26 @@ insula_prepare_experiment_context() {
   _insula_append_setenv INSULA_ENV_ARGS VASO_PREFIX /opt/vaso
 }
 
+foundry_insula_usage() {
+  cat <<'EOF'
+usage:
+  foundry/insula.sh [run] --line <cu129|cu130> [--phase run|fetch] [--print-argv] -- COMMAND [ARG...]
+  foundry/insula.sh [run] --line <cu129|cu130> --release DIR [--bundle TAR.ZST] [--gpus N] [--print-argv] -- COMMAND [ARG...]
+
+Set VASO_ESTATE_ROOT to an owned estate with a prepared rootfs.
+--line defaults to VASO_CUDA_LINE when set.
+--phase defaults to run (or INSULA_PHASE); fetch requires SHA-256-pinned inputs.
+--release runs shipped wheels offline using the bundled Python runtime.
+--bundle selects a rootfs archive for release execution; it requires --release.
+--gpus reserves N GPUs for release execution (default: 1 or INSULA_RELEASE_GPUS).
+--print-argv prints the planned command without preflight or execution;
+context preparation still runs and may create estate state.
+
+For unattended wheel builds, use foundry/build.sh --help.
+See docs/operator-guide.md and docs/foundry.md for preparation and examples.
+EOF
+}
+
 foundry_insula_main() {
   local line="${VASO_CUDA_LINE:-}"
   local print_argv=0
@@ -611,7 +631,7 @@ foundry_insula_main() {
         break
         ;;
       -h|--help)
-        sed -n '2,8p' "$0"
+        foundry_insula_usage
         return 0
         ;;
       *)
@@ -621,11 +641,13 @@ foundry_insula_main() {
     esac
   done
   if [[ -z "$line" ]]; then
-    echo "usage: $0 --line <cu129|cu130> [--phase PHASE] [--print-argv] -- <cmd> [args...]" >&2
+    echo "Foundry execution requires --line or VASO_CUDA_LINE" >&2
+    foundry_insula_usage >&2
     return 2
   fi
   if [[ "$#" -eq 0 ]]; then
-    echo "usage: $0 [run] --line <cu129|cu130> [--release DIR] [--bundle TAR.ZST] [--gpus N] [--phase PHASE] [--print-argv] -- <cmd> [args...]" >&2
+    echo "Foundry execution requires a command after --" >&2
+    foundry_insula_usage >&2
     return 2
   fi
   if [[ -n "$release_dir" ]]; then

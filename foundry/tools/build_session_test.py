@@ -282,6 +282,74 @@ class BuildSessionTest(unittest.TestCase):
             self.assertEqual(report["result_path"], str(r.output / "result.txt"))
             self.assertIn("ABANDONED", (r.output / "result.txt").read_text())
 
+    def test_variant_lifecycle_records_success_failure_and_interruption(self):
+        for error in (
+            None,
+            RuntimeError("build failed"),
+            OSError("cannot read outputs"),
+            ValueError("invalid build events"),
+            InterruptedError("terminated"),
+            KeyboardInterrupt(),
+        ):
+            with self.subTest(error=type(error).__name__):
+                with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+                    session = self.make_session(Path(directory))
+                    log = str(session.output / "build.log")
+                    session.report["stages"].append({"log": log})
+
+                    def build():
+                        with session.variant("cu129", "torch") as variant:
+                            self.assertEqual(variant["status"], "running")
+                            saved = json.loads(
+                                Path(session.report["summary_path"]).read_text()
+                            )
+                            self.assertEqual(saved["variants"][0]["status"], "running")
+                            variant["artifacts"] = [{"name": "retained.whl"}]
+                            if error is not None:
+                                raise error
+
+                    if error is None:
+                        build()
+                        status = "built"
+                    else:
+                        with self.assertRaises(type(error)) as raised:
+                            build()
+                        self.assertIs(raised.exception, error)
+                        status = (
+                            "interrupted"
+                            if isinstance(error, (InterruptedError, KeyboardInterrupt))
+                            else "failed"
+                        )
+                    saved = json.loads(Path(session.report["summary_path"]).read_text())
+                    variant = saved["variants"][0]
+                    self.assertEqual(variant["status"], status)
+                    self.assertEqual(variant["artifacts"], [{"name": "retained.whl"}])
+                    self.assertEqual(variant["log"], log)
+                    self.assertGreaterEqual(variant["duration_seconds"], 0)
+                    self.assertIn("finished_at", variant)
+                    if error is not None:
+                        self.assertEqual(variant["error"], str(error))
+                    else:
+                        self.assertNotIn("error", variant)
+                    self.assertEqual(
+                        [v["status"] for v in saved["variants"]][1:], ["pending"] * 3
+                    )
+                    events = [
+                        json.loads(line)
+                        for line in Path(session.report["events_path"])
+                        .read_text()
+                        .splitlines()
+                    ]
+                    finished = [e for e in events if e["event"] == "variant_finished"]
+                    self.assertEqual(len(finished), 1)
+                    self.assertEqual(finished[0]["status"], status)
+                    self.assertEqual(finished[0]["line"], "cu129")
+                    self.assertEqual(finished[0]["profile"], "torch")
+                    if error is None:
+                        self.assertEqual(finished[0]["artifacts"], 1)
+                    else:
+                        self.assertNotIn("artifacts", finished[0])
+
     def test_source_edits_are_detected(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory) / "repo"

@@ -1,1 +1,0 @@
-../../insula/rootfs/bundle.sh

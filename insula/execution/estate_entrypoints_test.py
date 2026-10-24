@@ -103,7 +103,7 @@ ENTRYPOINTS = [
         "insula.sh",
         [
             "bash",
-            str(ROOT / "scripts/insula/insula.sh"),
+            str(ROOT / "foundry/insula.sh"),
             "run",
             "--line",
             "cu129",
@@ -148,7 +148,7 @@ ENTRYPOINTS = [
         "result.py",
         [
             sys.executable,
-            str(ROOT / "insula/execution/result.py"),
+            str(ROOT / "foundry/tools/run_result.py"),
             "redact-args",
             "--",
             "ok",
@@ -160,7 +160,7 @@ ENTRYPOINTS = [
         "cut.sh",
         [
             "bash",
-            str(ROOT / "scripts/release/cut.sh"),
+            str(ROOT / "tools/release/cut.sh"),
             "--profile",
             "torch",
             "--line",
@@ -175,7 +175,7 @@ ENTRYPOINTS = [
         "determinism_check.sh",
         [
             "bash",
-            str(ROOT / "scripts/release/determinism_check.sh"),
+            str(ROOT / "tools/release/determinism_check.sh"),
             "--profile",
             "torch",
             "--line",
@@ -188,7 +188,7 @@ ENTRYPOINTS = [
         "determinism_compare.py",
         [
             sys.executable,
-            str(ROOT / "scripts/release/determinism_compare.py"),
+            str(ROOT / "tools/release/determinism_compare.py"),
             "--profile",
             "torch",
             "--line",
@@ -198,7 +198,7 @@ ENTRYPOINTS = [
             "--second",
             ".",
             "--allowlist",
-            str(ROOT / "scripts/release/determinism_allowlist.json"),
+            str(ROOT / "tools/release/determinism_allowlist.json"),
             "--out",
             str(ROOT / ".scratch" / "unused-determinism.json"),
         ],
@@ -207,7 +207,7 @@ ENTRYPOINTS = [
     ),
     (
         "estate.py",
-        [sys.executable, str(EXP / "tools/estate.py"), "--required-gib", "0"],
+        [sys.executable, str(ROOT / "insula/estate/estate.py"), "--required-gib", "0"],
         EXP,
         {},
     ),

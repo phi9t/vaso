@@ -124,12 +124,14 @@ There are two ways to supply a rootfs:
 
 - **Restore a pinned bundle:** follow the [operator restore recipe](operator-guide.md#restore-a-rootfs-and-wheels).
   Verify the OCI digest, file hashes, archive checksum, and selected CUDA line.
-- **Build a rootfs:** `insula/rootfs/build_rootfs.sh --line cu129` constructs
-  the line from the ecosystem lock. Its provisioning path uses Docker and
+- **Build a rootfs:** `insula/rootfs/prepare.sh build --line cu129 --fetch`
+  constructs the line from the ecosystem lock and installs pinned tooling. Its provisioning path uses Docker and
   network acquisition. This is separate from normal Bubblewrap execution.
 
-For native builds, also provision pinned Foundry tools and the complete source,
-module, and nested-build closure. Follow [Foundry provisioning](foundry.md#build-interface).
+Both preparation modes publish matching ecosystem and tooling manifests together
+and verify matching populated destinations. Older roots without a preparation
+receipt require a fresh destination. For native builds, also prepare the complete
+source, module, and nested-build closure. Follow [Foundry provisioning](foundry.md#build-interface).
 A deployment rootfs and wheels alone do not supply that closure.
 
 Before building, verify the selected rootfs tools and prepare the module cache:

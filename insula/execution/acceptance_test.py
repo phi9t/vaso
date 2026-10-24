@@ -4,14 +4,147 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+import acceptance as acceptance_module
+from vaso import atomic_files
+from acceptance import source_hashes
 
 
 SCRIPT = Path(__file__).with_name("acceptance.py")
+
+
+def test_failed_acceptance_save_preserves_report_and_cleans_staging(tmp_path, monkeypatch):
+    run = acceptance_module.AcceptanceRun(tmp_path, tmp_path / "evidence")
+    path = run.evidence / "result.json"
+    original = path.read_bytes()
+    run.report["error"] = "new diagnostic"
+
+    def fail(*args):
+        raise OSError("cannot publish acceptance report")
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(atomic_files.os, "replace", fail)
+        with pytest.raises(OSError, match="cannot publish acceptance report"):
+            run.save()
+    assert path.read_bytes() == original
+    assert list(run.evidence.iterdir()) == [path]
+    run.save()
+    assert json.loads(path.read_text())["error"] == "new diagnostic"
+
+
+@pytest.mark.parametrize("creation_fails", [False, True])
+def test_acceptance_restores_the_callers_sigterm_handler(
+    tmp_path, monkeypatch, creation_fails
+):
+    previous = signal.getsignal(signal.SIGTERM)
+
+    def run(_self):
+        handler = signal.getsignal(signal.SIGTERM)
+        assert callable(handler)
+        with pytest.raises(KeyboardInterrupt, match="SIGTERM"):
+            handler(signal.SIGTERM, None)
+        if creation_fails:
+            raise OSError("fixture setup error")
+        return 1
+
+    monkeypatch.setattr(acceptance_module.AcceptanceRun, "run", run)
+    result = acceptance_module.main(
+        ["--rootfs", str(tmp_path), "--evidence-dir", str(tmp_path / "evidence")]
+    )
+    assert result == (2 if creation_fails else 1)
+    assert signal.getsignal(signal.SIGTERM) == previous
+
+
+@pytest.mark.parametrize(
+    "failure, diagnostic",
+    [
+        (KeyboardInterrupt("fixture cancellation"), "fixture cancellation"),
+        (OSError("fixture communication failure"), "fixture communication failure"),
+        (subprocess.TimeoutExpired("fixture", 30), "timed out"),
+    ],
+)
+def test_interrupted_command_stops_child_and_retains_failed_evidence(
+    tmp_path, monkeypatch, failure, diagnostic
+):
+    run = acceptance_module.AcceptanceRun(tmp_path, tmp_path / "evidence")
+    processes = []
+    communicate = subprocess.Popen.communicate
+
+    def interrupt(process, *args, **kwargs):
+        if not processes:
+            processes.append(process)
+            raise failure
+        return communicate(process, *args, **kwargs)
+
+    def prepare():
+        run.env = {"PATH": "/usr/bin:/bin"}
+        run.command(
+            "interrupted", [sys.executable, "-c", "import time; time.sleep(60)"]
+        )
+
+    monkeypatch.setattr(subprocess.Popen, "communicate", interrupt)
+    monkeypatch.setattr(run, "prepare", prepare)
+    try:
+        escaped = False
+        try:
+            result = run.run()
+        except KeyboardInterrupt:
+            escaped = True
+        assert not escaped, "cancellation escaped without a failed acceptance result"
+        assert result == 1
+        assert processes[0].poll() is not None, "owned child survived the failed run"
+        report = json.loads((run.evidence / "result.json").read_text())
+        assert report["verdict"] == "failed"
+        assert diagnostic in report["error"]
+        assert report["commands"][0]["exit_code"] != 0
+        assert (run.evidence / "interrupted.stdout").is_file()
+        assert (run.evidence / "interrupted.stderr").is_file()
+        assert report["cleanup"]["state_removed"]
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                os.killpg(process.pid, signal.SIGKILL)
+            process.communicate(timeout=5)
+
+
+def test_source_manifest_includes_extracted_runtime_helpers_and_excludes_tests(
+    tmp_path,
+):
+    runtime = [
+        "insula/run.sh",
+        "insula/execution/acceptance.py",
+        "insula/execution/insula.sh",
+        "insula/execution/doctor.sh",
+        "insula/execution/lease.py",
+        "insula/estate/overlay_root.py",
+        "insula/estate/estate.py",
+        "insula/rootfs/verify_cuda_ecosystem.py",
+        "insula/execution/vaso/doctor.py",
+        "insula/execution/vaso/lease_state.py",
+        "insula/execution/vaso/__init__.py",
+        "insula/execution/vaso/nested/helper.py",
+    ]
+    tests = [
+        "insula/execution/vaso/doctor_test.py",
+        "insula/execution/vaso/test_helper.py",
+        "insula/execution/vaso/conftest.py",
+    ]
+    for relative in runtime + tests:
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("original\n")
+    before = source_hashes(tmp_path)
+    assert set(before) == set(runtime)
+    for changed in ("insula/execution/vaso/lease_state.py", "insula/rootfs/verify_cuda_ecosystem.py"):
+        before = source_hashes(tmp_path)
+        (tmp_path / changed).write_text("changed implementation\n")
+        after = source_hashes(tmp_path)
+        assert {path for path in before if before[path] != after[path]} == {changed}
 
 
 def run_acceptance(rootfs: Path, evidence: Path, **env: str) -> subprocess.CompletedProcess[str]:
@@ -76,7 +209,7 @@ def test_real_insula_acceptance_ignores_inherited_test_and_estate_overrides(tmp_
     assert result.returncode == 0, result.stdout + result.stderr
     report = json.loads((evidence / "result.json").read_text())
     assert report["verdict"] == "passed"
-    assert set(report["features"]) == {"readiness", "mounts-and-argv", "exit-status", "lease-recovery", "cleanup"}
+    assert set(report["features"]) == {"readiness", "mounts-and-argv", "exit-status", "interruption-and-retry", "lease-recovery", "cleanup"}
     assert all(report["features"].values())
     assert Path(report["bwrap"]["path"]).name == "bwrap"
     assert report["cleanup"]["state_removed"] is True

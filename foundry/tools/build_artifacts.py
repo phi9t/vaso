@@ -20,6 +20,45 @@ _RELEASE_WHEELHOUSE_SUFFIXES = (
 )
 
 
+def artifact_size_mismatches(artifacts: list[dict[str, Any]]) -> list[str]:
+    """Compare recorded sizes with materialized files without rewriting evidence."""
+    mismatches = []
+    for artifact in artifacts:
+        expected = artifact.get("size_bytes")
+        if expected is None:
+            continue
+        path = Path(artifact["path"])
+        actual = path.stat().st_size
+        if actual != expected:
+            mismatches.append(f"{path} (expected {expected}, actual {actual})")
+    return mismatches
+
+
+def missing_wheel_targets(
+    artifacts: list[dict[str, Any]], output_base: Path, targets: list[str]
+) -> list[str]:
+    """Find requested main-repository release wheelhouses absent from the inventory.
+
+    Match package and target paths rather than wheel distribution names, which
+    may differ from Bazel labels and include changing version/ABI suffixes.
+    Materialization and content verification remain separate checks.
+    """
+    wheelhouses = set()
+    execroot = output_base / "execroot/_main"
+    for artifact in artifacts:
+        relative = Path(artifact["path"]).relative_to(execroot)
+        parts = relative.parts
+        if len(parts) > 3 and parts[0] == "bazel-out" and parts[2] == "bin":
+            relative = Path(*parts[3:])
+        wheelhouses.update(relative.parents)
+    missing = []
+    for target in targets:
+        package, name = target.removeprefix("//").split(":", 1)
+        if Path(package) / (name + "_wheelhouse") not in wheelhouses:
+            missing.append(target)
+    return missing
+
+
 def _wheel_files(event: Any) -> Iterator[tuple[Path, dict[str, Any]]]:
     """Validate named-file records and yield safe release-wheel paths."""
     if not isinstance(event, dict):
