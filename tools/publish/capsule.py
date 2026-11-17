@@ -89,7 +89,7 @@ def blob(layout, data, media):
 
 def privacy_filter(member):
     parts = PurePosixPath(member.name).parts
-    if any(p in {".git", ".ssh", ".aws", ".gnupg", ".scratch"} for p in parts):
+    if any(p in {".git", ".ssh", ".aws", ".gnupg", ".scratch", "__pycache__", ".pytest_cache"} for p in parts):
         return None
     root = "capsule/rootfs/"
     if member.name.startswith(root):
@@ -129,8 +129,70 @@ def layer(layout, item=None, descriptor=None):
     finally:
         if os.path.exists(tmp): os.unlink(tmp)
 
-def pack(spec, dest, tag="capsule"):
+class TarLayer:
+    """One native OCI tar stream. No installed-member hashes or inventories."""
+    def __init__(self, layout):
+        self.layout = layout
+        fd, self.tmp = tempfile.mkstemp(dir=layout)
+        self.output = os.fdopen(fd, "wb")
+        self.compressed = DigestWriter(self.output)
+        self.gz = gzip.GzipFile(filename="", mode="wb", fileobj=self.compressed, compresslevel=1, mtime=0)
+        self.raw = DigestWriter(self.gz)
+        self.tar = tarfile.open(fileobj=self.raw, mode="w|", format=tarfile.PAX_FORMAT)
+        self.members = 0
+
+    def finish(self):
+        self.tar.close()
+        self.gz.close()
+        self.output.close()
+        if self.compressed.count >= 10_000_000_000:
+            os.unlink(self.tmp)
+            raise ValueError("compressed layer exceeds GHCR limit; reduce the layer target or select a different artifact representation")
+        digest = self.compressed.digest.hexdigest()
+        os.replace(self.tmp, self.layout / "blobs/sha256" / digest)
+        return ({"mediaType":LAYER,"digest":"sha256:"+digest,"size":self.compressed.count},
+                "sha256:"+self.raw.digest.hexdigest())
+
+    def abort(self):
+        self.tar.close(); self.gz.close(); self.output.close()
+        if os.path.exists(self.tmp): os.unlink(self.tmp)
+
+def component_layers(layout, item, max_layer_bytes):
+    # Bound uncompressed tar bytes between members, safely below GHCR's 10GB
+    # compressed-layer limit. Never slice a compressed stream into fake layers.
+    current = TarLayer(layout)
+    completed = []
+    def visit(source, arcname):
+        nonlocal current
+        info = current.tar.gettarinfo(str(source), arcname=arcname)
+        info = privacy_filter(info)
+        if info is None:
+            return
+        if current.members and current.tar.offset + info.size + 1024 > max_layer_bytes:
+            completed.append(current.finish())
+            current = TarLayer(layout)
+            info = privacy_filter(current.tar.gettarinfo(str(source), arcname=arcname))
+        if info.isfile():
+            with source.open("rb") as data:
+                current.tar.addfile(info, data)
+        else:
+            current.tar.addfile(info)
+        current.members += 1
+        if info.isdir():
+            for child in sorted(source.iterdir(), key=lambda x:x.name):
+                visit(child, arcname+"/"+child.name)
+    try:
+        visit(Path(item["source"]), "capsule/"+item["path"])
+        completed.append(current.finish())
+        return completed
+    except Exception:
+        current.abort()
+        raise
+
+def pack(spec, dest, tag="capsule", max_layer_bytes=2_000_000_000):
     validate(spec, sources=True)
+    if max_layer_bytes < 1024 or max_layer_bytes > 8_000_000_000:
+        raise ValueError("layer byte target must be between 1024 and 8000000000")
     if not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}", tag):
         raise ValueError("invalid OCI reference tag")
     if dest.exists(): raise ValueError("refusing to replace existing OCI layout")
@@ -143,9 +205,9 @@ def pack(spec, dest, tag="capsule"):
         desc = {"schema_version": 1, "layers": [{k:v for k,v in i.items() if k != "source"} for i in spec["layers"]]}
         layers, diffs = [], []
         for item in spec["layers"]:
-            entry, diff = layer(stage, item=item)
-            entry["annotations"] = {"io.vaso.capsule.layer": item["name"]}
-            layers.append(entry); diffs.append(diff)
+            for part, (entry, diff) in enumerate(component_layers(stage, item, max_layer_bytes)):
+                entry["annotations"] = {"io.vaso.capsule.layer": item["name"], "io.vaso.capsule.part":str(part)}
+                layers.append(entry); diffs.append(diff)
         entry, diff = layer(stage, descriptor=desc)
         layers.append(entry); diffs.append(diff)
         config = blob(stage, encoded({"architecture":"amd64","os":"linux","config":{"Labels":{"io.vaso.capsule.schema":"1"}},"rootfs":{"type":"layers","diff_ids":diffs}}), CONFIG)
@@ -272,7 +334,7 @@ def run_capsule(bundle, repo, estate, workspace, line, command, print_argv=False
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     sub=p.add_subparsers(dest="command",required=True)
-    a=sub.add_parser("pack"); a.add_argument("--spec",type=Path,required=True); a.add_argument("--layout",type=Path,required=True); a.add_argument("--tag",default="capsule")
+    a=sub.add_parser("pack"); a.add_argument("--spec",type=Path,required=True); a.add_argument("--layout",type=Path,required=True); a.add_argument("--tag",default="capsule"); a.add_argument("--max-layer-bytes",type=int,default=2_000_000_000)
     a=sub.add_parser("unpack"); a.add_argument("--layout",type=Path,required=True); a.add_argument("--dest",type=Path,required=True); a.add_argument("--tag",default="capsule"); a.add_argument("--umoci",default="umoci")
     a=sub.add_parser("plan"); a.add_argument("--bundle",type=Path,required=True)
     a=sub.add_parser("run"); a.add_argument("--bundle",type=Path,required=True); a.add_argument("--repo",type=Path,required=True); a.add_argument("--estate",type=Path,required=True); a.add_argument("--workspace",type=Path,required=True); a.add_argument("--line",required=True); a.add_argument("--print-argv",action="store_true"); a.add_argument("argv",nargs=argparse.REMAINDER)
@@ -280,7 +342,7 @@ def main():
         a=sub.add_parser(name); a.add_argument("--layout",type=Path,required=True); a.add_argument("--remote",required=True); a.add_argument("--tag",default="capsule"); a.add_argument("--oras-bin")
     args=p.parse_args()
     if args.command in ("push","pull"): print(transfer(args.command,args.layout,args.remote,args.tag,args.oras_bin))
-    elif args.command=="pack": print(pack(json.loads(args.spec.read_text()),args.layout,args.tag))
+    elif args.command=="pack": print(pack(json.loads(args.spec.read_text()),args.layout,args.tag,args.max_layer_bytes))
     elif args.command=="unpack": unpack(args.layout,args.dest,args.tag,args.umoci); print(args.dest)
     elif args.command=="run": run_capsule(args.bundle,args.repo,args.estate,args.workspace,args.line,args.argv[1:] if args.argv[:1]==["--"] else args.argv,args.print_argv)
     else: print(json.dumps(projections(args.bundle),indent=2))
