@@ -55,8 +55,13 @@ staged beside the destination and published only on success; existing
 destinations are not replaced. Run extraction unprivileged on a filesystem
 with an appropriate disk quota. No untrusted image command is executed.
 
-Packing uses one stream per semantic layer, gzip level 1, normalized ownership
-and timestamps. Only standard OCI compressed blob hashes and uncompressed
+Packing uses semantic component boundaries, gzip level 1, normalized ownership
+and timestamps. Components are further divided at tar-member boundaries using
+a 2 GB uncompressed byte target (`--max-layer-bytes`). Each part is a complete,
+independently compressed standard OCI tar layer, never a byte slice of one
+compressed archive. A single member may exceed the target; a compressed part
+at or above GHCR's 10 GB hard limit fails before publication. Rotation happens
+during serialization with no preliminary member inventory. Only standard OCI compressed blob hashes and uncompressed
 layer diff IDs are computed. There is no source/member hash manifest. Unchanged
 layer bytes retain the same OCI digest even if another component changes.
 
@@ -109,7 +114,8 @@ Package publication is not complete merely because local pack or GPU tests pass.
 
 ## Privacy and verification
 
-Packing excludes common credential/history directories, runtime directories,
+Packing excludes common credential/history directories, Python bytecode/test-cache
+directories (which can embed staging host paths), runtime directories,
 logs, and selected host identity files. This is **not a general sanitizer**.
 Prepare sanitized release inputs; review names, symlink targets, build metadata
 and embedded strings as required by the existing publication policy. Never

@@ -47,12 +47,13 @@ def test_semantic_layer_reuse(tmp_path):
 def test_basic_secret_exclusions(tmp_path):
     s=fixture(tmp_path); root=Path(s["layers"][0]["source"])
     (root/".ssh").mkdir(); (root/".ssh/key").write_text("secret")
+    (root/"__pycache__").mkdir(); (root/"__pycache__/host-path.pyc").write_text("private build path")
     (root/"etc").mkdir(); (root/"etc/shadow").write_text("secret")
     c.pack(s,tmp_path/"image"); m=inspect(tmp_path/"image")
     raw=gzip.decompress(read_blob(tmp_path/"image",m["layers"][0]))
     with tarfile.open(fileobj=io.BytesIO(raw)) as t:
         names=t.getnames()
-    assert not any(".ssh" in n or n.endswith("/shadow") for n in names)
+    assert not any(".ssh" in n or "__pycache__" in n or n.endswith("/shadow") for n in names)
 
 def test_bad_paths(tmp_path):
     s=fixture(tmp_path)
@@ -173,6 +174,36 @@ def test_public_destination_rejected_before_upload(tmp_path):
 def test_sources_root_projection_allowed(tmp_path):
     spec=fixture(tmp_path); spec["layers"][1]["guest"]="/sources"
     c.validate(spec,True)
+
+
+def test_bounded_parts_are_real_tar_layers(tmp_path):
+    spec=fixture(tmp_path); tools=Path(spec["layers"][1]["source"])
+    for i in range(8): (tools/str(i)).write_bytes(bytes(range(256))*12)
+    c.pack(spec,tmp_path/"oci",max_layer_bytes=4096)
+    manifest=inspect(tmp_path/"oci")
+    assert len(manifest["layers"]) > 3
+    config=json.loads(read_blob(tmp_path/"oci",manifest["config"]))
+    for desc,diff in zip(manifest["layers"],config["rootfs"]["diff_ids"]):
+        raw=gzip.decompress(read_blob(tmp_path/"oci",desc))
+        assert "sha256:"+hashlib.sha256(raw).hexdigest()==diff
+        with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+            assert archive.getmembers()
+
+def test_bounded_real_restore_preserves_links(tmp_path):
+    import os
+    umoci=os.environ.get("CAPSULE_TEST_UMOCI")
+    if not umoci: raise unittest.SkipTest("set CAPSULE_TEST_UMOCI")
+    spec=fixture(tmp_path); tools=Path(spec["layers"][1]["source"])
+    payload=bytes(range(256))*12
+    (tools/"large").write_bytes(payload)
+    os.link(tools/"large",tools/"same")
+    (tools/"alias").symlink_to("large")
+    c.pack(spec,tmp_path/"oci",max_layer_bytes=2048)
+    c.unpack(tmp_path/"oci",tmp_path/"restored",umoci=umoci)
+    directory=Path(c.projections(tmp_path/"restored")["bindings"][0]["source"])
+    assert (directory/"large").read_bytes()==payload
+    assert (directory/"same").read_bytes()==payload
+    assert (directory/"alias").read_bytes()==payload
 
 
 class CapsuleTests(unittest.TestCase):
