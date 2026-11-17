@@ -1,0 +1,43 @@
+--- a/torch/profiler/_cuspy/trace.py
++++ b/torch/profiler/_cuspy/trace.py
+@@ -365,11 +365,18 @@
+     ) -> int:
+         # normalized_thread_id: the raw CUPTI threadId reduced to signed 32-bit, vectorized
+         # at the call site (ctypes.c_int32 per record is otherwise the hot cost).
++        process_map = thread_resource_map.get(process_id, {})
++        # Explicit CUPTI thread resources identify the launch OS thread. External
++        # correlation owners may be inherited scopes or use another ID namespace.
++        if (
++            normalized_thread_id in process_map
++            and process_map[normalized_thread_id] is not None
++        ):
++            return process_map[normalized_thread_id]
+         linked = cpu_thread_by_correlation_id.get(correlation_id)
+         if linked is not None and linked[0] == process_id:
+             return linked[1]
+-        process_map = thread_resource_map.get(process_id, {})
+-        return process_map.get(normalized_thread_id, normalized_thread_id)
++        return normalized_thread_id
+ 
+     # Drop the trailing "Activity Buffer Request" overhead that lands after the last
+     # real activity: the cutoff is the max non-overhead end (converted ns).
+@@ -2128,10 +2135,15 @@
+         )
+         tid = np.fromiter(
+             (
+-                cpu_thread_by_correlation_id[cc][1]
+-                if cc in cpu_thread_by_correlation_id
+-                and cpu_thread_by_correlation_id[cc][0] == p
+-                else thread_resource_map.get(p, {}).get(nt, nt)
++                thread_resource_map[p][nt]
++                if nt in thread_resource_map.get(p, {})
++                and thread_resource_map[p][nt] is not None
++                else (
++                    cpu_thread_by_correlation_id[cc][1]
++                    if cc in cpu_thread_by_correlation_id
++                    and cpu_thread_by_correlation_id[cc][0] == p
++                    else nt
++                )
+                 for p, cc, nt in zip(pid, corr.tolist(), normtid.tolist())
+             ),
+             dtype=np.int64,
