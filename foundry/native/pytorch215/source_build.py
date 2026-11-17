@@ -86,6 +86,18 @@ class SourceBuild:
             rel = Path(name)
             if rel.is_absolute() or '..' in rel.parts: raise ValueError('Unsafe required toolchain path')
             if not (self.rootfs/rel).is_file(): raise FileNotFoundError(f'Required header/library missing from rootfs: {name}')
+        # NCCL's top-level nccl_device.h includes nested nccl_device/ headers.
+        # Pin the entire provider tree before admission, not just the facade.
+        for tree in self.profile.get('required_header_trees', []):
+            header_root = Path(tree['root'])
+            if header_root.is_absolute() or '..' in header_root.parts: raise ValueError('Unsafe provider header root')
+            for name, expected in tree['files'].items():
+                rel = Path(name)
+                if rel.is_absolute() or '..' in rel.parts: raise ValueError('Unsafe provider header path')
+                header = self.rootfs/header_root/rel
+                if not header.is_file(): raise FileNotFoundError(f"Required {tree['provider']} header missing: {header_root/rel}")
+                if not header.resolve().is_relative_to(self.rootfs): raise ValueError('Provider header escapes frozen rootfs')
+                if digest(header) != expected: raise ValueError(f"Pinned {tree['provider']} header digest mismatch: {header_root/rel}")
         return {'schema':'vaso.source-build-inputs.v2', 'profile_text':self.profile_path.read_bytes().decode('utf-8'),
                 'source_archive_sha256':self.profile['torch']['archive_sha256'],
                 'rootfs_manifest_text':(root/'build-manifest.json').read_bytes().decode('utf-8'),
@@ -193,7 +205,7 @@ class SourceBuild:
 def main() -> int:
     a=argparse.ArgumentParser(description=__doc__)
     a.add_argument('--site',required=True,type=Path)
-    a.add_argument('--profile',type=Path,default=HERE/'profiles/cu126-sm61-r3.json')
+    a.add_argument('--profile',type=Path,default=HERE/'profiles/cu126-sm61-r4.json')
     a.add_argument('--jobs',type=int,default=3);a.add_argument('--resume',action='store_true')
     a.add_argument('--max-seconds',type=int,default=10800)
     a.add_argument('action',choices=['prepare','build','status'])
