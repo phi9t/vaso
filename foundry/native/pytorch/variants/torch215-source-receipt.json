@@ -1,0 +1,13 @@
+{
+  "source_commit": "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457",
+  "clean_recursive_source": true,
+  "archive": {
+    "filename": "pytorch-v2.15.0-recursive-pascal.tar.zst",
+    "sha256": "32ed7ff3176aa6e9c8a0ddcc617c1e2bf6e65f24d2b534e29cfd22c6ad3cfbb1",
+    "bytes": 728505446,
+    "strip_prefix": "pytorch-v2.15.0"
+  },
+  "submodule_count": 61,
+  "receipt_origin": "Existing strict-source-closure.v1 producer receipt; reused without rehashing or a fresh source audit.",
+  "note": "Historical archive filename contains pascal; producer receipt records clean upstream source before variant patches."
+}

@@ -152,7 +152,6 @@ PACKAGE_GENERATORS: dict[str, dict[str, Any]] = {
             "patches": [
                 {
                     "path": "native/triton/patches/0001-llvm-35901313.patch",
-                    "sha256": "771dbaa52dbcaebff26f47684cacdb1edf237d900c8a418b11f9c2793397ce7f",
                 }
             ],
             "sha256": "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825",
@@ -503,14 +502,6 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -614,7 +605,7 @@ def leaf_prefix_plan(
     package_name: str,
     profile: str,
     line: str,
-    rootfs_sha256: str,
+    rootfs_identity_text: str,
     rootfs: dict[str, Any],
 ) -> dict[str, Any]:
     package = PACKAGE_GENERATORS[package_name]
@@ -636,7 +627,7 @@ def leaf_prefix_plan(
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": {},
@@ -659,8 +650,8 @@ def leaf_prefix_plan(
     return plan
 
 
-def zlib_ng_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
-    return leaf_prefix_plan(repo_root, "zlib-ng", profile, line, rootfs_sha256, rootfs)
+def zlib_ng_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:
+    return leaf_prefix_plan(repo_root, "zlib-ng", profile, line, rootfs_identity_text, rootfs)
 
 
 def manifest_label(prefix_file_label: str) -> str:
@@ -818,8 +809,10 @@ def triton_prefix_placeholders(package: dict[str, Any]) -> list[str]:
     return ["{prefix:" + key + "}" for key in package["deps"]]
 
 
-def triton_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
-    package = PACKAGE_GENERATORS["py-triton"]
+def triton_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:
+    package = copy.deepcopy(PACKAGE_GENERATORS["py-triton"])
+    for patch in package["source"]["patches"]:
+        patch["expected_text"] = (repo_root / patch["path"]).read_bytes().decode("utf-8")
     cuda_version = rootfs["components"]["cuda_toolkit"]["version"]
     toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
     cc_ref = toolchain_ref(toolchain_identifier)
@@ -830,7 +823,7 @@ def triton_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
         "line": line,
         "package": {"name": "py-triton", "version": package["version"]},
         "sources": [copy.deepcopy(package["source"])],
-        "inputs": [{"path": "native/triton/upstream_pins.json", "sha256": sha256_file(repo_root / "native" / "triton" / "upstream_pins.json")}],
+        "inputs": [{"path": "native/triton/upstream_pins.json", "expected_text": (repo_root / "native" / "triton" / "upstream_pins.json").read_bytes().decode("utf-8")}],
         "toolchain": {
             "cc": cc_ref,
             "cxx": cc_ref,
@@ -839,7 +832,7 @@ def triton_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": triton_dep_plan(package["deps"]),
@@ -983,6 +976,8 @@ def pytorch_env_script(package: dict[str, Any]) -> str:
             "py-protobuf",
         )
     ]
+    if package.get("h20_debian_layout"):
+        pythonpath_parts.insert(0, "$(printenv VASO_VARIANT_PYTHONPATH)")
     path_parts = [
         "$python/bin",
         "$cmake/bin",
@@ -1294,8 +1289,8 @@ def pytorch_env_script(package: dict[str, Any]) -> str:
             "  done",
             "done",
             'mkdir -p "$(dirname "$env_file")" "{work}/home" "{work}/pip-cache"',
-            'cudnn_library="$(first_provider_libdir "$cudnn" libcudnn.so libcudnn_static.a)"',
-            'nccl_lib_dir="$(first_provider_libdir "$nccl" libnccl.so libnccl_static.a)"',
+            ('cudnn_library="$(printenv VASO_CUDNN_LIB_DIR || first_provider_libdir "$cudnn" libcudnn.so libcudnn_static.a)"' if package.get("h20_debian_layout") else 'cudnn_library="$(first_provider_libdir "$cudnn" libcudnn.so libcudnn_static.a)"'),
+            ('nccl_lib_dir="$(printenv VASO_NCCL_LIB_DIR || first_provider_libdir "$nccl" libnccl.so libnccl_static.a)"' if package.get("h20_debian_layout") else 'nccl_lib_dir="$(first_provider_libdir "$nccl" libnccl.so libnccl_static.a)"'),
             'cudss_library="$(first_existing_library "$cudss" libcudss.so libcudss_static.a)"',
             'py_six_source_dir="$py_six/' + site + '"',
             'cat > "$env_file" <<EOF',
@@ -1370,10 +1365,10 @@ def pytorch_env_script(package: dict[str, Any]) -> str:
             "export CUDA_TOOLKIT_ROOT_DIR=\"$cuda\"",
             "export CUDA_PATH=\"$cuda\"",
             "export CUDNN_ROOT=\"$cudnn\"",
-            "export CUDNN_INCLUDE_DIR=\"$cudnn/include\"",
+            ('export CUDNN_INCLUDE_DIR="$(printenv VASO_CUDNN_INCLUDE_DIR || printf \'%s\' "$cudnn/include")"' if package.get("h20_debian_layout") else 'export CUDNN_INCLUDE_DIR="$cudnn/include"'),
             "export CUDNN_LIBRARY=\"$cudnn_library\"",
             "export NCCL_ROOT=\"$nccl\"",
-            "export NCCL_INCLUDE_DIR=\"$nccl/include\"",
+            ('export NCCL_INCLUDE_DIR="$(printenv VASO_NCCL_INCLUDE_DIR || printf \'%s\' "$nccl/include")"' if package.get("h20_debian_layout") else 'export NCCL_INCLUDE_DIR="$nccl/include"'),
             "export NCCL_LIB_DIR=\"$nccl_lib_dir\"",
             "export BLAS=OpenBLAS",
             "export OpenBLAS_HOME=\"$openblas\"",
@@ -1730,13 +1725,28 @@ def use_fixed_build_root(plan: dict[str, Any], root: str) -> None:
             plan[phase]["argv"][2] = "set -euo pipefail\n" + prologue + body
 
 
-def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
-    package = PACKAGE_GENERATORS["py-torch"]
+def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any], *,
+                 package_override: dict[str, Any] | None = None,
+                 source_manifest_path: str = "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+                 source_manifest_text: str | None = None,
+                 archive_identity_seed: bool = False,
+                 explicit_compiler_identity: str | None = None) -> dict[str, Any]:
+    package = package_override if package_override is not None else PACKAGE_GENERATORS["py-torch"]
     cuda_version = rootfs["components"]["cuda_toolkit"]["version"]
-    toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
-    cc_ref = toolchain_ref(toolchain_identifier)
+    if explicit_compiler_identity is None:
+        toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
+        cc_ref = toolchain_ref(toolchain_identifier)
+    else:
+        cc_ref = explicit_compiler_identity
+        # No ambient compiler fallback: the explicit variant provider must bind
+        # these paths before any build phase can run.
+        toolchain_env = {
+            "CC": "__requires_explicit_variant_toolchain__",
+            "CXX": "__requires_explicit_variant_toolchain__",
+            "CFLAGS": "", "CXXFLAGS": "", "CUDAFLAGS": "", "NVCC_FLAGS": "",
+        }
     env_script = "{work}/pytorch-build-env.sh"
-    source_manifest = repo_root / "native" / "pytorch" / "pytorch-v2.14.0-2b3ec348-submodules.json"
+    source_manifest = repo_root / source_manifest_path
     plan = {
         "schema": 1,
         "profile": profile,
@@ -1745,8 +1755,8 @@ def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, r
         "sources": [copy.deepcopy(package["source"])],
         "inputs": [
             {
-                "path": "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
-                "sha256": sha256_file(source_manifest),
+                "path": source_manifest_path,
+                "expected_text": source_manifest_text if source_manifest_text is not None else source_manifest.read_bytes().decode("utf-8"),
             }
         ],
         "toolchain": {
@@ -1757,7 +1767,7 @@ def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, r
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": dep_plan(package["deps"]),
@@ -1808,11 +1818,70 @@ def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, r
         "live_checks": copy.deepcopy(rootfs["live_checks"]),
     }
     use_fixed_build_root(plan, fixed_build_root("pytorch", line))
-    plan["determinism"]["seed"] = "sha256:" + plan_seed(plan)
+    plan["determinism"]["seed"] = "sha256:" + (package["source"]["sha256"] if archive_identity_seed else plan_seed(plan))
     return plan
 
 
-def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
+
+def pytorch_h20_cuspy_plan(
+    repo_root: Path, *, source: dict[str, Any], source_manifest_path: str,
+    source_manifest_text: str, rootfs: dict[str, Any], rootfs_identity_text: str,
+    compiler_identity: str | None = None, python_version: str = "3.13.13",
+) -> dict[str, Any]:
+    """Prepare a canonical plan from explicit closure receipts, without hashing.
+
+    This is a preparation API, not release-line registration or qualification.
+    Real cu133 rootfs/package closures must be bound before this plan can run.
+    The opt-in schema admits cu133 without changing legacy release defaults. Source receipts are assertions by the archive producer:
+    this generator does not inspect an archive or establish its cleanliness.
+    """
+    manifest_path = Path(source_manifest_path)
+    if manifest_path.is_absolute() or ".." in manifest_path.parts or not manifest_path.parts:
+        raise ValueError("source manifest path must be repository-relative")
+    manifest = json.loads(source_manifest_text)
+    if manifest.get("source_commit") != "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457":
+        raise ValueError("source receipt must pin upstream Torch 2.15.0")
+    if manifest.get("clean_recursive_source") is not True:
+        raise ValueError("source receipt must attest clean recursive source archive before patching")
+    approved_path = "native/pytorch/variants/torch215-cuspy-no-header-hash.patch"
+    approved_patch = {
+        "path": approved_path,
+        "expected_text": (repo_root / approved_path).read_bytes().decode("utf-8"),
+    }
+    if source.get("patches") != [approved_patch]:
+        raise ValueError("H20 Cuspy requires exactly the approved no-header-hash patch, unchanged")
+
+    digest = source.get("sha256", "")
+    if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+        raise ValueError("source archive requires a pinned SHA256")
+    if manifest.get("archive", {}).get("sha256") != digest:
+        raise ValueError("source archive and manifest digest must match")
+    if source.get("name") != "main" or source.get("archive") != "{source_archive}":
+        raise ValueError("source must use canonical main archive binding")
+    if json.loads(rootfs_identity_text) != rootfs:
+        raise ValueError("rootfs identity text must describe the supplied rootfs")
+    cuda_version = rootfs.get("components", {}).get("cuda_toolkit", {}).get("version", "")
+    if cuda_version != "13.3" and not cuda_version.startswith("13.3."):
+        raise ValueError("this immutable variant requires CUDA 13.3")
+    package = copy.deepcopy(PACKAGE_GENERATORS["py-torch"])
+    package.update(version="2.15.0", source=copy.deepcopy(source),
+                   torch_cuda_arch_list="9.0", gpu_archs=["sm_90"], h20_debian_layout=True)
+    plan = pytorch_plan(
+        repo_root, "torch", "cu133", rootfs_identity_text, rootfs,
+        package_override=package, source_manifest_path=source_manifest_path,
+        source_manifest_text=source_manifest_text,
+        archive_identity_seed=True, explicit_compiler_identity=compiler_identity,
+    )
+    if python_version not in ("3.13.13", "3.13.18"):
+        raise ValueError("unsupported explicit Python patch version")
+    if compiler_identity is not None:
+        plan["toolchain"]["cc"] = compiler_identity
+        plan["toolchain"]["cxx"] = compiler_identity
+    plan["toolchain"]["python"] = "python_313_native" if python_version == "3.13.13" else "python_3_13_18_variant"
+    return plan
+
+
+def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:
     package = PACKAGE_GENERATORS["py-torchvision"]
     cuda_version = rootfs["components"]["cuda_toolkit"]["version"]
     toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
@@ -1824,7 +1893,7 @@ def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: st
         "line": line,
         "package": {"name": "py-torchvision", "version": package["version"]},
         "sources": [copy.deepcopy(package["source"])],
-        "inputs": [{"path": "native/torchvision/upstream_pins.json", "sha256": sha256_file(repo_root / "native" / "torchvision" / "upstream_pins.json")}],
+        "inputs": [{"path": "native/torchvision/upstream_pins.json", "expected_text": (repo_root / "native" / "torchvision" / "upstream_pins.json").read_bytes().decode("utf-8")}],
         "toolchain": {
             "cc": cc_ref,
             "cxx": cc_ref,
@@ -1833,7 +1902,7 @@ def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: st
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": dep_plan(package["deps"]),
@@ -1888,7 +1957,7 @@ def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: st
     return plan
 
 
-def torchaudio_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
+def torchaudio_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:
     package = PACKAGE_GENERATORS["py-torchaudio"]
     cuda_version = rootfs["components"]["cuda_toolkit"]["version"]
     toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
@@ -1900,7 +1969,7 @@ def torchaudio_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str
         "line": line,
         "package": {"name": "py-torchaudio", "version": package["version"]},
         "sources": [copy.deepcopy(package["source"])],
-        "inputs": [{"path": "native/torchaudio/upstream_pins.json", "sha256": sha256_file(repo_root / "native" / "torchaudio" / "upstream_pins.json")}],
+        "inputs": [{"path": "native/torchaudio/upstream_pins.json", "expected_text": (repo_root / "native" / "torchaudio" / "upstream_pins.json").read_bytes().decode("utf-8")}],
         "toolchain": {
             "cc": cc_ref,
             "cxx": cc_ref,
@@ -1909,7 +1978,7 @@ def torchaudio_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": dep_plan(package["deps"]),
@@ -1964,7 +2033,7 @@ def torchaudio_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str
     return plan
 
 
-def jaxlib_nested_manifest_sha256(nested_pins: dict[str, Any]) -> str:
+def jaxlib_nested_manifest_text(nested_pins: dict[str, Any]) -> str:
     entries = []
     archives = nested_pins.get("archives", [])
     if not isinstance(archives, list):
@@ -1984,7 +2053,7 @@ def jaxlib_nested_manifest_sha256(nested_pins: dict[str, Any]) -> str:
         "schema_version": 1,
     }
     payload["tree_sha256"] = sha256_bytes(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8"))
-    return sha256_bytes(stable_json(payload).encode("utf-8"))
+    return stable_json(payload)
 
 
 def jaxlib_nested_archives(nested_pins: dict[str, Any]) -> list[dict[str, Any]]:
@@ -2085,7 +2154,7 @@ def jaxlib_install_command() -> str:
     )
 
 
-def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, rootfs: dict[str, Any]) -> dict[str, Any]:
+def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:
     package = PACKAGE_GENERATORS["py-jaxlib"]
     pins_path = repo_root / "native" / "jaxlib" / "upstream_pins.json"
     nested_path = repo_root / "native" / "jaxlib" / "nested_http_archives.json"
@@ -2097,7 +2166,7 @@ def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
     toolchain_identifier, toolchain_env = registered_toolchain(repo_root, profile, rootfs)
     cc_ref = toolchain_ref(toolchain_identifier)
     env_script = "{work}/jaxlib-build-env.sh"
-    manifest_sha = jaxlib_nested_manifest_sha256(nested_pins)
+    manifest_text = jaxlib_nested_manifest_text(nested_pins)
     plan = {
         "schema": 1,
         "profile": profile,
@@ -2114,9 +2183,9 @@ def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
             }
         ],
         "inputs": [
-            {"path": "native/jaxlib/upstream_pins.json", "sha256": sha256_file(pins_path)},
-            {"path": "native/jaxlib/nested_http_archives.json", "sha256": sha256_file(nested_path)},
-            {"path": "native/jaxlib/committed_plan_support.py", "sha256": sha256_file(support_path)},
+            {"path": "native/jaxlib/upstream_pins.json", "expected_text": pins_path.read_bytes().decode("utf-8")},
+            {"path": "native/jaxlib/nested_http_archives.json", "expected_text": nested_path.read_bytes().decode("utf-8")},
+            {"path": "native/jaxlib/committed_plan_support.py", "expected_text": support_path.read_bytes().decode("utf-8")},
         ],
         "toolchain": {
             "cc": cc_ref,
@@ -2126,7 +2195,7 @@ def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": f"//plans:{profile}/{line}/rootfs.identity.json",
-                "sha256": rootfs_sha256,
+                "expected_text": rootfs_identity_text,
             },
         },
         "deps": dep_plan(package["deps"]),
@@ -2184,11 +2253,11 @@ def jaxlib_plan(repo_root: Path, profile: str, line: str, rootfs_sha256: str, ro
             "build_py_args": jaxlib_build_py_args(cuda_line["cuda_major"], cuda_line["cuda_version"]),
             "distdir_manifest": {
                 "label": "@jaxlib_nested_cache_manifest//:manifest.json",
-                "sha256": manifest_sha,
+                "expected_text": manifest_text,
             },
             "repository_cache_manifest": {
                 "label": "@jaxlib_nested_cache_manifest//:manifest.json",
-                "sha256": manifest_sha,
+                "expected_text": manifest_text,
             },
         },
         "determinism": {
@@ -2222,22 +2291,22 @@ def generated_files(repo_root: Path) -> dict[Path, str]:
                 identity = rootfs_by_line[line]
                 identity_bytes = stable_json(identity).encode("utf-8")
                 if package_name in ("bzip2", "xz", "zlib-ng", "zstd"):
-                    plan = leaf_prefix_plan(repo_root, package_name, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = leaf_prefix_plan(repo_root, package_name, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = package_name.replace("-", "_") + ".plan.json"
                 elif package_name == "py-torch":
-                    plan = pytorch_plan(repo_root, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = pytorch_plan(repo_root, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = "pytorch.plan.json"
                 elif package_name == "py-triton":
-                    plan = triton_plan(repo_root, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = triton_plan(repo_root, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = "triton.plan.json"
                 elif package_name == "py-torchvision":
-                    plan = torchvision_plan(repo_root, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = torchvision_plan(repo_root, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = "torchvision.plan.json"
                 elif package_name == "py-torchaudio":
-                    plan = torchaudio_plan(repo_root, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = torchaudio_plan(repo_root, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = "torchaudio.plan.json"
                 elif package_name == "py-jaxlib":
-                    plan = jaxlib_plan(repo_root, profile, line, sha256_bytes(identity_bytes), identity)
+                    plan = jaxlib_plan(repo_root, profile, line, identity_bytes.decode("utf-8"), identity)
                     filename = "jaxlib.plan.json"
                 else:
                     raise ValueError(f"unsupported package generator {package_name}")

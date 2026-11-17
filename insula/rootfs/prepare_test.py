@@ -41,7 +41,10 @@ def inputs(tmp_path: Path):
                 (rootfs / "bin/sh").symlink_to(target)
                 if shell_kind == "nonexecutable-alias":
                     (rootfs / "usr/bin/vaso-shell").chmod(0o644)
-        manifest = {"schema_version": 2, "line": line, "lock": {"sha256": sha(LOCK)}}
+        ecosystem = json.loads(LOCK.read_text())
+        versions = {name: c["version"] for name, c in ecosystem["lines"][line]["components"].items()}
+        versions.update({name: c["version"] for name, c in ecosystem.get("components", {}).items()})
+        manifest = {"schema_version": 2, "line": line, "lock": {"schema_version": ecosystem["schema_version"]}, "component_versions": versions}
         (source / "rootfs-bundle.json").write_text(json.dumps(manifest))
         archive = tmp_path / f"{line}.tar.zst"
         with tarfile.open(tmp_path / f"{line}.tar", "w") as stream:

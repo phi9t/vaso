@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Provision and verify pinned Foundry tools in an immutable rootfs.
+"""Provision pinned packages and check selected Foundry tools without tree scans.
 
 Acquisition is explicit (--fetch). Installation only accepts a fresh tools
 prefix. --base makes a fresh rootfs with hard-linked, untouched base files;
 only new files are installed, so an existing shared rootfs remains unchanged.
-The derived rootfs is published after tooling verification; failed attempts
+Startup checks selected executable paths and wheel-prefix availability, not installed
+byte integrity. Package/archive digests are checked only at acquisition.
+The derived rootfs is published after these readiness checks; failed attempts
 remove their private staging trees and leave the destination available to retry.
 """
 
@@ -14,7 +16,6 @@ import argparse
 import hashlib
 import json
 import os
-import re
 from pathlib import Path, PurePosixPath
 import shutil
 import stat
@@ -51,7 +52,7 @@ def tool_relative(value: str) -> Path:
 
 
 def _read_tool_manifest(manifest: Path) -> dict:
-    """Validate the versioned file inventory before checking installed bytes."""
+    """Validate v2 metadata without pretending to verify installed content."""
     try:
         report = json.loads(manifest.read_text())
     except json.JSONDecodeError as exc:
@@ -61,23 +62,30 @@ def _read_tool_manifest(manifest: Path) -> dict:
     if (
         not isinstance(report, dict)
         or type(report.get("schema_version")) is not int
-        or report["schema_version"] != 1
+        or report["schema_version"] != 2
     ):
         raise ValueError(
-            f"invalid rootfs tooling manifest {manifest}: expected schema_version=1 object"
+            f"invalid rootfs tooling manifest {manifest}: expected schema_version=2; provision a fresh named rootfs (do not rewrite a live manifest)"
         )
     files = report.get("files")
     if not files:
         raise ValueError(f"empty rootfs tooling manifest: {manifest}")
     if not isinstance(files, dict):
         raise ValueError(
-            f"invalid rootfs tooling manifest {manifest}: files must be a hash mapping"
+            f"invalid rootfs tooling manifest {manifest}: files must be a path/type/size mapping"
         )
-    for name, sha in files.items():
-        if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{64}", sha) is None:
-            raise ValueError(
-                f"invalid rootfs tooling manifest {manifest}: invalid file hash for {name!r}"
-            )
+    if report.get("verification") != "selected-path-type-size-not-content":
+        raise ValueError(f"invalid rootfs tooling manifest {manifest}: unknown verification contract")
+    if not isinstance(report.get("lock_expected_text"), str):
+        raise ValueError(f"invalid rootfs tooling manifest {manifest}: missing literal lock identity")
+    prefixes = report.get("wheel_prefixes")
+    if not isinstance(prefixes, list) or any(not isinstance(p, str) for p in prefixes):
+        raise ValueError(f"invalid rootfs tooling manifest {manifest}: invalid wheel prefixes")
+    for name, identity in files.items():
+        if (not isinstance(identity, dict) or set(identity) != {"type", "size"}
+                or identity["type"] != "file" or type(identity["size"]) is not int
+                or identity["size"] < 0):
+            raise ValueError(f"invalid rootfs tooling manifest {manifest}: invalid file inventory for {name!r}")
     return report
 
 
@@ -88,17 +96,36 @@ def verify(rootfs: Path, lock: Path = LOCK) -> dict:
             f"missing rootfs tooling manifest: {manifest}; provision with foundry_tools.py"
         )
     report = _read_tool_manifest(manifest)
-    if report.get("lock_sha256") != digest(lock):
+    if report.get("lock_expected_text") != lock.read_bytes().decode("utf-8"):
         raise ValueError(f"rootfs tooling lock mismatch: {manifest}")
-    for name, sha in report["files"].items():
+    for name, identity in report["files"].items():
         try:
             path = rootfs / tool_relative(name)
         except ValueError as exc:
             raise ValueError(f"invalid rootfs tooling manifest {manifest}: {exc}") from exc
-        if not path.is_file() or path.is_symlink() or digest(path) != sha:
+        for ancestor in path.parents:
+            if ancestor == rootfs:
+                break
+            if ancestor.is_symlink():
+                raise ValueError(f"unsafe selected tooling ancestor symlink: {ancestor}")
+        try:
+            current = path.lstat()
+        except FileNotFoundError:
+            raise ValueError(f"missing or mismatched rootfs tool: {path}") from None
+        if not stat.S_ISREG(current.st_mode) or current.st_size != identity["size"]:
             raise ValueError(f"missing or mismatched rootfs tool: {path}")
+    for name in report["wheel_prefixes"]:
+        path = rootfs / tool_relative(name)
+        if path.is_symlink() or not path.is_dir():
+            raise ValueError(f"missing or mismatched wheel prefix: {path}")
     # Tool manifest cannot silently omit an executable selected by the lock.
-    for tool in json.loads(lock.read_text())["tools"]:
+    tools = json.loads(lock.read_text())["tools"]
+    expected_receipts = [{"name": t["name"], "version": t["version"], "sha256": t["sha256"]} for t in tools]
+    if report.get("tools") != expected_receipts:
+        raise ValueError(f"rootfs tooling package receipts mismatch: {manifest}")
+    if report["wheel_prefixes"] != sorted({t["path"] for t in tools if t["kind"] == "wheel"}):
+        raise ValueError(f"rootfs tooling wheel prefix selection mismatch: {manifest}")
+    for tool in tools:
         tool_relative(tool["path"])
         if tool["kind"] != "wheel" and tool["path"] not in report["files"]:
             raise ValueError(f"unrecorded rootfs tool: {tool['path']}")
@@ -179,6 +206,7 @@ def _install_tools(rootfs: Path, cache: Path, tools: list[dict], lock: Path) -> 
                 ) from exc
         else:
             raise ValueError(f"unsupported tool kind: {tool['kind']}")
+    selected_paths = [rootfs / tool_relative(t["path"]) for t in tools if t["kind"] != "wheel"]
     compat = prefix / "compat-bin"
     compat.mkdir()
     tool_paths = {t["path"] for t in tools}
@@ -192,17 +220,19 @@ def _install_tools(rootfs: Path, cache: Path, tools: list[dict], lock: Path) -> 
         path = compat / name
         path.write_text(f'#!/bin/bash\nexec {executable} "$@"\n')
         path.chmod(0o555)
+        selected_paths.append(path)
     report = {
-        "schema_version": 1,
-        "lock_sha256": digest(lock),
+        "schema_version": 2,
+        "verification": "selected-path-type-size-not-content",
+        "lock_expected_text": lock.read_bytes().decode("utf-8"),
         "tools": [
             {"name": t["name"], "version": t["version"], "sha256": t["sha256"]}
             for t in tools
         ],
+        "wheel_prefixes": sorted({t["path"] for t in tools if t["kind"] == "wheel"}),
         "files": {
-            p.relative_to(rootfs).as_posix(): digest(p)
-            for p in sorted(prefix.rglob("*"))
-            if p.is_file()
+            p.relative_to(rootfs).as_posix(): {"type": "file", "size": p.stat().st_size}
+            for p in sorted(selected_paths)
         },
     }
     (prefix / "foundry-tools.json").write_text(

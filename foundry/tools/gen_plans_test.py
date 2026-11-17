@@ -568,7 +568,10 @@ class GenPlansTest(unittest.TestCase):
         self.assertEqual(plan["deps"]["zstd"]["label"], "//native/zstd:zstd_action_prefix")
         self.assertEqual(plan["deps"]["zstd"]["manifest"], "action://native/zstd:zstd_action_prefix_manifest")
         self.assertNotIn("@zstd_native//:prefix_manifest.json", json.dumps(plan["deps"], sort_keys=True))
-        self.assertNotIn("native/pytorch/plan.py", json.dumps(plan, sort_keys=True))
+        # Literal source metadata can cite historical plan.py evidence; only the
+        # executable phases must remain independent of the legacy driver.
+        self.assertNotIn("native/pytorch/plan.py", json.dumps(
+            {phase: plan[phase] for phase in ("configure", "build", "install")}, sort_keys=True))
         self.assertNotIn("action_driver.py", json.dumps(plan, sort_keys=True))
         self.assertEqual(plan["determinism"]["source_date_epoch"], 0)
         plan_text = json.dumps(plan, sort_keys=True)

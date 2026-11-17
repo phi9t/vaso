@@ -406,3 +406,16 @@ alias(
     actual = ":fixture_extension",
     tags = ["manual"],
 )
+
+py_test(
+    name = "plan_literal_input_test",
+    srcs = ["plan_literal_input_test.py", "plan_executor.py", "plan_schema.py"],
+    main = "plan_literal_input_test.py",
+)
+
+
+py_test(
+    name = "variant_toolchain_test",
+    srcs = ["variant_toolchain_test.py", "plan_executor.py", "plan_schema.py"],
+    main = "variant_toolchain_test.py",
+)

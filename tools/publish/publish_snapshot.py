@@ -360,6 +360,29 @@ def load_publication_excludes(repo_root: Path, source: str) -> list[str]:
     return manifest_patterns(read_text_from_source(repo_root, source, PUBLICATION_EXCLUDES_PATH))
 
 
+VENDOR_CHECKSUM_TREE = "third_party/rust_pyo3_cargo/vendor"
+
+def refuse_vendor_mutation(relpath: str) -> None:
+    """Guard existing mutation points, without another inventory or hash pass."""
+    rel = relpath.rstrip("/")
+    if rel == VENDOR_CHECKSUM_TREE or rel.startswith(VENDOR_CHECKSUM_TREE + "/") or VENDOR_CHECKSUM_TREE.startswith(rel + "/"):
+        raise PublishError(
+            "publication would modify checksum-managed vendored sources; "
+            "vendor checksum regeneration is disabled. Resolve the source or "
+            "scrub scope explicitly before publishing (privacy checks remain required)."
+        )
+
+
+def guard_publication_write(root: Path, path: Path) -> None:
+    """Reject aliases into vendor or outside the publication before mutation."""
+    resolved_root = root.resolve()
+    resolved = path.resolve()
+    if not resolved.is_relative_to(resolved_root):
+        raise PublishError("publication write outside worktree refused")
+    refuse_vendor_mutation(path.relative_to(root).as_posix())
+    refuse_vendor_mutation(resolved.relative_to(resolved_root).as_posix())
+
+
 def export_source_tree(
     repo_root: Path,
     source: str,
@@ -383,6 +406,7 @@ def export_source_tree(
                 raise PublishError("unsafe archive path refused")
             excluded, rule_index = should_exclude_path(rel, rules, publication_excludes)
             if excluded:
+                refuse_vendor_mutation(rel)
                 if rule_index is not None:
                     hit_counts[rule_index] += 1
                 continue
@@ -427,7 +451,11 @@ def scrub_filenames(root: Path, rules: list[Rule], hit_counts: Counter[int]) -> 
         new_name = scrub_name(path.name, rel, rules, hit_counts)
         if new_name == path.name:
             continue
+        if new_name in (".", "..") or "/" in new_name or "\\" in new_name:
+            raise PublishError("filename scrub must produce one non-traversing basename")
+        guard_publication_write(root, path)
         target = path.with_name(new_name)
+        guard_publication_write(root, target)
         if target.exists():
             raise PublishError(f"filename scrub collision at {path.relative_to(root)}")
         path.rename(target)
@@ -452,6 +480,7 @@ def scrub_contents(root: Path, rules: list[Rule], hit_counts: Counter[int]) -> i
             target = os.readlink(path)
             new_target = scrub_name(target, rel, rules, hit_counts)
             if new_target != target:
+                guard_publication_write(root, path)
                 path.unlink()
                 path.symlink_to(new_target)
                 changed += 1
@@ -469,6 +498,7 @@ def scrub_contents(root: Path, rules: list[Rule], hit_counts: Counter[int]) -> i
             if hits:
                 hit_counts[rule.index] += hits
         if new != text:
+            guard_publication_write(root, path)
             path.write_bytes(new.encode("utf-8"))
             changed += 1
     return changed
@@ -487,6 +517,7 @@ def prune_tracker_allowlist(root: Path) -> int:
             continue
         kept.append(line)
     if removed:
+        guard_publication_write(root, allowlist)
         allowlist.write_text("".join(kept), encoding="utf-8")
     return removed
 
@@ -528,7 +559,7 @@ def is_top_level_call(line: str) -> bool:
     return re.match(r"^[A-Za-z_][A-Za-z0-9_]*\(", line) is not None
 
 
-def prune_bazel_wiring(path: Path, tokens: set[str]) -> int:
+def prune_bazel_wiring(path: Path, tokens: set[str], root: Path | None = None) -> int:
     original = path.read_text(encoding="utf-8")
     lines = original.splitlines(keepends=True)
     output: list[str] = []
@@ -563,16 +594,20 @@ def prune_bazel_wiring(path: Path, tokens: set[str]) -> int:
 
     rewritten = "".join(output)
     if rewritten != original:
+        if root is not None:
+            guard_publication_write(root, path)
         path.write_text(rewritten, encoding="utf-8")
     return removed
 
 
-def prune_reference_lines(path: Path, tokens: set[str]) -> int:
+def prune_reference_lines(path: Path, tokens: set[str], root: Path | None = None) -> int:
     original = path.read_text(encoding="utf-8")
     lines = original.splitlines(keepends=True)
     kept = [line for line in lines if not line_references_publication_exclude(line, tokens)]
     removed = len(lines) - len(kept)
     if removed:
+        if root is not None:
+            guard_publication_write(root, path)
         path.write_text("".join(kept), encoding="utf-8")
     return removed
 
@@ -590,13 +625,21 @@ def apply_publication_overlay(root: Path, publication_excludes: list[str]) -> in
         if rel == PUBLICATION_EXCLUDES_PATH:
             continue
         if path.name == "BUILD.bazel":
-            changed += prune_bazel_wiring(path, build_tokens)
+            changed += prune_bazel_wiring(path, build_tokens, root)
         elif path.suffix in {".md", ".rst", ".txt"}:
-            changed += prune_reference_lines(path, tokens)
+            changed += prune_reference_lines(path, tokens, root)
     return changed
 
 
-def run_regeneration_manifest(root: Path) -> int:
+def run_regeneration_manifest(root: Path, *, skip: bool = False) -> int | None:
+    """Run trusted repository-owned generators, not an untrusted command sandbox.
+
+    Mutation guards cover export/overlay/scrubbing, not arbitrary generator code.
+    The committed generators must be reviewed not to mutate vendor members.
+    Privacy rescans remain mandatory after regeneration.
+    """
+    if skip:
+        return None
     manifest = root / PUBLICATION_REGENERATE_PATH
     if not manifest.is_file():
         return 0
@@ -707,7 +750,54 @@ def host_identity_hits(text: str, tokens: set[str]) -> list[str]:
     return kinds
 
 
-def scan_host_identity(root: Path, tokens: set[str]) -> list[str]:
+def regular_git_blob(root: Path, revision: str | None, rel: str) -> str | None:
+    """Read existing Git object metadata only; never hash a worktree file."""
+    if revision is None:
+        result = git(root, "ls-files", "--stage", "-z", "--", rel)
+    else:
+        result = git(root, "ls-tree", "-z", revision, "--", rel)
+    records = [r for r in result.stdout.split("\0") if r]
+    if len(records) != 1:
+        return None
+    fields, name = records[0].split("\t", 1)
+    parts = fields.split()
+    if name != rel or parts[0] not in ("100644", "100755"):
+        return None
+    if revision is None:
+        return parts[1] if parts[2] == "0" else None
+    return parts[2] if parts[1] == "blob" else None
+
+
+def load_public_vendor_allowlist(path: Path | None, repo: Path, source: str, base: str) -> dict[str, dict[str, str]]:
+    """External reviewed exceptions for exact unchanged public vendor blobs."""
+    if path is None:
+        return {}
+    if base not in ("origin/ultron/mainline", "refs/remotes/origin/ultron/mainline"):
+        raise PublishError("vendor exceptions require the independently verified public remote mainline base")
+    path = path.expanduser().resolve()
+    if path.is_relative_to(repo.resolve()):
+        raise PublishError("public vendor allowlist must be outside the repository")
+    document = json.loads(path.read_text())
+    if not isinstance(document, list):
+        raise PublishError("public vendor allowlist must be a list")
+    allowed = {}
+    for entry in document:
+        if not isinstance(entry, dict) or set(entry) != {"path", "token", "blob"}:
+            raise PublishError("invalid public vendor allowlist entry")
+        rel, token, blob = entry["path"], entry["token"], entry["blob"]
+        if not all(isinstance(v, str) and v for v in (rel, token, blob)):
+            raise PublishError("invalid public vendor allowlist strings")
+        if not rel.startswith(VENDOR_CHECKSUM_TREE + "/") or ".." in Path(rel).parts or "\\" in rel or rel in allowed:
+            raise PublishError("public vendor allowlist requires unique normalized vendor paths")
+        if re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", blob) is None:
+            raise PublishError("invalid public vendor blob identity")
+        if regular_git_blob(repo, source, rel) != blob or regular_git_blob(repo, base, rel) != blob:
+            raise PublishError("vendor exception lacks identical source and public-base blobs")
+        allowed[rel] = {"token": token, "blob": blob}
+    return allowed
+
+
+def scan_host_identity(root: Path, tokens: set[str], public_vendor_allowlist: dict[str, dict[str, str]] | None = None) -> list[str]:
     findings: list[str] = []
     for path in publication_paths(root):
         rel = path.relative_to(root).as_posix()
@@ -720,7 +810,16 @@ def scan_host_identity(root: Path, tokens: set[str]) -> list[str]:
         # Latin-1 preserves ASCII identifiers embedded in ELF files and other
         # binary payloads without silently excluding undecodable files.
         text = path.read_bytes().decode("latin-1")
-        findings += [f"{kind} content {rel}" for kind in host_identity_hits(text, tokens)]
+        content_tokens = tokens
+        exception = (public_vendor_allowlist or {}).get(rel)
+        if exception and regular_git_blob(root, None, rel) == exception["blob"]:
+            # Scan the exact existing object whose provenance was checked, not
+            # potentially divergent unstaged worktree bytes.
+            result = subprocess.run(["git", "-C", str(root), "cat-file", "blob", exception["blob"]],
+                                    check=True, capture_output=True)
+            text = result.stdout.decode("latin-1")
+            content_tokens = tokens - {exception["token"]}
+        findings += [f"{kind} content {rel}" for kind in host_identity_hits(text, content_tokens)]
     return findings
 
 
@@ -730,7 +829,8 @@ def run_verify(worktree: Path, command: str) -> int:
 
 
 def commit_snapshot(worktree: Path, message: str, author_name: str, author_email: str) -> str:
-    git(worktree, "add", "-A")
+    # Commit exactly the index staged and scanned after verification. Never
+    # stage new worktree bytes after that final privacy/provenance scan.
     # The public commit must carry only the publishing identity and message:
     # drop the caller's GIT_* overrides and injected config, and skip hooks
     # that could append trailers.
@@ -818,7 +918,7 @@ def print_summary(
     rules: list[Rule],
     publication_excludes: int,
     overlay_edits: int,
-    regeneration_count: int,
+    regeneration_count: int | None,
     verify_rc: int | None,
     commit_sha: str | None,
     pushed: bool,
@@ -831,7 +931,7 @@ def print_summary(
     print(f"files: {file_count}")
     print(f"publication excludes: {publication_excludes}")
     print(f"publication overlay edits: {overlay_edits}")
-    print(f"regeneration commands: {regeneration_count}")
+    print(f"regeneration commands: {regeneration_count if regeneration_count is not None else 'skipped (explicit; exported derived files retained after scrub/overlay)'}")
     for rule in rules:
         print(f"rule {rule.index} hits: {hit_counts.get(rule.index, 0)}")
     print("rescan: clean")
@@ -874,6 +974,7 @@ def publish(args: argparse.Namespace) -> int:
 
     source = args.source
     base = args.base
+    public_vendor_allowlist = load_public_vendor_allowlist(args.public_vendor_allowlist, repo_root, source, base)
     source_short = git(repo_root, "rev-parse", "--short", source).stdout.strip()
     publication_excludes = load_publication_excludes(repo_root, source)
     worktree = (args.worktree or default_worktree_path(args.branch, source_short)).resolve()
@@ -888,11 +989,11 @@ def publish(args: argparse.Namespace) -> int:
     pruned_allowlist_entries = prune_tracker_allowlist(worktree)
     if pruned_allowlist_entries:
         print(f"tracker allowlist pruned: {pruned_allowlist_entries}")
-    regeneration_count = run_regeneration_manifest(worktree)
+    regeneration_count = run_regeneration_manifest(worktree, skip=args.skip_regeneration)
     sync_git_index(worktree)
 
     findings = scan_remaining(worktree, rules)
-    findings += [f"host identity {f}" for f in scan_host_identity(worktree, host_tokens(args.host_token))]
+    findings += [f"host identity {f}" for f in scan_host_identity(worktree, host_tokens(args.host_token), public_vendor_allowlist)]
     if findings:
         for finding in findings[:20]:
             print(f"REFUSED: rescan failed: {finding}", file=sys.stderr)
@@ -927,7 +1028,7 @@ def publish(args: argparse.Namespace) -> int:
     # without a scan. Stage and check that final set before committing.
     sync_git_index(worktree)
     findings = scan_remaining(worktree, rules)
-    findings += [f"host identity {f}" for f in scan_host_identity(worktree, host_tokens(args.host_token))]
+    findings += [f"host identity {f}" for f in scan_host_identity(worktree, host_tokens(args.host_token), public_vendor_allowlist)]
     findings += [f"excluded path {path.relative_to(worktree)}" for path in publication_paths(worktree)
                  if should_exclude_path(path.relative_to(worktree).as_posix(), rules, publication_excludes)[0]]
     if findings:
@@ -969,8 +1070,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--worktree", type=Path)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--push", action="store_true")
+    parser.add_argument("--skip-regeneration", action="store_true", help="retain committed derived files; still require privacy rescans and successful verification of scrubbed literal inputs")
     parser.add_argument("--verify-command")
     parser.add_argument("--message", "-m")
+    parser.add_argument("--public-vendor-allowlist", type=Path, help="external independently reviewed exact public vendor path/token/blob exceptions")
     parser.add_argument("--host-token", action="append", default=[], help="extra host identity literal the rescan must not find")
     parser.add_argument("--author-name", default=DEFAULT_AUTHOR_NAME)
     parser.add_argument("--author-email", default=DEFAULT_AUTHOR_EMAIL)

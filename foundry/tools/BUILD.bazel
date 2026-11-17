@@ -2242,3 +2242,15 @@ py_binary(
     ],
     main = "sbom.py",
 )
+
+
+py_test(
+    name = "pytorch_variant_plan_test",
+    srcs = ["gen_plans.py", "pytorch_variant_plan_test.py"],
+    data = [
+        "//native/common:plan_schema.py",
+        "//native/common:plan_executor.py",
+        "//native/pytorch:variants/torch215-cuspy-no-header-hash.patch",
+    ],
+    main = "pytorch_variant_plan_test.py",
+)

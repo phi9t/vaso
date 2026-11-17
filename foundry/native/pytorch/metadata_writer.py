@@ -87,6 +87,7 @@ def write_outputs(args: argparse.Namespace) -> None:
         "package": package["name"],
         "version": package["version"],
         "action_input_digest": action_input_digest,
+        "action_input_identity_kind": keys["packages"][package_key(plan)].get("key_kind", "legacy-merkle"),
         "declared_cuda_architectures": list(plan.get("gpu_archs", [])),
         "torch_cuda_arch_list": torch_cuda_arch_list(plan),
         "python_abi": python_abi_from_wheel(args.wheel, args.python_abi, plan),

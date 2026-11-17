@@ -65,7 +65,7 @@ def schema_v1() -> dict[str, Any]:
             "gpu_archs": {"items": {"type": "string"}, "type": "array"},
             "inputs": {"items": {"$ref": "#/$defs/input"}, "type": "array"},
             "install": {"$ref": "#/$defs/phase"},
-            "line": {"enum": list(LINES)},
+            "line": {"enum": list(LINES) + ["cu133"]},
             "live_checks": {"$ref": "#/$defs/live_checks"},
             "nested_bazel": {
                 "additionalProperties": False,
@@ -113,11 +113,8 @@ def schema_v1() -> dict[str, Any]:
                     "python": {"type": "string"},
                     "rootfs_identity": {
                         "additionalProperties": False,
-                        "properties": {
-                            "label": {"type": "string"},
-                            "sha256": {"type": "string"},
-                        },
-                        "required": ["label", "sha256"],
+                        "properties": {"label": {"type": "string"}, "expected_text": {"type": "string"}},
+                        "required": ["label", "expected_text"],
                         "type": "object",
                     },
                 },
@@ -178,21 +175,17 @@ def schema_v1() -> dict[str, Any]:
             },
             "input": {
                 "additionalProperties": False,
-                "properties": {
-                    "label": {"type": "string"},
-                    "path": {"type": "string"},
-                    "sha256": {"type": "string"},
-                },
-                "required": ["path", "sha256"],
+                "properties": {"label": {"type": "string"}, "path": {"type": "string"}, "expected_text": {"type": "string"}},
+                "required": ["path", "expected_text"],
                 "type": "object",
             },
             "manifest": {
                 "additionalProperties": False,
                 "properties": {
                     "label": {"type": "string"},
-                    "sha256": {"type": "string"},
+                    "expected_text": {"type": "string"},
                 },
-                "required": ["label", "sha256"],
+                "required": ["label", "expected_text"],
                 "type": "object",
             },
             "nested_archive": {
@@ -218,9 +211,9 @@ def schema_v1() -> dict[str, Any]:
                 "additionalProperties": False,
                 "properties": {
                     "path": {"type": "string"},
-                    "sha256": {"type": "string"},
+                    "expected_text": {"type": "string"},
                 },
-                "required": ["path", "sha256"],
+                "required": ["path", "expected_text"],
                 "type": "object",
             },
             "phase": {

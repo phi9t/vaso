@@ -1,6 +1,7 @@
 """Committed-plan native PyTorch prefix rule."""
 
 load("//native/common:build_settings.bzl", "ReleaseCudaLineInfo")
+load("//toolchains:h20_build_toolchain.bzl", "H20BuildToolchainInfo")
 load("//native/common:native_action_inputs.bzl", "native_action_default_rootfs_identity", "native_action_dep_prefix_args", "native_action_prefix_manifest_attrs", "native_action_prefix_manifest_inputs", "native_action_prefix_manifest_map", "native_action_prefix_path", "native_action_rootfs_identity_attrs", "native_action_rootfs_identity_file")
 load("//native/common:native_action_toolchain.bzl", "rootfs_platform_forward_attrs")
 
@@ -23,6 +24,9 @@ PytorchTokenInfo = provider(
         "value": "Token value supplied through --//native/pytorch:token.",
     },
 )
+
+def _declared_plan_path(item):
+    return item[1]
 
 _REQUIRED_TOKEN = "build-native-pytorch"
 _PYTORCH_ACTION_CPUS = 4
@@ -99,9 +103,15 @@ def _pytorch_action_prefix_impl(ctx):
     if token != _REQUIRED_TOKEN:
         fail("full native PyTorch build requires token {}; set //native/pytorch:token to that value".format(_REQUIRED_TOKEN))
 
-    line = ctx.attr._line[ReleaseCudaLineInfo].value
-    plan = _line_checked_file(ctx, ctx.file.plan, profile = "torch", consumer = "PyTorch", kind = "plan")
-    rootfs_identity = native_action_rootfs_identity_file(ctx, profile = "torch", consumer = "PyTorch")
+    variant = ctx.attr.variant_toolchain[H20BuildToolchainInfo] if ctx.attr.variant_toolchain else None
+    line = "cu133" if variant else ctx.attr._line[ReleaseCudaLineInfo].value
+    plan = ctx.file.plan if variant else _line_checked_file(ctx, ctx.file.plan, profile = "torch", consumer = "PyTorch", kind = "plan")
+    rootfs_identity = ctx.file.rootfs_identity if variant else native_action_rootfs_identity_file(ctx, profile = "torch", consumer = "PyTorch")
+    if variant:
+        if ctx.file.cuda_prefix_file != variant.cuda_prefix_file or ctx.file.python_prefix_file != variant.python_prefix_file:
+            fail("variant CUDA/Python dependency prefixes must match the explicit build toolchain")
+        if ctx.file.nccl_prefix_file != variant.nccl_prefix_file or ctx.file.cudnn_prefix_file != variant.cudnn_prefix_file:
+            fail("variant NCCL/cuDNN prefixes must match the explicit build toolchain")
     dep_manifest_inputs = native_action_prefix_manifest_inputs(
         ctx,
         _PREFIX_KEY_ATTRS,
@@ -109,7 +119,7 @@ def _pytorch_action_prefix_impl(ctx):
     )
     dep_prefix_args = native_action_dep_prefix_args(ctx, _PREFIX_KEY_ATTRS)
     zstd_prefix = native_action_prefix_path(ctx, _PREFIX_KEY_ATTRS, "zstd")
-    source_manifest_plan_path = "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json"
+    source_manifest_plan_path = ctx.attr.source_manifest_plan_path
 
     action_inputs = [
         ctx.file._runtime_executor,
@@ -145,7 +155,14 @@ def _pytorch_action_prefix_impl(ctx):
         source_manifest_plan_path + "=" + ctx.file.source_manifest.path,
     ]
 
-    for target, plan_path in sorted(ctx.attr.inputs.items(), key = lambda item: item[1]):
+    for target, plan_path in sorted(ctx.attr.patches.items(), key = _declared_plan_path):
+        files = target.files.to_list()
+        if len(files) != 1:
+            fail("patch {} must provide exactly one file".format(target.label))
+        action_inputs.append(files[0])
+        arguments.extend(["--patch", plan_path + "=" + files[0].path])
+
+    for target, plan_path in sorted(ctx.attr.inputs.items(), key = _declared_plan_path):
         files = target.files.to_list()
         if len(files) != 1:
             fail("extra input {} must provide exactly one file".format(target.label))
@@ -153,11 +170,14 @@ def _pytorch_action_prefix_impl(ctx):
         arguments.extend(["--input", plan_path + "=" + files[0].path])
 
     arguments.extend(dep_prefix_args)
+    if variant:
+        action_inputs.extend(variant.files.to_list())
+        arguments.extend(["--variant-toolchain", variant.contract.path])
 
     ctx.actions.run(
         inputs = depset(action_inputs),
         outputs = [prefix, wheel],
-        executable = "python3",
+        executable = variant.python if variant else "python3",
         arguments = [ctx.file._runtime_executor.path] + arguments,
         env = {
             "LC_ALL": "C",
@@ -194,9 +214,9 @@ def _pytorch_action_prefix_impl(ctx):
         ctx.attr.python_abi,
     ] + dep_prefix_args
     ctx.actions.run(
-        inputs = depset([ctx.file._metadata_writer, plan, ctx.file._keys, rootfs_identity, wheel]),
+        inputs = depset([ctx.file._metadata_writer, plan, ctx.file._keys, rootfs_identity, wheel], transitive = [variant.files] if variant else []),
         outputs = [build_plan, provider_metadata, result_marker],
-        executable = "python3",
+        executable = variant.python if variant else "python3",
         arguments = metadata_args,
         env = {
             "LC_ALL": "C",
@@ -216,7 +236,7 @@ def _pytorch_action_prefix_impl(ctx):
             build_plan = build_plan,
             provider_metadata = provider_metadata,
             package = "py-torch",
-            version = "2.14.0",
+            version = "2.15.0" if variant else "2.14.0",
             python_abi = ctx.attr.python_abi,
         ),
     ]
@@ -232,6 +252,7 @@ pytorch_token_flag = rule(
 _pytorch_action_prefix = rule(
     implementation = _pytorch_action_prefix_impl,
     attrs = {
+        "variant_toolchain": attr.label(providers = [H20BuildToolchainInfo]),
         "plan": attr.label(
             allow_single_file = True,
             mandatory = True,
@@ -247,10 +268,18 @@ _pytorch_action_prefix = rule(
             mandatory = True,
             doc = "The sha256-pinned recursive PyTorch source archive.",
         ),
+        "source_manifest_plan_path": attr.string(
+            default = "native/pytorch/pytorch-v2.14.0-2b3ec348-submodules.json",
+            doc = "Exact inputs[].path for the declared source manifest in the committed plan.",
+        ),
         "source_manifest": attr.label(
             allow_single_file = True,
             default = "//native/pytorch:pytorch-v2.14.0-2b3ec348-submodules.json",
             doc = "Manifest of the recursive PyTorch source archive's third-party submodules.",
+        ),
+        "patches": attr.label_keyed_string_dict(
+            allow_files = True,
+            doc = "Patch files keyed by label; values match sources[].patches[].path.",
         ),
         "inputs": attr.label_keyed_string_dict(
             allow_files = True,
@@ -364,4 +393,32 @@ def pytorch_action_prefix(name, visibility = None, **kwargs):
         name = name,
         actual = ":" + impl_name,
         visibility = visibility,
+    )
+
+
+def pytorch_variant_action(name, plan, rootfs_identity, source_archive, source_manifest, source_manifest_plan_path, variant_toolchain, **kwargs):
+    """Reuse the canonical action with explicit variant pins, never legacy defaults.
+
+    The caller must first register the matching immutable release line, rootfs
+    and dependency closures. This macro does not bypass platform/line checks.
+    """
+    if not source_manifest_plan_path or source_manifest_plan_path.startswith("/") or ".." in source_manifest_plan_path.split("/"):
+        fail("variant source_manifest_plan_path must be a safe repository-relative plan input")
+    # Explicit variant execution does not apply the legacy gcc13.3/cp313.13 transition.
+    if "prefix_manifest_files" not in kwargs:
+        kwargs["prefix_manifest_files"] = native_action_prefix_manifest_map(_PREFIX_KEY_ATTRS, kwargs)
+    kwargs.setdefault("python_abi", "cp313")
+    kwargs["exec_compatible_with"] = kwargs.get("exec_compatible_with", []) + [
+        "@platforms//cpu:x86_64", "@platforms//os:linux",
+    ]
+    _pytorch_action_prefix(
+        name = name,
+        output_basename = name,
+        variant_toolchain = variant_toolchain,
+        plan = plan,
+        rootfs_identity = rootfs_identity,
+        source_archive = source_archive,
+        source_manifest = source_manifest,
+        source_manifest_plan_path = source_manifest_plan_path,
+        **kwargs
     )

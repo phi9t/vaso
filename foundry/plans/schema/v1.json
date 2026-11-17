@@ -22,19 +22,19 @@
     "input": {
       "additionalProperties": false,
       "properties": {
+        "expected_text": {
+          "type": "string"
+        },
         "label": {
           "type": "string"
         },
         "path": {
           "type": "string"
-        },
-        "sha256": {
-          "type": "string"
         }
       },
       "required": [
         "path",
-        "sha256"
+        "expected_text"
       ],
       "type": "object"
     },
@@ -81,16 +81,16 @@
     "manifest": {
       "additionalProperties": false,
       "properties": {
-        "label": {
+        "expected_text": {
           "type": "string"
         },
-        "sha256": {
+        "label": {
           "type": "string"
         }
       },
       "required": [
         "label",
-        "sha256"
+        "expected_text"
       ],
       "type": "object"
     },
@@ -139,16 +139,16 @@
     "patch": {
       "additionalProperties": false,
       "properties": {
-        "path": {
+        "expected_text": {
           "type": "string"
         },
-        "sha256": {
+        "path": {
           "type": "string"
         }
       },
       "required": [
         "path",
-        "sha256"
+        "expected_text"
       ],
       "type": "object"
     },
@@ -280,7 +280,8 @@
     "line": {
       "enum": [
         "cu129",
-        "cu130"
+        "cu130",
+        "cu133"
       ]
     },
     "live_checks": {
@@ -408,16 +409,16 @@
         "rootfs_identity": {
           "additionalProperties": false,
           "properties": {
-            "label": {
+            "expected_text": {
               "type": "string"
             },
-            "sha256": {
+            "label": {
               "type": "string"
             }
           },
           "required": [
             "label",
-            "sha256"
+            "expected_text"
           ],
           "type": "object"
         }

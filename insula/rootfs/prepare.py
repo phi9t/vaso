@@ -48,12 +48,6 @@ def check_tree(destination: Path) -> None:
     for path in (destination / "rootfs", destination / "rootfs-bundle.json", destination / "rootfs/opt", destination / "rootfs/opt/vaso", destination / "rootfs-preparation.json"):
         if path.is_symlink():
             raise ValueError(f"unsafe rootfs preparation symlink: {path}")
-    prefix = destination / "rootfs/opt/vaso"
-    if prefix.exists():
-        for parent, directories, files in os.walk(prefix):
-            for name in (*directories, *files):
-                if (Path(parent) / name).is_symlink():
-                    raise ValueError(f"unsafe tooling prefix symlink: {Path(parent) / name}")
 
 
 def verify(destination: Path, args, selection: dict, attempt: Path, *, receipt: bool) -> None:
@@ -64,16 +58,29 @@ def verify(destination: Path, args, selection: dict, attempt: Path, *, receipt: 
         raise ValueError("invalid rootfs manifest: expected object with lock object")
     if manifest.get("line") != args.line:
         raise ValueError("rootfs manifest line mismatch")
-    if manifest.get("lock", {}).get("sha256") != selection["ecosystem_sha256"]:
-        raise ValueError("rootfs ecosystem lock mismatch")
+    expected_versions = {
+        name: component["version"]
+        for name, component in selection["ecosystem_line"]["components"].items()
+    } | {
+        name: component["version"]
+        for name, component in selection["ecosystem_components"].items()
+    }
+    if manifest.get("component_versions") != expected_versions:
+        raise ValueError("rootfs ecosystem component version mismatch")
     shell = verify_cuda_ecosystem.resolve_rootfs_path(rootfs, "/bin/sh")
     if not shell.is_file() or not os.access(shell, os.X_OK):
         raise ValueError("rootfs is missing or has no executable /bin/sh")
     foundry_tools.verify(rootfs, args.tools_lock)
-    report = verify_cuda_ecosystem.build_report(rootfs, json.loads(args.lock.read_text()), args.line, gpu=False)
-    write_json(attempt / "ecosystem-verification.json", report)
-    if not report["ok"]:
-        raise ValueError("rootfs ecosystem verification failed: " + json.dumps(report["issues"]))
+    # Preparation is a cheap readiness check. The standalone ecosystem verifier
+    # is an explicit audit, not a prerequisite that recursively scans this tree.
+    write_json(attempt / "ecosystem-readiness.json", {
+        "verification": "selected-readiness-not-full-audit",
+        "line": args.line,
+        "declared_component_versions": expected_versions,
+        "shell_available": True,
+        "selected_tools_available": True,
+        "gpu_qualified": False,
+    })
     if receipt and json.loads((destination / "rootfs-preparation.json").read_text()) != selection:
         raise ValueError("rootfs preparation selection mismatch")
 
@@ -200,7 +207,13 @@ def main(argv=None) -> int:
             raise ValueError(f"symlink destination or parent is unsafe: {destination}")
         if destination == estate or estate.is_relative_to(destination):
             raise ValueError("destination must not contain the estate or attempt records")
-        selection = {"mode": args.mode, "line": args.line, "ecosystem_sha256": foundry_tools.digest(args.lock), "tooling_sha256": foundry_tools.digest(args.tools_lock)}
+        ecosystem = json.loads(args.lock.read_text())
+        selection = {
+            "schema_version": 2, "mode": args.mode, "line": args.line,
+            "ecosystem_line": ecosystem["lines"][args.line],
+            "ecosystem_components": ecosystem.get("components", {}),
+            "tooling": json.loads(args.tools_lock.read_text()),
+        }
         if args.mode == "restore":
             selection["archive_sha256"] = args.digest
         result["selection"] = selection

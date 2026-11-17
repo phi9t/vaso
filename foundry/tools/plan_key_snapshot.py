@@ -178,12 +178,9 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def read_input_text(path: Path) -> str:
+    """Read literal metadata once per comparison; never hash individual files."""
+    return path.read_bytes().decode("utf-8")
 
 
 def label_to_path(label: str) -> Path:
@@ -298,22 +295,22 @@ def package_key_for_plan_with_deps(
     toolchain = plan["toolchain"]
     rootfs_identity_rel = label_to_path(toolchain["rootfs_identity"]["label"])
     rootfs_identity_path = repo_root / rootfs_identity_rel
-    rootfs_sha = sha256_file(rootfs_identity_path)
-    expected_rootfs_sha = toolchain["rootfs_identity"]["sha256"]
-    if rootfs_sha != expected_rootfs_sha:
+    rootfs_text = read_input_text(rootfs_identity_path)
+    expected_rootfs_text = toolchain["rootfs_identity"]["expected_text"]
+    if rootfs_text != expected_rootfs_text:
         raise ValueError(
-            f"{rel_plan}: rootfs identity sha256 mismatch: expected {expected_rootfs_sha}, got {rootfs_sha}"
+            f"{rel_plan}: rootfs identity text mismatch"
         )
     inputs: list[dict[str, str]] = [
         {
             "kind": "plan",
             "path": rel_plan,
-            "sha256": sha256_bytes(plan_bytes),
+            "expected_text": plan_bytes.decode("utf-8"),
         },
         {
             "kind": "schema",
             "path": schema_rel.as_posix(),
-            "sha256": sha256_file(repo_root / schema_rel),
+            "expected_text": read_input_text(repo_root / schema_rel),
         },
     ]
     for source in plan["sources"]:
@@ -327,34 +324,32 @@ def package_key_for_plan_with_deps(
         )
         for patch in source.get("patches", []):
             patch_path = input_path(repo_root, patch["path"])
-            patch_sha = sha256_file(patch_path)
-            expected_patch_sha = patch["sha256"]
-            if patch_sha != expected_patch_sha:
+            patch_text = read_input_text(patch_path)
+            expected_patch_text = patch["expected_text"]
+            if patch_text != expected_patch_text:
                 raise ValueError(
-                    f"{rel_plan}: patch sha256 mismatch for {patch['path']}: "
-                    f"expected {expected_patch_sha}, got {patch_sha}"
+                    f"{rel_plan}: patch text mismatch for {patch['path']}"
                 )
             inputs.append(
                 {
                     "kind": "patch",
                     "path": patch["path"],
-                    "sha256": patch_sha,
+                    "expected_text": patch_text,
                 }
             )
     for item in plan["inputs"]:
         path = input_path(repo_root, item["path"])
-        actual_sha = sha256_file(path)
-        expected_sha = item["sha256"]
-        if actual_sha != expected_sha:
+        actual_text = read_input_text(path)
+        expected_text = item["expected_text"]
+        if actual_text != expected_text:
             raise ValueError(
-                f"{rel_plan}: input sha256 mismatch for {item['path']}: "
-                f"expected {expected_sha}, got {actual_sha}"
+                f"{rel_plan}: input text mismatch for {item['path']}"
             )
         inputs.append(
             {
                 "kind": "input",
                 "path": item["path"],
-                "sha256": actual_sha,
+                "expected_text": actual_text,
             }
         )
     inputs.extend(
@@ -362,17 +357,17 @@ def package_key_for_plan_with_deps(
         {
             "kind": "executor",
             "path": "native/common/plan_executor.py",
-            "sha256": sha256_file(repo_root / "native" / "common" / "plan_executor.py"),
+            "expected_text": read_input_text(repo_root / "native" / "common" / "plan_executor.py"),
         },
         {
             "kind": "executor",
             "path": "native/common/plan_schema.py",
-            "sha256": sha256_file(repo_root / "native" / "common" / "plan_schema.py"),
+            "expected_text": read_input_text(repo_root / "native" / "common" / "plan_schema.py"),
         },
         {
             "kind": "rootfs",
             "path": rootfs_identity_rel.as_posix(),
-            "sha256": rootfs_sha,
+            "expected_text": rootfs_text,
         },
         ]
     )
@@ -403,7 +398,7 @@ def package_key_for_plan_with_deps(
             if is_repo_plan_label(manifest_label):
                 manifest_rel = label_to_path(manifest_label)
                 dep_input["manifest"] = manifest_rel.as_posix()
-                dep_input["manifest_sha256"] = sha256_file(repo_root / manifest_rel)
+                dep_input["manifest_expected_text"] = read_input_text(repo_root / manifest_rel)
             else:
                 dep_input["manifest"] = manifest_label
         inputs.append(dep_input)
@@ -412,7 +407,7 @@ def package_key_for_plan_with_deps(
             {
                 "kind": "action-wrapper",
                 "path": "native/zlib_ng/zlib_ng_action.bzl",
-                "sha256": sha256_file(repo_root / "native" / "zlib_ng" / "zlib_ng_action.bzl"),
+                "expected_text": read_input_text(repo_root / "native" / "zlib_ng" / "zlib_ng_action.bzl"),
                 "argv": LEAF_ACTION_ARGV,
                 "env": ACTION_ENV,
             }
@@ -424,19 +419,19 @@ def package_key_for_plan_with_deps(
                 {
                     "kind": "executor",
                     "path": "native/common/prefix_manifest.py",
-                    "sha256": sha256_file(repo_root / "native" / "common" / "prefix_manifest.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "common" / "prefix_manifest.py"),
                 },
                 {
                     "kind": "action-wrapper",
                     "path": "native/common/committed_plan_prefix.bzl",
-                    "sha256": sha256_file(repo_root / "native" / "common" / "committed_plan_prefix.bzl"),
+                    "expected_text": read_input_text(repo_root / "native" / "common" / "committed_plan_prefix.bzl"),
                     "argv": LEAF_ACTION_ARGV,
                     "env": ACTION_ENV,
                 },
                 {
                     "kind": "action-wrapper",
                     "path": wrapper_path,
-                    "sha256": sha256_file(repo_root / wrapper_path),
+                    "expected_text": read_input_text(repo_root / wrapper_path),
                 },
             ]
         )
@@ -445,7 +440,7 @@ def package_key_for_plan_with_deps(
             {
                 "kind": "action-wrapper",
                 "path": "native/triton/triton_action.bzl",
-                "sha256": sha256_file(repo_root / "native" / "triton" / "triton_action.bzl"),
+                "expected_text": read_input_text(repo_root / "native" / "triton" / "triton_action.bzl"),
                 "argv": TRITON_ACTION_ARGV,
                 "env": ACTION_ENV,
             }
@@ -456,12 +451,12 @@ def package_key_for_plan_with_deps(
                 {
                     "kind": "executor",
                     "path": "native/common/prefix_manifest.py",
-                    "sha256": sha256_file(repo_root / "native" / "common" / "prefix_manifest.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "common" / "prefix_manifest.py"),
                 },
                 {
                     "kind": "action-wrapper",
                     "path": "native/torchvision/torchvision_action.bzl",
-                    "sha256": sha256_file(repo_root / "native" / "torchvision" / "torchvision_action.bzl"),
+                    "expected_text": read_input_text(repo_root / "native" / "torchvision" / "torchvision_action.bzl"),
                     "argv": TORCHVISION_ACTION_ARGV,
                     "env": ACTION_ENV,
                 },
@@ -473,12 +468,12 @@ def package_key_for_plan_with_deps(
                 {
                     "kind": "executor",
                     "path": "native/common/prefix_manifest.py",
-                    "sha256": sha256_file(repo_root / "native" / "common" / "prefix_manifest.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "common" / "prefix_manifest.py"),
                 },
                 {
                     "kind": "action-wrapper",
                     "path": "native/torchaudio/torchaudio_action.bzl",
-                    "sha256": sha256_file(repo_root / "native" / "torchaudio" / "torchaudio_action.bzl"),
+                    "expected_text": read_input_text(repo_root / "native" / "torchaudio" / "torchaudio_action.bzl"),
                     "argv": TORCHAUDIO_ACTION_ARGV,
                     "env": ACTION_ENV,
                 },
@@ -491,25 +486,25 @@ def package_key_for_plan_with_deps(
                 {
                     "kind": "executor",
                     "path": "native/jaxlib/runtime_jobs_executor.py",
-                    "sha256": sha256_file(repo_root / "native" / "jaxlib" / "runtime_jobs_executor.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "jaxlib" / "runtime_jobs_executor.py"),
                 },
                 {
                     "kind": "executor",
                     "path": "native/common/prefix_manifest.py",
-                    "sha256": sha256_file(repo_root / "native" / "common" / "prefix_manifest.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "common" / "prefix_manifest.py"),
                 },
                 {
                     "kind": "nested-bazel",
                     "archive_count": len(nested_bazel.get("archives", [])),
                     "distdir_manifest": nested_bazel.get("distdir_manifest", {}).get("label", ""),
-                    "distdir_manifest_sha256": nested_bazel.get("distdir_manifest", {}).get("sha256", ""),
+                    "distdir_manifest_expected_text": nested_bazel.get("distdir_manifest", {}).get("expected_text", ""),
                     "repository_cache_manifest": nested_bazel.get("repository_cache_manifest", {}).get("label", ""),
-                    "repository_cache_manifest_sha256": nested_bazel.get("repository_cache_manifest", {}).get("sha256", ""),
+                    "repository_cache_manifest_expected_text": nested_bazel.get("repository_cache_manifest", {}).get("expected_text", ""),
                 },
                 {
                     "kind": "action-wrapper",
                     "path": "native/jaxlib/jaxlib_action.bzl",
-                    "sha256": sha256_file(repo_root / "native" / "jaxlib" / "jaxlib_action.bzl"),
+                    "expected_text": read_input_text(repo_root / "native" / "jaxlib" / "jaxlib_action.bzl"),
                     "argv": JAXLIB_ACTION_ARGV,
                     "env": ACTION_ENV,
                 },
@@ -521,12 +516,12 @@ def package_key_for_plan_with_deps(
                 {
                     "kind": "executor",
                     "path": "native/pytorch/runtime_jobs_executor.py",
-                    "sha256": sha256_file(repo_root / "native" / "pytorch" / "runtime_jobs_executor.py"),
+                    "expected_text": read_input_text(repo_root / "native" / "pytorch" / "runtime_jobs_executor.py"),
                 },
                 {
                     "kind": "action-wrapper",
                     "path": "native/pytorch/pytorch_action.bzl",
-                    "sha256": sha256_file(repo_root / "native" / "pytorch" / "pytorch_action.bzl"),
+                    "expected_text": read_input_text(repo_root / "native" / "pytorch" / "pytorch_action.bzl"),
                     "argv": PYTORCH_ACTION_ARGV,
                     "env": ACTION_ENV,
                 },
@@ -577,6 +572,29 @@ def compute_snapshot(repo_root: Path) -> dict[str, Any]:
     }
 
 
+
+def compact_snapshot(repo_root: Path) -> dict[str, Any]:
+    """Describe selected sources/versions, not a transitive action integrity key.
+
+    Read each committed plan once; never reopen or hash support files or recurse
+    dependency keys. The legacy merkle_key field remains for metadata consumers,
+    but key_kind explicitly disclaims action/Merkle integrity.
+    """
+    packages = {}
+    for path in plan_entries(repo_root):
+        plan = json.loads(path.read_bytes())
+        sources = [{"name": s["name"], "sha256": s["sha256"]} for s in plan["sources"]]
+        packages[package_key(plan)] = {
+            "merkle_key": sources[0]["sha256"],
+            "key_kind": "descriptive-source-pin-not-action-digest",
+            "package": plan["package"],
+            "sources": sources,
+            "gpu_archs": plan.get("gpu_archs", []),
+            "toolchain": {k: plan["toolchain"][k] for k in ("cc", "cxx", "cuda", "python") if k in plan["toolchain"]},
+        }
+    return {"schema": 1, "mode": "descriptive-only", "packages": packages}
+
+
 def write_snapshot(path: Path, snapshot: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(stable_json(snapshot), encoding="utf-8")
@@ -598,12 +616,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--out", type=Path)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--audit", action="store_true", help="Explicit deferred full input audit; not a build prerequisite")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    snapshot = compute_snapshot(args.repo_root)
+    snapshot = compute_snapshot(args.repo_root) if args.audit else compact_snapshot(args.repo_root)
     if args.check:
         errors = check_snapshot(args.repo_root, snapshot)
         if errors:

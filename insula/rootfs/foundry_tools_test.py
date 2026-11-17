@@ -1,4 +1,4 @@
-"""The rootfs tooling boundary validates pinned contents before execution."""
+"""Pinned package acquisition and cheap selected-tool readiness checks."""
 
 from __future__ import annotations
 
@@ -48,6 +48,44 @@ class FoundryToolsTest(unittest.TestCase):
             )
         )
 
+    def test_provision_and_verify_never_walk_installed_tree(self):
+        (self.cache / self.sha).write_bytes(self.payload)
+        real_digest = foundry_tools.digest
+        def archive_only(path):
+            self.assertEqual(Path(path).parent, self.cache)
+            return real_digest(path)
+        with patch.object(Path, "rglob", side_effect=AssertionError("tree walk forbidden")), \
+             patch.object(os, "walk", side_effect=AssertionError("tree walk forbidden")), \
+             patch.object(foundry_tools, "digest", side_effect=archive_only):
+            report = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
+            self.assertEqual(foundry_tools.verify(self.rootfs, self.lock), report)
+        self.assertEqual(set(report["files"]), {"opt/vaso/bin/bazel-real", "opt/vaso/compat-bin/bazel"})
+
+    def test_verify_never_hashes_lock_or_installed_files(self):
+        (self.cache / self.sha).write_bytes(self.payload)
+        report = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
+        with patch.object(foundry_tools, "digest", side_effect=AssertionError("per-file hash forbidden")):
+            self.assertEqual(foundry_tools.verify(self.rootfs, self.lock), report)
+
+    def test_legacy_manifest_fails_without_migration(self):
+        (self.cache / self.sha).write_bytes(self.payload)
+        foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
+        manifest = self.rootfs / "opt/vaso/foundry-tools.json"
+        old = json.dumps({"schema_version": 1, "files": {"opt/vaso/bin/bazel-real": self.sha}})
+        manifest.write_text(old)
+        with self.assertRaisesRegex(ValueError, "fresh"):
+            foundry_tools.verify(self.rootfs, self.lock)
+        self.assertEqual(manifest.read_text(), old)
+
+    def test_same_size_content_change_is_not_claimed_as_byte_verification(self):
+        (self.cache / self.sha).write_bytes(self.payload)
+        report = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
+        binary = self.rootfs / "opt/vaso/bin/bazel-real"
+        binary.chmod(0o755)
+        binary.write_bytes(b"x" * len(self.payload))
+        self.assertEqual(foundry_tools.verify(self.rootfs, self.lock), report)
+        self.assertEqual(report["verification"], "selected-path-type-size-not-content")
+
     def test_missing_or_corrupt_acquisition_leaves_rootfs_untouched(self) -> None:
         for contents in (None, b"corrupt"):
             if contents is not None:
@@ -58,10 +96,10 @@ class FoundryToolsTest(unittest.TestCase):
                 foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
             self.assertFalse(self.rootfs.exists())
 
-    def test_provision_verify_and_fail_closed_on_installed_drift(self) -> None:
+    def test_provision_verify_and_reject_selected_binary_size_drift(self) -> None:
         (self.cache / self.sha).write_bytes(self.payload)
         report = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
-        self.assertEqual(report["files"]["opt/vaso/bin/bazel-real"], self.sha)
+        self.assertEqual(report["files"]["opt/vaso/bin/bazel-real"], {"type": "file", "size": len(self.payload)})
         self.assertEqual(foundry_tools.verify(self.rootfs, self.lock), report)
         binary = self.rootfs / "opt/vaso/bin/bazel-real"
         inode = binary.stat().st_ino
@@ -85,7 +123,7 @@ class FoundryToolsTest(unittest.TestCase):
             "invalid JSON",
             [],
             None,
-            {**valid, "schema_version": 2},
+            {**valid, "schema_version": 1},
             {**valid, "files": ["opt/vaso/bin/bazel-real"]},
             {**valid, "files": {"opt/vaso/bin/bazel-real": None}},
             {**valid, "files": {"opt/vaso/bin/bazel-real": "bad hash"}},
@@ -234,9 +272,10 @@ class FoundryToolsTest(unittest.TestCase):
         report = foundry_tools.provision(self.rootfs, self.cache, lock=self.lock)
 
         self.assertEqual(foundry_tools.verify(self.rootfs, self.lock), report)
-        self.assertIn(
+        self.assertNotIn(
             "opt/vaso/verification-python/package/__init__.py", report["files"]
         )
+        self.assertEqual(report["wheel_prefixes"], ["opt/vaso/verification-python"])
         self.assertEqual(original.read_bytes(), b"vendor bytes")
         self.assertEqual(
             original.stat().st_ino, (self.rootfs / "usr/lib/vendor.so").stat().st_ino
@@ -391,8 +430,8 @@ class FoundryToolsTest(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(foundry_tools.main(argv), 0)
         self.assertEqual(
-            foundry_tools.verify(self.rootfs, self.lock)["lock_sha256"],
-            foundry_tools.digest(self.lock),
+            foundry_tools.verify(self.rootfs, self.lock)["lock_expected_text"],
+            self.lock.read_bytes().decode("utf-8"),
         )
         self.assertEqual(
             original.stat().st_ino, (self.rootfs / "readonly/marker").stat().st_ino
