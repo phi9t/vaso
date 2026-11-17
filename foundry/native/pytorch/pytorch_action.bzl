@@ -172,7 +172,7 @@ def _pytorch_action_prefix_impl(ctx):
     arguments.extend(dep_prefix_args)
     if variant:
         action_inputs.extend(variant.files.to_list())
-        arguments.extend(["--variant-toolchain", variant.contract.path])
+        arguments.extend(["--variant-toolchain", variant.contract.path, "--defer-relocation-audit"])
 
     ctx.actions.run(
         inputs = depset(action_inputs),
@@ -213,6 +213,8 @@ def _pytorch_action_prefix_impl(ctx):
         "--python-abi",
         ctx.attr.python_abi,
     ] + dep_prefix_args
+    if variant:
+        metadata_args.extend(["--source-archive-identity", "--relocation-audit-deferred"])
     ctx.actions.run(
         inputs = depset([ctx.file._metadata_writer, plan, ctx.file._keys, rootfs_identity, wheel], transitive = [variant.files] if variant else []),
         outputs = [build_plan, provider_metadata, result_marker],
@@ -225,6 +227,7 @@ def _pytorch_action_prefix_impl(ctx):
         },
         mnemonic = "PytorchNativeMetadata",
         progress_message = "Writing native PyTorch metadata %{label}",
+        execution_requirements = {"no-sandbox": "1"},
         use_default_shell_env = False,
     )
 

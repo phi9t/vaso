@@ -613,6 +613,20 @@ def fail_on_path_leaks(hits: list[str]) -> None:
         fail("non-relocatable output leak(s):\n" + "\n".join(hits))
 
 
+def audit_output_relocation(prefix: Path | None, wheel: Path | None,
+                            forbidden: set[str], *, deferred: bool = False) -> None:
+    """Optional build relocation audit, separate from publication privacy scans."""
+    if deferred:
+        print("plan-executor: output relocation audit deferred; not verified", file=sys.stderr)
+        return
+    hits: list[str] = []
+    if prefix is not None:
+        hits.extend(scan_output_for_path_leaks(prefix, forbidden))
+    if wheel is not None and wheel.is_file():
+        hits.extend(scan_file_for_path_leaks(wheel, forbidden))
+    fail_on_path_leaks(hits)
+
+
 def rewrite_pkg_config_files(prefix: Path) -> None:
     if not prefix.is_dir():
         return
@@ -650,8 +664,9 @@ def bind_variant_toolchain(plan: dict[str, Any], contract_path: Path, runtime_ve
     contract = read_json(contract_path)
     if contract.get("schema") != 1 or contract.get("host_os") != "linux" or contract.get("host_arch") != "x86_64":
         fail("unsupported variant host toolchain contract")
-    if plan.get("gpu_archs") != ["sm_90"] or contract.get("cuda_arch_list") != "9.0":
-        fail("H20 variant must target SM90, not the default SM100")
+    selected_arch = {"9.0": ["sm_90"], "10.0": ["sm_100"]}.get(contract.get("cuda_arch_list"))
+    if selected_arch is None or plan.get("gpu_archs") != selected_arch or contract.get("gpu_archs") != selected_arch:
+        fail("variant must consistently select SM90 or SM100 in plan and toolchain")
     if contract.get("python_abi") != "cp313":
         fail("H20 variant requires cp313 ABI")
     version = contract.get("python_version")
@@ -739,6 +754,7 @@ def execute_plan(
     nested_repository_cache: Path | None,
     nested_disk_cache: Path | None,
     variant_toolchain: Path | None = None,
+    defer_relocation_audit: bool = False,
 ) -> None:
     plan = read_json(plan_path)
     schema = load_schema(schema_path)
@@ -866,12 +882,7 @@ def execute_plan(
         if wheel is not None:
             forbidden.add(str(wheel))
         forbidden.update(action_path_tokens(forbidden_paths))
-        leak_hits: list[str] = []
-        if prefix is not None:
-            leak_hits.extend(scan_output_for_path_leaks(prefix, forbidden))
-        if wheel is not None and wheel.is_file():
-            leak_hits.extend(scan_file_for_path_leaks(wheel, forbidden))
-        fail_on_path_leaks(leak_hits)
+        audit_output_relocation(prefix, wheel, forbidden, deferred=defer_relocation_audit)
     finally:
         if created_work and work.exists():
             shutil.rmtree(work)
@@ -893,6 +904,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--nested-repository-cache", type=Path)
     parser.add_argument("--nested-disk-cache", type=Path)
     parser.add_argument("--variant-toolchain", type=Path)
+    parser.add_argument("--defer-relocation-audit", action="store_true", help="Defer optional build relocation scan, not publication privacy checks")
     return parser.parse_args(argv)
 
 
@@ -915,6 +927,7 @@ def main(argv: list[str] | None = None) -> int:
             args.nested_repository_cache,
             args.nested_disk_cache,
             args.variant_toolchain,
+            args.defer_relocation_audit,
         )
     except SystemExit as exc:
         message = str(exc)

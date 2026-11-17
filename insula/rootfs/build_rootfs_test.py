@@ -51,7 +51,7 @@ def copy_minimal_checkout(root: Path, name: str) -> Path:
     experiment_root = root / name / "foundry"
     rootfs_dir = experiment_root / "rootfs"
     rootfs_dir.mkdir(parents=True)
-    for src in (SCRIPT, LOCK, LLVM_PLAN):
+    for src in (SCRIPT, LOCK, LLVM_PLAN, ROOTFS_DIR / "install_cuda_ecosystem.py", ROOTFS_DIR / "collect_cuda_versions.py"):
         shutil.copy2(src, rootfs_dir / src.name)
     return experiment_root
 

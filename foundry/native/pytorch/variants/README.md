@@ -113,3 +113,28 @@ NCCL include, cuDNN include/x86_64-linux-gnu, and lib/x86_64-linux-gnu for both.
 This first increment uses an explicit typed-provider label, not automatic Bazel
 toolchain resolution. ToolchainInfo/type exposure does not imply a registered
 production resolver or complete hermetic package acquisition graph.
+
+### Explicit B200 architecture selection
+
+The same typed provider accepts cuda_arch_list="10.0" for SM100; its default
+remains "9.0" for H20/SM90. The executor requires the plan and provider to agree
+on both architecture fields, so selecting B200 never silently relabels an H20
+plan. pytorch_b200_cuspy_plan prepares the SM100 plan through the same canonical
+Torch action with 36 direct prefixes. This API does not manufacture a cu133 rootfs
+receipt or bind missing dependencies, and is not itself a runnable build target.
+
+A restored cu130 capsule is a bootstrap input, not a cu133 closure. In addition
+to CUDA13.3/NCCL/cuDNN, preserve and qualify full-graph cuSPARSELt, cuDSS and
+NVSHMEM declarations. Production Cuspy must use matching LLVM23 bindings and
+libclang runtime dependencies; the experimental requirements file's libclang18
+wheel is not a substitute. Source-built CPython3.13.13 remains the production
+interpreter unless explicitly changed with evidence.
+
+
+The full Torch 2.15 variant also declares
+`torch215-cudss-context-include.patch`: its cuDSS handle-pool translation unit
+uses CUDA/cuDSS types and exception macros but includes only the generic handle
+pool template. The patch explicitly includes `ATen/cuda/CUDAContext.h` under
+`USE_CUDSS`, which supplies the required declarations. It does not disable
+cuDSS or modify the clean source archive. The generator requires both reviewed
+patch texts, and the B200 action declares both patch labels.
