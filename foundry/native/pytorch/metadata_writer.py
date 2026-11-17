@@ -36,6 +36,18 @@ def plan_merkle_key(plan: dict[str, Any], keys: dict[str, Any]) -> str:
     return item["merkle_key"]
 
 
+def metadata_identity(plan: dict[str, Any], keys: dict[str, Any], *, source_archive_only: bool = False) -> tuple[str, str]:
+    if source_archive_only:
+        # This receipt identifies the already acquired source archive only.
+        # It is deliberately not a digest of the action or dependency closure.
+        sources = plan.get("sources", [])
+        main = [item for item in sources if isinstance(item, dict) and item.get("name") == "main"]
+        if len(main) != 1 or not re.fullmatch(r"[0-9a-f]{64}", str(main[0].get("sha256", ""))):
+            raise SystemExit("explicit source identity requires one pinned main archive")
+        return main[0]["sha256"], "source-archive-only"
+    return plan_merkle_key(plan, keys), keys["packages"][package_key(plan)].get("key_kind", "legacy-merkle")
+
+
 def parse_name_path(items: list[str], flag: str) -> dict[str, str]:
     values: dict[str, str] = {}
     for item in items:
@@ -73,9 +85,10 @@ def python_abi_from_wheel(wheel: Path, requested: str, plan: dict[str, Any]) -> 
 
 def write_outputs(args: argparse.Namespace) -> None:
     plan = read_json(args.plan)
-    keys = read_json(args.keys)
+    source_archive_only = getattr(args, "source_archive_identity", False)
+    keys = {} if source_archive_only else read_json(args.keys)
     package = plan["package"]
-    action_input_digest = plan_merkle_key(plan, keys)
+    action_input_digest, identity_kind = metadata_identity(plan, keys, source_archive_only=source_archive_only)
     dep_prefixes = parse_name_path(args.dep_prefix, "--dep-prefix")
     args.build_plan_out.parent.mkdir(parents=True, exist_ok=True)
     args.provider_metadata_out.parent.mkdir(parents=True, exist_ok=True)
@@ -87,7 +100,8 @@ def write_outputs(args: argparse.Namespace) -> None:
         "package": package["name"],
         "version": package["version"],
         "action_input_digest": action_input_digest,
-        "action_input_identity_kind": keys["packages"][package_key(plan)].get("key_kind", "legacy-merkle"),
+        "action_input_identity_kind": identity_kind,
+        "build_relocation_audit": "deferred-not-verified" if getattr(args, "relocation_audit_deferred", False) else "required-by-build-action",
         "declared_cuda_architectures": list(plan.get("gpu_archs", [])),
         "torch_cuda_arch_list": torch_cuda_arch_list(plan),
         "python_abi": python_abi_from_wheel(args.wheel, args.python_abi, plan),
@@ -127,6 +141,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan", type=Path, required=True)
     parser.add_argument("--keys", type=Path, required=True)
+    parser.add_argument("--source-archive-identity", action="store_true", help="Use the declared archive receipt, not an action-closure digest")
+    parser.add_argument("--relocation-audit-deferred", action="store_true")
     parser.add_argument("--rootfs-identity", type=Path, required=True)
     parser.add_argument("--wheel", type=Path, required=True)
     parser.add_argument("--build-plan-out", type=Path, required=True)

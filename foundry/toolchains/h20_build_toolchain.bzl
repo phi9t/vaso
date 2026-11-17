@@ -10,6 +10,9 @@ def _h20_build_toolchain_impl(ctx):
         fail("declare the actual supported cp313 interpreter version, never relabel it")
     if ctx.attr.cuda_version != "13.3":
         fail("H20 Cuspy toolchain requires CUDA 13.3")
+    if ctx.attr.cuda_arch_list not in ["9.0", "10.0"]:
+        fail("explicit Cuspy variant must target SM90 or SM100")
+    gpu_arch = "sm_90" if ctx.attr.cuda_arch_list == "9.0" else "sm_100"
     codegen_names = ["cupti_header", "cupti_version_header", "libclang", "clang_cindex", "clang_init"]
     codegen_files = [getattr(ctx.file, name) for name in codegen_names if getattr(ctx.file, name)]
     if ctx.attr.enable_cuspy_codegen:
@@ -36,8 +39,8 @@ def _h20_build_toolchain_impl(ctx):
         "host_os": "linux",
         "host_arch": "x86_64",
         "cuda_version": ctx.attr.cuda_version,
-        "cuda_arch_list": "9.0",
-        "gpu_archs": ["sm_90"],
+        "cuda_arch_list": ctx.attr.cuda_arch_list,
+        "gpu_archs": [gpu_arch],
         "python_abi": "cp313",
         "python_version": ctx.attr.python_version,
         "compiler_identity": ctx.attr.compiler_identity,
@@ -68,6 +71,7 @@ def _h20_build_toolchain_impl(ctx):
 h20_build_toolchain = rule(
     implementation = _h20_build_toolchain_impl,
     attrs = {
+        "cuda_arch_list": attr.string(default = "9.0", values = ["9.0", "10.0"]),
         "enable_cuspy_codegen": attr.bool(default = False),
         "cupti_header": attr.label(allow_single_file = True),
         "cupti_version_header": attr.label(allow_single_file = True),

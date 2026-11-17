@@ -7,6 +7,7 @@ bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "rules_java", version = "9.3.0", dev_dependency = True)
 
 include("//:dev.MODULE.bazel")
+include("//:cuspy.MODULE.bazel")
 
 # FC-M2a registers rootfs-owned toolchain identities for analysis-only
 # resolution. The private default constraints below keep the default platform on

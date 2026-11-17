@@ -3,6 +3,11 @@
 
 Dry-run mode writes to an OCI layout directory under ``$VASO_ESTATE_ROOT`` and
 never contacts a registry.
+
+For pinned rootfs acquisition, pull --rootfs-archive-only keeps ORAS OCI
+blob verification and the reconstructed archive's size/digest check without
+custom per-file metadata or split-part hashing. This is not a verification
+bypass and does not change release pulls or rootfs unpacking.
 """
 
 from __future__ import annotations
@@ -679,6 +684,14 @@ def replace_target(stage: Path, target: Path) -> None:
 def pull_artifact(args: argparse.Namespace) -> int:
     tag = args.tag
     digest = args.digest
+    archive_only = getattr(args, "rootfs_archive_only", False)
+    if archive_only and (
+        args.artifact != "rootfs"
+        or not digest
+        or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest)
+        or tag
+    ):
+        fail("--rootfs-archive-only requires --artifact rootfs and a pinned --digest sha256:...")
     ref, package, layout = target_reference(
         registry=args.registry,
         dry_run=args.dry_run,
@@ -705,7 +718,12 @@ def pull_artifact(args: argparse.Namespace) -> int:
     stage = stage_target(target)
     try:
         run_oras(args, ["pull", *oras_layout_flag(args.dry_run), ref, "-o", str(stage)], env_extra=auth_env)
-        verify_files(stage, entries)
+        # ORAS verifies OCI blobs during pull. In this explicit rootfs mode,
+        # rely on that transport check for metadata; reassemble_rootfs below
+        # still checks the complete archive size and digest. Do not rehash
+        # metadata or split parts individually.
+        if not archive_only:
+            verify_files(stage, entries)
         archive_name = None
         if args.artifact == "rootfs":
             archive_name = reassemble_rootfs(stage, annotations)
@@ -723,7 +741,8 @@ def pull_artifact(args: argparse.Namespace) -> int:
             "reference": ref,
             "layout": str(layout) if layout is not None else None,
             "target_dir": str(target),
-            "verified_files": len(entries),
+            "verified_files": 0 if archive_only else len(entries),
+            "verification": "oci-blobs-and-rootfs-archive" if archive_only else "per-file-sha256",
             "archive": archive_name,
         },
     )
@@ -865,6 +884,10 @@ def parser() -> argparse.ArgumentParser:
     pull.add_argument("--tag")
     pull.add_argument("--digest")
     pull.add_argument("--target-dir", type=Path, required=True)
+    pull.add_argument(
+        "--rootfs-archive-only", action="store_true",
+        help="pinned rootfs only: retain ORAS blob and complete archive verification; do not custom-hash metadata or parts",
+    )
     pull.set_defaults(func=pull_artifact)
     return p
 

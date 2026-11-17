@@ -12,6 +12,7 @@ package(default_visibility = ["//visibility:public"])
 exports_files([
     "variants/python313-cuspy-requirements.txt",
     "variants/torch215-cuspy-no-header-hash.patch",
+    "variants/torch215-cudss-context-include.patch",
     "BUILD.bazel",
     "action_driver.py",
     "action_prefix_test.py",

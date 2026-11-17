@@ -14,7 +14,7 @@ foundry/build.sh --source --site /path/to/site.json --resume build
 
 The external site JSON provides `estate_root`, `rootfs`, and `source_archive`.
 The source archive SHA256 and compiler flags are owned by
-`profiles/cu126-sm61-r3.json`, not supplied by ambient environment. All tools
+`profiles/cu126-sm61-r4.json`, not supplied by ambient environment. All tools
 and providers must be inside the selected rootfs at `/opt/vaso`; the rootfs
 manifest is `opt/vaso/build-manifest.json`. This source profile uses CPython
 3.12, CUDA 12.6, SM61, system NCCL, cuDNN and Kineto. Optional CPU-quantization,
@@ -46,3 +46,21 @@ headers are a build input, not permission to update the host NVIDIA driver.
 ## Metadata identity migration
 
 The v2 source-build receipt stores exact UTF-8 profile, rootfs-manifest, driver, and entry-script bytes instead of hashing individual small files. Source edits compare literal pre/postimages; archive and wheel SHA-256 checks remain. Old v1 receipts intentionally do not resume under the new driver: create a fresh named build rather than rewriting an active receipt. Existing running builds and their checkouts are not modified by this migration.
+
+
+## CUDA 12.6 developer-header closure and Pascal qualification
+
+The r4 profile also requires the complete 44-header nested NCCL tree, along
+with CUDA 12.6 profiler API headers (cudaProfiler.h and cuda_profiler_api.h)
+at both include paths. Missing or altered headers fail before native
+compilation; stage pinned upstream packages into a **new** rootfs and seal
+its manifest rather than modifying an existing build's rootfs. The
+provider_headers.py preparer materializes and validates the complete declared
+header tree from a separate pinned source directory before sealing.
+
+PyTorch 2.15 defaults to the nccl2 backend on this fixture: its collectives
+are captured by a c10d FlightRecorderHook and dumped using
+_dump_fr_trace(backend="nccl2"). The legacy _dump_nccl_trace()
+API returns an empty ring in this case. Runtime acceptance requires
+nonempty entries from the correct backend, both GPUs, and actual kernels;
+no old installation or Kineto-only result substitutes for Flight Recorder.

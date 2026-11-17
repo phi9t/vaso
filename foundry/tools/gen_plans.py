@@ -1745,6 +1745,13 @@ def pytorch_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text:
             "CXX": "__requires_explicit_variant_toolchain__",
             "CFLAGS": "", "CXXFLAGS": "", "CUDAFLAGS": "", "NVCC_FLAGS": "",
         }
+        if explicit_compiler_identity == "toolchain:gcc_13_3":
+            # The declared canonical drivers require the existing Insula marker.
+            # The driver still checks that the projected manifest is readable.
+            toolchain_env.update(
+                VASO_IN_INSULA="1",
+                VASO_ROOTFS_BUNDLE_MANIFEST="/run/vaso/rootfs-bundle.json",
+            )
     env_script = "{work}/pytorch-build-env.sh"
     source_manifest = repo_root / source_manifest_path
     plan = {
@@ -1827,6 +1834,7 @@ def pytorch_h20_cuspy_plan(
     repo_root: Path, *, source: dict[str, Any], source_manifest_path: str,
     source_manifest_text: str, rootfs: dict[str, Any], rootfs_identity_text: str,
     compiler_identity: str | None = None, python_version: str = "3.13.13",
+    cuda_arch_list: str = "9.0",
 ) -> dict[str, Any]:
     """Prepare a canonical plan from explicit closure receipts, without hashing.
 
@@ -1843,13 +1851,16 @@ def pytorch_h20_cuspy_plan(
         raise ValueError("source receipt must pin upstream Torch 2.15.0")
     if manifest.get("clean_recursive_source") is not True:
         raise ValueError("source receipt must attest clean recursive source archive before patching")
-    approved_path = "native/pytorch/variants/torch215-cuspy-no-header-hash.patch"
-    approved_patch = {
-        "path": approved_path,
-        "expected_text": (repo_root / approved_path).read_bytes().decode("utf-8"),
-    }
-    if source.get("patches") != [approved_patch]:
-        raise ValueError("H20 Cuspy requires exactly the approved no-header-hash patch, unchanged")
+    approved_paths = [
+        "native/pytorch/variants/torch215-cuspy-no-header-hash.patch",
+        "native/pytorch/variants/torch215-cudss-context-include.patch",
+    ]
+    approved_patches = [
+        {"path": path, "expected_text": (repo_root / path).read_bytes().decode("utf-8")}
+        for path in approved_paths
+    ]
+    if source.get("patches") != approved_patches:
+        raise ValueError("Cuspy requires exactly the approved no-header-hash and cuDSS include patches, unchanged")
 
     digest = source.get("sha256", "")
     if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
@@ -1863,9 +1874,12 @@ def pytorch_h20_cuspy_plan(
     cuda_version = rootfs.get("components", {}).get("cuda_toolkit", {}).get("version", "")
     if cuda_version != "13.3" and not cuda_version.startswith("13.3."):
         raise ValueError("this immutable variant requires CUDA 13.3")
+    gpu_archs = {"9.0": ["sm_90"], "10.0": ["sm_100"]}.get(cuda_arch_list)
+    if gpu_archs is None:
+        raise ValueError("explicit Cuspy variant must target SM90 or SM100")
     package = copy.deepcopy(PACKAGE_GENERATORS["py-torch"])
     package.update(version="2.15.0", source=copy.deepcopy(source),
-                   torch_cuda_arch_list="9.0", gpu_archs=["sm_90"], h20_debian_layout=True)
+                   torch_cuda_arch_list=cuda_arch_list, gpu_archs=gpu_archs, h20_debian_layout=True)
     plan = pytorch_plan(
         repo_root, "torch", "cu133", rootfs_identity_text, rootfs,
         package_override=package, source_manifest_path=source_manifest_path,
@@ -1879,6 +1893,13 @@ def pytorch_h20_cuspy_plan(
         plan["toolchain"]["cxx"] = compiler_identity
     plan["toolchain"]["python"] = "python_313_native" if python_version == "3.13.13" else "python_3_13_18_variant"
     return plan
+
+
+def pytorch_b200_cuspy_plan(repo_root: Path, **kwargs) -> dict[str, Any]:
+    """Explicit SM100 variant using the same full dependency graph as H20."""
+    if "cuda_arch_list" in kwargs:
+        raise ValueError("B200 variant fixes cuda_arch_list=10.0")
+    return pytorch_h20_cuspy_plan(repo_root, cuda_arch_list="10.0", **kwargs)
 
 
 def torchvision_plan(repo_root: Path, profile: str, line: str, rootfs_identity_text: str, rootfs: dict[str, Any]) -> dict[str, Any]:

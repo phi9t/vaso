@@ -718,6 +718,8 @@ def _write_vaso_provenance(
         "rootfs_bundle_digest": _rootfs_bundle_digest(provider_doc),
         "upstream_version": upstream_version,
     }
+    if "build_relocation_audit" in provider_doc:
+        provenance["build_relocation_audit"] = provider_doc["build_relocation_audit"]
     path.write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 

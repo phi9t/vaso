@@ -26,6 +26,15 @@ class VariantToolchainTest(unittest.TestCase):
     def bind(self):
         self.path.write_text(json.dumps(self.contract))
         return executor.bind_variant_toolchain(self.plan,self.path,runtime_version=(3,13,18))
+    def test_b200_is_explicit_and_consistent(self):
+        self.contract["cuda_arch_list"] = "10.0"
+        self.contract["gpu_archs"] = ["sm_100"]
+        self.plan["gpu_archs"] = ["sm_100"]
+        self.bind()
+        self.contract["gpu_archs"] = ["sm_90"]
+        with self.assertRaisesRegex(SystemExit, "consistently"):
+            self.bind()
+
     def test_binds_real_declared_tools_without_hashes(self):
         with patch.object(executor,"sha256_file",side_effect=AssertionError("hash forbidden")):
             selected = self.bind()

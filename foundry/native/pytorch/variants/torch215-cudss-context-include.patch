@@ -1,0 +1,9 @@
+--- a/aten/src/ATen/native/cuda/linalg/CudssHandlePool.cpp
++++ b/aten/src/ATen/native/cuda/linalg/CudssHandlePool.cpp
+@@ -1,5 +1,6 @@
+ #include <ATen/cuda/detail/DeviceThreadHandles.h>
+ 
+ #if defined(USE_CUDSS)
++#include <ATen/cuda/CUDAContext.h>
+ 
+ namespace at::cuda {
