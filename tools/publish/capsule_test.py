@@ -206,6 +206,38 @@ def test_bounded_real_restore_preserves_links(tmp_path):
     assert (directory/"alias").read_bytes()==payload
 
 
+def test_base_manifest_is_packed_without_local_path(tmp_path):
+    spec=fixture(tmp_path); source=tmp_path/"base-manifest.json"; source.write_text('{"line":"cu130"}')
+    spec["rootfs_manifest"]=str(source)
+    c.pack(spec,tmp_path/"oci")
+    m=inspect(tmp_path/"oci")
+    raw=gzip.decompress(read_blob(tmp_path/"oci",m["layers"][-1]))
+    with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+        assert json.load(archive.extractfile("capsule/rootfs-bundle.json"))=={"line":"cu130"}
+        desc=json.load(archive.extractfile("capsule/descriptor.json"))
+    assert "rootfs_manifest" not in desc
+
+def test_metadata_append_reuses_layers_and_restores(tmp_path):
+    import os
+    spec=fixture(tmp_path); layout=tmp_path/"oci"; c.pack(spec,layout)
+    before=inspect(layout)["layers"]
+    source=tmp_path/"manifest.json"; source.write_text('{"line":"cu130"}')
+    digest=c.add_rootfs_manifest(layout,source)
+    assert inspect(layout)["layers"][:-1]==before
+    assert c.add_rootfs_manifest(layout,source)==digest
+    umoci=os.environ.get("CAPSULE_TEST_UMOCI")
+    if umoci:
+        c.unpack(layout,tmp_path/"restored",umoci=umoci)
+        assert json.loads((tmp_path/"restored/rootfs/capsule/rootfs-bundle.json").read_text())=={"line":"cu130"}
+
+
+def test_manifest_source_symlink_rejected(tmp_path):
+    spec=fixture(tmp_path); target=tmp_path/"manifest.json"; target.write_text("{}")
+    source=tmp_path/"link.json"; source.symlink_to(target)
+    spec["rootfs_manifest"]=str(source)
+    with unittest.TestCase().assertRaises(ValueError): c.pack(spec,tmp_path/"oci")
+
+
 class CapsuleTests(unittest.TestCase):
     pass
 

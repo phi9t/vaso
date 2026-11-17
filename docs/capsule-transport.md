@@ -12,6 +12,7 @@ Supply a local packing specification:
 ```json
 {
   "schema_version": 1,
+  "rootfs_manifest": "/staging/rootfs-bundle.json",
   "layers": [
     {"name": "base", "source": "/staging/base", "path": "rootfs"},
     {"name": "graph", "source": "/staging/graph", "path": "bundles/graph", "guest": "/workspace/build-graph"},
@@ -21,7 +22,12 @@ Supply a local packing specification:
 }
 ```
 
-The local `source` fields are never serialized into the capsule descriptor.
+The local `source` and `rootfs_manifest` paths are never serialized into the
+capsule descriptor. Supply the selected base rootfs's published manifest:
+canonical compiler wrappers require it at `/run/vaso/rootfs-bundle.json`.
+It is stored beside the inner rootfs, where normal Insula context binds it.
+For an already packed layout, `add-rootfs-manifest --layout DIR --file FILE`
+adds one small native OCI metadata layer without repacking existing blobs.
 Each source must be a deliberately selected directory. Use distinct component
 layers for the declared Bazel graph, pinned source archives, toolchains, and
 optional installed-prefix/wheel artifacts. This is the adapted package graph,
