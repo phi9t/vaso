@@ -68,8 +68,13 @@ def validate(doc, sources=False):
                 raise ValueError("each source must be an explicit real directory")
     if targets.count("rootfs") != 1:
         raise ValueError("exactly one rootfs required")
-    if set(doc) != {"schema_version", "layers"}:
+    allowed = {"schema_version", "layers"} | ({"rootfs_manifest"} if sources else set())
+    if set(doc) - allowed:
         raise ValueError("unknown descriptor fields")
+    if sources and "rootfs_manifest" in doc:
+        manifest = Path(doc["rootfs_manifest"])
+        if not manifest.is_absolute() or not manifest.is_file() or manifest.is_symlink():
+            raise ValueError("rootfs_manifest must be an explicit existing file")
     return doc
 
 class DigestWriter:
@@ -107,7 +112,7 @@ def privacy_filter(member):
     member.pax_headers = {}
     return member
 
-def layer(layout, item=None, descriptor=None):
+def layer(layout, item=None, descriptor=None, rootfs_manifest=None):
     # One streaming pass over members; native compressed and uncompressed layer hashes.
     fd, tmp = tempfile.mkstemp(dir=layout)
     try:
@@ -118,11 +123,13 @@ def layer(layout, item=None, descriptor=None):
                 with tarfile.open(fileobj=raw, mode="w|", format=tarfile.PAX_FORMAT) as tar:
                     if item is not None:
                         tar.add(item["source"], arcname="capsule/" + item["path"], filter=privacy_filter)
-                    else:
+                    elif descriptor is not None:
                         data = encoded(descriptor)
                         member = tarfile.TarInfo("capsule/descriptor.json")
                         member.size, member.mode = len(data), 0o644
                         tar.addfile(member, io.BytesIO(data))
+                    if rootfs_manifest is not None:
+                        tar.add(str(rootfs_manifest), arcname="capsule/rootfs-bundle.json", filter=privacy_filter)
             digest = compressed.digest.hexdigest()
         os.replace(tmp, layout / "blobs/sha256" / digest)
         return {"mediaType": LAYER, "digest": "sha256:" + digest, "size": compressed.count}, "sha256:" + raw.digest.hexdigest()
@@ -208,7 +215,7 @@ def pack(spec, dest, tag="capsule", max_layer_bytes=2_000_000_000):
             for part, (entry, diff) in enumerate(component_layers(stage, item, max_layer_bytes)):
                 entry["annotations"] = {"io.vaso.capsule.layer": item["name"], "io.vaso.capsule.part":str(part)}
                 layers.append(entry); diffs.append(diff)
-        entry, diff = layer(stage, descriptor=desc)
+        entry, diff = layer(stage, descriptor=desc, rootfs_manifest=spec.get("rootfs_manifest"))
         layers.append(entry); diffs.append(diff)
         config = blob(stage, encoded({"architecture":"amd64","os":"linux","config":{"Labels":{"io.vaso.capsule.schema":"1"}},"rootfs":{"type":"layers","diff_ids":diffs}}), CONFIG)
         manifest = blob(stage, encoded({"schemaVersion":2,"mediaType":MANIFEST,"config":config,"layers":layers}), MANIFEST)
@@ -219,6 +226,41 @@ def pack(spec, dest, tag="capsule", max_layer_bytes=2_000_000_000):
         return manifest["digest"]
     finally:
         if stage.exists(): shutil.rmtree(stage)
+
+def add_rootfs_manifest(layout, source, tag="capsule"):
+    """Append only base metadata; existing large OCI blobs are never repacked."""
+    if not source.is_file() or source.is_symlink():
+        raise ValueError("expected a regular rootfs manifest")
+    index = json.loads((layout/"index.json").read_text())
+    selected = [(i,m) for i,m in enumerate(index["manifests"])
+                if m.get("annotations",{}).get("org.opencontainers.image.ref.name")==tag]
+    if len(selected) != 1:
+        raise ValueError("local image tag is missing or ambiguous")
+    number, old = selected[0]
+    def read_native(desc):
+        digest = desc["digest"]
+        if not re.fullmatch(r"sha256:[0-9a-f]{64}",digest):
+            raise ValueError("unsupported OCI descriptor")
+        return json.loads((layout/"blobs/sha256"/digest.split(":")[1]).read_text())
+    manifest = read_native(old)
+    config = read_native(manifest["config"])
+    entry, diff = layer(layout, rootfs_manifest=source)
+    if manifest["layers"] and manifest["layers"][-1]["digest"] == entry["digest"]:
+        return old["digest"]
+    entry["annotations"] = {"io.vaso.capsule.layer":"base-metadata"}
+    manifest["layers"].append(entry)
+    config["rootfs"]["diff_ids"].append(diff)
+    manifest["config"] = blob(layout, encoded(config), CONFIG)
+    updated = blob(layout, encoded(manifest), MANIFEST)
+    updated["annotations"] = old.get("annotations",{})
+    index["manifests"][number] = updated
+    fd, temporary = tempfile.mkstemp(dir=layout, prefix=".index-")
+    try:
+        with os.fdopen(fd,"wb") as output: output.write(encoded(index))
+        os.replace(temporary, layout/"index.json")
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
+    return updated["digest"]
 
 def projections(bundle):
     outer = (bundle / "rootfs").resolve()
@@ -340,8 +382,10 @@ def main():
     a=sub.add_parser("run"); a.add_argument("--bundle",type=Path,required=True); a.add_argument("--repo",type=Path,required=True); a.add_argument("--estate",type=Path,required=True); a.add_argument("--workspace",type=Path,required=True); a.add_argument("--line",required=True); a.add_argument("--print-argv",action="store_true"); a.add_argument("argv",nargs=argparse.REMAINDER)
     for name in ("push", "pull"):
         a=sub.add_parser(name); a.add_argument("--layout",type=Path,required=True); a.add_argument("--remote",required=True); a.add_argument("--tag",default="capsule"); a.add_argument("--oras-bin")
+    a=sub.add_parser("add-rootfs-manifest"); a.add_argument("--layout",type=Path,required=True); a.add_argument("--file",type=Path,required=True); a.add_argument("--tag",default="capsule")
     args=p.parse_args()
-    if args.command in ("push","pull"): print(transfer(args.command,args.layout,args.remote,args.tag,args.oras_bin))
+    if args.command=="add-rootfs-manifest": print(add_rootfs_manifest(args.layout,args.file,args.tag))
+    elif args.command in ("push","pull"): print(transfer(args.command,args.layout,args.remote,args.tag,args.oras_bin))
     elif args.command=="pack": print(pack(json.loads(args.spec.read_text()),args.layout,args.tag,args.max_layer_bytes))
     elif args.command=="unpack": unpack(args.layout,args.dest,args.tag,args.umoci); print(args.dest)
     elif args.command=="run": run_capsule(args.bundle,args.repo,args.estate,args.workspace,args.line,args.argv[1:] if args.argv[:1]==["--"] else args.argv,args.print_argv)
