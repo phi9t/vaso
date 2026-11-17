@@ -10,6 +10,8 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
+    "variants/python313-cuspy-requirements.txt",
+    "variants/torch215-cuspy-no-header-hash.patch",
     "BUILD.bazel",
     "action_driver.py",
     "action_prefix_test.py",
@@ -192,4 +194,13 @@ py_test(
     ],
     data = ["//tools:abi_parity.py"],
     main = "gates_test.py",
+)
+
+# Admission evidence for the planned H20 Cuspy variant; this test does not
+# qualify a wheel or wire a new native build selection.
+py_test(
+    name = "cuspy_admission_test",
+    srcs = ["cuspy_admission.py", "cuspy_admission_test.py"],
+    data = ["variants/torch215-cu133-sm90-cuspy.json"],
+    main = "cuspy_admission_test.py",
 )

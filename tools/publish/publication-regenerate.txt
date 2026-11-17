@@ -1,5 +1,6 @@
 # Commands run from the scrubbed publication worktree before verify.
 python3 foundry/tools/gen_plans.py --repo-root foundry
-python3 foundry/tools/plan_key_snapshot.py --repo-root foundry --out foundry/plans/keys.json
+# Full plan-key audits are deferred, never an automatic publication/build prerequisite.
 python3 tools/publish/regenerate_pending_torch_artifacts.py --repo-root foundry
-python3 tools/publish/regenerate_vendor_checksums.py
+# Vendored Cargo checksum manifests are preserved unchanged.
+# Sanitizer mutations under the vendor tree fail closed; no per-file rehash.

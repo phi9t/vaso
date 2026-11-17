@@ -14,6 +14,10 @@ NativeActionPrefixInfo = provider(
     },
 )
 
+def _dependency_key(item):
+    return item[1]
+
+
 def native_action_prefix_manifest_attrs():
     return {
         "prefix_manifest_files": attr.label_keyed_string_dict(
@@ -55,7 +59,7 @@ def _native_action_prefixes_by_key(ctx, prefix_key_attrs):
             manifest = info.manifest,
             prefix = info.prefix,
         )
-    for target, dep_key in sorted(ctx.attr.prefix_manifest_files.items(), key = lambda item: item[1]):
+    for target, dep_key in sorted(ctx.attr.prefix_manifest_files.items(), key = _dependency_key):
         if dep_key not in expected:
             fail("{} declares unexpected dependency content manifest key {}".format(ctx.label, dep_key))
         if dep_key in by_key:
@@ -96,7 +100,7 @@ def _native_action_prefix_manifest_files_by_key(ctx, prefix_key_attrs):
 def _legacy_native_action_prefix_manifest_files_by_key(ctx, prefix_key_attrs):
     expected = {key: attr_name for key, attr_name in prefix_key_attrs}
     by_key = {}
-    for target, dep_key in sorted(ctx.attr.prefix_manifest_files.items(), key = lambda item: item[1]):
+    for target, dep_key in sorted(ctx.attr.prefix_manifest_files.items(), key = _dependency_key):
         if dep_key not in expected:
             fail("{} declares unexpected dependency content manifest key {}".format(ctx.label, dep_key))
         files = target.files.to_list()

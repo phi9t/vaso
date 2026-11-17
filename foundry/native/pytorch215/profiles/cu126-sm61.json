@@ -1,0 +1,15 @@
+{
+  "schema": "vaso.torch-source-profile.v1",
+  "name": "torch215-cu126-sm61",
+  "torch": {"version": "2.15.0+vaso.cu126.sm61", "upstream_commit": "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457", "archive_sha256": "32ed7ff3176aa6e9c8a0ddcc617c1e2bf6e65f24d2b534e29cfd22c6ad3cfbb1", "archive_prefix": "pytorch-v2.15.0"},
+  "toolchain": {"cuda_major_minor": "12.6", "cuda_arch_list": "6.1", "python_abi": "cp312", "profiler": "kineto"},
+  "environment": {
+    "USE_CUDA": "1", "USE_CUDNN": "1", "USE_DISTRIBUTED": "1", "USE_NCCL": "1", "USE_SYSTEM_NCCL": "1", "USE_KINETO": "1", "USE_CUPTI_SO": "1", "USE_GLOO": "1",
+    "USE_FBGEMM": "0", "USE_NNPACK": "0", "USE_PYTORCH_QNNPACK": "0", "USE_XNNPACK": "0", "USE_MKLDNN": "0", "USE_MKL": "0", "USE_MAGMA": "0", "USE_CUFILE": "0", "USE_CUDSS": "0", "USE_CUSPARSELT": "0", "USE_NVSHMEM": "0", "USE_NCCL_EP": "0", "USE_FLASH_ATTENTION": "0", "USE_MEM_EFF_ATTENTION": "0", "USE_TENSORPIPE": "0", "USE_MPI": "0", "BUILD_TEST": "0", "BUILD_BINARY": "0", "BUILD_LAZY_TS_BACKEND": "0", "USE_ITT": "0", "USE_NUMA": "0", "USE_PRECOMPILED_HEADERS": "0",
+    "CUDA_HOME": "/opt/vaso/cuda", "CUDA_ROOT": "/opt/vaso/cuda", "CUDAToolkit_ROOT": "/opt/vaso/cuda", "CUDA_TOOLKIT_ROOT_DIR": "/opt/vaso/cuda", "CUDA_VERSION": "12.6", "DESIRED_CUDA": "12.6", "CUDNN_INCLUDE_DIR": "/opt/vaso/cuda/include", "CUDNN_LIB_DIR": "/opt/vaso/cuda/lib64", "CUDNN_LIBRARY": "/opt/vaso/cuda/lib64/libcudnn.so.9", "NCCL_ROOT_DIR": "/opt/vaso/cuda", "NCCL_INCLUDE_DIR": "/opt/vaso/cuda/include", "NCCL_LIB_DIR": "/opt/vaso/cuda/lib64", "CC": "gcc", "CXX": "g++", "CMAKE_BUILD_TYPE": "Release", "PYTORCH_BUILD_NUMBER": "1",
+    "PATH": "/opt/vaso/cmake/bin:/opt/vaso/python-deps/bin:/opt/vaso/cuda/bin:/usr/local/bin:/usr/bin:/bin", "PYTHONPATH": "/opt/vaso/python-deps", "LD_LIBRARY_PATH": "/opt/vaso/cuda/lib64:/usr/local/lib", "PIP_NO_INDEX": "1", "PYTHONDONTWRITEBYTECODE": "1",
+    "CMAKE_ARGS": "-DCUDNN_INCLUDE_PATH=/opt/vaso/cuda/include -DCUDNN_LIBRARY_PATH=/opt/vaso/cuda/lib64/libcudnn.so.9 -DNCCL_INCLUDE_DIR=/opt/vaso/cuda/include -DNCCL_LIBRARIES=/opt/vaso/cuda/lib64/libnccl.so.2 -DFETCHCONTENT_FULLY_DISCONNECTED=ON"
+  },
+  "critical_source_files": ["third_party/psimd/CMakeLists.txt", "third_party/psimd/LICENSE", "third_party/gloo/CMakeLists.txt", "third_party/fbgemm/external/asmjit/CMakeLists.txt", "torch/profiler/_cuspy/core.py", "pyproject.toml"],
+  "notes": ["Pascal compilation uses CUDA12.6. CUDA13 CUPTI is a separate experimental runtime probe, not an automatic compiler upgrade.", "CPU quantization, sparse-Lt, FlashAttention, MKLDNN, TensorPipe and optional vendor backends are disabled in this focused training build.", "This explicit source-wheel route is independent of the existing 2.14 Bazel release actions."]
+}

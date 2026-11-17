@@ -184,14 +184,13 @@ class RepairWheelTest(unittest.TestCase):
                 {
                     "schema_version": 1,
                     "action_input_digest": "input-digest-1234",
+                    "action_input_identity_kind": "legacy-merkle",
                     "declared_cuda_architectures": ["sm_100"],
                     "git_sha": "abcdef1234567890",
                     "line": "cu130",
                     "profile": "torch",
                     "provider_package": "py-torch",
                     "rootfs_bundle_digest": "sha256:" + ("c" * 64),
-                    "rootfs_lock_sha256": "sha256:" + hashlib.sha256(lock.read_bytes()).hexdigest(),
-                    "spack_lock_sha256": "sha256:" + hashlib.sha256(spack_lock.read_bytes()).hexdigest(),
                     "upstream_version": "1.0",
                 },
             )
@@ -559,14 +558,13 @@ class RepairWheelTest(unittest.TestCase):
                 {
                     "schema_version": 1,
                     "action_input_digest": "input-digest-1234",
+                    "action_input_identity_kind": "legacy-merkle",
                     "declared_cuda_architectures": ["sm_100"],
                     "git_sha": "abcdef1234567890",
                     "line": "cu130",
                     "profile": "torch",
                     "provider_package": "py-torch",
                     "rootfs_bundle_digest": "sha256:" + ("b" * 64),
-                    "rootfs_lock_sha256": "sha256:" + hashlib.sha256(lock.read_bytes()).hexdigest(),
-                    "spack_lock_sha256": "sha256:" + hashlib.sha256(spack_lock.read_bytes()).hexdigest(),
                     "upstream_version": "1.0",
                 },
             )

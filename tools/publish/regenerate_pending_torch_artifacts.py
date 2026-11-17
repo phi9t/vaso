@@ -47,10 +47,17 @@ def refresh_manifest(repo_root: Path, line: str, keys: dict[str, Any]) -> bool:
     path = repo_root / "plans" / "torch" / line / "torch-artifact.json"
     manifest = read_json(path)
     key = plan_key(keys, line)
-    if not is_pending_manifest(manifest) and manifest.get("plan_key") == key:
-        return False
+    kind = keys["packages"][f"torch/{line}/py-torch"].get("key_kind", "legacy-merkle")
+    # A descriptive source pin cannot establish artifact/build compatibility.
+    if kind == "legacy-merkle" and not is_pending_manifest(manifest) and manifest.get("plan_key") == key:
+        if manifest.get("plan_key_kind") == kind:
+            return False
+        manifest["plan_key_kind"] = kind
+        path.write_text(stable_json(manifest), encoding="utf-8")
+        return True
     manifest["archive"] = f"step-b-pending://torch/{line}/{key}"
     manifest["plan_key"] = key
+    manifest["plan_key_kind"] = kind
     manifest["sha256"] = ZERO_SHA256
     path.write_text(stable_json(manifest), encoding="utf-8")
     return True

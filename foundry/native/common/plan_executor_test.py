@@ -50,7 +50,7 @@ def minimal_plan() -> dict[str, object]:
             "python": "python_313_native",
             "rootfs_identity": {
                 "label": "//plans:torch/cu130/rootfs.identity.json",
-                "sha256": "filled-by-test",
+                "expected_text": "filled-by-test",
             },
         },
         "deps": {},
@@ -110,9 +110,7 @@ class PlanExecutorTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=scratch_parent()) as tmp:
             plan = json.loads(json.dumps(plan))
             plan["sources"][0]["sha256"] = hashlib.sha256(archive.read_bytes()).hexdigest()
-            plan["toolchain"]["rootfs_identity"]["sha256"] = hashlib.sha256(
-                rootfs_identity.read_bytes()
-            ).hexdigest()
+            plan["toolchain"]["rootfs_identity"]["expected_text"] = rootfs_identity.read_bytes().decode("utf-8")
             plan_path = Path(tmp) / "plan.json"
             plan_path.write_text(json.dumps(plan, sort_keys=True), encoding="utf-8")
             output_args: list[str] = []
@@ -301,7 +299,7 @@ class PlanExecutorTest(unittest.TestCase):
             )
             plan = minimal_plan()
             plan["sources"][0]["patches"] = [
-                {"path": "message.patch", "sha256": hashlib.sha256(patch.read_bytes()).hexdigest()}
+                {"path": "message.patch", "expected_text": patch.read_bytes().decode("utf-8")}
             ]
             plan["configure"] = {"cwd": "{src}", "argv": ["true"], "env": {}}
             plan["build"] = {"cwd": "{src}", "argv": ["true"], "env": {}}
@@ -487,7 +485,7 @@ class PlanExecutorTest(unittest.TestCase):
             declared.write_text("declared\n", encoding="utf-8")
             plan = minimal_plan()
             plan["inputs"] = [
-                {"path": str(declared), "sha256": hashlib.sha256(declared.read_bytes()).hexdigest()}
+                {"path": str(declared), "expected_text": declared.read_bytes().decode("utf-8")}
             ]
             plan["configure"] = {"cwd": "{src}", "argv": ["true"], "env": {}}
             plan["build"] = {"cwd": "{src}", "argv": ["true"], "env": {}}
@@ -537,11 +535,11 @@ class PlanExecutorTest(unittest.TestCase):
                 ],
                 "distdir_manifest": {
                     "label": "@jaxlib_nested_cache_manifest//:manifest.json",
-                    "sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+                    "expected_text": manifest.read_bytes().decode("utf-8"),
                 },
                 "repository_cache_manifest": {
                     "label": "@jaxlib_nested_cache_manifest//:manifest.json",
-                    "sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+                    "expected_text": manifest.read_bytes().decode("utf-8"),
                 },
                 "build_py_args": [
                     "build/build.py",

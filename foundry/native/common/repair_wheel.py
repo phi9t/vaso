@@ -588,14 +588,6 @@ def _wheel_timestamp() -> tuple[int, int, int, int, int, int]:
     return time.gmtime(epoch)[:6]
 
 
-def _file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return "sha256:" + digest.hexdigest()
-
-
 def _normalize_sha256(value: Any) -> str | None:
     if not isinstance(value, str) or not value:
         return None
@@ -717,14 +709,13 @@ def _write_vaso_provenance(
     provenance = {
         "schema_version": 1,
         "action_input_digest": action_input_digest,
+        "action_input_identity_kind": provider_doc.get("action_input_identity_kind", "legacy-merkle"),
         "declared_cuda_architectures": _declared_cuda_architectures(provider_doc),
         "git_sha": git_sha,
         "line": line,
         "profile": profile,
         "provider_package": provider_doc.get("package"),
         "rootfs_bundle_digest": _rootfs_bundle_digest(provider_doc),
-        "rootfs_lock_sha256": _file_sha256(lock_path),
-        "spack_lock_sha256": _file_sha256(spack_lock_path),
         "upstream_version": upstream_version,
     }
     path.write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8")

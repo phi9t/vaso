@@ -84,7 +84,7 @@ def validate_plan(plan: dict[str, Any], schema: dict[str, Any]) -> None:
             fail(f"plan field toolchain.env.{key} must be a string")
     rootfs_identity = require_mapping(toolchain.get("rootfs_identity"), "toolchain.rootfs_identity")
     require_string(rootfs_identity.get("label"), "toolchain.rootfs_identity.label")
-    require_string(rootfs_identity.get("sha256"), "toolchain.rootfs_identity.sha256")
+    validate_file_identity(rootfs_identity, "toolchain.rootfs_identity")
 
     source_names = [require_string(source.get("name"), "source.name") for source in require_list(plan["sources"], "sources")]
     if len(source_names) != len(set(source_names)):
@@ -111,7 +111,7 @@ def validate_plan(plan: dict[str, Any], schema: dict[str, Any]) -> None:
         for manifest_name in ("distdir_manifest", "repository_cache_manifest"):
             manifest = require_mapping(nested_bazel.get(manifest_name), f"nested_bazel.{manifest_name}")
             require_string(manifest.get("label"), f"nested_bazel.{manifest_name}.label")
-            require_string(manifest.get("sha256"), f"nested_bazel.{manifest_name}.sha256")
+            validate_file_identity(manifest, f"nested_bazel.{manifest_name}")
         build_py_args = require_list(nested_bazel.get("build_py_args"), "nested_bazel.build_py_args")
         if not all(isinstance(item, str) and item for item in build_py_args):
             fail("plan nested_bazel.build_py_args must be a non-empty string list")
@@ -362,20 +362,29 @@ def read_dep_prefixes(plan: dict[str, Any], items: list[str]) -> dict[str, str]:
     return prefixes
 
 
+def validate_file_identity(identity: dict[str, Any], label: str) -> None:
+    # Small declared metadata is compared directly, never individually hashed.
+    if "sha256" in identity or not isinstance(identity.get("expected_text"), str):
+        fail(f"{label} requires expected_text and must not use a per-file sha256")
+
+
+def verify_file_identity(path: Path, identity: dict[str, Any], label: str) -> None:
+    validate_file_identity(identity, label)
+    if path.read_bytes() != identity["expected_text"].encode("utf-8"):
+        fail(f"{label} literal content mismatch")
+
+
 def verify_extra_inputs(plan: dict[str, Any], input_args: list[str]) -> None:
     paths = parse_name_path_args(input_args, "--input")
     for item in require_list(plan["inputs"], "inputs"):
         input_obj = require_mapping(item, "inputs[]")
         logical_path = require_string(input_obj.get("path"), "inputs[].path")
-        expected_sha = require_string(input_obj.get("sha256"), "inputs[].sha256")
         path = paths.get(logical_path)
         if path is None:
             fail(f"missing declared input binding: {logical_path}")
         if not path.is_file():
             fail(f"declared input is missing: {logical_path}")
-        actual_sha = sha256_file(path)
-        if actual_sha != expected_sha:
-            fail(f"declared input sha256 mismatch for {logical_path}: expected {expected_sha}, got {actual_sha}")
+        verify_file_identity(path, input_obj, f"declared input {logical_path}")
 
 
 def verify_nested_cache_manifests(plan: dict[str, Any], manifest_args: list[str]) -> dict[str, Path]:
@@ -408,10 +417,7 @@ def verify_nested_cache_manifests(plan: dict[str, Any], manifest_args: list[str]
         path = paths[kind]
         if not path.is_file():
             fail(f"nested cache manifest input is missing: {kind}={path}")
-        expected_sha = require_string(manifest["sha256"], f"nested_bazel.{kind}_manifest.sha256")
-        actual_sha = sha256_file(path)
-        if actual_sha != expected_sha:
-            fail(f"nested cache manifest sha256 mismatch for {kind}: expected {expected_sha}, got {actual_sha}")
+        verify_file_identity(path, manifest, f"nested_bazel.{kind}_manifest")
         payload = read_json(path)
         if payload.get("schema_version") != 1:
             fail(f"nested cache manifest {kind} must have schema_version=1")
@@ -442,15 +448,12 @@ def apply_source_patches(source: dict[str, Any], src: Path, patch_paths: dict[st
     for patch in require_list(source.get("patches"), "source.patches"):
         patch_obj = require_mapping(patch, "source.patches[]")
         logical_path = require_string(patch_obj.get("path"), "source.patches[].path")
-        expected_sha = require_string(patch_obj.get("sha256"), "source.patches[].sha256")
         patch_path = patch_paths.get(logical_path)
         if patch_path is None:
             fail(f"missing declared patch input: {logical_path}")
         if not patch_path.is_file():
             fail(f"patch input is missing: {patch_path}")
-        actual_sha = sha256_file(patch_path)
-        if actual_sha != expected_sha:
-            fail(f"patch sha256 mismatch for {logical_path}: expected {expected_sha}, got {actual_sha}")
+        verify_file_identity(patch_path, patch_obj, f"source.patches[{logical_path}]")
         completed = subprocess.run(["patch", "-p1", "--input", str(patch_path.resolve())], cwd=src, check=False)
         if completed.returncode != 0:
             fail(f"failed to apply patch {logical_path}: exit code {completed.returncode}")
@@ -641,6 +644,86 @@ def output_kinds(plan: dict[str, Any]) -> set[str]:
     }
 
 
+
+def bind_variant_toolchain(plan: dict[str, Any], contract_path: Path, runtime_version=None) -> dict[str, str]:
+    """Bind only explicitly declared H20 tools, without scans or ambient fallback."""
+    contract = read_json(contract_path)
+    if contract.get("schema") != 1 or contract.get("host_os") != "linux" or contract.get("host_arch") != "x86_64":
+        fail("unsupported variant host toolchain contract")
+    if plan.get("gpu_archs") != ["sm_90"] or contract.get("cuda_arch_list") != "9.0":
+        fail("H20 variant must target SM90, not the default SM100")
+    if contract.get("python_abi") != "cp313":
+        fail("H20 variant requires cp313 ABI")
+    version = contract.get("python_version")
+    if version not in ("3.13.13", "3.13.18"):
+        fail("unsupported declared Python patch version")
+    if tuple(runtime_version or sys.version_info[:3]) != tuple(int(x) for x in version.split(".")):
+        fail("declared Python patch version does not match action interpreter")
+    expected_python = "python_313_native" if version == "3.13.13" else "python_3_13_18_variant"
+    tc = plan["toolchain"]
+    if tc.get("python") != expected_python or tc.get("cc") != contract.get("compiler_identity") or tc.get("cxx") != contract.get("compiler_identity"):
+        fail("plan compiler/Python identity differs from explicit variant toolchain")
+    if contract.get("cuda_version") != "13.3" or not tc.get("cuda", "").startswith("rootfs:cuda@13.3"):
+        fail("variant requires matching CUDA 13.3 plan and tools")
+    tools = contract.get("tools", {})
+    paths = {}
+    for name in ("cc", "cxx", "nvcc", "python"):
+        value = tools.get(name)
+        if not isinstance(value, str) or not value:
+            fail("variant missing declared " + name)
+        paths[name] = str(Path(value).resolve())
+    # Prefix markers are declared inputs, not private workspace path literals.
+    selected_prefixes = {}
+    for name, executable in (("cuda", "nvcc"), ("python", "python")):
+        marker = Path(contract[name + "_prefix_file"])
+        prefix = Path(marker.read_text().strip()).resolve()
+        selected_prefixes[name] = str(prefix)
+        if not Path(paths[executable]).is_relative_to(prefix):
+            fail("variant " + name + " executable is outside its declared prefix")
+    for name, include in (("nccl", "include"), ("cudnn", "include/x86_64-linux-gnu")):
+        marker = Path(contract["library_prefix_files"][name])
+        prefix = Path(marker.read_text().strip()).resolve()
+        selected_prefixes[name] = str(prefix)
+        tc["env"]["VASO_" + name.upper() + "_INCLUDE_DIR"] = str(prefix / include)
+        tc["env"]["VASO_" + name.upper() + "_LIB_DIR"] = str(prefix / "lib/x86_64-linux-gnu")
+    site_marker = Path(contract["python_site_packages_file"])
+    site_packages = str(Path(site_marker.read_text().strip()).resolve())
+    codegen = contract.get("cuspy_codegen")
+    if codegen is not None:
+        if not isinstance(codegen, dict) or not codegen.get("clang_source_identity"):
+            fail("Cuspy codegen needs a declared common clang source identity")
+        files = {}
+        for name in ("cupti_header", "cupti_version_header", "libclang", "clang_cindex", "clang_init"):
+            value = codegen.get(name)
+            if not isinstance(value, str) or not value:
+                fail("Cuspy codegen missing declared " + name)
+            path = Path(value).resolve()
+            if not path.is_file():
+                fail("Cuspy codegen input must be a file: " + name)
+            files[name] = path
+        header = files["cupti_header"]
+        version_header = files["cupti_version_header"]
+        if header.name != "cupti_activity.h" or version_header.name != "cupti_version.h" or header.parent != version_header.parent:
+            fail("Cuspy CUPTI headers must be named sibling activity/version files")
+        cindex = files["clang_cindex"]
+        init = files["clang_init"]
+        if cindex.name != "cindex.py" or init.name != "__init__.py" or cindex.parent != init.parent or cindex.parent.name != "clang":
+            fail("Cuspy clang bindings must be declared sibling clang package files")
+        # The producer binds both library and bindings to one source identity.
+        # This is not an ABI proof; the isolated generator smoke must establish it.
+        site_packages = str(cindex.parent.parent) + os.pathsep + site_packages
+        tc["env"]["CUPTI_INCLUDE_DIR"] = str(header.parent)
+        tc["env"]["LIBCLANG_PATH"] = str(files["libclang"])
+    tc["env"].update({
+        "PYTHONPATH": site_packages,
+        "VASO_VARIANT_PYTHONPATH": site_packages,
+        "CC": paths["cc"], "CXX": paths["cxx"], "CUDAHOSTCXX": paths["cxx"],
+        "CUDACXX": paths["nvcc"], "CMAKE_CUDA_COMPILER": paths["nvcc"],
+        "PYTHON_EXECUTABLE": paths["python"],
+    })
+    return selected_prefixes
+
+
 def execute_plan(
     plan_path: Path,
     schema_path: Path,
@@ -655,10 +738,15 @@ def execute_plan(
     nested_distdir: Path | None,
     nested_repository_cache: Path | None,
     nested_disk_cache: Path | None,
+    variant_toolchain: Path | None = None,
 ) -> None:
     plan = read_json(plan_path)
     schema = load_schema(schema_path)
     validate_plan(plan, schema)
+    if variant_toolchain is not None:
+        selected_prefixes = bind_variant_toolchain(plan, variant_toolchain)
+        dep_prefix_args = [item for item in dep_prefix_args if item.split("=", 1)[0] not in selected_prefixes]
+        dep_prefix_args += [name + "=" + path for name, path in selected_prefixes.items()]
     kinds = output_kinds(plan)
     if "prefix" in kinds and prefix is None:
         fail("plan declares a prefix output but --prefix-out was not passed")
@@ -679,13 +767,11 @@ def execute_plan(
         if actual_source_sha != expected_source_sha:
             fail(f"source archive sha256 mismatch for {source_name}: expected {expected_source_sha}, got {actual_source_sha}")
 
-    expected_rootfs_sha = require_string(
-        require_mapping(require_mapping(plan["toolchain"], "toolchain")["rootfs_identity"], "toolchain.rootfs_identity")["sha256"],
-        "toolchain.rootfs_identity.sha256",
+    rootfs_identity_spec = require_mapping(
+        require_mapping(plan["toolchain"], "toolchain")["rootfs_identity"],
+        "toolchain.rootfs_identity",
     )
-    actual_rootfs_sha = sha256_file(rootfs_identity)
-    if actual_rootfs_sha != expected_rootfs_sha:
-        fail(f"rootfs identity sha256 mismatch: expected {expected_rootfs_sha}, got {actual_rootfs_sha}")
+    verify_file_identity(rootfs_identity, rootfs_identity_spec, "rootfs identity")
     rootfs = read_json(rootfs_identity)
     check_live_rootfs_identity(rootfs)
     check_live_plan(plan)
@@ -806,6 +892,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--nested-distdir", type=Path)
     parser.add_argument("--nested-repository-cache", type=Path)
     parser.add_argument("--nested-disk-cache", type=Path)
+    parser.add_argument("--variant-toolchain", type=Path)
     return parser.parse_args(argv)
 
 
@@ -827,6 +914,7 @@ def main(argv: list[str] | None = None) -> int:
             args.nested_distdir,
             args.nested_repository_cache,
             args.nested_disk_cache,
+            args.variant_toolchain,
         )
     except SystemExit as exc:
         message = str(exc)

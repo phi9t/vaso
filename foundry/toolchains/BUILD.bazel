@@ -11,6 +11,7 @@ load(":rootfs_cc_builtin_includes.bzl", "ROOTFS_CC_BUILTIN_INCLUDE_DIRECTORIES_B
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
+    "h20_build_toolchain.bzl",
     "clang_23_cc_driver",
     "clang_23_cxx_driver",
     "gcc_13_3_cc_driver",
@@ -346,3 +347,6 @@ py_test(
     main = "rootfs_cc_builtin_include_probe_test.py",
     tags = ["insula-only"],
 )
+
+# Explicitly registered by callers only; legacy rootfs resolution is unchanged.
+toolchain_type(name = "h20_build_toolchain_type")

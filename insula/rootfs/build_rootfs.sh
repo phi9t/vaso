@@ -200,9 +200,8 @@ if [[ "$NO_CACHE" == "1" ]]; then
   DOCKER_BUILD_FLAGS+=(--no-cache --pull=false)
 fi
 
-LOCK_SHA256="$(sha256sum "$LOCK" | awk '{print $1}')"
-LOCK_SHA8="${LOCK_SHA256:0:8}"
-BUILD_CTX="$WORK_ROOT/rootfs-build-contexts/${LINE}-${LOCK_SHA8}-$$"
+BUILD_ID="$(date -u +%Y%m%dT%H%M%S)-$$"
+BUILD_CTX="$WORK_ROOT/rootfs-build-contexts/${LINE}-${BUILD_ID}-$$"
 if [[ -e "$BUILD_CTX" ]]; then
   echo "build context already exists: $BUILD_CTX" >&2
   exit 2
@@ -744,7 +743,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TMPDIR=/build/tmp
 ARG VASO_CUDA_LINE
 LABEL org.vaso.cuda.line="${LINE}" \\
-      org.vaso.cuda.lock_sha256="${LOCK_SHA256}" \\
+      org.vaso.build.id="${BUILD_ID}" \\
       org.vaso.llvm.cache_key="${LLVM_CACHE_KEY}" \\
       org.vaso.cuda.base_digest="${BASE_DIGEST}"
 COPY cuda_ecosystem.lock.json /build/cuda_ecosystem.lock.json
@@ -781,7 +780,7 @@ RUN VASO_CUDA_LINE="\$VASO_CUDA_LINE" python3 /build/collect_cuda_versions.py > 
 RUN rm -rf /build
 DOCKER
 
-DERIVED="vaso-rootfs-${LINE}:${LOCK_SHA8}"
+DERIVED="vaso-rootfs-${LINE}:${BUILD_ID}"
 
 echo "== 1. pull digest-pinned base image =="
 docker pull "$BASE_REF" 1>&2
@@ -810,7 +809,7 @@ docker build \
 echo "== 4. export the derived image filesystem into a plain rootfs tree =="
 rm -rf "$ROOTFS"
 mkdir -p "$ROOTFS"
-CID="$(docker create --name "vaso-rootfs-${LINE}-${LOCK_SHA8}-extract-$$" "$DERIVED")"
+CID="$(docker create --name "vaso-rootfs-${LINE}-${BUILD_ID}-extract-$$" "$DERIVED")"
 docker export "$CID" | tar -x -C "$ROOTFS"
 docker rm -f "$CID" >/dev/null
 CID=""
@@ -855,7 +854,7 @@ done
 
 echo "== 5. record provenance manifest =="
 BASE_IMAGE_ID="$(docker image inspect "$BASE_REF" --format '{{.Id}}')"
-python3 - "$MANIFEST" "$LOCK" "$LOCK_REPO_PATH" "$LOCK_SHA256" "$LINE" "$BASE_REF" "$BASE_DIGEST" \
+python3 - "$MANIFEST" "$LOCK" "$LOCK_REPO_PATH" "$LINE" "$BASE_REF" "$BASE_DIGEST" \
   "$BASE_IMAGE_ID" "$DERIVED" "$UBUNTU_VER" "$ROOTFS" \
   "$LLVM_CACHE_KEY" "${APT_INSTALL[@]}" <<'PY'
 import json
@@ -870,7 +869,6 @@ from pathlib import Path
     out,
     lock_path,
     lock_repo_path,
-    lock_sha256,
     line,
     base_ref,
     base_digest,
@@ -985,7 +983,6 @@ manifest = {
     "ubuntu_version": ubuntu,
     "lock": {
         "path": lock_repo_path,
-        "sha256": lock_sha256,
         "schema_version": lock["schema_version"],
     },
     "component_versions": {

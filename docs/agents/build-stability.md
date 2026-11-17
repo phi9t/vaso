@@ -4,62 +4,22 @@ A native package rebuilds only when its source/version, toolchain, or flags
 change. Native torch, torchvision, torchaudio, Triton, and jaxlib builds take
 hours; structural and support-tool changes must preserve their inputs.
 
-## Inspect the actual inputs
+## Keep early validation small
 
-From the repository root:
+First achieve a basic working build and repeat unconstrained end-to-end success.
+Inspect selected versions, flags, declared paths and command output when needed.
+Do not eagerly hash source files, headers, metadata, installed files, or directory
+trees. Do not replace hashing with broad eager inventory/stat scans. Historical
+exact-input, recursive snapshot, and determinism workflows are deferred until
+repeated success and a demonstrated need; they are not prerequisites for a build.
+Existing archive checks at acquisition may remain, but add no unnecessary
+integrity work. A cheap availability check is not proof of byte-level integrity.
 
-```sh
-python3 -B foundry/tools/rebuild_impact.py --repo-root . --fast --base HEAD --worktree
-python3 -B foundry/tools/plan_key_snapshot.py --check
-```
-
-Fast impact is conservative. If it reports a possible rebuild, inspect the
-matched inputs and compare exact action signatures where needed: the action
-key, argv, environment, and declared input paths. Compare actual input digests
-and the tool/runfiles closure too. An unchanged `actionKey` alone is
-insufficient. `tools/bazel-lab/` contains the supporting experiments.
-
-Capture queries through the same Foundry entrypoint as builds; Bazel runs
-inside insula with the selected profile and rootfs:
-
-```sh
-foundry/run.sh --bazel-aquery \
-  'mnemonic("ZlibNgActionPrefix", deps(//native/zlib_ng:zlib_ng_action_prefix))' \
-  --output=jsonproto --output_file=/vaso/agents/<owner>/actions.json
-```
-
-For retained JSON, use `rebuild_impact.py --exact --insula --package zlib-ng`
-with `--aquery-json-base`, `--aquery-json-head`, and the corresponding
-`--aquery-output-base-base` and `--aquery-output-base-head`. Those output bases
-must still contain the queried inputs. Explicit output bases are authoritative
-for generated and external inputs; a checkout link cannot substitute for a
-missing snapshot input. `--snapshot-dir` writes both action
-signatures and actual input digests to a new evidence directory. Missing
-actions or unreadable inputs prevent a verified unchanged result. Materialized
-directory inputs include nested names, file contents, executable bits, and
-symlink targets and their contents. Host placement, owner, and timestamps
-do not affect those digests; cycles and unsupported file types remain
-unverified. Git source inputs include executable mode and resolve source
-aliases in the selected snapshot. Run live
-queries inside insula; retained JSON comparison itself does not execute Bazel.
-
-Cached builds can leave intermediate files and directory contents
-unmaterialized. Build the queried targets with `--remote_download_outputs=all`
-before comparing their input contents. An aquery captures metadata and does
-not fetch missing artifacts.
-
-Release-wheel repair declares the native Torch directories whose libraries
-it may vendor, including through platform-forwarding rules. A prefix path
-in provider metadata does not materialize a cached output. Determinism runs
-download all outputs and reject missing dependency-manifest evidence; their
-directory snapshots preserve symlink types as well as contents.
-
-Relevant inputs include committed plans, ordered patches/source digests,
-`native/common/` executor and toolchain helpers, `toolchains/`, profile locks,
-rootfs ecosystem identity, and build/gate arguments. Repository-rule prefixes
-can change a consumer's input digest through `prefix_manifest.json` even when
-its action key stays constant. Moves can change labels; retain native paths
-and labels during structural work.
+Relevant declared inputs include plans, source archive pins, ordered patches,
+executor/toolchain helpers, profile locks and build arguments. Preserve native
+paths and labels during structural changes, but do not run recursive digest
+comparisons merely to demonstrate that preservation. Do not claim unchanged
+artifact contents based solely on metadata.
 
 Host estate paths, output-base locations, job counts, planner metadata,
 commit SHA/time, release suffixes, credentials, and ambient environment are

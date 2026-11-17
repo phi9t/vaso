@@ -1,0 +1,17 @@
+{
+  "schema": "vaso.pytorch-variant-admission.v1",
+  "name": "torch215-cu133-sm90-cuspy",
+  "status": "planned-not-build-wired",
+  "torch": {"version": "2.15.0", "commit": "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457"},
+  "python_abi": "cp313",
+  "cuda_toolkit": "13.3",
+  "cuda_arch_list": "9.0",
+  "cupti": {"minimum_api": 130300, "soname": "libcupti.so.13", "build_runtime_match_required": true},
+  "profiler": "cuspy",
+  "required_python_modules": ["numpy", "cupti", "torch.profiler._cuspy._cupti_stubs"],
+  "required_native_symbol": "torch._C._profiler._cuspy",
+  "required_nccl_headers": ["nccl.h", "nccl_device.h", "nccl_device/coop.h"],
+  "canonical_build_target": "//native/pytorch:pytorch_action",
+  "runtime_qualified": false,
+  "pending": ["pinned CUDA13.3 rootfs closure", "Bazel source and plan selection", "cupti-python rootfs dependency", "generated stubs gate", "H20 driver and ownership admission", "real Cuspy trace qualification"]
+}

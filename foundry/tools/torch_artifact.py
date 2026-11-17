@@ -69,6 +69,11 @@ def plan_key(keys: Path, line: str) -> str:
     return key
 
 
+def plan_key_kind(keys: Path, line: str) -> str:
+    package = read_json(keys).get("packages", {}).get(f"torch/{line}/py-torch", {})
+    return package.get("key_kind", "legacy-merkle")
+
+
 def _has_any(prefix: Path, rels: tuple[Path, ...]) -> bool:
     return any((prefix / rel).exists() for rel in rels)
 
@@ -266,6 +271,7 @@ def produce_torch_artifact(
     manifest = {
         "archive": _manifest_archive_path(final_archive, estate_root),
         "plan_key": plan_key(keys, line),
+        "plan_key_kind": plan_key_kind(keys, line),
         "sha256": digest,
         "source_commit": source_commit(source_manifest),
     }
