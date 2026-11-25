@@ -1,0 +1,12 @@
+--- a/lib/Dialect/TritonGPU/Transforms/AccelerateMatmul.cpp
++++ b/lib/Dialect/TritonGPU/Transforms/AccelerateMatmul.cpp
+@@ -970,6 +970,9 @@
+   if (type::isFloat8(operandElType)) {
+     return FpToFpOp::create(builder, loc, tensorPromotedType, operand);
+   }
++  // Signed i8 dot on the pre-MMA path must widen integers, not floats.
++  if (operandElType.isInteger(8) && promotedType.isInteger(32))
++    return arith::ExtSIOp::create(builder, loc, tensorPromotedType, operand);
+   return arith::ExtFOp::create(builder, loc, tensorPromotedType, operand);
+ }
+ 
