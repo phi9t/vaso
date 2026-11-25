@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "name": "triton38-cu126-sm61",
+  "triton_commit": "675c59878aa2280b31f722aaf42b825fcee21de8",
+  "source_archive": "triton-675c59878aa2280b31f722aaf42b825fcee21de8.tar.gz",
+  "source_sha256": "61a11952362a0d54e67fb11fd29f25747da7339fe4ed39b2cff730c21ebe8825",
+  "llvm_commit": "4611156032e1ebac68b2b8f6107b1475a7c60800",
+  "llvm_prefix": "llvm-46111560-ubuntu-x64-1",
+  "llvm_archive_sha256": "38a3d11991211617c9e5200959c751540b8d0f8982dcbf23ac6b5468fd2ec909",
+  "python_abi": "cp312",
+  "cuda": "12.6",
+  "gpu_arch": "sm_61",
+  "torch_version": "2.15.0+vaso.cu126.sm61",
+  "proton": false
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "base_profile": "triton38-cu126-sm61",
+  "prefix": "/opt/vaso/pascal",
+  "runtime": "standalone-insula",
+  "rootfs_os": "debian:13",
+  "python_abi": "cp312",
+  "cuda": "12.6",
+  "gpu_arch": "sm_61",
+  "torch_version": "2.15.0+vaso.cu126.sm61",
+  "triton_commit": "675c59878aa2280b31f722aaf42b825fcee21de8",
+  "llvm_commit": "4611156032e1ebac68b2b8f6107b1475a7c60800",
+  "pybind11": "3.0.2",
+  "lit": "18.1.8",
+  "nlohmann_json": "3.11.3",
+  "uv_version": "0.9.27",
+  "uv_sha256": "13b335cfb84d5ec0a649ce071d6eb7c1e81496412caf9646f75434049da9d85c",
+  "transformers_commit": "3a96649547593bacad4b65d43442ccdf15d0ae0f",
+  "nvidia_driver": "native-host-projection",
+  "required_linker_alias": {
+    "path": "/usr/lib/x86_64-linux-gnu/libz.so",
+    "target": "libz.so.1"
+  },
+  "build_backends": [
+    "nvidia",
+    "amd"
+  ],
+  "proton": false,
+  "external_package_mounts_for_qualification": []
+}
