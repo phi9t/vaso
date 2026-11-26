@@ -75,9 +75,8 @@ reuse that suite's cache.
 
 The published tiny checkpoint is untrained. This qualifies its checkpoint
 conversion and FP32 text execution, not language quality, the full trained
-checkpoint, BF16 execution, vision, MTP, padding, or packed sequences. The current
-upstream full checkpoint conversion expands experts and does not fit this
-Pascal host. A packed expert cache/offload implementation remains separate work.
+checkpoint, BF16 execution, vision, MTP, padding, or packed sequences. The upstream full checkpoint conversion expands experts and does not fit this
+Pascal host. The native packed expert mode described below avoids that expansion.
 
 The external owner is an explicit finite execution mode. Each stage requires a
 successful payload and complete child cleanup; GPU leases are released after
@@ -89,3 +88,18 @@ comparison receipt. Use a fresh output directory for a new attempt.
 The final status.json and summary.json aggregate process counts, numerical
 errors, token stability, cleanup, and lease release. This workflow does not
 rebuild the already qualified native packages.
+
+## Native packed weights with FP32 compute
+
+The packed loader, bounded expert cache, Triton projections and text generation
+entrypoint are described in [inkling_packed_inference.md](inkling_packed_inference.md).
+Run the complete repeated suite through `foundry/build.sh --inkling-packed-inference`.
+This route keeps NVFP4/MXFP8 expert storage and FP32 activations and arithmetic.
+An optional fixed archive on a second admitted GPU serves reused packed weights;
+`--archive-mib` enables its repeated qualification. The generation entrypoint
+uses native final-message continuation and can require a completed final answer.
+
+CUDA diagnostics use the pinned CUDA 12.6.77 cuobjdump and nvdisasm pair from the
+12.6.3 redistributable. The CPU capsule probe assembles an SM61 DP4A fixture with
+CUDA 12.6 ptxas and checks both disassemblers, so incompatible newer tools cannot
+silently replace this diagnostic path.

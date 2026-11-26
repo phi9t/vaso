@@ -26,5 +26,48 @@
     "amd"
   ],
   "proton": false,
-  "external_package_mounts_for_qualification": []
+  "external_package_mounts_for_qualification": [],
+  "cuda_diagnostics": {
+    "redistrib_release": "12.6.3",
+    "prefix": "/opt/vaso/pascal/cuda-tools/12.6.77",
+    "components": {
+      "cuobjdump": {
+        "version": "12.6.77",
+        "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cuobjdump/linux-x86_64/cuda_cuobjdump-linux-x86_64-12.6.77-archive.tar.xz",
+        "sha256": "54d0edf14284249baf8e2db1c26c71d079ad7afd1f41779e22f239ff9e8bf60f",
+        "size": 219068
+      },
+      "nvdisasm": {
+        "version": "12.6.77",
+        "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvdisasm/linux-x86_64/cuda_nvdisasm-linux-x86_64-12.6.77-archive.tar.xz",
+        "sha256": "aeae4d2bdeaaa0b9149f1c6f486d40b248e8f4f5f1fccba42de5ab69337f7252",
+        "size": 49896188
+      }
+    }
+  },
+  "packed_inkling": {
+    "expert_storage": [
+      "nvfp4_e2m1_block16_e4m3",
+      "mxfp8_e4m3_row_block32_ue8m0"
+    ],
+    "ordinary_parameter_dtype": "float32",
+    "activation_dtype": "float32",
+    "compute_dtype": "float32",
+    "activation_quantization": false,
+    "default_cache_bytes_per_device": 268435456,
+    "loader": "packed_checkpoint.py",
+    "projection_kernel": "packed_experts.py",
+    "text_entrypoint": "inkling_packed_generate.py",
+    "qualification_entrypoint": "run_packed_inference.py",
+    "native_direct_text_placement": true,
+    "fixed_archive": {
+      "enabled_by_default": false,
+      "storage": "native packed codes, scales and outer scales",
+      "selection": "whole physical layers ordered by logical reuse",
+      "budget_scope": "archive payload, separate from the compute-device LRU",
+      "separate_cuda_device": true
+    },
+    "default_response_mode": "final",
+    "final_answer_gate": "--require-final-answer"
+  }
 }
