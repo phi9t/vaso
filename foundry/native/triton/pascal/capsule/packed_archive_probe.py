@@ -64,6 +64,8 @@ def main():
         "reference": "same compute GPU with CPU-backed native packed weights",
         "compute_device": str(compute), "archive_device": str(archive),
         "repeats": args.repeats, "new_tokens": args.new_tokens, "runs": [],
+        "torch_version": torch.__version__, "torch_git_version": torch.version.git_version,
+        "allocator_backend": torch.cuda.memory.get_allocator_backend(),
     }
     model = store = None
 
@@ -127,22 +129,160 @@ def main():
             for key, bank in store._archive_banks.items()
         }
 
+    def check_original_nonalias_sequence():
+        # Preserve the original ordering: no readback between get() and XOR.
+        # A stronger pre-mutation read can itself synchronize a faulty transfer.
+        key = next(iter(store._archive_banks))
+        observations = report["original_nonalias_sequence"] = []
+        for repeat in range(3):
+            before = int(store.matrices[key].weight.reshape(-1)[0])
+            prior = dict(store._devices.get(str(compute), {}))
+            with torch.inference_mode():
+                entry = store.get(*key, 0, compute)
+                entry.weight.reshape(-1)[0].bitwise_xor_(1)
+                torch.cuda.synchronize(compute)
+                assert int(store._archive_banks[key].weight.reshape(-1)[0]) == before
+                assert int(store.matrices[key].weight.reshape(-1)[0]) == before
+                del entry
+            store.clear_cache()
+            with torch.inference_mode():
+                entry = store.get(*key, 0, compute)
+                actual = int(entry.weight.reshape(-1)[0])
+                current = store._devices[str(compute)]
+                observation = {
+                    "repeat": repeat, "layer": key[0], "projection": key[1], "expert": 0,
+                    "expected_first_byte": before, "refill_first_byte": actual,
+                    "current_device": torch.cuda.current_device(),
+                    "compute_device": str(entry.weight.device),
+                    "archive_device": str(store._archive_banks[key].weight.device),
+                    "shape": list(entry.weight.shape), "stride": list(entry.weight.stride()),
+                    "hits_delta": current["hits"] - prior.get("hits", 0),
+                    "misses_delta": current["misses"] - prior.get("misses", 0),
+                    "passed": actual == before,
+                }
+                observations.append(observation)
+                assert actual == before, observation
+                assert observation["misses_delta"] == 2 and observation["hits_delta"] == 0
+                del entry
+            store.clear_cache()
+
     def check_nonalias():
         key = next(iter(store._archive_banks))
-        before = int(store.matrices[key].weight.reshape(-1)[0])
+        matrix = store.matrices[key]
+        expected = {
+            field: (None if getattr(matrix, field) is None else
+                    getattr(matrix, field)[:1].view(torch.uint8).clone())
+            for field in ("weight", "scales", "outer_scale")
+        }
+        store.clear_cache()
+        details = report["cache_copy_regression"] = {
+            "layer": key[0], "projection": key[1], "expert": 0,
+            "before": store.stats(), "fields_checked": list(expected),
+        }
+
+        def assert_bytes(entry, phase, wanted_fields=expected):
+            details["phase"] = phase
+            for field, wanted in wanted_fields.items():
+                actual = getattr(entry, field)
+                if wanted is None:
+                    assert actual is None
+                else:
+                    assert actual.device == compute
+                    actual_bytes = actual.view(torch.uint8)
+                    scalar_first = int(actual_bytes.reshape(-1)[0])
+                    readback = actual_bytes.cpu()
+                    mismatch = readback.reshape(-1) != wanted.reshape(-1)
+                    count = int(mismatch.count_nonzero())
+                    observation = {
+                        "device": str(actual.device), "dtype": str(actual.dtype),
+                        "shape": list(actual.shape), "stride": list(actual.stride()),
+                        "current_device": torch.cuda.current_device(),
+                        "current_stream": int(torch.cuda.current_stream(compute).cuda_stream),
+                        "source_device": str(getattr(store._archive_banks[key], field).device),
+                        "source_stride": list(getattr(store._archive_banks[key], field).stride()),
+                        "bytes": wanted.numel(), "mismatched_bytes": count,
+                        "first_expected_byte": int(wanted.reshape(-1)[0]),
+                        "scalar_first_actual_byte": scalar_first,
+                        "bulk_first_actual_byte": int(readback.reshape(-1)[0]),
+                    }
+                    if count:
+                        first = int(mismatch.nonzero()[0, 0])
+                        observation.update(
+                            first_mismatch_offset=first,
+                            expected_byte=int(wanted.reshape(-1)[first]),
+                            actual_byte=int(readback.reshape(-1)[first]),
+                        )
+                    details.setdefault("observations", {}).setdefault(phase, {})[field] = observation
+                    assert scalar_first == int(readback.reshape(-1)[0]), observation
+                    torch.testing.assert_close(
+                        readback, wanted, atol=0, rtol=0,
+                        msg=f"{phase}: {field} bytes differ from the CPU source",
+                    )
+
         with torch.inference_mode():
             entry = store.get(*key, 0, compute)
-            entry.weight.reshape(-1)[0].bitwise_xor_(1)
+            details["after_first_copy"] = store.stats()
+            assert_bytes(entry, "fresh_copy_before_mutation")
+            for field, wanted in expected.items():
+                if wanted is not None:
+                    getattr(entry, field).view(torch.uint8).reshape(-1)[0].bitwise_xor_(1)
             torch.cuda.synchronize(compute)
-            assert int(store._archive_banks[key].weight.reshape(-1)[0]) == before
-            assert int(store.matrices[key].weight.reshape(-1)[0]) == before
+            for field, wanted in expected.items():
+                if wanted is not None:
+                    torch.testing.assert_close(
+                        getattr(store._archive_banks[key], field)[:1].view(torch.uint8).cpu(),
+                        wanted, atol=0, rtol=0,
+                    )
+                    torch.testing.assert_close(
+                        getattr(matrix, field)[:1].view(torch.uint8), wanted, atol=0, rtol=0,
+                    )
             del entry
         store.clear_cache()
+        details["after_clear"] = store.stats()
+        assert details["after_clear"]["resident_bytes"] == 0
         with torch.inference_mode():
             entry = store.get(*key, 0, compute)
-            assert int(entry.weight.reshape(-1)[0]) == before
+            details["after_refill"] = store.stats()
+            assert_bytes(entry, "refill_after_mutation_and_clear")
+            del entry
+        assert details["after_first_copy"]["misses"] - details["before"]["misses"] == 1
+        assert details["after_refill"]["misses"] - details["after_first_copy"]["misses"] == 1
+        assert details["after_refill"]["hits"] == details["before"]["hits"]
+        store.clear_cache()
+        # Prove that an archived key reads its GPU bank, not the CPU mmap.
+        bank = store._archive_banks[key]
+        changed = {field: None if value is None else value.clone()
+                   for field, value in expected.items()}
+        changed["weight"].reshape(-1)[0].bitwise_xor_(1)
+        store.clear_cache()
+        entry = None
+        with torch.inference_mode():
+            bank.weight.view(torch.uint8).reshape(-1)[0].bitwise_xor_(1)
+            torch.cuda.synchronize(archive)
+            try:
+                entry = store.get(*key, 0, compute)
+                assert_bytes(entry, "changed_archive_source", changed)
+                torch.testing.assert_close(
+                    matrix.weight[:1].view(torch.uint8), expected["weight"], atol=0, rtol=0,
+                )
+                details["changed_archive_byte_observed_without_cpu_change"] = True
+            finally:
+                bank.weight.view(torch.uint8).reshape(-1)[0].bitwise_xor_(1)
+                torch.cuda.synchronize(archive)
+                entry = None
+                store.clear_cache()
+        for field, wanted in expected.items():
+            if wanted is not None:
+                torch.testing.assert_close(
+                    getattr(bank, field)[:1].view(torch.uint8).cpu(), wanted, atol=0, rtol=0,
+                )
+        with torch.inference_mode():
+            entry = store.get(*key, 0, compute)
+            assert_bytes(entry, "restored_archive_source")
             del entry
         store.clear_cache()
+        details["archive_restored_before_forward"] = True
+        details["passed"] = True
 
     try:
         stage("load")
@@ -276,6 +416,7 @@ def main():
             report["archive_banks_bitwise_equal"] = check_archive_bytes()
             assert report["archive_banks_bitwise_equal"] == initial["matrix_count"]
             pointers = archive_pointers()
+            check_original_nonalias_sequence()
             check_nonalias()
             assert archive_pointers() == pointers
             assert store.stats()["archive"]["resident_bytes"] == full_budget
@@ -322,6 +463,11 @@ def main():
                 assert state["resident_bytes"] <= store.cache_budget_bytes
                 assert state["archive"]["resident_bytes"] <= budget
                 assert state["archive"]["source_hits"] > 0
+                archive_state = state["archive"]
+                assert archive_state["source_hits"] + archive_state["source_misses"] == (
+                    state["misses"] - archive_state["cache_misses_at_prepare"])
+                assert sum(archive_state["source_hits_by_format"].values()) == archive_state["source_hits"]
+                assert sum(archive_state["source_misses_by_format"].values()) == archive_state["source_misses"]
                 assert archive_pointers() == pointers
                 if mode == "full":
                     assert state["archive"]["source_misses"] == 0
