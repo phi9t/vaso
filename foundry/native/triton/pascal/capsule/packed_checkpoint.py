@@ -374,10 +374,11 @@ class PackedWeightStore:
                         # GPU-GPU .to may enqueue asynchronously even without
                         # non_blocking. Complete its destination-stream barrier.
                         torch.cuda.current_stream(device_key).synchronize()
-                    counter = "source_hit" if archived else "source_miss"
-                    self._archive_stats[counter + "s"] += 1
-                    self._archive_stats[counter + "_bytes"] += size
-                    formats = self._archive_stats[counter + "s_by_format"]
+                    counter = "source_hits" if archived else "source_misses"
+                    self._archive_stats[counter] += 1
+                    byte_counter = "source_hit_bytes" if archived else "source_miss_bytes"
+                    self._archive_stats[byte_counter] += size
+                    formats = self._archive_stats[counter + "_by_format"]
                     formats[matrix.format] = formats.get(matrix.format, 0) + 1
                 value = CachedExpert(weight, scales, outer, size)
                 cache[key] = value
