@@ -3,7 +3,7 @@
 
 Only the model shard, its index/configuration, and tokenizer/processor assets
 are fetched. Streaming .part files resume with HTTP Range; completed downloads
-are admitted by exact byte count and, for LFS objects, the published SHA256.
+are admitted by exact byte count and pinned SHA256 for every asset.
 The acquisition manifest records bounded retry outcomes and durable progress.
 No credentials are read or supplied, and redirect/signed URLs are never logged.
 Run under the capsule payload owner with a timeout longer than --max-seconds.
@@ -30,17 +30,20 @@ import urllib.request
 REPO = "thinkingmachines/Inkling-2-Mini"
 REVISION = "c9d028302cd0f035fdf8e7e91f089a4ce94d2195"
 FILES = {
-    "config.json": (2722, None),
-    "generation_config.json": (98, None),
-    "hf_quant_config.json": (67924, None),
-    "model.safetensors.index.json": (109300, None),
-    "processor_config.json": (461, None),
-    "special_tokens_map.json": (529, None),
-    "tokenizer_config.json": (13235, None),
-    "chat_template.jinja": (6868, None),
+    "config.json": (2722, "a7a349601f0984c4abf999c480ef775d8567d21f5f84b4e8a3e035b44f288dc2"),
+    "generation_config.json": (98, "a08737c07a65a8fdf69f7cf086576210e5aad4b241437090b26d7b0c4f7905f7"),
+    "hf_quant_config.json": (67924, "7c656207d3ce37879c7be209a036b0dde43bf01f78159bff06880b868ed57143"),
+    "model.safetensors.index.json": (109300, "c1631065b7b00787993522dddc66a68b3abee869192977fb3dcb796e63bc5838"),
+    "processor_config.json": (461, "d7350adce18c8be4b607f261c8f0f7eabbf720bb7aaf648a43d4f8372bbacc2d"),
+    "special_tokens_map.json": (529, "c16f44b3594563d82743ddb0417a2be1bfe3e2000dfad2da4b8f32554593e1a0"),
+    "tokenizer_config.json": (13235, "bf09342d285139fd37ce10c70878af1d52cb390e9901e10248654293a80ee636"),
+    "chat_template.jinja": (6868, "53a9035f3255945704b5857657cfb00c1165090c0641c4f782a0cbf268cc16dc"),
     "tokenizer.json": (26178678, "7f332727f9a3f093dd452a39cc978e6757627e5dad1b0673aa4e75174f236dd6"),
     "model-00001-of-00001.safetensors": (19526019168, "65e60f51aa1284d4fb022584908c315270334d991828bb774af60584523539d1"),
 }
+# Small-file digests are pinned from two independent acquisitions of REVISION.
+# The two large LFS assets retain their published object SHA256.
+LFS_ASSETS = {"tokenizer.json", "model-00001-of-00001.safetensors"}
 TOTAL_BYTES = sum(size for size, _ in FILES.values())
 
 
@@ -84,7 +87,8 @@ def acquire(args):
     prior = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     if prior and (prior.get("repo"), prior.get("revision")) != (REPO, REVISION):
         raise AcquisitionError("destination_belongs_to_different_source")
-    done = {item["name"]: item for item in prior.get("files", []) if item["name"] in FILES}
+    # A manifest is a historical receipt, not proof of present bytes.
+    done = {}
     state = {"schema_version": 1, "repo": REPO, "revision": REVISION,
              "purpose": "published production checkpoint", "trained": True,
              "expected_total_bytes": TOTAL_BYTES, "complete": False,
@@ -130,40 +134,73 @@ def acquire(args):
             raise AcquisitionError("partial_size_mismatch")
         digest = hasher.hexdigest()
         if expected_sha is not None and digest != expected_sha:
-            raise AcquisitionError("sha256_mismatch_partial_preserved")
+            quarantine(name, part, "partial_sha256_mismatch")
+            raise AcquisitionError("sha256_mismatch_partial_quarantined_retry")
         with part.open("rb") as handle:
             os.fsync(handle.fileno())
         part.replace(final)
         done[name] = {"name": name, "bytes": expected_size, "sha256": digest,
-                      "sha256_matches_published_lfs": expected_sha is not None}
+                      "sha256_matches_published_lfs": name in LFS_ASSETS,
+                      "sha256_matches_pinned": True}
         save("downloaded", name, expected_size)
+
+    def quarantine(name, path, reason):
+        # Preserve suspect bytes without leaving them eligible for resumption.
+        import tempfile
+        folder = Path(tempfile.mkdtemp(prefix=name + ".corrupt-", dir=destination))
+        path.replace(folder / path.name)
+        state["attempt_events"].append({"file": name, "event": reason,
+                                        "quarantine": folder.name, "utc": utc_now()})
+        save("quarantined", name, 0)
 
     try:
         save("starting")
         remaining = 0
         for name, (expected_size, expected_sha) in FILES.items():
+            budget()
+            if expected_sha is None:
+                raise AcquisitionError("missing_pinned_sha256")
             final, part = destination / name, destination / (name + ".part")
-            record = done.get(name)
-            reusable = (record is not None and final.is_file()
-                        and final.stat().st_size == expected_size
-                        and record.get("bytes") == expected_size
-                        and (expected_sha is None or record.get("sha256") == expected_sha))
-            if not reusable:
-                done.pop(name, None)
-                existing = part.stat().st_size if part.is_file() else 0
-                remaining += max(0, expected_size - existing)
-        if shutil.disk_usage(destination).free < remaining + 64 * 1024 * 1024:
+            if final.is_symlink() or part.is_symlink():
+                raise AcquisitionError("symlink_asset_rejected")
+            if final.exists():
+                if not final.is_file():
+                    raise AcquisitionError("nonregular_final_asset")
+                if final.stat().st_size == expected_size:
+                    hasher = hashlib.sha256()
+                    count = hash_partial(final, hasher, name)
+                    if count == expected_size and hasher.hexdigest() == expected_sha:
+                        done[name] = {"name": name, "bytes": expected_size, "sha256": expected_sha,
+                                      "sha256_matches_published_lfs": name in LFS_ASSETS,
+                                      "sha256_matches_pinned": True}
+                        save("verified_existing", name, count)
+                        continue
+                quarantine(name, final, "existing_asset_integrity_mismatch")
+            if part.exists():
+                if not part.is_file():
+                    raise AcquisitionError("nonregular_partial_asset")
+                size = part.stat().st_size
+                if size > expected_size:
+                    quarantine(name, part, "oversize_partial")
+                elif size == expected_size:
+                    hasher = hashlib.sha256()
+                    count = hash_partial(part, hasher, name)
+                    if count == expected_size and hasher.hexdigest() == expected_sha:
+                        finish(name, part, final, expected_size, expected_sha, hasher)
+                        continue
+                    quarantine(name, part, "partial_sha256_mismatch")
+            existing = part.stat().st_size if part.is_file() else 0
+            remaining += expected_size - existing
+        if remaining and shutil.disk_usage(destination).free < remaining + 64 * 1024 * 1024:
             raise AcquisitionError("insufficient_disk_space")
         for name, (expected_size, expected_sha) in FILES.items():
             budget()
             final, part = destination / name, destination / (name + ".part")
             if name in done:
-                save("reused", name, expected_size)
+                save("reused_verified", name, expected_size)
                 continue
             if final.exists():
-                if part.exists():
-                    raise AcquisitionError("ambiguous_unadmitted_final_and_partial")
-                final.replace(part)
+                raise AcquisitionError("unexpected_final_asset_after_preflight")
             offset = part.stat().st_size if part.exists() else 0
             if offset > expected_size:
                 raise AcquisitionError("partial_exceeds_expected_size")

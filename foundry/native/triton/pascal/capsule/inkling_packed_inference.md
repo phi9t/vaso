@@ -64,8 +64,8 @@ leased for the complete model lifetime.
 budget_bytes=...)` preflights a deterministic selection of complete physical
 layers. It prioritizes layers by their logical reuse in the pinned model. The
 archive contains the original packed codes, scales and FP32 outer scales. On a
-compute-cache miss, archived slices are copied from the archive GPU; remaining
-slices come from CPU safetensors backing. All projection arithmetic stays on the
+compute-cache miss, archived slices are copied through explicit synchronous
+CPU staging; remaining slices come from CPU safetensors backing. All projection arithmetic stays on the
 compute GPU. The fixed selection avoids repeatedly duplicating the same hot CPU
 pages in another general LRU.
 
@@ -78,10 +78,9 @@ fit in RAM.
 
 The archive preserves the CPU mappings without pinning or cloning the entire
 bank. Archived ranges are not read again for CUDA inference, allowing their CPU
-pages to become cold. Initial population still reads those weights once. Actual
-cross-device transfer behavior depends on the installed GPUs and driver; the
-report records peer capability, and correctness does not assume direct peer
-access. Archive payload, source accesses and transfer bytes are reported
+pages to become cold. Initial population still reads those weights once. The
+report records peer capability for diagnosis only. Cross-GPU copies use
+explicit host staging regardless of that capability. Archive payload, source accesses and transfer bytes are reported
 separately from the compute LRU. Release both with `close()`.
 
 ## Repeated qualification through Vaso
@@ -206,3 +205,22 @@ native FP4/FP8 arithmetic on Pascal. Larger-batch grouped GEMM, training,
 vision input and distributed model execution have separate qualification needs.
 Finite external-supervisor runs are qualified independently of production
 systemd service supervision.
+
+### Integrity regressions
+
+The pinned production acquisition hashes every current asset before admitting
+existing bytes; a prior acquisition receipt cannot substitute for verification.
+Suspect final or complete partial assets are quarantined rather than reused.
+Small-file SHA256 pins were cross-checked against independent downloads of the
+same immutable revision; the LFS assets use their published SHA256. A freshly
+downloaded digest mismatch fails closed, and the next invocation starts fresh.
+No per-token hashing is required. Acquisition assumes exclusive ownership of
+its destination; it does not protect against a concurrent non-cooperating
+writer after admission.
+
+Cross-GPU archive refills stage the selected tensor slice in host memory
+and synchronize before cache admission. No direct peer mode is exposed.
+Peer-access capability in receipts is diagnostic, not an integrity guarantee.
+Run the targeted offline regressions with `uv run --offline --no-project --
+python p0_integrity_test.py`. Run `p0_transport_test.py` only with both GPUs
+admitted and leased, using the pinned runtime, and retain its JSON receipt.
