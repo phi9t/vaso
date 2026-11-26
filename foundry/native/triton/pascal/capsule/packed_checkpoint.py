@@ -18,6 +18,9 @@ activation device. Clear the cache explicitly when releasing a GPU.
 place_packed_text_model(model, device) leaves the vision tower on CPU and
 selects explicit text-only input mode; metadata is model.packed_text_placement.
 
+Cross-device archive refills use explicit synchronous CPU staging, never implicit
+peer copies. The source archive is immutable after installation.
+
 Optional store.prepare_archive(archive_device, compute_device=..., budget_bytes=...)
 preloads fixed whole-layer native banks on a distinct CUDA device. Selection
 favors physical layers visited most often by the model loop. Archived keys are
@@ -121,7 +124,7 @@ class PackedWeightStore:
             "source_misses": 0, "source_miss_bytes": 0,
             "source_hits_by_format": {}, "source_misses_by_format": {},
             "initialization_seconds": 0.0, "peer_access": {}, "cuda_memory": {},
-            "copy_mode": "synchronous torch.to; CUDA selects peer or host-staged transfer",
+            "copy_mode": "explicit synchronous host bounce for cross-GPU copies",
             "budget_scope": "immutable packed payload only; allocator and CUDA context overhead excluded",
             "allocator_peak_scope": "maximum of observed PyTorch device peaks; caller may reset counters between observations",
         }
@@ -179,8 +182,23 @@ class PackedWeightStore:
 
     @staticmethod
     def _copy_archive_tensor(source, device):
-        # copy=True forbids accidental aliases even if this helper is reused.
-        return source.to(device=device, non_blocking=False, copy=True)
+        """Copy without using CUDA peer transport, even if peer access is enabled.
+
+        Archive inputs are immutable and published after synchronization. Only a
+        selected expert is staged at refill, bounding host memory by that slice.
+        Do not use a dtype conversion: packed codes and scales must keep their
+        original bytes, including NaN encodings. No direct peer mode is exposed
+        until its integrity is independently qualified.
+        """
+        target = torch.device(device)
+        if source.device.type == "cuda" and target.type == "cuda" and source.device != target:
+            torch.cuda.synchronize(source.device)
+            staging = source.to(device="cpu", non_blocking=False, copy=True)
+            result = staging.to(device=target, non_blocking=False, copy=True)
+            torch.cuda.current_stream(target).synchronize()
+            return result
+        # Also forbid aliases for CPU-backed or same-device copies.
+        return source.to(device=target, non_blocking=False, copy=True)
 
     def _copy_archive_bank(self, matrix, device):
         # Clear partial allocations from traceback locals if a later copy fails.
@@ -364,15 +382,14 @@ class PackedWeightStore:
                 # Budget admission precedes every device allocation.
                 assert stats["resident_bytes"] + size <= self.cache_budget_bytes
                 source = self._archive_banks.get(matrix_key, matrix)
-                weight = source.weight[expert:expert + 1].to(device_key, non_blocking=False, copy=True)
-                scales = source.scales[expert:expert + 1].to(device_key, non_blocking=False, copy=True)
-                outer = (source.outer_scale[expert:expert + 1].to(device_key, non_blocking=False, copy=True)
+                weight = self._copy_archive_tensor(source.weight[expert:expert + 1], device_key)
+                scales = self._copy_archive_tensor(source.scales[expert:expert + 1], device_key)
+                outer = (self._copy_archive_tensor(source.outer_scale[expert:expert + 1], device_key)
                          if source.outer_scale is not None else None)
                 if self._archive_banks:
                     archived = matrix_key in self._archive_banks
                     if archived:
-                        # GPU-GPU .to may enqueue asynchronously even without
-                        # non_blocking. Complete its destination-stream barrier.
+                        # Publish cache entries only after every staged field completes.
                         torch.cuda.current_stream(device_key).synchronize()
                     counter = "source_hits" if archived else "source_misses"
                     self._archive_stats[counter] += 1
