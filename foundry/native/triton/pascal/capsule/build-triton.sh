@@ -1,13 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 P=/opt/vaso/pascal
-export PATH="$P/build-python/bin:/opt/vaso/cmake/bin:/opt/vaso/python-deps/bin:/opt/vaso/cuda/bin:/usr/local/bin:/usr/bin:/bin"
+CUDA_TOOLS="$P/cuda-tools/12.6.77/bin"
+export PATH="$CUDA_TOOLS:$P/build-python/bin:/opt/vaso/cmake/bin:/opt/vaso/python-deps/bin:/opt/vaso/cuda/bin:/usr/local/bin:/usr/bin:/bin"
 export PYTHONPATH="$P/build-python:/opt/vaso/python-deps"
 export LD_LIBRARY_PATH=/opt/vaso/cuda/lib64:/usr/local/lib
 export CUDA_HOME=/opt/vaso/cuda CC=gcc CXX=g++ TRITON_OFFLINE_BUILD=1 TRITON_BUILD_PROTON=OFF PIP_NO_INDEX=1 PYTHONNOUSERSITE=1
 export LLVM_SYSPATH="$P/llvm" JSON_SYSPATH="$P/json"
 export TRITON_PTXAS_PATH=/opt/vaso/cuda/bin/ptxas TRITON_PTXAS_BLACKWELL_PATH="$P/vendor/bin/ptxas-blackwell"
-export TRITON_CUOBJDUMP_PATH="$P/vendor/bin/cuobjdump" TRITON_NVDISASM_PATH="$P/vendor/bin/nvdisasm"
+export TRITON_CUOBJDUMP_PATH="$CUDA_TOOLS/cuobjdump" TRITON_NVDISASM_PATH="$CUDA_TOOLS/nvdisasm"
 export TRITON_CUDACRT_PATH="$CUDA_HOME/include" TRITON_CUDART_PATH="$CUDA_HOME/include" TRITON_CUPTI_INCLUDE_PATH="$CUDA_HOME/include" TRITON_CUPTI_LIB_PATH="$CUDA_HOME/lib64"
 export TRITON_LIBDEVICE_PATH="$CUDA_HOME/nvvm/libdevice/libdevice.10.bc"
 export C_INCLUDE_PATH="$CUDA_HOME/include" CPLUS_INCLUDE_PATH="$CUDA_HOME/include"
