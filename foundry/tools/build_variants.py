@@ -65,6 +65,10 @@ class Runner:
             status_interval=args.status_interval,
             lock_fd=lock_fd,
         )
+        # Persist request intent before preflight. A failed preparation must
+        # remain distinguishable from a failed native build on later status.
+        self.run.report["requested_phase"] = "prepare" if args.prepare_only else "build"
+        self.run.save()
         self.inputs = InputStore(
             self.estate,
             seed_estate=args.seed_estate,

@@ -8,7 +8,7 @@ No installed `vaso` umbrella command is supported.
 |---|---|---|
 | Prepare a rootfs | `insula/rootfs/prepare.sh restore|build` | Replaces manual bundle/build/tooling/manifest handoff; stages and verifies the complete selection, preserves failed attempts and existing destinations |
 | Run a generic command | `insula/run.sh --rootfs DIR --workspace PROJECT -- COMMAND` | Canonical execution command; `--line` selects a prepared estate rootfs; no Foundry package policy |
-| Select a named build target | `foundry/build.sh --target TARGET --phase prepare\|build\|status` | Common target catalog and explicit backend selection; `--list-targets` enumerates the supported profiles |
+| Select a named build target | `foundry/build.sh --target TARGET --phase prepare\|build\|status` | Common Bazel target catalog, explicit Insula ownership, and target-bound result schema; `--list-targets` enumerates the supported profiles |
 | Prepare/build packages | `foundry/build.sh --line cu129 --profile torch` | Pinned input preparation and offline serial matrix; `--prepare-only` records preparation separately from builds |
 | Inspect a build | `foundry/build.sh --estate-root DIR --status` | Reads retained outcomes without launching a build; failed attempts remain independently inspectable |
 | Direct Bazel and gates | `foundry/run.sh --bazel-build`, `--bazel-aquery`, `--insula-cmd` | Specialist operations retain targets, queries, native arguments and sandbox paths |

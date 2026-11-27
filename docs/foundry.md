@@ -350,61 +350,101 @@ the rootfs.
 
 ## Unified explicit build targets
 
-Use the common target contract to select the package family, CUDA line,
-architecture and Python ABI before choosing a build phase. The host-side
-dispatcher uses uv with an available local Python runtime; it does not install
-dependencies or change a native recipe.
+Use one target and phase contract for the modern matrix and the Pascal native
+builds. The host dispatcher and the Pascal build frontend run through uv with
+locally available Python; build execution does not download Python or packages.
+
+| Target | Native build | CUDA / Python |
+|---|---|---|
+| `cu129/torch`, `cu130/torch` | Existing PyTorch, torchvision, torchaudio and Triton Bazel matrix | CUDA 12.9 or 13.0 / CPython 3.13 |
+| `cu129/jax`, `cu130/jax` | Existing jaxlib Bazel matrix | CUDA 12.9 or 13.0 / CPython 3.13 |
+| `cu126-sm61/torch` | Complete recursive PyTorch 2.15 source-wheel action | CUDA 12.6, SM61 / CPython 3.12 |
+| `cu126-sm61/triton` | Complete patched Triton 3.8 source-wheel action | CUDA 12.6, SM61 / CPython 3.12 |
 
     foundry/build.sh --list-targets
     foundry/build.sh --target cu129/torch --phase prepare --estate-root /path/to/estate
     foundry/build.sh --target cu130/jax --phase build --estate-root /path/to/estate
-    foundry/build.sh --target cu126-sm61/torch --phase build --site /path/to/site.json
-    foundry/build.sh --target cu126-sm61/torch --phase status --site /path/to/site.json
 
-The modern targets derive their membership from the existing Bazel matrix.
-The Pascal Torch target delegates to the pinned native source driver; select an
-explicit compatible source profile with --source-profile when inspecting or
-resuming a distinct historical build. That driver still requires --resume for
-a previously prepared build. No historical work directory is migrated.
+Both Pascal targets use the same packaged Bazel workspace, unchanged shared
+Foundry plan executor, uv frontend, artifact validation and native result
+schema. Each uncached action extracts a clean source tree. Bazel owns successful
+outputs and cache reuse; historical CMake/Ninja work directories are not adopted.
+The complete Pascal capsule supplies its tools and dependency prefixes.
+[The native build guide](../foundry/native/pascal/README.md) documents their
+producer identities, package features and capsule construction.
 
-The preferred Pascal Triton target runs the packaged builder from an immutable
-standalone Insula capsule:
+The modern source-built dependency graph remains intact. Pascal retains its
+qualified GCC 12, CPython 3.12 and feature selection. Its existing binary
+tool/dependency providers, including CPython and LLVM/MLIR, are explicit capsule
+inputs; this does not claim that their production has moved into the modern
+Spack-derived source graph.
 
-    foundry/build.sh --target cu126-sm61/triton --phase prepare \
+### Execute a Pascal build
+
+Select a new immutable builder capsule and a private Estate in an absolute
+CPU-only Insula spec. Ordinary compilation requires no GPU. Both target names
+accept the same options and produce the same kind of result.
+
+    foundry/build.sh --target cu126-sm61/torch --phase prepare \
       --insula /path/to/insula --spec /path/to/cpu.toml --plan-only
+
+With delegated native supervision, provide the native state and run identity,
+plus a fresh directory for the Foundry request:
+
+    foundry/build.sh --target cu126-sm61/torch --phase build \
+      --insula /path/to/insula --spec /path/to/cpu.toml \
+      --state /path/to/owned-state --run-id torch-build-1 \
+      --output /path/to/attempts/torch-build-1 --jobs 2 --max-seconds 43200
+
+On a host without delegated native supervision, select a finite external
+payload owner explicitly. There is no automatic ownership fallback:
+
     foundry/build.sh --target cu126-sm61/triton --phase build \
       --insula /path/to/insula --spec /path/to/cpu.toml \
-      --state /path/to/owned-state --run-id unique-build
+      --supervisor /path/to/payload_owner.py \
+      --output /path/to/attempts/triton-build-1 --jobs 2 --max-seconds 14400
+
+Every new prepare/build invocation needs a fresh output directory and request
+identity. Its native receipt is indexed by that identity, so a later invocation
+cannot substitute an earlier successful result. Failed attempts, logs and
+cleanup evidence remain available. A repeat build can reuse a valid Bazel
+action cache without importing an unfinished native work tree.
+
     foundry/build.sh --target cu126-sm61/triton --phase status \
-      --insula /path/to/insula --state /path/to/owned-state --run-id unique-build
+      --output /path/to/attempts/triton-build-1
 
-For a host without delegated native supervision, an explicitly selected finite
-external payload owner is supported; it is never an automatic fallback:
+A plan must admit one exact CPU-only command, no external dependency mounts,
+and a matching packaged profile. The reviewed plan digest is enforced by the
+chosen owner. All Bazel actions use no-sandbox; Insula supplies the execution
+boundary. Insula retains its shared host-network contract, while package
+builds and Bazel input resolution use already packaged inputs.
 
-    foundry/build.sh --target cu126-sm61/triton --phase prepare \
-      --insula /path/to/insula --spec /path/to/cpu.toml \
-      --supervisor /path/to/payload_owner.py --output /path/to/new-attempt \
-      --max-seconds 120
-    foundry/build.sh --target cu126-sm61/triton --phase status \
-      --output /path/to/new-attempt
+### Interpret phases and results
 
-A native capsule plan must be a single CPU-only execution with no external
-dependency mounts and a matching packaged Pascal profile. The spec may only
-override MAX_JOBS. Both native and external supervision receive the resolved
-plan digest; the external controller checks it before starting a payload.
-The caller owns the estate and chooses one supervision mode explicitly.
-The prepare phase uses the packaged builder's --prepare-only path, which
-publishes and validates patched source but does not build a wheel.
+`--describe` prints dispatch without executing or admitting a workload.
+`--plan-only` resolves an actual Insula admission plan without running it.
+A successful `prepare` performs Bazel loading and analysis; it is not a compiled
+wheel. A successful `build` requires validated wheel outputs and the selected
+owner's successful exit and cleanup evidence. Native execution and cache reuse
+are recorded separately. A missing or mismatched native result fails closed.
 
-All targets expose prepare, build and status; --describe prints only a
-non-executing dispatch description. --plan-only is an actual native admission
-plan for the capsule target, not a successful build. Backend-specific options
-are rejected where they do not apply. Status and qualification evidence retain
-their respective backend schemas. Existing --line/--profile, --source,
---pascal-triton and --pascal-capsule entrypoints remain for compatibility.
-The legacy Pascal Triton driver is not the preferred new build path.
+Canonical status uses a shared versioned result shape, bound to the requested
+target and attempt. Modern target status selects the latest report containing
+that exact CUDA line/profile instead of displaying an unrelated matrix run.
+Native receipts retain detailed backend information, logs and artifact
+inventories. Invocation paths, request IDs, timestamps and CPU job counts stay
+outside native action identity.
 
-This consolidates the operator interface and capsule admission, not the native
-action graphs: the Pascal Torch and Triton recipes are not yet Bazel actions.
-Native dependency pins, compiler flags and package action keys remain owned by
-their existing recipes. GPU/runtime qualification remains a separate operation.
+A CPU machine can compile the CUDA wheel using the packaged toolchain. Wheel
+production and CPU import checks do not establish GPU runtime qualification;
+CUDA/NCCL, numerical and multi-GPU acceptance remain separate operations on
+suitable hardware. Colab runtimes are temporary, so retain completed artifacts
+and evidence in the controlling Estate before terminating the owned runtime.
+
+The [CPU portability guide](build-portability.md) covers exact capsule transfer,
+optional pinned public transfer seeds, and evidence recovery from Colab.
+
+The historical `--line/--profile`, `--source`, `--pascal-triton` and
+`--pascal-capsule` entrypoints remain for compatibility. Historical source-build
+status/resume uses `foundry/build.sh --source`; canonical Pascal targets now
+select the shared Bazel builder.

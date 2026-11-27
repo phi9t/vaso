@@ -79,6 +79,23 @@ class BuildVariantsTest(unittest.TestCase):
             cache = estate / "vaso/cache/bazel/repository-cache/content_addressable/sha256" / asset.sha256 / "file"
             self.assertEqual(cache.read_bytes(), payload)
 
+    def test_requested_phase_survives_failed_preflight(self):
+        from build_report import target_result
+        for prepare in (False, True):
+            with self.subTest(prepare=prepare), tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+                estate=Path(directory)/"estate"
+                output=io.StringIO()
+                argv=["--estate-root",str(estate),"--color","never"] + (["--prepare-only"] if prepare else [])
+                with patch.object(b.Runner,"preflight",side_effect=RuntimeError("fixture preflight failure")), \
+                     redirect_stdout(output), redirect_stderr(output):
+                    self.assertEqual(b.main(argv),1)
+                pointer=json.loads((estate/"agents/build-variants/latest.json").read_text())
+                report=json.loads(Path(pointer["summary"]).read_text())
+                expected="prepare" if prepare else "build"
+                self.assertEqual(report["requested_phase"],expected)
+                result=target_result(report,"cu129/torch")
+                self.assertEqual((result["phase"],result["state"]),(expected,"failed"))
+
     def test_help_explains_cache_boundaries_and_progress_legend(self):
         stream = io.StringIO()
         with redirect_stdout(stream), self.assertRaises(SystemExit) as raised:

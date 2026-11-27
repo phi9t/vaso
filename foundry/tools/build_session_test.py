@@ -350,6 +350,98 @@ class BuildSessionTest(unittest.TestCase):
                     else:
                         self.assertNotIn("artifacts", finished[0])
 
+    def committed_repo(self, directory):
+        root = Path(directory) / "repo"
+        subprocess.run(["git", "init", "-q", str(root)], check=True)
+        path = root / "source"
+        path.write_text("before")
+        subprocess.run(["git", "add", "source"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=Build Test", "-c", "user.email=build@example.invalid",
+             "commit", "-qm", "fixture"],
+            cwd=root, check=True,
+        )
+        return root, path
+
+    def test_checkout_observation_does_not_read_clean_source_contents(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, _ = self.committed_repo(directory)
+            # Git owns its index checks. The build coordinator must not reopen
+            # every source merely to establish its own recursive digest.
+            with patch.object(Path, "open", side_effect=AssertionError("source content scan")):
+                observed = b.source_identity(root)
+                self.assertEqual(observed, b.source_identity(root))
+            self.assertTrue(observed.startswith("git-observation-v1:"))
+
+    def test_checkout_observation_detects_another_edit_to_a_dirty_file(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, path = self.committed_repo(directory)
+            path.write_text("dirty!")
+            before = b.source_identity(root)
+            original = path.stat()
+            path.write_text("other!")
+            # Same length and restored mtime still constitute an ordinary edit.
+            os.utime(path, ns=(original.st_atime_ns, original.st_mtime_ns))
+            self.assertNotEqual(before, b.source_identity(root))
+
+    def test_checkout_observation_detects_index_only_changes(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, path = self.committed_repo(directory)
+            before = b.source_identity(root)
+            original = path.stat()
+            blob = subprocess.check_output(
+                ["git", "hash-object", "-w", "--stdin"], cwd=root, input=b"staged",
+            ).decode().strip()
+            subprocess.run(
+                ["git", "update-index", "--cacheinfo", "100644," + blob + ",source"],
+                cwd=root, check=True,
+            )
+            self.assertEqual(path.stat(), original)
+            self.assertNotEqual(before, b.source_identity(root))
+
+    def test_checkout_observation_detects_a_new_commit(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, _ = self.committed_repo(directory)
+            before = b.source_identity(root)
+            subprocess.run(
+                ["git", "-c", "user.name=Build Test", "-c", "user.email=build@example.invalid",
+                 "commit", "--allow-empty", "-qm", "next provenance"],
+                cwd=root, check=True,
+            )
+            self.assertNotEqual(before, b.source_identity(root))
+
+    def test_checkout_observation_rejects_untracked_nested_repository(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, _ = self.committed_repo(directory)
+            self.committed_repo(root / "nested")
+            with self.assertRaisesRegex(RuntimeError, "untracked nested repository"):
+                b.source_identity(root)
+
+    def test_checkout_observation_rejects_changed_submodule_worktree(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root, _ = self.committed_repo(directory)
+            nested, source = self.committed_repo(root / "nested")
+            subprocess.run(
+                ["git", "add", "nested/repo"], cwd=root, check=True, capture_output=True,
+            )
+            subprocess.run(
+                ["git", "-c", "user.name=Build Test", "-c", "user.email=build@example.invalid",
+                 "commit", "-qm", "gitlink"],
+                cwd=root, check=True,
+            )
+            b.source_identity(root)
+            source.write_text("dirty child")
+            with self.assertRaisesRegex(RuntimeError, "dirty submodule"):
+                b.source_identity(root)
+            subprocess.run(["git", "add", "source"], cwd=nested, check=True)
+            subprocess.run(
+                ["git", "-c", "user.name=Build Test", "-c", "user.email=build@example.invalid",
+                 "commit", "-qm", "next child"],
+                cwd=nested, check=True,
+            )
+            with self.assertRaisesRegex(RuntimeError, "dirty submodule"):
+                b.source_identity(root)
+
     def test_source_edits_are_detected(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
             root = Path(directory) / "repo"
