@@ -13,6 +13,10 @@ been recovered. High-memory CPU allocation is useful for native compiler and
 linker memory. Requesting it does not authorize purchasing a subscription.
 Do not copy OAuth credentials into the VM or the capsule.
 
+The [2026-11-27 qualification report](build-qualification-2026-11-27.md)
+records the source-build, local-cache and exact-wheel runtime results, including
+the final CMake selector validation boundary.
+
 ## Admit against the job's effective resources
 
 Choose concurrency from the job's cgroup and its visible ancestors, together

@@ -1,5 +1,8 @@
 # Pascal native Bazel builds
 
+See the [2026-11-27 portability qualification](../../../docs/build-qualification-2026-11-27.md)
+for the measured build/cache matrix and exact-wheel CPU/GPU checks.
+
 This additive graph builds complete PyTorch 2.15 and Triton 3.8 source wheels
 inside the qualified CUDA 12.6 / SM61 / CPython 3.12 Insula capsule. Both
 actions use the unchanged Foundry plan executor, uv as the build frontend,
@@ -27,6 +30,13 @@ unchanged shared executor, creates both native plans, and installs
 /opt/vaso/pascal/bin/build-native. It rejects a published capsule. Files
 replace staged paths atomically so a hardlinked parent capsule is preserved.
 The caller then publishes the stage using the normal Insula bundle workflow.
+
+The Torch plan explicitly sets `CMAKE_EXECUTABLE=/opt/vaso/cmake/bin/cmake`
+for scikit-build-core. Its normal discovery prefers the Python-bundled CMake
+and can fall back to another version if a probe times out. The explicit path
+selects the declared standalone CMake provider and fails if that candidate
+cannot be used. This selector is part of the native plan and action identity;
+job counts remain an admission choice outside that identity.
 
 No compilation requires a GPU. The capsule supplies every tool and dependency;
 the build invocation admits no extra dependency mounts. Insula keeps its

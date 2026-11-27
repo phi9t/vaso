@@ -83,6 +83,10 @@ def build_plan(package: str, torch_profile: dict, triton_profile: dict, identity
     if package == "torch":
         env.update(torch_profile["environment"])
         env.update({
+            # scikit-build-core otherwise probes the Python cmake module before
+            # PATH and may choose a different bundled version after a timeout.
+            # An explicit executable is its sole candidate: failure stays closed.
+            "CMAKE_EXECUTABLE": "/opt/vaso/cmake/bin/cmake",
             "MAX_JOBS": "{jobs}", "CMAKE_BUILD_PARALLEL_LEVEL": "{jobs}",
             "TORCH_CUDA_ARCH_LIST": torch_profile["toolchain"]["cuda_arch_list"],
             "PYTORCH_BUILD_VERSION": torch_profile["torch"]["version"],

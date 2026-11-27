@@ -61,6 +61,8 @@ class PascalNativeTest(unittest.TestCase):
         for name, value in profile["environment"].items():
             self.assertEqual(plan["toolchain"]["env"][name], value)
         self.assertEqual(plan["sources"][0]["sha256"], profile["torch"]["archive_sha256"])
+        self.assertEqual(plan["toolchain"]["env"]["CMAKE_EXECUTABLE"],
+                         PROVIDERS["cmake"]["prefix"] + "/bin/cmake")
 
     def test_bad_capsule_identity_rejected(self):
         for bad in ("", "a"*63, "G"*64, "../x"):
