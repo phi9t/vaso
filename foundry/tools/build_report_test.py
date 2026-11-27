@@ -117,6 +117,43 @@ class BuildReportTest(unittest.TestCase):
             for field, path in b.report_paths(output).items():
                 self.assertEqual(report[field], path)
 
+    def test_target_history_uses_start_time_not_modified_old_report(self):
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as directory:
+            root=Path(directory)
+            variant={"line":"cu129","profile":"torch","status":"built","artifacts":[]}
+            old=root/"old/summary.json"
+            new=root/"new/summary.json"
+            other=root/"other/summary.json"
+            b.atomic_json(old,{"status":"built","started_at":"2026-01-01","variants":[variant]})
+            b.atomic_json(new,{"status":"failed","started_at":"2026-01-02","variants":[{**variant,"status":"failed"}]})
+            b.atomic_json(other,{"status":"built","started_at":"2026-01-03","variants":[{**variant,"line":"cu130"}]})
+            os.utime(old,(9999999999,9999999999))
+            for pointer in (None,{"summary":str(other)}):
+                if pointer: b.atomic_json(root/"latest.json",pointer)
+                report,path=b.latest_target_report(root,"cu129","torch")
+                self.assertEqual(path,new)
+                self.assertEqual(b.target_result(report,"cu129/torch")["state"],"failed")
+
+    def test_prepared_matrix_status_remains_prepared(self):
+        report={"status":"prepared","summary_path":"/summary.json",
+                "variants":[{"line":"cu129","profile":"torch","status":"skipped","artifacts":[]}]}
+        result=b.target_result(report,"cu129/torch")
+        self.assertEqual((result["phase"],result["state"]),("prepare","prepared"))
+        self.assertEqual(result["artifacts"],[])
+        self.assertIsNone(result["lifecycle"]["cleanup_complete"])
+        with self.assertRaisesRegex(ValueError,"selected target"):
+            b.target_result(report,"cu130/torch")
+
+    def test_failed_request_uses_explicit_phase_and_does_not_guess_legacy_intent(self):
+        report={"status":"failed","summary_path":"/summary.json",
+                "variants":[{"line":"cu129","profile":"torch","status":"pending","artifacts":[]}]}
+        self.assertEqual(b.target_result(report,"cu129/torch")["phase"],"unknown")
+        for phase in ("prepare","build"):
+            result=b.target_result({**report,"requested_phase":phase},"cu129/torch")
+            self.assertEqual((result["phase"],result["state"]),(phase,"failed"))
+        with self.assertRaisesRegex(ValueError,"requested_phase"):
+            b.target_result({**report,"requested_phase":"invented"},"cu129/torch")
+
 
 if __name__ == "__main__":
     unittest.main()

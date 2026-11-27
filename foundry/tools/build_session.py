@@ -16,11 +16,11 @@ import json
 import os
 from pathlib import Path
 import signal
+from stat import S_ISDIR
 import subprocess
 import time
 import uuid
 
-from build_inputs import digest
 from build_progress import (
     Console,
     report_text,
@@ -46,23 +46,52 @@ class StageFailure(RuntimeError):
 
 
 def source_identity(repo_root: Path) -> str:
-    """Detect source edits between stages, including uncommitted runner changes."""
-    names = subprocess.check_output(
-        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+    """Observe normal checkout edits without digesting the source tree.
+
+    Git supplies the committed provenance and changed paths. Only those paths
+    receive a metadata observation, including already dirty and untracked files.
+    This is a fixed-checkout guard, not byte-level integrity or a native cache
+    key. The owner must still keep its checkout fixed for the entire build.
+    """
+    head = subprocess.run(
+        ["git", "--no-optional-locks", "rev-parse", "--verify", "--quiet", "HEAD"],
+        cwd=repo_root, capture_output=True, check=False,
+    )
+    if head.returncode not in (0, 1):
+        raise RuntimeError("cannot observe build checkout HEAD: " + head.stderr.decode(errors="replace"))
+    status = subprocess.check_output(
+        ["git", "--no-optional-locks", "status", "--porcelain=v2", "-z",
+         "--untracked-files=all", "--no-renames", "--ignore-submodules=none"],
         cwd=repo_root,
-    ).split(b"\0")
-    result = hashlib.sha256()
-    for raw in sorted(set(names) - {b""}):
-        path = repo_root / os.fsdecode(raw)
-        result.update(raw + b"\0")
-        if path.is_symlink():
-            result.update(b"link\0" + os.fsencode(os.readlink(path)))
-        elif path.is_file():
-            result.update(str(path.stat().st_mode & 0o777).encode() + b"\0")
-            result.update(bytes.fromhex(digest(path)))
+    )
+    observation = hashlib.sha256(head.stdout + b"\0" + status)
+    for record in status.split(b"\0"):
+        if not record:
+            continue
+        if record.startswith(b"1 "):
+            fields = record.split(b" ", 8)
+            # An already dirty submodule can change without changing its outer
+            # status record. Do not imply that a parent-only guard covers it.
+            if fields[2].startswith(b"S") and fields[2] != b"S...":
+                raise RuntimeError("build checkout has a dirty submodule; record its commit in the parent and clean its worktree before building")
+            raw = fields[8]
+        elif record.startswith(b"u "):
+            raw = record.split(b" ", 10)[10]
+        elif record.startswith(b"? "):
+            raw = record[2:]
         else:
-            result.update(b"missing")
-    return result.hexdigest()
+            raise RuntimeError("unsupported Git checkout status record")
+        path = repo_root / os.fsdecode(raw)
+        try:
+            stat = path.lstat()
+            if record.startswith(b"? ") and S_ISDIR(stat.st_mode):
+                raise RuntimeError("build checkout has an untracked nested repository; commit or exclude it before building")
+            metadata = (stat.st_mode, stat.st_size, stat.st_mtime_ns,
+                        stat.st_ctime_ns, stat.st_ino)
+        except FileNotFoundError:
+            metadata = None
+        observation.update(raw + b"\0" + repr(metadata).encode() + b"\0")
+    return "git-observation-v1:" + observation.hexdigest()
 
 
 def planned_variants(
@@ -206,6 +235,7 @@ class BuildSession:
             "lines": self.lines,
             "profiles": self.profiles,
             "source_identity": self.identity,
+            "source_observation": "Git provenance and changed-path metadata; not a content digest",
             "estate_root": str(self.estate),
             **report_paths(self.output),
             "console_mode": self.console.mode,

@@ -106,6 +106,7 @@ def main():
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--timeout", type=int, default=7200)
     p.add_argument("--admission-timeout", type=int, default=7200)
+    p.add_argument("--expected-plan-sha256", help="Require the caller-reviewed plan identity")
     p.add_argument("--gpu", action="store_true")
     p.add_argument("--lease-cli", type=Path)
     p.add_argument("--lease-estate", type=Path)
@@ -114,6 +115,8 @@ def main():
     command = a.command[1:] if a.command[:1] == ["--"] else a.command
     if not command:
         p.error("a capsule command is required")
+    if a.expected_plan_sha256 is not None and not re.fullmatch(r"[0-9a-f]{64}", a.expected_plan_sha256):
+        p.error("expected plan SHA256 must be 64 lowercase hex characters")
     if a.timeout <= 0 or a.admission_timeout <= 0:
         p.error("timeouts must be positive")
     if a.gpu and (not a.lease_cli or not a.lease_estate):
@@ -158,6 +161,9 @@ def run_request(a, command, signals):
         planned.check_returncode()
         signals.check()
         plan = json.loads(planned.stdout)
+        expected = getattr(a, "expected_plan_sha256", None)
+        if expected is not None and plan["plan_sha256"] != expected:
+            raise RuntimeError("Resolved Insula plan differs from caller-reviewed plan")
         main_plan = plan["main"]
         if main_plan["argv"] != command or main_plan["extra_mounts"]:
             raise RuntimeError("Expected exact command and no external dependency mounts")
