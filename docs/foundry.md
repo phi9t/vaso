@@ -347,3 +347,64 @@ backing directories on separate disk volumes. Their sandbox paths remain
 placement does not change native identity. Keep the estate's sandbox mount
 points as directories, since an absolute host symlink cannot resolve inside
 the rootfs.
+
+## Unified explicit build targets
+
+Use the common target contract to select the package family, CUDA line,
+architecture and Python ABI before choosing a build phase. The host-side
+dispatcher uses uv with an available local Python runtime; it does not install
+dependencies or change a native recipe.
+
+    foundry/build.sh --list-targets
+    foundry/build.sh --target cu129/torch --phase prepare --estate-root /path/to/estate
+    foundry/build.sh --target cu130/jax --phase build --estate-root /path/to/estate
+    foundry/build.sh --target cu126-sm61/torch --phase build --site /path/to/site.json
+    foundry/build.sh --target cu126-sm61/torch --phase status --site /path/to/site.json
+
+The modern targets derive their membership from the existing Bazel matrix.
+The Pascal Torch target delegates to the pinned native source driver; select an
+explicit compatible source profile with --source-profile when inspecting or
+resuming a distinct historical build. That driver still requires --resume for
+a previously prepared build. No historical work directory is migrated.
+
+The preferred Pascal Triton target runs the packaged builder from an immutable
+standalone Insula capsule:
+
+    foundry/build.sh --target cu126-sm61/triton --phase prepare \
+      --insula /path/to/insula --spec /path/to/cpu.toml --plan-only
+    foundry/build.sh --target cu126-sm61/triton --phase build \
+      --insula /path/to/insula --spec /path/to/cpu.toml \
+      --state /path/to/owned-state --run-id unique-build
+    foundry/build.sh --target cu126-sm61/triton --phase status \
+      --insula /path/to/insula --state /path/to/owned-state --run-id unique-build
+
+For a host without delegated native supervision, an explicitly selected finite
+external payload owner is supported; it is never an automatic fallback:
+
+    foundry/build.sh --target cu126-sm61/triton --phase prepare \
+      --insula /path/to/insula --spec /path/to/cpu.toml \
+      --supervisor /path/to/payload_owner.py --output /path/to/new-attempt \
+      --max-seconds 120
+    foundry/build.sh --target cu126-sm61/triton --phase status \
+      --output /path/to/new-attempt
+
+A native capsule plan must be a single CPU-only execution with no external
+dependency mounts and a matching packaged Pascal profile. The spec may only
+override MAX_JOBS. Both native and external supervision receive the resolved
+plan digest; the external controller checks it before starting a payload.
+The caller owns the estate and chooses one supervision mode explicitly.
+The prepare phase uses the packaged builder's --prepare-only path, which
+publishes and validates patched source but does not build a wheel.
+
+All targets expose prepare, build and status; --describe prints only a
+non-executing dispatch description. --plan-only is an actual native admission
+plan for the capsule target, not a successful build. Backend-specific options
+are rejected where they do not apply. Status and qualification evidence retain
+their respective backend schemas. Existing --line/--profile, --source,
+--pascal-triton and --pascal-capsule entrypoints remain for compatibility.
+The legacy Pascal Triton driver is not the preferred new build path.
+
+This consolidates the operator interface and capsule admission, not the native
+action graphs: the Pascal Torch and Triton recipes are not yet Bazel actions.
+Native dependency pins, compiler flags and package action keys remain owned by
+their existing recipes. GPU/runtime qualification remains a separate operation.

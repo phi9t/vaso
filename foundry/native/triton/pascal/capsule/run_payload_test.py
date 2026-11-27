@@ -26,7 +26,7 @@ class RunPayloadTest(unittest.TestCase):
 import json,os,sys
 argv=sys.argv[sys.argv.index('--')+1:]
 devices=['/dev/nvidia1','/dev/nvidiactl'] if os.environ.get('TEST_GPU') else []
-print(json.dumps({'plan_sha256':'fixture','main':{'argv':argv,'devices':devices,'extra_mounts':[]}}))
+print(json.dumps({'plan_sha256':'a'*64,'main':{'argv':argv,'devices':devices,'extra_mounts':[]}}))
 """)
         self.program("nvidia-smi", "pass\n")
         self.lease = self.program("lease", r"""
@@ -82,6 +82,23 @@ raise SystemExit(rc)
         if gpu:
             command += ["--gpu", "--lease-cli", str(self.lease), "--lease-estate", str(self.root)]
         return command + ["--", "/fixture/payload"]
+
+    def test_caller_reviewed_plan_pin(self):
+        for name, expected, success in (("matches", "a"*64, True), ("changed", "b"*64, False)):
+            with self.subTest(name=name):
+                output = self.root / name
+                argv = self.command(output)
+                boundary = argv.index("--")
+                argv[boundary:boundary] = ["--expected-plan-sha256", expected]
+                result = subprocess.run(argv, env=self.env, text=True, capture_output=True, timeout=15)
+                status = json.loads((output / "status.json").read_text())
+                if success:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertTrue(status["cleanup_complete"])
+                else:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("differs from caller-reviewed plan", status["error"])
+                    self.assertFalse((output / "owner").exists())
 
     def test_admission_probe_timeout_retries_before_leasing(self):
         marker = self.root / "probe-started"

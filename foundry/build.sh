@@ -2,6 +2,12 @@
 # Prepare pinned inputs, then build selected wheel variants inside insula.
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Canonical profile selection; legacy entrypoints remain compatible.
+case "${1:-}" in
+  --target|--target=*|--list-targets)
+    exec uv run --offline --no-project --no-python-downloads --no-config -- python -B "$DIR/tools/build_contract.py" "$@"
+    ;;
+esac
 if [[ "${1:-}" == "--inkling-packed-inference" ]]; then
   shift
   exec python3 -B "$DIR/native/triton/pascal/capsule/run_packed_inference.py" "$@"

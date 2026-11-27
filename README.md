@@ -20,6 +20,9 @@ supply GPU access. Normal execution needs no Docker daemon.
 The three primary operations are `insula/rootfs/prepare.sh restore|build`,
 `insula/run.sh -- COMMAND`, and `foundry/build.sh --line cu129 --profile torch`.
 Foundry also provides `--prepare-only` and durable `--status` inspection.
+For an explicit build target spanning the modern and Pascal pathways, use
+`foundry/build.sh --list-targets` and `foundry/build.sh --target TARGET --phase build`.
+See [unified build targets](docs/foundry.md#unified-explicit-build-targets).
 See the [command migration table](docs/command-migration.md) for specialist and
 retired routes.
 
